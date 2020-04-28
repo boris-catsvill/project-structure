@@ -1,0 +1,88 @@
+.column-chart__chart {
+  width: 100%;
+  height: calc(var(--chart-height) * 1px);
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.column-chart__chart div {
+  height: calc(var(--value) * 1px);
+  background-color: var(--chart-column-color);
+  min-width: 1px;
+  flex-grow: 1;
+  margin: 0 0 0 1px;
+  cursor: pointer;
+}
+
+.column-chart__chart div:first-child {
+  margin: 0;
+}
+
+.column-chart__chart div.is-hovered {
+  opacity: 1;
+}
+
+.column-chart__chart.has-hovered div:not(.is-hovered) {
+  opacity: 0.5;
+}
+
+.column-chart__container {
+  max-width: 100%;
+  position: relative;
+}
+
+.column-chart {
+  padding: 16px 26px 24px;
+  background: var(--white);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  border-radius: 4px;
+  border-left: 2px solid var(--chart-column-color);
+  position: relative;
+}
+
+.column-chart__title {
+  font-size: 16px;
+  line-height: 20px;
+  color: var(--grey);
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.column-chart__link {
+  color: var(--blue);
+  text-decoration: none;
+}
+
+.column-chart__header {
+  font-weight: 600;
+  font-size: 28px;
+  line-height: 35px;
+  color: var(--dark-blue);
+  margin-bottom: 28px;
+  position: relative;
+}
+
+.column-chart_loading .column-chart__header,
+.column-chart_loading .column-chart__chart {
+  display: none;
+}
+
+.column-chart_loading .column-chart__container {
+  height: 113px;
+}
+
+.column-chart_loading .column-chart__container:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 113px;
+  background: url("charts-skeleton.svg") center no-repeat;
+  background-size: cover;
+  display: block;
+}

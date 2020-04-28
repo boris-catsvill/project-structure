@@ -1,0 +1,22 @@
+.dashboard__charts {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-gap: 24px;
+  --chart-height: 50;
+}
+
+.dashboard__chart_orders {
+  --chart-column-color: var(--yellow);
+}
+
+.dashboard__chart_sales {
+  --chart-column-color: var(--green);
+}
+
+.dashboard__chart_customers {
+  --chart-column-color: var(--purple);
+}
+
+.dashboard .sortable-table {
+  --cols: 6;
+}
