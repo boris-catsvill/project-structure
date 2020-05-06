@@ -15,7 +15,7 @@ export default class SortableTable {
     const { bottom } = this.element.getBoundingClientRect();
     const { id, order } = this.sorted;
 
-    if (bottom < document.documentElement.clientHeight && !this.loading) {
+    if (bottom < document.documentElement.clientHeight && !this.loading && !this.sortLocally) {
       this.start = this.end;
       this.end = this.start + this.step;
 
@@ -79,8 +79,7 @@ export default class SortableTable {
     this.start = start;
     this.end = end;
 
-    // NOTE: needed for correct work in src/pages/dashboard/index.js:93
-    // this.render();
+    this.render();
   }
 
   async render() {
@@ -109,7 +108,7 @@ export default class SortableTable {
 
     this.element.classList.add('sortable-table_loading');
 
-    const data = await fetchJson(this.url.toString());
+    const data = await fetchJson(this.url);
 
     this.element.classList.remove('sortable-table_loading');
 

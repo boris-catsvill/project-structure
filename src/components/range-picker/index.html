@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+  body {
+    background-color: var(--grey-light);
+    margin: 0;
+    padding: 50px 0;
+  }
+  .container {
+    display: flex;
+    justify-content: flex-end;
+    height: 100%;
+    max-width: 960px;
+    margin: 0 auto;
+  }
+</style>
+
+<link rel="stylesheet" href="style.css">
+
+<div id="holder" class="container"></div>
+
+<script type="module">
+  import RangePicker from './index.js';
+
+  const rangePicker = new RangePicker({
+    from: new Date(2019, 9, 2),
+    to: new Date(2019, 10, 5)
+  });
+
+  holder.append(rangePicker.element);
+
+  rangePicker.element.addEventListener('date-select', event => {
+    console.error(event);
+  });
+</script>

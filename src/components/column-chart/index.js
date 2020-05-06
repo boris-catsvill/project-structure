@@ -14,8 +14,7 @@ export default class ColumnChart {
     this.link = link;
     this.value = value;
 
-    // NOTE: needed for correct work in src/pages/dashboard/index.js:93
-    // this.render();
+    this.render();
   }
 
   getColumnBody(data) {

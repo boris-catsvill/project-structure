@@ -10,7 +10,7 @@
     "sourceType": "module"
   },
   "rules": {
-    "no-debugger": "warn",
+    "no-debugger": "error",
     "no-dupe-keys": "warn",
     "no-dupe-args": "warn",
     "no-duplicate-case": "warn",
