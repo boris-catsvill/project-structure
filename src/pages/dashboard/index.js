@@ -142,7 +142,7 @@ export default class Page {
       const { from, to } = event.detail;
       this.updateChartsComponents(from, to);
       this.updateTableComponent(from, to);
-    })
+    });
   }
 
   destroy () {
