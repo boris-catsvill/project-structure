@@ -4,6 +4,7 @@ const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const jsLoaders = require('./loaders/js-loaders');
 const cssLoaders = require('./loaders/css-loaders');
@@ -58,6 +59,15 @@ module.exports = {
       // both options are optional
       filename: '[name].css',
       chunkFilename: '[id].css',
-    })
+    }),
+    new CopyWebpackPlugin([
+      {
+        from: path.join(__dirname, '../src/assets')
+      },
+      {
+        from: path.join(__dirname, '../src/components/product-form/*.svg'),
+        flatten: true
+      }
+    ])
   ]
 };
