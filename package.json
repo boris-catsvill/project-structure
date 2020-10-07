@@ -2,7 +2,7 @@
   "name": "project-structure",
   "version": "1.0.0",
   "description": "",
-  "main": "babel.config.js",
+  "main": "index.js",
   "scripts": {
     "start": "npm run build && npm run static-server",
     "develop": "cross-env NODE_ENV=development webpack-dev-server --config ./webpack/webpack.dev.js",
