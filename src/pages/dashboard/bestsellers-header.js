@@ -21,7 +21,8 @@ const header = [
     id: 'price',
     title: 'Price',
     sortable: true,
-    sortType: 'number'
+    sortType: 'number',
+    template: data => '$'+ data
   },
   {
     id: 'status',

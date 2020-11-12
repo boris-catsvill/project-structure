@@ -20,13 +20,14 @@ const header = [
     title: 'Дата',
     sortable: true,
     sortType: 'date',
-    template: data => `${new Date(data).toLocaleDateString()}`
+    template: data => `${new Date(data).toLocaleDateString('ru', {month: 'short', day: '2-digit', year: 'numeric'})}`
   },
   {
     id: 'totalCost',
     title: 'Стоимость',
     sortable: true,
-    sortType: 'formattedNumber'
+    sortType: 'formattedNumber',
+    template: data => '$' + data
   },
   {
     id: 'delivery',
@@ -73,22 +74,21 @@ export default class Page {
     }, {})
   }
 
-
   async initComponents() {
     this.components.rangePicker = new RangePicker({from: this.from, to: this.to})
     this.components.salesList = new SortableTable(header, {
       url: `api/rest/orders?createdAt_gte=${this.from.toISOString()}&createdAt_lte=${this.to.toISOString()}&_sort=createdAt&_order=desc&_start=0&_end=30`,
       sortByDefault: header[2].id
     })
-
-    const salesData = await fetchJson(`api/rest/orders?createdAt_gte=${this.from.toISOString()}&createdAt_lte=${this.to.toISOString()}&_sort=createdAt&_order=desc&_start=0&_end=30`)
-    this.components.salesList.updateBody(salesData)
   }
 
   initEventListeners() {
     this.subElements.rangePicker.addEventListener('date-select', async (e) => {
-      const { from, to} = e.detail
-      const salesData = await fetchJson(`api/rest/orders?createdAt_gte=${from.toISOString()}&createdAt_lte=${to.toISOString()}&_sort=createdAt&_order=desc&_start=0&_end=30`)
+      const {from, to} = e.detail
+      const salesData = await this.components.salesList.fetchData({
+        dateFrom: from.toISOString(),
+        dateTo: to.toISOString()
+      })
       this.components.salesList.updateBody(salesData)
     })
   }
@@ -100,19 +100,10 @@ export default class Page {
     })
   }
 
-
-  // async fetchData() {
-  //   this.element.classList.add('sortable-table_loading')
-  //   const sales = await fetchJson(`${process.env.BACKEND_URL}/api/rest/orders?createdAt_gte=${from.toISOString()}&createdAt_lte=${to.toISOString()}&_sort=createdAt&_order=desc&_start=0&_end=30`)
-  //   this.element.classList.remove('sortable-table_loading')
-  //   this.components.sortableTable.update(sales)
-  // }
-
   destroy() {
     for (const component of Object.values(this.components)) {
       component.destroy()
     }
   }
-
 }
 

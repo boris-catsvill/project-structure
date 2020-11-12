@@ -1,73 +1,75 @@
 import SortableList from "../../components/sortable-list"
+import fetchJson from "../../utils/fetch-json";
 
 export default class Page {
   element = null
-  subElements = {}
   components = {}
-
-  constructor() {
-  }
+  categories = []
 
   async render() {
-    this.element = document.createElement('div')
-    this.element.innerHTML = this.template
-    this.subElements = this.getSubElements(this.element)
-    await this.initComponents()
-    this.initEventListeners()
+    this.categories = await this.fetchCategories()
+
+    const element = document.createElement('div')
+    element.innerHTML = this.template
+    this.element = element.firstElementChild
+
     this.renderComponents()
     return this.element
   }
 
   get template() {
     return `
-    <div class="content__top-panel">
-        <h1 class="page-title">Продажи</h1>
-        <div data-element="rangePicker"></div>
-    </div>
-    <div data-element="salesList"></div>`
+    <div class="categories">
+      <div class="content__top-panel">
+          <h1 class="page-title">Категории товаров</h1>
+      </div>
+      <div data-element="categoriesContainer">
+          ${this.categories.map(category => this.getCategory(category)).join('')}
+      </div>
+    </div>`
   }
 
-  getSubElements(element) {
-    const elements = element.querySelectorAll('[data-element]')
-    return [...elements].reduce((accum, item) => {
-      accum[item.dataset.element] = item
-      return accum
-    }, {})
+  getCategory({id, title}) {
+    return `
+      <div class="category" data-id="${id}">
+        <header class="category__header">${title}</header>
+        <div class="category__body">
+          <div class="subcategory-list"></div>
+        </div>
+      </div>`
   }
 
-
-  async initComponents() {
-    this.components.rangePicker = new RangePicker({from: this.from, to: this.to})
-    this.components.salesList = new SortableTable(header, {
-      url: `api/rest/orders?createdAt_gte=${this.from.toISOString()}&createdAt_lte=${this.to.toISOString()}&_sort=createdAt&_order=desc&_start=0&_end=30`,
-      sortByDefault: header[2].id
-    })
-
-    const salesData = await fetchJson(`api/rest/orders?createdAt_gte=${this.from.toISOString()}&createdAt_lte=${this.to.toISOString()}&_sort=createdAt&_order=desc&_start=0&_end=30`)
-    this.components.salesList.updateBody(salesData)
-  }
-
-  initEventListeners() {
-    this.subElements.rangePicker.addEventListener('date-select', async (e) => {
-      const { from, to} = e.detail
-      const salesData = await fetchJson(`api/rest/orders?createdAt_gte=${from.toISOString()}&createdAt_lte=${to.toISOString()}&_sort=createdAt&_order=desc&_start=0&_end=30`)
-      this.components.salesList.updateBody(salesData)
-    })
+  getItem({id, title, count}) {
+    let element = document.createElement('div')
+    element.innerHTML = `
+      <li class="categories__sortable-list-item" data-grab-handle="" data-id="${id}">
+        <strong>${title}</strong>
+        <span><b>${count}</b> products</span>
+      </li>`
+    return element.firstElementChild
   }
 
   renderComponents() {
-    Object.keys(this.subElements).forEach(element => {
-      const root = this.subElements[element]
-      root.append(this.components[element].element)
+    const allLists = this.element.querySelectorAll('.subcategory-list')
+    allLists.forEach((root, index) => {
+      const listElements = this.categories[index].subcategories.map(item => this.getItem(item))
+      const sortableList = new SortableList({items: listElements})
+
+      root.append(sortableList.element)
+      this.components[index] = sortableList
     })
   }
 
+  fetchCategories = () => {
+    const categoriesURL = new URL('/api/rest/categories', process.env.BACKEND_URL)
+    categoriesURL.searchParams.set('_sort', 'weight')
+    categoriesURL.searchParams.set('_refs', 'subcategory')
+    return fetchJson(categoriesURL)
+  }
 
   destroy() {
     for (const component of Object.values(this.components)) {
       component.destroy()
     }
   }
-
 }
-
