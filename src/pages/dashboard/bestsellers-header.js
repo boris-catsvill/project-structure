@@ -3,13 +3,7 @@ const header = [
     id: 'images',
     title: 'Image',
     sortable: false,
-    template: data => {
-      return `
-          <div class="sortable-table__cell">
-            <img class="sortable-table-image" alt="Image" src="${data[0].url}">
-          </div>
-        `;
-    }
+    template: data => `<img class="sortable-table-image" alt="Image" src="${(data) ? data[0]?.url : ''}">`
   },
   {
     id: 'title',
@@ -27,18 +21,15 @@ const header = [
     id: 'price',
     title: 'Price',
     sortable: true,
-    sortType: 'number'
+    sortType: 'number',
+    template: data => '$'+ data
   },
   {
     id: 'status',
     title: 'Status',
     sortable: true,
     sortType: 'number',
-    template: data => {
-      return `<div class="sortable-table__cell">
-          ${data > 0 ? 'Active' : 'Inactive'}
-        </div>`;
-    }
+    template: data => `${data > 0 ? 'Active' : 'Inactive'}`
   },
 ];
 

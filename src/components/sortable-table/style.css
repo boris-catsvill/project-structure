@@ -1,6 +1,6 @@
 .sortable-table {
   background-color: var(--white);
-  max-width: 100%;
+  width: 100%;
   border-radius: 4px;
   margin-bottom: 40px;
   overflow: hidden;
