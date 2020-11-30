@@ -6,11 +6,11 @@ export default class SortableTable {
   element = null
   subElements = {}
   start = 0
-  step = 20
+  step = 30
   loading = false
   isFullyLoaded = false
 
-  constructor(header, {data = [], sortByDefault = header[1].id, url = '', isSortLocally = false} = {}) {
+  constructor({header = [], data = [], sortByDefault = header[1]?.id, url = '', isSortLocally = false} = {}) {
     this.url = new URL(url, BACKEND_URL)
     this.data = [...data]
     this.header = header
@@ -23,7 +23,7 @@ export default class SortableTable {
 
   resetDefaults = () => {
     this.start = 0
-    this.step = 20
+    this.step = 30
     this.isFullyLoaded = false
   }
 
@@ -32,11 +32,14 @@ export default class SortableTable {
                     sortOrder = this.lastSortOrder,
                     dateFrom = '',
                     dateTo = '',
+                    start = 0,
+                    end = this.step,
                     title_like= null,
                     status = null
                   } = {}) {
-    this.url.searchParams.set('_start', String(this.start))
-    this.url.searchParams.set('_end', String(this.start + this.step))
+    if (start === 0) this.isFullyLoaded = false
+    this.url.searchParams.set('_start', start)
+    this.url.searchParams.set('_end', end)
     this.url.searchParams.set('_sort', sortField)
     this.url.searchParams.set('_order', sortOrder)
     if (dateFrom) {
@@ -46,11 +49,10 @@ export default class SortableTable {
       this.url.searchParams.set('createdAt_lte', dateTo)
     }
     if (title_like !== null) {
-      this.url.searchParams.set('title_like', title_like.toUpperCase())
+      this.url.searchParams.set('title_like', title_like)
     }
     if (status !== null) {
       this.url.searchParams.set('status', status)
-      console.log(this.url)
     }
     this.element.classList.add('sortable-table_loading')
     const response = await fetchJson(this.url)
@@ -151,7 +153,7 @@ export default class SortableTable {
       && !this.isFullyLoaded) {
       this.start += this.step
       this.isLoading = true
-      this.addToBody(await this.fetchData())
+      this.addToBody(await this.fetchData({ start: this.start, end: this.start + this.step}))
       this.isLoading = false
     }
   }
@@ -173,20 +175,18 @@ export default class SortableTable {
   }
 
   async sortOnServer() {
-    console.log('onServer')
     this.resetDefaults()
     this.updateBody(await this.fetchData())
   }
 
-  sortOnClient(fieldValue, orderValue) {
-    console.log('locally')
-    const headerItem = this.header.find(item => item.id === fieldValue)
+  sortOnClient(column, order) {
+    const headerItem = this.header.find(item => item.id === column)
     const data = [...this.data]
-    const sortOrder = orderValue === 'desc' ? -1 : 1
+    const sortOrder = order === 'desc' ? -1 : 1
     if (headerItem.sortType === 'number') {
-      data.sort((a, b) => sortOrder * (a[fieldValue] - b[fieldValue]))
+      data.sort((a, b) => sortOrder * (a[column] - b[column]))
     } else if (headerItem.sortType === 'string') {
-      data.sort((a, b) => sortOrder * (a[fieldValue].localeCompare(b[fieldValue], ['ru', 'en'])))
+      data.sort((a, b) => sortOrder * (a[column].localeCompare(b[column], ['ru', 'en'])))
     }
     this.updateBody(data)
   }

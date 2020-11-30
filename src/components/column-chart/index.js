@@ -49,8 +49,13 @@ export default class ColumnChart {
   update(newData = []) {
     const parentElement = this.element.parentElement
     this.data = newData
+    this.value = this.data.reduce((accum, item) => accum + item)
     this.element.remove()
     this.render()
     parentElement.append(this.element)
+  }
+
+  updateHeader() {
+
   }
 }

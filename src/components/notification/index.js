@@ -3,14 +3,15 @@ let lastNotification = null
 export default class NotificationMessage {
   element = null
 
-  constructor(message = '', {duration = 0, type = 'success'} = {}) {
+  constructor({message = '', duration = 3000, type = 'success'} = {}) {
     this.message = message
     this.duration = duration
     this.type = type
     this.render()
   }
+
   removeLastNotification() {
-    if(lastNotification) {
+    if (lastNotification) {
       lastNotification.destroy()
     }
    }

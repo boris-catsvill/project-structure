@@ -1,9 +1,9 @@
-import RangePicker from '../../components/range-picker/index.js';
-import SortableTable from '../../components/sortable-table/index.js';
-import ColumnChart from '../../components/column-chart/index.js';
-import header from './bestsellers-header.js';
+import RangePicker from '../../components/range-picker/index.js'
+import SortableTable from '../../components/sortable-table/index.js'
+import ColumnChart from '../../components/column-chart/index.js'
+import header from './bestsellers-header.js'
 
-import fetchJson from '../../utils/fetch-json.js';
+import fetchJson from '../../utils/fetch-json.js'
 
 export default class Page {
   element;
@@ -30,13 +30,10 @@ export default class Page {
 
   async updateChartsComponents (from, to) {
     const [ordersData, salesData, customersData] = await this.getDataForColumnCharts(from, to);
-    const ordersDataTotal = ordersData.reduce((accum, item) => accum + item);
-    const salesDataTotal = salesData.reduce((accum, item) => accum + item);
-    const customersDataTotal = customersData.reduce((accum, item) => accum + item);
 
-    this.components.ordersChart.update({headerData: ordersDataTotal, bodyData: ordersData});
-    this.components.salesChart.update({headerData: '$' + salesDataTotal, bodyData: salesData});
-    this.components.customersChart.update({headerData: customersDataTotal, bodyData: customersData});
+    this.components.ordersChart.update(ordersData)
+    this.components.salesChart.update(salesData)
+    this.components.customersChart.update(customersData)
   }
 
   async initComponents () {
@@ -49,7 +46,8 @@ export default class Page {
       to
     });
 
-    const sortableTable = new SortableTable(header, {
+    const sortableTable = new SortableTable({
+      header,
       url: `api/dashboard/bestsellers?_start=1&_end=20&from=${from.toISOString()}&to=${to.toISOString()}`,
       isSortLocally: true
     });

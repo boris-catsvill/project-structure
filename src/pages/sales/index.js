@@ -1,6 +1,5 @@
 import SortableTable from '../../components/sortable-table/index.js'
 import RangePicker from "../../components/range-picker"
-import fetchJson from '../../utils/fetch-json'
 
 const header = [
   {
@@ -76,7 +75,8 @@ export default class Page {
 
   async initComponents() {
     this.components.rangePicker = new RangePicker({from: this.from, to: this.to})
-    this.components.salesList = new SortableTable(header, {
+    this.components.salesList = new SortableTable({
+      header,
       url: `api/rest/orders?createdAt_gte=${this.from.toISOString()}&createdAt_lte=${this.to.toISOString()}&_sort=createdAt&_order=desc&_start=0&_end=30`,
       sortByDefault: header[2].id
     })

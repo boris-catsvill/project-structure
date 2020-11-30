@@ -1,5 +1,6 @@
 import SortableList from "../../components/sortable-list"
 import fetchJson from "../../utils/fetch-json";
+import '../../components/categories/style.css'
 
 export default class Page {
   element = null
@@ -14,7 +15,17 @@ export default class Page {
     this.element = element.firstElementChild
 
     this.renderComponents()
+    this.initEventListeners()
     return this.element
+  }
+
+  initEventListeners() {
+    this.element.addEventListener('pointerdown', (e) => {
+      const categoryHeader = e.target.closest('.category__header')
+      if (categoryHeader) {
+        categoryHeader.parentElement.classList.toggle('category_open')
+      }
+    })
   }
 
   get template() {
@@ -23,15 +34,17 @@ export default class Page {
       <div class="content__top-panel">
           <h1 class="page-title">Категории товаров</h1>
       </div>
-      <div data-element="categoriesContainer">
-          ${this.categories.map(category => this.getCategory(category)).join('')}
+      <div data-elenet="categories">
+        <div data-element="categoriesContainer">
+            ${this.categories.map(category => this.getCategory(category)).join('')}
+        </div>
       </div>
     </div>`
   }
 
   getCategory({id, title}) {
     return `
-      <div class="category" data-id="${id}">
+      <div class="category category_open" data-id="${id}">
         <header class="category__header">${title}</header>
         <div class="category__body">
           <div class="subcategory-list"></div>
@@ -50,12 +63,12 @@ export default class Page {
   }
 
   renderComponents() {
-    const allLists = this.element.querySelectorAll('.subcategory-list')
-    allLists.forEach((root, index) => {
-      const listElements = this.categories[index].subcategories.map(item => this.getItem(item))
+    const listContainers = this.element.querySelectorAll('.subcategory-list')
+    listContainers.forEach((container, index) => {
+      const {subcategories} = this.categories[index]
+      const listElements = subcategories.map(subcategory => this.getItem(subcategory))
       const sortableList = new SortableList({items: listElements})
-
-      root.append(sortableList.element)
+      container.append(sortableList.element)
       this.components[index] = sortableList
     })
   }

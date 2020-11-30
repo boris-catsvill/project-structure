@@ -16,10 +16,10 @@ export default class Page {
     element.innerHTML = `
       <div class="product-list">
         <div class="content__top-panel">
-            <h1 class="page-title">Товары</h1>
+            <h1 class="page-title" title="Pizda">Товары</h1>
             <a href="/products/add" class="button-primary">Добавить товар</a>
         </div>
-        <div class="content-box_small">
+        <div class="content-box content-box_small">
             <form class="form-inline">
                 <div class="form-group">
                     <label class="form-label">Сортировать по:</label>
@@ -27,8 +27,7 @@ export default class Page {
                 </div>
 
                 <div class="form-group" data-element="doubleSlider">
-                  <label class="form-label" style="display: inline;">Цена:</label>
-                  <div></div>
+                  <label class="form-label">Цена:</label>
                 </div>
 
                 <div class="form-group">
@@ -68,7 +67,8 @@ export default class Page {
       selected: {from: this.priceFrom, to: this.priceTo}
     })
 
-    this.components.productsTable = new SortableTable(header, {
+    this.components.productsTable = new SortableTable({
+      header,
       url: `api/rest/products?_embed=subcategory.category&price_gte=${this.priceFrom}&price_lte=${this.priceTo}&_sort=quantity&_order=asc&_start=0&_end=30\``,
       sortByDefault: header[1].id
     })
