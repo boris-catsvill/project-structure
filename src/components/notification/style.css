@@ -1,4 +1,11 @@
+body {
+  position: relative;
+}
+
 .notification {
+  position: fixed;
+  bottom: 40px;
+  right: 30px;
   width: 200px;
   margin: 10px 5px;
   font-size: 14px;
