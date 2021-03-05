@@ -20,6 +20,15 @@ export default class Router {
         this.navigate(href);
       }
     });
+    const toggle = document.querySelector('.sidebar__toggler');
+    const body = document.body;
+    toggle.addEventListener('click', () => {
+      if (body.classList.contains('is-collapsed-sidebar')){
+          body.classList.remove('is-collapsed-sidebar');
+      } else {
+          body.classList.add('is-collapsed-sidebar');
+      }
+    });
   }
 
   static instance() {

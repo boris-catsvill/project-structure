@@ -90,6 +90,11 @@
   margin: 0 0 12px;
 }
 
+.sortable-list__placeholder
+{
+  list-style-type: none;
+}
+
 .sortable-table__empty-placeholder,
 .sortable-table_empty .sortable-table__header,
 .sortable-table_empty .sortable-table__body {

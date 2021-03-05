@@ -38,7 +38,7 @@ export default class ColumnChart {
     return `
       <div class="column-chart column-chart_loading" style="--chart-height: ${this.chartHeight}">
         <div class="column-chart__title">
-          Total ${this.label}
+          ${this.label}
           ${this.getLink()}
         </div>
         <div class="column-chart__container">
