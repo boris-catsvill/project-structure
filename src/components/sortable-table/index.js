@@ -7,8 +7,8 @@ export default class SortableTable {
   subElements = {};
   data = [];
   loading = false;
-  step = 20;
-  start = 1;
+  step = 30;
+  start = 0;
   end = this.start + this.step;
 
   onWindowScroll = async() => {
@@ -18,12 +18,9 @@ export default class SortableTable {
     if (bottom < document.documentElement.clientHeight && !this.loading && !this.isSortLocally) {
       this.start = this.end;
       this.end = this.start + this.step;
-
       this.loading = true;
-
       const data = await this.loadData(id, order, this.start, this.end);
       this.update(data);
-
       this.loading = false;
     }
   };
@@ -63,12 +60,13 @@ export default class SortableTable {
     url = '',
     sorted = {
       id: headersConfig.find(item => item.sortable).id,
-      order: 'asc'
+      order: 'asc',
     },
     isSortLocally = false,
-    step = 20,
-    start = 1,
-    end = start + step
+    step = 30,
+    start = 0,
+    end = start + step,
+    linkId = null
   } = {}) {
 
     this.headersConfig = headersConfig;
@@ -78,6 +76,7 @@ export default class SortableTable {
     this.step = step;
     this.start = start;
     this.end = end;
+    this.linkId = linkId;
 
     this.render();
   }
@@ -99,24 +98,20 @@ export default class SortableTable {
     this.initEventListeners();
   }
 
-  async loadData(id, order, start = this.start, end = this.end) {
+  async loadData(id = this.sorted.id, order = this.sorted.order, start = this.start, end = this.end) {
     this.url.searchParams.set('_sort', id);
     this.url.searchParams.set('_order', order);
     this.url.searchParams.set('_start', start);
     this.url.searchParams.set('_end', end);
-
+    
     this.element.classList.add('sortable-table_loading');
-
     const data = await fetchJson(this.url);
-
     this.element.classList.remove('sortable-table_loading');
-
     return data;
   }
 
   addRows(data) {
     this.data = data;
-
     this.subElements.body.innerHTML = this.getTableRows(data);
   }
 
@@ -164,11 +159,21 @@ export default class SortableTable {
   }
 
   getTableRows(data) {
-    return data.map(item => `
-      <div class="sortable-table__row">
-        ${this.getTableRow(item, data)}
-      </div>`
-    ).join('');
+    return data.map((item) => {
+      if (this.linkId) {
+        return `
+          <a href="/products/${item[this.linkId]}" class="sortable-table__row">
+            ${this.getTableRow(item, data)}
+          </div>
+        `;
+      } else {
+        return `
+          <div class="sortable-table__row">
+            ${this.getTableRow(item, data)}
+          </div>
+        `;
+      }
+    }).join('');
   }
 
   getTableRow(item) {
@@ -212,9 +217,8 @@ export default class SortableTable {
   }
 
   async sortOnServer(id, order) {
-    const start = 1;
-    const end = start + this.step;
-    const data = await this.loadData(id, order, start, end);
+    this.start = 0;
+    const data = await this.loadData(id, order);
 
     this.renderRows(data);
   }

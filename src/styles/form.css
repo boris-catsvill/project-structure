@@ -64,6 +64,14 @@ form .form-label {
   color: var(--table-grey);
   margin-bottom: 8px;
 }
+form #text-filter
+{
+ margin: 0px 0px 0px 10px;
+}
+form #status-filter
+{
+ margin: 0px 0px 0px 10px;
+}
 
 form .form-control {
   background-color: var(--white);
