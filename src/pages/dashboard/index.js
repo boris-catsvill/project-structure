@@ -35,8 +35,9 @@ export default class Page {
 	}
 
 	async initComponents () {
-		const to = new Date();
-		const from = new Date(to.getTime() - (30 * 24 * 60 * 60 * 1000));
+		const date = new Date();
+		const to = new Date(date);
+		const from = new Date(date.setMonth(date.getMonth() - 1));
 		const [ordersData, salesData, customersData] = await this.getDataForColumnCharts(from, to);
 		const rangePicker = new RangePicker({
 			from,

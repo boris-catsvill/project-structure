@@ -23,7 +23,6 @@ export default class Router {
     const toggle = document.querySelector('.sidebar__toggler');
     const body = document.body;
     toggle.addEventListener('click', () => {
-      console.log(1);
       if (body.classList.contains('is-collapsed-sidebar')){
           body.classList.remove('is-collapsed-sidebar');
       } else {

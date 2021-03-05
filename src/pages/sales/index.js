@@ -8,8 +8,9 @@ export default class Page {
 	components = {};
 
 	constructor() {
-		this.to = new Date();
-		this.from = new Date(this.to.getTime() - (30 * 24 * 60 * 60 * 1000));
+		const date = new Date();
+		this.to = new Date(date);
+		this.from = new Date(date.setMonth(date.getMonth() - 1));
 	}
 
 	initComponents() {
