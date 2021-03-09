@@ -44,28 +44,32 @@ export default class SortableList {
     this.dragStop();
   };
 
-  constructor({items = []} = {}) {
+  constructor({ items = [], element }) {
     this.items = items;
+
+    if (element) {
+     this.element = element
+    } else {
+      this.element = document.createElement('ul');
+      this.element.className = 'sortable-list';
+    }
 
     this.render();
   }
 
   render() {
-    this.element = document.createElement('ul');
-    this.element.className = 'sortable-list';
-
     this.addItems();
-    this.initEventListeners();
+    this.initEventListeners(this.element);
   }
 
-  initEventListeners() {
-    this.element.addEventListener('pointerdown', event => this.onPointerDown(event));
+  initEventListeners(element) {
+    element.addEventListener('pointerdown', event => this.onPointerDown(event));
   }
 
   addItems() {
     // item is a DOM element
     for (let item of this.items) {
-      item.classList.add('sortable-list__item');
+     item.classList.add('sortable-list__item');
     }
 
     this.element.append(...this.items);

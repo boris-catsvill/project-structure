@@ -73,11 +73,13 @@ export default class Page {
       value: customersData.reduce((accum, item) => accum + item),
     });
 
-    this.components.sortableTable = sortableTable;
-    this.components.ordersChart = ordersChart;
-    this.components.salesChart = salesChart;
-    this.components.customersChart = customersChart;
-    this.components.rangePicker = rangePicker;
+    this.components = {
+      sortableTable,
+      ordersChart,
+      salesChart,
+      customersChart,
+      rangePicker,
+    }
   }
 
   get template () {
