@@ -46,7 +46,6 @@ export default class SortableList {
 
   constructor({items = []} = {}) {
     this.items = items;
-
     this.render();
   }
 
@@ -103,7 +102,7 @@ export default class SortableList {
 
     this.draggingElem = itemElem;
 
-    this.placeholderElem = document.createElement('li');
+    this.placeholderElem = document.createElement('div');
     this.placeholderElem.className = 'sortable-list__placeholder';
 
     // itemElem will get position:fixed
