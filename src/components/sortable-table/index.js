@@ -129,6 +129,12 @@ export default class SortableTable {
     this.subElements.body.append(...rows.childNodes);
   }
 
+  updateData = async (url) => {
+    const newData = await fetchJson(url);
+    const newRows = this.getTableRows(newData);
+    this.subElements.body.innerHTML = newRows;
+  }
+
   getTableHeader() {
     return `<div data-element="header" class="sortable-table__header sortable-table__row">
       ${this.headersConfig.map(item => this.getHeaderRow(item)).join('')}

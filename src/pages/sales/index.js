@@ -81,7 +81,7 @@ export default class Sales {
         this.element = wrapper.firstElementChild;
         wrapper.remove();
 
-        this.loadTable();
+        this.loadTable(this.dates.from, this.dates.to);
         
         this.initEventListeners();
     }
@@ -97,9 +97,9 @@ export default class Sales {
         `;
     }
 
-    loadTable() {
-        this.url.searchParams.set('createdAt_gte', this.dates.from.toISOString());
-        this.url.searchParams.set('createdAt_lte', this.dates.to.toISOString());
+    loadTable(from, to) {
+        this.url.searchParams.set('createdAt_gte', from.toISOString());
+        this.url.searchParams.set('createdAt_lte', to.toISOString());
 
         this.sortableTable = new SortableTable(this.header, {
             url: this.url,
@@ -114,14 +114,19 @@ export default class Sales {
         this.element.querySelector('[data-elem="ordersContainer"]').append(this.sortableTable.element);
     }
 
-
     initEventListeners() {
         this.element.addEventListener('date-select', async (evt) => {
             this.dates.from = evt.detail.from;
             this.dates.to = evt.detail.to;
 
-            this.sortableTable.updateData(this.dates.from, this.dates.to);
+            this.updateTable();
         });
+    }
+
+    updateTable() {
+            this.sortableTable.url.searchParams.set('createdAt_gte', this.dates.from.toISOString());
+            this.sortableTable.url.searchParams.set('createdAt_lte', this.dates.to.toISOString());
+            this.sortableTable.updateData(this.sortableTable.url);
     }
 
     destroy() {
