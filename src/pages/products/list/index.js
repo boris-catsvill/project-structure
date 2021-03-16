@@ -119,16 +119,23 @@ export default class ProductsList {
       this.from = evt.detail.from;
       this.to = evt.detail.to;
 
-      this.table.priceLow = this.from;
-      this.table.priceHigh = this.to;
+      this.url.searchParams.set('price_gte', this.from);
+      this.url.searchParams.set('price_lte', this.to);
 
-      this.table.updateData(this.url);
+      const data = await fetchJson(this.url);
+
+      this.table.renderRows(data);
+      this.table.url = this.url;
+
+      // this.table.updateData(this.url);
     });
   }
 
   initTable() {
     this.table = new SortableTable(this.header, {
-      url: this.url
+      url: this.url,
+      step: 30,
+      start: 0
     });
 
     this.subElements.productsContainer.append(this.table.element);

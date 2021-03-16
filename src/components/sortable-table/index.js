@@ -78,8 +78,6 @@ export default class SortableTable {
     this.step = step;
     this.start = start;
     this.end = end;
-    this.priceLow = '';
-    this.priceHigh = '';
 
     this.render();
   }
@@ -106,12 +104,6 @@ export default class SortableTable {
     this.url.searchParams.set('_order', order);
     this.url.searchParams.set('_start', start);
     this.url.searchParams.set('_end', end);
-
-    if (this.priceLow && this.priceHigh) {
-      this.url.searchParams.set('price_gte', this.priceLow);
-      this.url.searchParams.set('price_lte', this.priceHigh);
-    }
-    
 
     this.element.classList.add('sortable-table_loading');
 
@@ -226,10 +218,9 @@ export default class SortableTable {
   }
 
   async sortOnServer(id, order) {
-    const start = 1;
+    const start = 0;
     const end = start + this.step;
     const data = await this.loadData(id, order, start, end);
-    console.log(data);
 
     this.renderRows(data);
   }
