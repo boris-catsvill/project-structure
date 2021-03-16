@@ -1,4 +1,4 @@
-import fetchJson from "../../utils/fetch-json.js";
+import fetchJson from '../../utils/fetch-json.js';
 
 const BACKEND_URL = 'https://course-js.javascript.ru';
 
@@ -11,7 +11,7 @@ export default class SortableTable {
   start = 1;
   end = this.start + this.step;
 
-  onWindowScroll = async() => {
+  onWindowScroll = async () => {
     const { bottom } = this.element.getBoundingClientRect();
     const { id, order } = this.sorted;
 
@@ -54,7 +54,7 @@ export default class SortableTable {
       if (this.isSortLocally) {
         this.sortLocally(id, newOrder);
       } else {
-        this.sortOnServer(id, newOrder);
+        this.sortOnServer(id, newOrder, 1, 1 + this.step);
       }
     }
   };
@@ -85,16 +85,13 @@ export default class SortableTable {
   async render() {
     const {id, order} = this.sorted;
     const wrapper = document.createElement('div');
-
     wrapper.innerHTML = this.getTable();
 
     const element = wrapper.firstElementChild;
-
     this.element = element;
     this.subElements = this.getSubElements(element);
 
     const data = await this.loadData(id, order, this.start, this.end);
-
     this.renderRows(data);
     this.initEventListeners();
   }
@@ -106,7 +103,6 @@ export default class SortableTable {
     this.url.searchParams.set('_end', end);
 
     this.element.classList.add('sortable-table_loading');
-
     const data = await fetchJson(this.url);
 
     this.element.classList.remove('sortable-table_loading');
@@ -165,9 +161,9 @@ export default class SortableTable {
 
   getTableRows(data) {
     return data.map(item => `
-      <div class="sortable-table__row">
+      <a href="products/${item.id}" class="sortable-table__row">
         ${this.getTableRow(item, data)}
-      </div>`
+      </a>`
     ).join('');
   }
 
@@ -191,9 +187,7 @@ export default class SortableTable {
       <div class="sortable-table">
         ${this.getTableHeader()}
         ${this.getTableBody(this.data)}
-
         <div data-element="loading" class="loading-line sortable-table__loading-line"></div>
-
         <div data-element="emptyPlaceholder" class="sortable-table__empty-placeholder">
           No products
         </div>
@@ -208,12 +202,10 @@ export default class SortableTable {
   sortLocally(id, order) {
     const sortedData = this.sortData(id, order);
 
-    this.subElements.body.innerHTML = this.getTableRows(sortedData);
+    this.subElements.body.innerHTML = this.getTableBody(sortedData);
   }
 
-  async sortOnServer(id, order) {
-    const start = 1;
-    const end = start + this.step;
+  async sortOnServer(id, order, start, end) {
     const data = await this.loadData(id, order, start, end);
 
     this.renderRows(data);
@@ -236,14 +228,14 @@ export default class SortableTable {
 
     return arr.sort((a, b) => {
       switch (sortType) {
-        case 'number':
-          return direction * (a[id] - b[id]);
-        case 'string':
-          return direction * a[id].localeCompare(b[id], 'ru');
-        case 'custom':
-          return direction * customSorting(a, b);
-        default:
-          return direction * (a[id] - b[id]);
+      case 'number':
+        return direction * (a[id] - b[id]);
+      case 'string':
+        return direction * a[id].localeCompare(b[id], 'ru');
+      case 'custom':
+        return direction * customSorting(a, b);
+      default:
+        return direction * (a[id] - b[id]);
       }
     });
   }
@@ -260,11 +252,11 @@ export default class SortableTable {
 
   remove() {
     this.element.remove();
-    document.removeEventListener('scroll', this.onWindowScroll);
   }
 
   destroy() {
     this.remove();
     this.subElements = {};
+    document.removeEventListener('scroll', this.onWindowScroll);
   }
 }
