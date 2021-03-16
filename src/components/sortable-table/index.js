@@ -68,7 +68,7 @@ export default class SortableTable {
     isSortLocally = false,
     step = 20,
     start = 1,
-    end = start + step
+    end = start + step,
   } = {}) {
 
     this.headersConfig = headersConfig;
@@ -78,6 +78,8 @@ export default class SortableTable {
     this.step = step;
     this.start = start;
     this.end = end;
+    this.priceLow = '';
+    this.priceHigh = '';
 
     this.render();
   }
@@ -104,6 +106,12 @@ export default class SortableTable {
     this.url.searchParams.set('_order', order);
     this.url.searchParams.set('_start', start);
     this.url.searchParams.set('_end', end);
+
+    if (this.priceLow && this.priceHigh) {
+      this.url.searchParams.set('price_gte', this.priceLow);
+      this.url.searchParams.set('price_lte', this.priceHigh);
+    }
+    
 
     this.element.classList.add('sortable-table_loading');
 
@@ -178,14 +186,14 @@ export default class SortableTable {
   }
 
   getTableRow(item) {
-    const cells = this.headersConfig.map(({id, template}) => {
+    const cells = this.headersConfig.map(({ id, template }) => {
       return {
         id,
         template
       };
     });
 
-    return cells.map(({id, template}) => {
+    return cells.map(({ id, template }) => {
       return template
         ? template(item[id])
         : `<div class="sortable-table__cell">${item[id]}</div>`;
@@ -221,6 +229,7 @@ export default class SortableTable {
     const start = 1;
     const end = start + this.step;
     const data = await this.loadData(id, order, start, end);
+    console.log(data);
 
     this.renderRows(data);
   }

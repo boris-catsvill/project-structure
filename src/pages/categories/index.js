@@ -1,4 +1,4 @@
-import SortableList from '../sortable-list/index.js';
+import SortableList from '../../components/sortable-list/index.js';
 const BACKEND_URL = 'https://course-js.javascript.ru';
 
 export default class Categories {

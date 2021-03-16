@@ -53,10 +53,12 @@
     </main>
 
 <script type="module">
-  import ProductEdit from './index.js';
+  import ProductsList from './index.js';
 
-  const productEdit = new ProductEdit('101-planset-lenovo-tab-p10-tb-x705l-32-gb-3g-lte-belyj');
+  const productsList = new ProductsList();
+  content.append(productsList.element);
+//   console.log(page);
 
-  content.append(productEdit.element);
+//   content.append(page.render());
 </script>
 </body>

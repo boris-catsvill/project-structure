@@ -17,13 +17,11 @@ export default class SortableList {
 
         this.element = wrapper;
         wrapper.remove();
-
-        
     }
 
-    initEventListeners() { 
-        document.addEventListener('pointerdown', this.delete);
-        document.addEventListener('pointerdown', this.pointerdown);
+    initEventListeners() {
+        this.element.addEventListener('pointerdown', this.delete);
+        this.element.addEventListener('pointerdown', this.pointerdown);
     }
 
     delete = (evt) => { 
@@ -47,7 +45,7 @@ export default class SortableList {
 
         this.activeElement.ondragstart = () => false;
         
-        document.addEventListener('pointerup', this.pointerup);
+        this.element.addEventListener('pointerup', this.pointerup);
         document.addEventListener('pointermove', this.pointermove);
     }
 
@@ -91,11 +89,12 @@ export default class SortableList {
         this.activeElement.style.cssText = '';
 
         document.removeEventListener('pointermove', this.pointermove);
-        document.removeEventListener('pointerup', this.pointerup);
+        this.element.removeEventListener('pointerup', this.pointerup);
     }
 
     initActiveElement(target) {
         this.activeElement = target.closest('li');
+        console.log(this.activeElement);
 
         const { height, left, top } = this.activeElement.getBoundingClientRect();
         const { width } = this.element.getBoundingClientRect();
@@ -134,13 +133,13 @@ export default class SortableList {
 
     destroy() {
         this.remove();
-        document.removeEventListener('pointerdown', this.delete);
-        document.removeEventListener('pointerdown', this.pointerdown);
+        this.element.removeEventListener('pointerdown', this.delete);
+        this.element.removeEventListener('pointerdown', this.pointerdown);
     }
 
     remove() {
         this.element.remove();
-        document.removeEventListener('pointerdown', this.delete);
-        document.removeEventListener('pointerdown', this.pointerdown);
+        this.element.removeEventListener('pointerdown', this.delete);
+        this.element.removeEventListener('pointerdown', this.pointerdown);
     }
 }

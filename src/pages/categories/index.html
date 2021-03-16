@@ -5,7 +5,7 @@
     <title>Админка для магазина</title>
     <link rel="apple-touch-icon-precomposed" href="../../assets/favicon/apple-touch-icon-precomposed.png">
     <link rel="icon" href="../../assets/favicon/favicon.png">
-    <link rel="stylesheet" href="../../../styles/all.css">
+    <link rel="stylesheet" href="../../styles/all.css">
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -51,12 +51,17 @@
         <section class="content" id='content'>
         </section>
     </main>
+    <script type='module'>
+        import Categories from './index.js';
+        
+        const categories = new Categories({
+            url: 'api/rest/categories',
+            sort: 'weight',
+            refs: 'subcategory'
+        });
 
-<script type="module">
-  import ProductEdit from './index.js';
-
-  const productEdit = new ProductEdit('101-planset-lenovo-tab-p10-tb-x705l-32-gb-3g-lte-belyj');
-
-  content.append(productEdit.element);
-</script>
+        content.append(categories.element);
+    </script>
 </body>
+
+</html>

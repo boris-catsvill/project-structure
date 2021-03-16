@@ -1,6 +1,6 @@
-import SortableList from '../2-sortable-list/index.js';
-import escapeHtml from './utils/escape-html.js';
-import fetchJson from './utils/fetch-json.js';
+import SortableList from '../sortable-list/index.js';
+import escapeHtml from '../../utils/escape-html.js';
+import fetchJson from '../../utils/fetch-json.js';
 
 const IMGUR_CLIENT_ID = '28aaa2e823b03b1';
 const BACKEND_URL = 'https://course-js.javascript.ru';
@@ -58,6 +58,7 @@ export default class ProductForm {
 
     this.dataProduct = await fetchJson(this.urlProduct);
     this.dataProduct = this.dataProduct[0];
+    console.log(this.dataProduct);
 
     const formControls = this.subElements.productForm.querySelectorAll('.form-control');
 
