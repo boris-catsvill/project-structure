@@ -44,7 +44,7 @@ class Tooltip {
     document.addEventListener('pointerout', this.onMouseOut);
   }
 
-  initialize () {
+  initialize() {
     this.initEventListeners();
   }
 
@@ -57,13 +57,18 @@ class Tooltip {
   }
 
   moveTooltip(event) {
-    const left = event.clientX + 10;
-    const top = event.clientY + 10;
+    const shift = 10;
+    const left = event.clientX + shift;
+    const top = event.clientY + shift;
 
     // TODO: Add logic for window borders
 
-    this.element.style.left = left + 'px';
-    this.element.style.top = top + 'px';
+    this.element.style.left = `${left}px`;
+    this.element.style.top = `${top}px`;
+  }
+
+  remove () {
+    this.element.remove();
   }
 
   destroy() {
