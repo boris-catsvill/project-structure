@@ -13,7 +13,7 @@ export default class Page {
       template: (data = []) => {
         return `
           <div class="sortable-table__cell">
-            <img class="sortable-table-image" alt="Image" src="${data[0]?.url}">
+            <img class="sortable-table-image" alt="Image" src="${data[0].url}">
           </div>
         `;
       }

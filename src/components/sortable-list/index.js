@@ -94,7 +94,6 @@ export default class SortableList {
 
     initActiveElement(target) {
         this.activeElement = target.closest('li');
-        console.log(this.activeElement);
 
         const { height, left, top } = this.activeElement.getBoundingClientRect();
         const { width } = this.element.getBoundingClientRect();

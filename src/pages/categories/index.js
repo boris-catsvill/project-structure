@@ -2,21 +2,23 @@ import SortableList from '../../components/sortable-list/index.js';
 const BACKEND_URL = 'https://course-js.javascript.ru';
 
 export default class Page {
-    constructor({ url, sort, refs } = {}) {
+    constructor({ url = 'api/rest/categories', sort = 'weight', refs = 'subcategory' } = {}) {
         this.url = new URL(url, BACKEND_URL);
         this.sort = sort;
         this.refs = refs;
         this.render();
     }
 
-    render() {
+    async render() {
         const wrapper = document.createElement('div');
         wrapper.innerHTML = this.getTemplate();
         this.element = wrapper.firstElementChild;
-        this.loadData();
+        await this.loadData();
         wrapper.remove();
 
         this.initEventListeners();
+
+        return this.element;
     }
 
     getTemplate() {
