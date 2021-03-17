@@ -1,7 +1,7 @@
 import SortableList from '../../components/sortable-list/index.js';
 const BACKEND_URL = 'https://course-js.javascript.ru';
 
-export default class Categories {
+export default class Page {
     constructor({ url, sort, refs } = {}) {
         this.url = new URL(url, BACKEND_URL);
         this.sort = sort;

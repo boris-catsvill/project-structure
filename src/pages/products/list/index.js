@@ -4,7 +4,7 @@ import fetchJson from "../../../utils/fetch-json.js";
 
 const BACKEND_URL = 'https://course-js.javascript.ru/';
 
-export default class ProductsList {
+export default class Page {
   header = [
     {
       id: 'images',
@@ -100,6 +100,7 @@ export default class ProductsList {
     this.initURL();
     this.initDoubleSlider();
     this.initTable();
+    this.initEventListeners();
   }
 
   initDoubleSlider() {
@@ -126,8 +127,6 @@ export default class ProductsList {
 
       this.table.renderRows(data);
       this.table.url = this.url;
-
-      // this.table.updateData(this.url);
     });
   }
 
@@ -147,6 +146,29 @@ export default class ProductsList {
       this.url.searchParams.set('_order', this.order);
       this.url.searchParams.set('_start', this.start);
       this.url.searchParams.set('_end', this.end);
+  }
+
+  initEventListeners() {
+    this.subElements.filterName.addEventListener('input', async evt => {
+      this.url.searchParams.set('title_like', evt.target.value);
+
+      const data = await fetchJson(this.url);
+      this.table.renderRows(data);
+      this.table.url = this.url;
+    });
+
+    this.subElements.filterStatus.addEventListener('change', async evt => {
+
+      if (evt.target.value === '1' || evt.target.value === '0') {
+        this.url.searchParams.set('status', evt.target.value);
+      } else {
+        this.url.searchParams.delete('status');
+      }
+
+      const data = await fetchJson(this.url);
+      this.table.renderRows(data);
+      this.table.url = this.url;
+    })
   }
 
   getTemplate() {
@@ -178,5 +200,13 @@ export default class ProductsList {
         <div data-elem="productsContainer" class="products-list__container"></div>
       </div>
   `;
+  }
+
+  remove() {
+    this.element.remove();
+  }
+
+  destroy() {
+    this.remove();
   }
 }

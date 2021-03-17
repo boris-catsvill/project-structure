@@ -2,7 +2,7 @@ import ProductForm from '../../../components/product-form/index.js';
 
 const BACKEND_URL = 'https://course-js.javascript.ru/';
 
-export default class ProductEdit {
+export default class Page {
   constructor(productID = '') {
     this.productID = productID;
     this.render();
