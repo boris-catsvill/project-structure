@@ -58,7 +58,6 @@ export default class ProductForm {
 
     this.dataProduct = await fetchJson(this.urlProduct);
     this.dataProduct = this.dataProduct[0];
-    console.log(this.dataProduct);
 
     const formControls = this.subElements.productForm.querySelectorAll('.form-control');
 

@@ -23,7 +23,7 @@ export default class ColumnChart {
 
     getTemplate() { 
         return `
-            <div class="column-chart column-chart_loading" --chart-height: ${this.chartHeight}>
+            <div class="column-chart column-chart_loading dashboard__chart_${this.label}" --chart-height: ${this.chartHeight}>
                 <div class="column-chart__title">
                         Total ${this.label}
                         <a href="${this.link}" class="column-chart__link">View all</a>

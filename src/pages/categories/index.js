@@ -6,7 +6,6 @@ export default class Page {
         this.url = new URL(url, BACKEND_URL);
         this.sort = sort;
         this.refs = refs;
-        this.render();
     }
 
     async render() {
@@ -94,6 +93,7 @@ export default class Page {
     initEventListeners() {
         this.element.addEventListener('pointerdown', (evt) => {
             if (!evt.target.classList.contains('category__header')) return;
+            console.log(evt.target.closest('.category'));
             evt.target.closest('.category').classList.toggle('category_open');
         });
     }

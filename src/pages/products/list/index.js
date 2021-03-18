@@ -1,6 +1,8 @@
 import SortableTable from '../../../components/sortable-table/index.js';
 import DoubleSlider from '../../../components/double-slider/index.js';
 import fetchJson from "../../../utils/fetch-json.js";
+import PageEdit from "../edit/index.js";
+import ProductForm from '../../../components/product-form/index.js';
 
 const BACKEND_URL = 'https://course-js.javascript.ru/';
 
@@ -68,11 +70,6 @@ export default class Page {
     order = 'asc',
     start = 0,
     end = 30,
-    dates = {
-        from: new Date((new Date).getTime() - 30 * 24 * 3600 * 1000),
-        to: new Date()
-    }
-
 } = {}) {
     this.url = new URL(url, BACKEND_URL);
     this.embed = embed;
@@ -82,7 +79,7 @@ export default class Page {
     this.end = end;
     this.from = '';
     this.to = '';
-    this.render();
+    this.page = 'products';
 }
 
   render() {
@@ -100,7 +97,10 @@ export default class Page {
     this.initURL();
     this.initDoubleSlider();
     this.initTable();
+
     this.initEventListeners();
+
+    return this.element;
   }
 
   initDoubleSlider() {
@@ -134,7 +134,8 @@ export default class Page {
     this.table = new SortableTable(this.header, {
       url: this.url,
       step: 30,
-      start: 0
+      start: 0,
+      page: this.page
     });
 
     this.subElements.productsContainer.append(this.table.element);
@@ -168,7 +169,24 @@ export default class Page {
       const data = await fetchJson(this.url);
       this.table.renderRows(data);
       this.table.url = this.url;
-    })
+    });
+    
+    this.subElements.productsContainer.addEventListener('pointerdown', async evt => {
+
+      if (!evt.target.closest('a').classList.contains('sortable-table__row')) return;
+      // evt.preventDefault();
+
+      // setTimeout(() => { console.log(window.location.pathname) }, 1000);
+      // // this.remove();
+      // console.log(window.location.pathname);
+      // this.element = new ProductForm(window.location.path);
+      // // console.log(newPage.productId);
+      // // console.log(await newPage.render());
+      // await this.element.render();
+
+
+      // document.querySelector('#content').append(await newPage.render());
+    });
   }
 
   getTemplate() {

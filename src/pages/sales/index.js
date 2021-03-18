@@ -64,7 +64,6 @@ export default class Page {
         this.start = start;
         this.end = end;
         this.dates = dates;
-        this.render();
     }
 
      render() {
@@ -84,6 +83,8 @@ export default class Page {
         this.loadTable(this.dates.from, this.dates.to);
         
         this.initEventListeners();
+         
+        return this.element;
     }
 
     getTemplate() {

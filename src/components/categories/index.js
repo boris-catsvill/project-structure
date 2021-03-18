@@ -89,12 +89,12 @@ export default class Categories {
         return listItems;
     }
 
-    initEventListeners() {
-        this.element.addEventListener('pointerdown', (evt) => {
-            if (!evt.target.classList.contains('category__header')) return;
-            evt.target.closest('.category').classList.toggle('category_open');
-        });
-    }
+    // initEventListeners() {
+    //     this.element.addEventListener('pointerdown', (evt) => {
+    //         if (!evt.target.classList.contains('category__header')) return;
+    //         evt.target.closest('.category').classList.toggle('category_open');
+    //     });
+    // }
 
     remove() {
         this.element.remove();
