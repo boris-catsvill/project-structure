@@ -5,6 +5,7 @@ const BACKEND_URL = 'https://course-js.javascript.ru/';
 export default class PageEdit {
   constructor(productID = '') {
     this.productID = productID;
+    console.log(window.location.pathname);
   }
 
   render() {

@@ -171,23 +171,28 @@ export default class Page {
       this.table.url = this.url;
     });
     
-    this.subElements.productsContainer.addEventListener('pointerdown', async evt => {
+    this.subElements.productsContainer.addEventListener('pointerdown', evt => {
 
       if (!evt.target.closest('a').classList.contains('sortable-table__row')) return;
-      // evt.preventDefault();
-
-      // setTimeout(() => { console.log(window.location.pathname) }, 1000);
-      // // this.remove();
-      // console.log(window.location.pathname);
-      // this.element = new ProductForm(window.location.path);
-      // // console.log(newPage.productId);
-      // // console.log(await newPage.render());
-      // await this.element.render();
-
-
-      // document.querySelector('#content').append(await newPage.render());
+      // setTimeout(() => { this.changePage() }, 1000);
+      const href = evt.target.closest('a').getAttribute('href');
+      const id = href.split('/products/')[1];
+      const newPage = new PageEdit(id);
+      // this.remove();
+      document.querySelector('#content').append(newPage.render());
     });
   }
+
+  // async changePage() {
+  //   const href = window.location.pathname;
+  //   const id = href.split('/products/')[1];
+  //   const newPage = new PageEdit(id).render();
+  //   console.log(newPage);
+
+  //   // this.element.remove();
+
+  //   document.querySelector('#content').append(newPage);
+  // }
 
   getTemplate() {
     return `
