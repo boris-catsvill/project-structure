@@ -171,16 +171,16 @@ export default class Page {
       this.table.url = this.url;
     });
     
-    this.subElements.productsContainer.addEventListener('pointerdown', evt => {
+    // this.subElements.productsContainer.addEventListener('pointerdown', evt => {
 
-      if (!evt.target.closest('a').classList.contains('sortable-table__row')) return;
-      // setTimeout(() => { this.changePage() }, 1000);
-      const href = evt.target.closest('a').getAttribute('href');
-      const id = href.split('/products/')[1];
-      const newPage = new PageEdit(id);
-      // this.remove();
-      document.querySelector('#content').append(newPage.render());
-    });
+    //   if (!evt.target.closest('a').classList.contains('sortable-table__row')) return;
+    //   // setTimeout(() => { this.changePage() }, 1000);
+    //   const href = evt.target.closest('a').getAttribute('href');
+    //   const id = href.split('/products/')[1];
+    //   const newPage = new PageEdit(id);
+    //   // this.remove();
+    //   document.querySelector('#content').append(newPage.render());
+    // });
   }
 
   // async changePage() {

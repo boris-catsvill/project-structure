@@ -3,9 +3,15 @@ import ProductForm from '../../../components/product-form/index.js';
 const BACKEND_URL = 'https://course-js.javascript.ru/';
 
 export default class PageEdit {
-  constructor(productID = '') {
+
+  constructor(productID = window.location.pathname) {
     this.productID = productID;
-    console.log(window.location.pathname);
+    this.parsePath();
+  }
+
+  parsePath() {
+    const path = this.productID.split('/products/')[1];
+    path === 'add' ? this.productID = '' : this.productID = path;
   }
 
   render() {
