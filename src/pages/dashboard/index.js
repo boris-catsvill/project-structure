@@ -5,6 +5,8 @@ import header from './bestsellers-header.js';
 
 import fetchJson from '../../utils/fetch-json.js';
 
+const URL_PATH = process.env.URL_PATH;
+
 export default class Page {
   element;
   subElements = {};
@@ -83,6 +85,7 @@ export default class Page {
       start: 0,
       end: 30,
       isSortLocally: true,
+      rowUrlTemplate: row => `/${URL_PATH}products/${row.id}`,
     });
 
     const formatTooltip = (key, value) => `
@@ -99,7 +102,7 @@ export default class Page {
         to,
       },
       label: 'Заказы',
-      link: 'sales',
+      link: `${URL_PATH}sales`,
       formatTooltip,
     });
 

@@ -2,6 +2,8 @@ import DoubleSlider from '../../../components/double-slider';
 import SortableTable from '../../../components/sortable-table';
 import header from './products-header.js';
 
+const URL_PATH = process.env.URL_PATH;
+
 export default class Page {
   element;
   subElements = {};
@@ -15,7 +17,7 @@ export default class Page {
       <div class="products-list">
         <div class="content__top-panel">
           <h2 class="page-title">Товары</h2>
-          <a href="/products/add" class="button-primary">Добавить товар</a>
+          <a href="/${URL_PATH}products/add" class="button-primary">Добавить товар</a>
         </div>
         <div class="content-box content-box_small">
           <form class="form-inline">
@@ -72,6 +74,7 @@ export default class Page {
           <p>Не найдено товаров удовлетворяющих выбранному критерию</p>
         </div>
       `,
+      rowUrlTemplate: row => `/${URL_PATH}products/${row.id}`,
     });
 
     this.components = {

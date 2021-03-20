@@ -44,6 +44,7 @@ export default class SortableTable {
     start = 0,
     end = start + step,
     placeholder = 'Не найдено',
+    rowUrlTemplate = null,
   } = {}) {
     this.headerConfig = headerConfig;
     this.url = new URL(url, process.env.BACKEND_URL);
@@ -53,6 +54,7 @@ export default class SortableTable {
     this.start = start;
     this.end = end;
     this.placeholder = placeholder;
+    this.rowUrlTemplate = rowUrlTemplate;
 
     this.render();
   }
@@ -99,11 +101,19 @@ export default class SortableTable {
   }
 
   getBody(data = []) {
-    return data.map(item => `
-      <a href="/products/${item.id}" class="sortable-table__row">
-        ${this.getRow(item)}
-      </a>
-    `).join('');
+    if (this.rowUrlTemplate) {
+      return data.map(item => `
+        <a href="${this.rowUrlTemplate(item)}" class="sortable-table__row">
+          ${this.getRow(item)}
+        </a>
+      `).join('');
+    } else {
+      return data.map(item => `
+        <div class="sortable-table__row">
+          ${this.getRow(item)}
+        </div>
+      `).join('');
+    }
   }
 
   getRow(row) {

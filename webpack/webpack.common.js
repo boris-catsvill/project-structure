@@ -47,6 +47,7 @@ module.exports = {
   },
   plugins: [
     new webpack.DefinePlugin({
+      'process.env.URL_PATH': JSON.stringify(process.env.URL_PATH || ''),
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
       'process.env.IMGUR_CLIENT_ID': JSON.stringify(process.env.IMGUR_CLIENT_ID),
       'process.env.BACKEND_URL': JSON.stringify(process.env.BACKEND_URL)

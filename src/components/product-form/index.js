@@ -3,6 +3,8 @@ import SortableList from '../sortable-list'
 import escapeHtml from '../../utils/escape-html.js';
 import fetchJson from '../../utils/fetch-json.js';
 
+const URL_PATH = process.env.URL_PATH;
+
 export default class ProductForm {
   product;
   defaultProduct = {
@@ -189,12 +191,12 @@ export default class ProductForm {
         <input type="hidden" name="url" value="${url}">
         <input type="hidden" name="source" value="${escapeHtml(source)}">
         <span>
-          <img src="/icons/icon-grab.svg" data-grab-handle="" alt="grab">
+          <img src="/${URL_PATH}icons/icon-grab.svg" data-grab-handle="" alt="grab">
           <img class="sortable-table__cell-img" alt="Image" src="${url}">
           <span>${escapeHtml(source)}</span>
         </span>
         <button type="button">
-          <img src="/icons/icon-trash.svg" data-delete-handle="" alt="delete">
+          <img src="/${URL_PATH}icons/icon-trash.svg" data-delete-handle="" alt="delete">
         </button>
       </li>
     `;

@@ -1,6 +1,8 @@
 import ProductForm from '../../../components/product-form';
 import NotificationMessage from '../../../components/notification';
 
+const URL_PATH = process.env.URL_PATH;
+
 export default class Page {
   element;
   subElements = {};
@@ -15,7 +17,7 @@ export default class Page {
       <div class="products-edit">
         <div class="content__top-panel">
           <h1 class="page-title">
-            <a href="/products" class="link">Товары</a> / Редактировать
+            <a href="/${URL_PATH}products" class="link">Товары</a> / Редактировать
           </h1>
         </div>
         <div class="content-box" data-element="productForm"></div>
