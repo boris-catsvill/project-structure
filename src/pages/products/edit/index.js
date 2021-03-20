@@ -1,18 +1,94 @@
+import ProductForm from '../../../components/product-form';
+import NotificationMessage from '../../../components/notification';
+
 export default class Page {
   element;
   subElements = {};
   components = {};
 
+  get template() {
+    return `
+      <div class="products-edit">
+        <div class="content__top-panel">
+          <h1 class="page-title">
+            <a href="/products" class="link">Товары</a> / Редактировать
+          </h1>
+        </div>
+        <div class="content-box" data-element="productForm"></div>
+      </div>
+    `;
+  }
+
   async render() {
-    const element = document.createElement('div');
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = this.template;
+    this.element = wrapper.firstElementChild;
 
-    element.innerHTML = `
-      <div>
-        <h1>Edit page</h1>
-      </div>`;
+    this.subElements = this.getSubElements();
 
-    this.element = element.firstElementChild;
+    await this.initComponents();
+    this.renderComponents();
+    this.initEventListners();
 
     return this.element;
+  }
+
+  async initComponents() {
+    let productId;
+    let id = decodeURI(window.location.pathname)
+      .replace(/^\/|\/$/, '')
+      .replace('products/', '');
+    if (id && id !== 'add') productId = id;
+    const productForm = new ProductForm(productId);
+    await productForm.render();
+
+    this.components = {
+      productForm,
+    };
+  }
+
+  renderComponents() {
+    Object.keys(this.components).forEach(component => {
+      const root = this.subElements[component];
+      const { element } = this.components[component];
+
+      root.append(element);
+    });
+  }
+
+  initEventListners() {
+    const savedNotification = new NotificationMessage('Товар добавлен', { duration: 2000, type: 'success' });
+    this.element.addEventListener('product-saved', event => {
+      savedNotification.show();
+    });
+
+    const updatedNotification = new NotificationMessage('Товар сохранен', { duration: 2000, type: 'success' });
+    this.element.addEventListener('product-updated', event => {
+      updatedNotification.show();
+    });
+  }
+
+  getSubElements() {
+    const elements = this.element.querySelectorAll('[data-element]');
+    return [...elements].reduce((accum, subElement) => {
+      accum[subElement.dataset.element] = subElement;
+      return accum;
+    }, {});
+  }
+
+  remove() {
+    this.element.remove();
+  }
+
+  destroy() {
+    for (const component of Object.values(this.components)) {
+      component.destroy();
+    }
+
+    this.remove();
+
+    this.element = null;
+    this.subElements = null;
+    this.components = null;
   }
 }

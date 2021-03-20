@@ -1,4 +1,4 @@
-import escapeHtml from '../../utils/escape-html.js'
+import escapeHtml from '../../../utils/escape-html.js'
 
 const getSubcategoryTooltip = (category, subcategory) => `
   <div class="sortable-table-tooltip">
@@ -28,16 +28,14 @@ const header = [
   {
     id: 'subcategory',
     title: 'Категория',
-    sortable: true,
-    sortType: 'custom',
+    sortable: false,
     template: data => {
       return `
         <div class="sortable-table__cell">
           <span data-tooltip="${escapeHtml(getSubcategoryTooltip(data.category.title, data.title))}">${data.title}</span>
         </div>
       `;
-    },
-    customSorting: (a, b) => a.subcategory.title.localeCompare(b.subcategory.title, ['ru', 'en'], { caseFirst: 'upper' }),
+    }
   },
   {
     id: 'quantity',
@@ -50,19 +48,22 @@ const header = [
     title: 'Цена',
     sortable: true,
     sortType: 'number',
-    template: data => {
-      return `
-        <div class="sortable-table__cell">
-          <span>$${data}</span>
-        </div>
-      `;
-    },
+    template: data => `
+      <div class="sortable-table__cell">
+        $${data.toLocaleString('en-US')}
+      </div>
+    `
   },
   {
-    id: 'sales',
-    title: 'Продажи',
+    id: 'status',
+    title: 'Статус',
     sortable: true,
-    sortType: 'number'
+    sortType: 'number',
+    template: data => {
+      return `<div class="sortable-table__cell">
+        ${data > 0 ? 'Активен' : 'Неактивен'}
+      </div>`;
+    }
   },
 ];
 
