@@ -1,4 +1,4 @@
-import escapeHtml from '../../utils/escape-html.js'
+import escapeHtml from '../../utils/escape-html.js';
 
 const getSubcategoryTooltip = (category, subcategory) => `
   <div class="sortable-table-tooltip">

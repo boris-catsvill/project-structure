@@ -16,7 +16,8 @@ router
   .setNotFoundPagePath('error404')
   .listen();
 
-document.querySelector('button.sidebar__toggler').addEventListener('click', () => {
+document.querySelector('button.sidebar__toggler').addEventListener('click', event => {
+  event.preventDefault();
   document.body.classList.toggle('is-collapsed-sidebar');
 });
 
@@ -29,8 +30,10 @@ document.addEventListener('route', event => {
   const path = `${event.detail.path}/`;
 
   nav.forEach(item => {
-    path.startsWith(`${item.page}/`)
-      ? item.element.classList.add('active')
-      : item.element.classList.remove('active');
+    if (path.startsWith(`${item.page}/`)) {
+      item.element.classList.add('active');
+    } else {
+      item.element.classList.remove('active');
+    }
   });
-})
+});

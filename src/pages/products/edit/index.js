@@ -6,6 +6,10 @@ export default class Page {
   subElements = {};
   components = {};
 
+  constructor([_, productId]) {
+    this.productId = productId;
+  }
+
   get template() {
     return `
       <div class="products-edit">
@@ -34,12 +38,7 @@ export default class Page {
   }
 
   async initComponents() {
-    let productId;
-    let id = decodeURI(window.location.pathname)
-      .replace(/^\/|\/$/, '')
-      .replace('products/', '');
-    if (id && id !== 'add') productId = id;
-    const productForm = new ProductForm(productId);
+    const productForm = new ProductForm(this.productId);
     await productForm.render();
 
     this.components = {
