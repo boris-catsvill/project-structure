@@ -51,4 +51,3 @@ window.addEventListener('unhandledrejection', event => {
     alert(event.reason.message);
   }
 });
-
