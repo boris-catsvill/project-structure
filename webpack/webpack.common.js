@@ -55,6 +55,11 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: path.join(__dirname, '../src/index.html')
     }),
+    new HtmlWebpackPlugin({
+      template: path.join(__dirname, '../src/404.html'),
+      filename: '404.html',
+      inject: false,
+    }),
     new MiniCssExtractPlugin({
       // Options similar to the same options in webpackOptions.output
       // both options are optional
@@ -66,9 +71,8 @@ module.exports = {
         from: path.join(__dirname, '../src/assets')
       },
       {
-        from: path.join(__dirname, '../src/components/product-form/*.svg'),
-        flatten: true
-      }
+        from: path.join(__dirname, '../src/ghspa.js')
+      },
     ])
   ]
 };

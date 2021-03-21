@@ -8,6 +8,8 @@
 Проект - это фронтенд часть типичной "Панели управления" для магазина товаров,
 реализованная на чистом JavaScript.
 
+### [Live demo](https://sitnikovyuriy.github.io/project-structure/)
+
 ## Preview
 
 [![preview](./preview.png)](https://project-structure/)
