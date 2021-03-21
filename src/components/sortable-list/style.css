@@ -2,12 +2,12 @@
   position: relative;
   padding: 0;
   margin: 12px 0;
+  list-style: none;
 }
 
 .sortable-list__item {
   min-height: 60px;
   background-color: var(--white);
-  list-style: none;
   padding: 16px 16px 16px 40px;
   display: flex;
   flex-direction: row;

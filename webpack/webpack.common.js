@@ -47,12 +47,18 @@ module.exports = {
   },
   plugins: [
     new webpack.DefinePlugin({
+      'process.env.URL_PATH': JSON.stringify(process.env.URL_PATH || ''),
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
       'process.env.IMGUR_CLIENT_ID': JSON.stringify(process.env.IMGUR_CLIENT_ID),
       'process.env.BACKEND_URL': JSON.stringify(process.env.BACKEND_URL)
     }),
     new HtmlWebpackPlugin({
       template: path.join(__dirname, '../src/index.html')
+    }),
+    new HtmlWebpackPlugin({
+      template: path.join(__dirname, '../src/404.html'),
+      filename: '404.html',
+      inject: false,
     }),
     new MiniCssExtractPlugin({
       // Options similar to the same options in webpackOptions.output
@@ -65,9 +71,8 @@ module.exports = {
         from: path.join(__dirname, '../src/assets')
       },
       {
-        from: path.join(__dirname, '../src/components/product-form/*.svg'),
-        flatten: true
-      }
+        from: path.join(__dirname, '../src/ghspa.js')
+      },
     ])
   ]
 };
