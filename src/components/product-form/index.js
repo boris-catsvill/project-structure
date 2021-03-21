@@ -78,7 +78,7 @@ export default class ProductForm {
     wrapper.innerHTML = `
       <li class="products-edit__imagelist-item sortable-list__item">
         <span>
-          <img src="./icon-grab.svg" data-grab-handle alt="grab">
+          <img src="./src/components/product-form/icon-grab.svg" data-grab-handle alt="grab">
           <img class="sortable-table__cell-img" alt="${imgName}" src="${path}">
           <span>${imgName}</span>
         </span>
@@ -107,7 +107,6 @@ export default class ProductForm {
 
   renderFrom() {
     const {categories, defaultProducts} = this;
-    const images = this.products.images;
 
     return `
       <form data-element="productForm" class="form-grid">
