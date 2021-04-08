@@ -68,7 +68,8 @@ export default class SortableTable {
     isSortLocally = false,
     step = 20,
     start = 1,
-    end = start + step
+    end = start + step,
+    page = ''
   } = {}) {
 
     this.headersConfig = headersConfig;
@@ -78,12 +79,13 @@ export default class SortableTable {
     this.step = step;
     this.start = start;
     this.end = end;
+    this.page = page;
 
     this.render();
   }
 
   async render() {
-    const {id, order} = this.sorted;
+    const { id, order } = this.sorted;
     const wrapper = document.createElement('div');
 
     wrapper.innerHTML = this.getTable();
@@ -129,6 +131,12 @@ export default class SortableTable {
     this.subElements.body.append(...rows.childNodes);
   }
 
+  updateData = async (url) => {
+    const newData = await fetchJson(url);
+    const newRows = this.getTableRows(newData);
+    this.subElements.body.innerHTML = newRows;
+  }
+
   getTableHeader() {
     return `<div data-element="header" class="sortable-table__header sortable-table__row">
       ${this.headersConfig.map(item => this.getHeaderRow(item)).join('')}
@@ -164,22 +172,34 @@ export default class SortableTable {
   }
 
   getTableRows(data) {
-    return data.map(item => `
+    let result;
+
+    if (this.page === 'products') {
+      result = data.map(item => `
+      <a href="/products/${item.id}" class="sortable-table__row">
+        ${this.getTableRow(item, data)}
+      </a>`
+      ).join('');
+    } else {
+      result = data.map(item => `
       <div class="sortable-table__row">
         ${this.getTableRow(item, data)}
       </div>`
     ).join('');
+    }
+
+    return result;
   }
 
   getTableRow(item) {
-    const cells = this.headersConfig.map(({id, template}) => {
+    const cells = this.headersConfig.map(({ id, template }) => {
       return {
         id,
         template
       };
     });
 
-    return cells.map(({id, template}) => {
+    return cells.map(({ id, template }) => {
       return template
         ? template(item[id])
         : `<div class="sortable-table__cell">${item[id]}</div>`;
@@ -212,7 +232,7 @@ export default class SortableTable {
   }
 
   async sortOnServer(id, order) {
-    const start = 1;
+    const start = 0;
     const end = start + this.step;
     const data = await this.loadData(id, order, start, end);
 

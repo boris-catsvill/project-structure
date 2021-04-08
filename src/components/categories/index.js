@@ -1,23 +1,22 @@
-import SortableList from '../../components/sortable-list/index.js';
-const BACKEND_URL = 'https://course-js.javascript.ru';
+import SortableList from '../sortable-list/index.js';
+const BACKEND_URL = process.env.BACKEND_URL;
 
-export default class Page {
-    constructor({ url = 'api/rest/categories', sort = 'weight', refs = 'subcategory' } = {}) {
+export default class Categories {
+    constructor({ url, sort, refs } = {}) {
         this.url = new URL(url, BACKEND_URL);
         this.sort = sort;
         this.refs = refs;
+        this.render();
     }
 
-    async render() {
+    render() {
         const wrapper = document.createElement('div');
         wrapper.innerHTML = this.getTemplate();
         this.element = wrapper.firstElementChild;
-        await this.loadData();
+        this.loadData();
         wrapper.remove();
 
         this.initEventListeners();
-
-        return this.element;
     }
 
     getTemplate() {
@@ -88,14 +87,6 @@ export default class Page {
         }
 
         return listItems;
-    }
-
-    initEventListeners() {
-        this.element.addEventListener('pointerdown', (evt) => {
-            if (!evt.target.classList.contains('category__header')) return;
-            console.log(evt.target.closest('.category'));
-            evt.target.closest('.category').classList.toggle('category_open');
-        });
     }
 
     remove() {
