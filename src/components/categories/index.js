@@ -1,5 +1,5 @@
 import SortableList from '../sortable-list/index.js';
-const BACKEND_URL = 'https://course-js.javascript.ru';
+const BACKEND_URL = process.env.BACKEND_URL;
 
 export default class Categories {
     constructor({ url, sort, refs } = {}) {
@@ -88,13 +88,6 @@ export default class Categories {
 
         return listItems;
     }
-
-    // initEventListeners() {
-    //     this.element.addEventListener('pointerdown', (evt) => {
-    //         if (!evt.target.classList.contains('category__header')) return;
-    //         evt.target.closest('.category').classList.toggle('category_open');
-    //     });
-    // }
 
     remove() {
         this.element.remove();

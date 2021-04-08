@@ -82,7 +82,7 @@ export default class ColumnChart {
     }
 
     makeUrl(from, to) { 
-        const url = new URL(this.url, 'https://course-js.javascript.ru/');
+        const url = new URL(this.url, process.env.BACKEND_URL);
         url.searchParams.set('from', from.toISOString());
         url.searchParams.set('to', to.toISOString());
 

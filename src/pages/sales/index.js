@@ -3,7 +3,7 @@ import SortableTable from '../../components/sortable-table/index.js';
 
 import fetchJson from '../../utils/fetch-json.js';
 
-const BACKEND_URL = 'https://course-js.javascript.ru/';
+const BACKEND_URL = process.env.BACKEND_URL;
 
 export default class Page {
     header = [
@@ -53,7 +53,7 @@ export default class Page {
         start = 0,
         end = 30,
         dates = {
-            from: new Date((new Date).getTime() - 30 * 24 * 3600 * 1000),
+            from: new Date((new Date).setMonth((new Date).getMonth() - 1)),
             to: new Date()
         }
     

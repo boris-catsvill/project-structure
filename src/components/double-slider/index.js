@@ -79,17 +79,19 @@ export default class DoubleSlider {
     }
 
     initThumb(evt) {
-
-        let activeThumb;
         
-        (evt.target === this.leftThumb) ? activeThumb = this.leftThumb : activeThumb = this.rightThumb;
+        const activeThumb = (evt.target === this.leftThumb) ? this.leftThumb : this.rightThumb;
        
         let { left, right } = activeThumb.getBoundingClientRect();
         
         activeThumb.leftX = left;
         activeThumb.rightX = right;
 
-        (activeThumb === this.leftThumb) ? activeThumb.positionStart = left : activeThumb.positionStart = right;
+        if (activeThumb === this.leftThumb) {
+            activeThumb.positionStart = left;
+        } else {
+            activeThumb.positionStart = right;  
+        }
 
         activeThumb.shiftX = evt.clientX - activeThumb.positionStart;
 
