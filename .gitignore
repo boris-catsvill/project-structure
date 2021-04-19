@@ -4,3 +4,4 @@ cypress/videos
 cypress/screenshots
 build
 dist
+package-lock.json
