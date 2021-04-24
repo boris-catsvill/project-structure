@@ -1,5 +1,7 @@
 const menuItems = ['dashboard', 'products', 'categories', 'sales'];
 
+const URL_PATH = process.env.URL_PATH;
+
 export default function renderMenu(path) {
   return menuItems
     .map(item => {
@@ -7,7 +9,7 @@ export default function renderMenu(path) {
 
       return `
         <li ${match ? 'class="active"' : ''}>
-          <a href="/${item === 'dashboard' ? '' : item}" data-page="${item}">
+          <a href="/${URL_PATH}${item === 'dashboard' ? '' : item}" data-page="${item}">
             <i class="icon-${item}"></i>
             <span>${item}</span>
           </a>
