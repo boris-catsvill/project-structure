@@ -1,5 +1,7 @@
 import fetchJson from "../../utils/fetch-json.js";
 
+const URL_PATH = process.env.URL_PATH;
+
 export default class SortableTable {
   element;
   subElements = {};
@@ -228,7 +230,7 @@ export default class SortableTable {
 
   getTableRows(data) {
     return data.map(item => `
-      <a href="/products/${item.id}" class="sortable-table__row">
+      <a href="/${URL_PATH}products/${item.id}" class="sortable-table__row">
         ${this.getTableRow(item, data)}
       </a>`
     ).join('');

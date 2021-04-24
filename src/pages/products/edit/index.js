@@ -1,6 +1,8 @@
 import ProductForm from '../../../components/product-form/index.js';
 import NotificationMessage from '../../../components/notification/index.js';
 
+const URL_PATH = process.env.URL_PATH;
+
 export default class EditPage {
   element;
   subElements = {};
@@ -12,7 +14,7 @@ export default class EditPage {
       <div class="products-edit">
         <div class="content__top-panel">
         <h1 class="page-title">
-            <a href="/products" class="link">Товары</a> / ${this.currentId ? "Редактировать" : "Добавить"} 
+            <a href="/${URL_PATH}products" class="link">Товары</a> / ${this.currentId ? "Редактировать" : "Добавить"} 
           </h1>
         </div>
         <div class="content-box">       

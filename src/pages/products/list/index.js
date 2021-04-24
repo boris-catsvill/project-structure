@@ -2,6 +2,8 @@ import SortableTable from '../../../components/sortable-table/index.js';
 import FilterPanel from '../../../components/filter-panel/index.js';
 import header from './products-header.js';
 
+const URL_PATH = process.env.URL_PATH;
+
 export default class ProductsPage {
   subElements = {};
   components = {};
@@ -14,7 +16,7 @@ export default class ProductsPage {
       <div class="products-list">
         <div class="content__top-panel">
           <h1 class="page-title">Товары</h1>
-          <a href="/products/add" class="button-primary">Добавить товар</a>
+          <a href="/${URL_PATH}products/add" class="button-primary">Добавить товар</a>
         </div>
         <div data-element="filterPanel">
         </div>

@@ -2,6 +2,8 @@ import SortableList from '../sortable-list/index.js';
 import escapeHtml from '../../utils/escape-html.js';
 import fetchJson from '../../utils/fetch-json.js';
 
+const URL_PATH = process.env.URL_PATH;
+
 export default class ProductForm {
   defaultFormData = {
     title: '',
@@ -248,18 +250,21 @@ export default class ProductForm {
 
   renderImageItem({ source, url }) {
     const image = document.createElement('div');
+    const path = process.env.NODE_ENV === 'production' ?
+      `../../${URL_PATH}` :
+      '../';
 
     image.innerHTML = `
       <li class="products-edit__imagelist-item sortable-list__item" style="">
         <input type="hidden" name="url" value="${escapeHtml(url)}">
         <input type="hidden" name="source" value="${escapeHtml(source)}">
         <span>
-          <img src="../icon-grab.svg" data-grab-handle="" alt="grab">
+          <img src="${path}icon-grab.svg" data-grab-handle="" alt="grab">
           <img class="sortable-table__cell-img" alt="Image" src="${url}">
           <span>${escapeHtml(source)}</span>
         </span>
         <button type="button">
-          <img src="../icon-trash.svg" data-delete-handle="" alt="delete">
+          <img src="${path}icon-trash.svg" data-delete-handle="" alt="delete">
         </button>
         </span>
       </li>
