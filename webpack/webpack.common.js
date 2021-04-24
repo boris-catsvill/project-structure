@@ -49,7 +49,9 @@ module.exports = {
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
       'process.env.IMGUR_CLIENT_ID': JSON.stringify(process.env.IMGUR_CLIENT_ID),
-      'process.env.BACKEND_URL': JSON.stringify(process.env.BACKEND_URL)
+      'process.env.BACKEND_URL': JSON.stringify(process.env.BACKEND_URL),
+      'process.env.DATA_API': JSON.stringify(process.env.DATA_API),
+      'process.env.URL_PATH': JSON.stringify(process.env.URL_PATH || '')
     }),
     new HtmlWebpackPlugin({
       template: path.join(__dirname, '../src/index.html')
@@ -66,6 +68,14 @@ module.exports = {
       },
       {
         from: path.join(__dirname, '../src/components/product-form/*.svg'),
+        flatten: true
+      },
+      {
+        from: path.join(__dirname, '../src/components/sortable-table/*.svg'),
+        flatten: true
+      },
+      {
+        from: path.join(__dirname, '../src/components/notification/*.svg'),
         flatten: true
       }
     ])

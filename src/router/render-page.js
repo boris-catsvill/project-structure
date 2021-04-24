@@ -1,5 +1,10 @@
-export default async function(path, match) {
+import renderMenu from '../components/menu/index.js';
+
+export default async function(path, match) {  
   const main = document.querySelector('main');
+  const menu = document.querySelector('.sidebar__nav');
+
+  menu.innerHTML = renderMenu(path);
 
   main.classList.add('is-loading');
 
