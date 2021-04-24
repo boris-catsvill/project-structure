@@ -118,6 +118,10 @@
   color: var(--blue);
 }
 
+.sidebar__nav li span {
+  text-transform: capitalize;
+}
+
 .sidebar__toggler {
   -webkit-appearance: none;
   -moz-appearance: none;

@@ -1,7 +1,5 @@
 import fetchJson from "../../utils/fetch-json.js";
 
-const BACKEND_URL = process.env.BACKEND_URL;
-
 export default class SortableTable {
   element;
   subElements = {};
@@ -75,7 +73,7 @@ export default class SortableTable {
   } = {}) {
 
     this.headersConfig = headersConfig;
-    this.url = new URL(url, BACKEND_URL);
+    this.url = new URL(url, process.env.BACKEND_URL);
     this.sorted = sorted;
     this.isSortLocally = isSortLocally;
     this.step = step;

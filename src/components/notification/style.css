@@ -2,8 +2,7 @@
   background-color: var(--black);
   opacity: 0.8;
   border-radius: 4px;
-  -webkit-animation: fadeOut 0.3s linear;
-          animation: fadeOut 0.3s linear;
+  animation: calc(var(--value) * 0.1) ease-out calc(var(--value) * 0.9) fadeOut;
   display: none;
   position: fixed;
   right: 75px;
@@ -12,8 +11,7 @@
 
 .notification.show {
   display: block;
-  -webkit-animation: fadeIn 0.3s linear;
-          animation: fadeIn 0.3s linear;
+  animation: calc(var(--value) * 0.1) ease-out calc(var(--value) * 0.9) fadeIn;
 }
 
 .notification__content {

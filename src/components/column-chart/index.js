@@ -1,7 +1,5 @@
 import fetchJson from '../../utils/fetch-json.js';
 
-const BACKEND_URL = process.env.BACKEND_URL;
-
 export default class ColumnChart {
   element = null;
   subElements = {};
@@ -105,7 +103,7 @@ export default class ColumnChart {
   async update(startDate, endDate) {
     this.startLoading();
 
-    const url = new URL(this.url, BACKEND_URL);
+    const url = new URL(this.url, process.env.BACKEND_URL);
 
     url.searchParams.set('from', startDate.toJSON());
     url.searchParams.set('to', endDate.toJSON());

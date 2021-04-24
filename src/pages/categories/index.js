@@ -2,9 +2,6 @@ import SortableList from '../../components/sortable-list/index.js';
 import NotificationMessage from '../../components/notification/index.js';
 import fetchJson from '../../utils/fetch-json.js';
 
-const BACKEND_URL = process.env.BACKEND_URL;
-const DATA_API = process.env.DATA_API;
-
 export default class CategoriesPage {
   subElements = {};
   components = {};
@@ -26,7 +23,7 @@ export default class CategoriesPage {
       }));
 
     try {
-      await fetchJson(`${BACKEND_URL}${DATA_API}/subcategories`, {
+      await fetchJson(`${process.env.BACKEND_URL}${process.env.DATA_API}/subcategories`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json'
@@ -88,7 +85,7 @@ export default class CategoriesPage {
   }
 
   async getCategories() {
-    const url = new URL(`${DATA_API}/categories`, BACKEND_URL);
+    const url = new URL(`${process.env.DATA_API}/categories`, process.env.BACKEND_URL);
     url.searchParams.set(`_sort`, `weight`);
     url.searchParams.set(`_refs`, `subcategory`);
 

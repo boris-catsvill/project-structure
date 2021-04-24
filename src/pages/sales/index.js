@@ -1,9 +1,6 @@
 import SortableTable from '../../components/sortable-table/index.js';
 import RangePicker from '../../components/range-picker/index.js';
-import fetchJson from '../../utils/fetch-json.js';
 import header from './orders-header.js';
-
-const BACKEND_URL = process.env.BACKEND_URL;
 
 export default class SalesPage {
   subElements = {};
@@ -75,7 +72,7 @@ export default class SalesPage {
 
     sortableTable.url = new URL(
       `api/rest/orders?createdAt_gte=${from.toISOString()}&createdAt_lte=${to.toISOString()}`,
-      BACKEND_URL
+      process.env.BACKEND_URL
     );
 
     const data = await sortableTable.loadData();

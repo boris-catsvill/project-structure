@@ -99,7 +99,7 @@ export default class Page {
       url: 'api/dashboard/sales',
       className: 'sales',
       label: 'Продажи',
-      formatHeading: data => `${this.formatSales(data)}`,
+      formatHeading: data => this.formatSales(data),
       range: {
         from,
         to
@@ -153,21 +153,11 @@ export default class Page {
   }
 
   formatSales(data) {
-    const sales = data.toString();
-    let result = ``;
-
-    for (let i = 0; i < sales.length; i++) {
-      if (
-        (i + 1) % 3 === 0 &&
-        (i + 1) !== sales.length
-      ) {
-        result += `${sales[i]},`;
-      } else {
-        result += sales[i];
-      }
-    }
-
-    return `$${result}`;
+    return data.toLocaleString('en', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0
+    });
   }
 
   remove() {

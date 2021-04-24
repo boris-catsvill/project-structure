@@ -2,10 +2,6 @@ import SortableList from '../sortable-list/index.js';
 import escapeHtml from '../../utils/escape-html.js';
 import fetchJson from '../../utils/fetch-json.js';
 
-const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID;
-const BACKEND_URL = process.env.BACKEND_URL;
-const DATA_API = process.env.DATA_API;
-
 export default class ProductForm {
   defaultFormData = {
     title: '',
@@ -48,7 +44,7 @@ export default class ProductForm {
           const result = await fetchJson('https://api.imgur.com/3/image', {
             method: 'POST',
             headers: {
-              Authorization: `Client-ID ${IMGUR_CLIENT_ID}`
+              Authorization: `Client-ID ${process.env.IMGUR_CLIENT_ID}`
             },
             body: formData
           });
@@ -178,14 +174,14 @@ export default class ProductForm {
   }
 
   async getProductData(productId) {
-    const url = new URL(`${DATA_API}/products`, BACKEND_URL);
+    const url = new URL(`${process.env.DATA_API}/products`, process.env.BACKEND_URL);
     url.searchParams.set(`id`, productId);
 
     return fetchJson(url.href);
   }
 
   async getCategories() {
-    const url = new URL(`${DATA_API}/categories`, BACKEND_URL);
+    const url = new URL(`${process.env.DATA_API}/categories`, process.env.BACKEND_URL);
     url.searchParams.set(`_sort`, `weight`);
     url.searchParams.set(`_refs`, `subcategory`);
 
@@ -195,7 +191,7 @@ export default class ProductForm {
   async save() {
     const formData = this.getFormData();
 
-    const result = await fetchJson(`${BACKEND_URL}${DATA_API}/products`, {
+    const result = await fetchJson(`${process.env.BACKEND_URL}${process.env.DATA_API}/products`, {
       method: this.productId ? 'PATCH' : 'PUT',
       headers: {
         'Content-Type': 'application/json'
