@@ -10,8 +10,8 @@ export default class Sales {
     }
 
     initComponents() {
-        const from = new Date();
-        const to = new Date(from.getFullYear(), from.getMonth() + 1);
+        const to = new Date();
+        const from = new Date(to.getFullYear(), to.getMonth() -1);
 
         this.components.rangePicker = new RangePicker({from, to});
 
