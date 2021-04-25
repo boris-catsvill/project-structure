@@ -4,22 +4,23 @@ import fetchJson from '../../utils/fetch-json.js';
 export default class Categories {
 
     constructor() {
-        this.components = {}
+        this.components = {};
     }
 
     async getCategoriesData() {
-        this.categories = await fetchJson('https://course-js.javascript.ru/api/rest/categories?_sort=weight&_refs=subcategory');
+        this.categories = await fetchJson(`${process.env.BACKEND_URL}api/rest/categories?_sort=weight&_refs=subcategory`);
     }
 
     initComponents() {
         this.categories.map(category => {
-            this.components[category.id] = new SortableList(getArrOfLiElement(category.subcategories));
+            this.components[category.id] = new SortableList(getObjectWithArrOfLiElement(category.subcategories));
         })
 
-        function getArrOfLiElement(object) {
+        function getObjectWithArrOfLiElement(object) {
             const liArray = object.reduce((accum, current) => {
                 const liElement = document.createElement('li');
-                liElement.textContent = current.title
+                liElement.setAttribute('data-grab-handle', '');
+                liElement.textContent = current.title;
                 accum.push(liElement);
 
                 return accum;
@@ -35,8 +36,9 @@ export default class Categories {
 
     getTemplate() {
         const categoriesElement = this.categories.reduce((accum, category) => {
-            return accum + this.createCategory(category); //TODO Поправить это
-        }, '');
+            accum.push(this.createCategory(category));
+            return accum;
+        }, []).join('');
 
         return `<div class="class="categories">
                     <div class="content__top-panel">
@@ -83,11 +85,10 @@ export default class Categories {
 
     destroy() {
         this.remove();
-        for(let key of this.components) {
+        for (const key in this.components) {
             this.components[key].destroy();
         }
     }
-
 
     // -------------------------- Utils Methods --------------------------
     getSubElements(element) {
