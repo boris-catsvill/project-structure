@@ -2,11 +2,17 @@ import SortableList from '../../components/sortable-list/index.js';
 import NotificationMessage from '../../components/notification/index.js';
 import fetchJson from '../../utils/fetch-json.js';
 
-const BACKEND_URL = 'https://course-js.javascript.ru/';
+const BACKEND_URL = process.env.BACKEND_URL;
 const API_URL_CATEGORIES = 'api/rest/categories';
 const API_URL_SUBCATEGORIES = 'api/rest/subcategories';
 
 export default class CategoriesPage {
+	constructor() {
+
+		this.render();
+		this.initEventListeners();
+	}
+
 	getTemplate() {
 		return `
       <div class="categories">
@@ -41,8 +47,6 @@ export default class CategoriesPage {
 
 		this.categories = await this.getCategories();
 		this.renderCategories(this.categories);
-
-		this.initEventListeners();
 
 		return this.element;
 	}

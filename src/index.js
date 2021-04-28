@@ -1,10 +1,10 @@
 import Router from './router/index.js';
 import tooltip from './components/tooltip/index.js';
-import sidebarEvents from './utils/sidebar.js';
+import sidebarEventsInit from './utils/sidebar.js';
 
 tooltip.initialize();
 
-sidebarEvents();
+sidebarEventsInit();
 
 const router = Router.instance();
 

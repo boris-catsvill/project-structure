@@ -3,17 +3,22 @@ import SortableTable from '../../../components/sortable-table/index.js';
 import FilterForm from '../../../components/filter-form/index.js';
 import header from './products-header.js';
 
-const BACKEND_URL = 'https://course-js.javascript.ru/';
+const BACKEND_URL = process.env.BACKEND_URL;
 
 import fetchJson from '../../../utils/fetch-json.js';
 
-export default class Page {
+export default class ProductsPage {
   element;
   subElements = {};
   components = {};
 
   sliderFrom = 0;
   sliderTo = 4000;
+
+  constructor() {
+    this.initComponents();
+    this.initEventListeners();
+  }
 
   get getTemplate() {
     return `
@@ -44,7 +49,9 @@ export default class Page {
     const subElementsFields = Object.keys(this.subElements);
 
     for (const index in subElementsFields) {
-      this.subElements[subElementsFields[index]].append(this.components[subElementsFields[index]].element);
+      const elementField = subElementsFields[index];
+
+      this.subElements[elementField].append(this.components[elementField].element);
     }
 
     this.initEventListeners();
@@ -74,25 +81,26 @@ export default class Page {
   }
 
   getSubElements(element) {
-		const result = {};
-		const elements = element.querySelectorAll('[data-element]');
+    const result = {};
+    const elements = element.querySelectorAll('[data-element]');
 
-		for (const subElement of elements) {
-			const name = subElement.dataset.element;
+    for (const subElement of elements) {
+      const name = subElement.dataset.element;
 
-			result[name] = subElement;
-		}
+      result[name] = subElement;
+    }
 
-		return result;
-	}
+    return result;
+  }
 
   async updateComponents(detail, type) {
+    const { sortableTable } = this.components;
     const params = {
       from: this.sliderFrom,
       to: this.sliderTo,
     }
 
-    switch(type){
+    switch (type) {
       case 'change-name':
         params.title = detail;
         break;
@@ -109,29 +117,29 @@ export default class Page {
 
     url.searchParams.set('price_gte', params.from);
     url.searchParams.set('price_lte', params.to);
-    if(params.title){
+
+    if (params.title) {
       url.searchParams.set('title_like', params.title);
     }
-    if(params.status){
+    if (params.status) {
       url.searchParams.set('status', params.status);
     }
+
     url.searchParams.set('_sort', 'title');
     url.searchParams.set('_order', 'asc');
     url.searchParams.set('_start', 0);
     url.searchParams.set('_end', 30);
 
-    this.components.sortableTable.element.classList.add('sortable-table_loading');
+    sortableTable.element.classList.add('sortable-table_loading');
 
     const data = await fetchJson(url.toString());
 
-    this.components.sortableTable.element.classList.remove('sortable-table_loading');
+    sortableTable.element.classList.remove('sortable-table_loading');
 
-    console.log(data);
-
-    if(data.length > 0){
-      this.components.sortableTable.addRows(data);
-    }else{
-      this.components.sortableTable.element.classList.add('sortable-table_empty');
+    if (data.length) {
+      sortableTable.addRows(data);
+    } else {
+      sortableTable.element.classList.add('sortable-table_empty');
     }
   }
 

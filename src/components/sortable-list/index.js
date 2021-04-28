@@ -8,13 +8,14 @@ export default class SortableList {
 
   getTemplate(items) {
     return `
-          <ul class="sortable-list">
-              ${items.map(item => {
-      item.classList.add('sortable-list__item');
-      return item.outerHTML
-    }).join('')}
-          </ul>
-      `;
+      <ul class="sortable-list">
+        ${items.map(item => {
+          item.classList.add('sortable-list__item');
+
+          return item.outerHTML;
+        }).join('')}
+      </ul>
+    `;
   }
 
   getPlaceholder() {
@@ -86,7 +87,7 @@ export default class SortableList {
 
     const moveListener = (event) => {
       this.replaceElement(event);
-    }
+    };
 
     const downListener = (event) => {
       this.currentItem = event.target.closest('li');
@@ -109,7 +110,7 @@ export default class SortableList {
       this.currentItem.classList.add('sortable-list__item_dragging');
 
       document.addEventListener('pointermove', moveListener);
-    }
+    };
 
     const upListener = () => {
       document.removeEventListener('pointermove', moveListener);
@@ -120,12 +121,12 @@ export default class SortableList {
         detail: this.element
       }));
       this.currentItem.classList.remove('sortable-list__item_dragging');
-    }
+    };
 
     const deleteListener = (event) => {
       this.currentItemDelete = event.target.closest('li');
       this.currentItemDelete.remove();
-    }
+    };
 
     itemsDelete.forEach((item) => {
       item.addEventListener('pointerdown', deleteListener);

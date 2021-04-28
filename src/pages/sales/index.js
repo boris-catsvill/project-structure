@@ -2,7 +2,7 @@ import SortableTable from '../../components/sortable-table/index.js';
 import RangePicker from '../../components/range-picker/index.js';
 import header from './sales-header.js';
 
-const BACKEND_URL = 'https://course-js.javascript.ru/';
+const BACKEND_URL = process.env.BACKEND_URL;
 
 import fetchJson from '../../utils/fetch-json.js';
 
@@ -34,7 +34,9 @@ export default class SalesPage {
         const subElementsFields = Object.keys(this.subElements);
 
         for (const index in subElementsFields) {
-            this.subElements[subElementsFields[index]].append(this.components[subElementsFields[index]].element);
+            const elementField = subElementsFields[index];
+
+            this.subElements[elementField].append(this.components[elementField].element);
         }
 
         this.initEventListeners();
@@ -67,18 +69,20 @@ export default class SalesPage {
     }
 
     async updateComponents(from, to) {
+        const { sortableTable } = this.components;
         const data = await fetchJson(`${BACKEND_URL}api/rest/orders?createdAt_gte=${from}&createdAt_lte=${to}&_sort=createdAt&_order=desc&_start=0&_end=30`);
 
-        this.components.sortableTable.addRows(data);
+        sortableTable.addRows(data);
     }
 
     initEventListeners() {
+        const { rangePicker } = this.components;
         const onUpdatePage = (event) => {
             const { from, to } = event.detail;
             this.updateComponents(from, to);
         }
 
-        this.components.rangePicker.element.addEventListener('date-select', onUpdatePage);
+        rangePicker.element.addEventListener('date-select', onUpdatePage);
     }
 
     getSubElements(element) {

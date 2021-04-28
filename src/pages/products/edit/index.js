@@ -39,15 +39,17 @@ export default class EditPage {
 
 		this.element = element.firstElementChild;
 
-		this.subElements = this.getSubElements();
+		this.subElements = this.getSubElements(element);
 
 		await this.initComponents();
 
 		const subElementsFields = Object.keys(this.subElements);
 
-    for (const index in subElementsFields) {
-      this.subElements[subElementsFields[index]].append(this.components[subElementsFields[index]].element);
-    }
+		for (const index in subElementsFields) {
+			const elementField = subElementsFields[index];
+			
+			this.subElements[elementField].append(this.components[elementField].element);
+		}
 
 		this.initEventListeners();
 

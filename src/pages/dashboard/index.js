@@ -3,11 +3,11 @@ import SortableTable from '../../components/sortable-table/index.js';
 import ColumnChart from '../../components/column-chart/index.js';
 import header from './bestsellers-header.js';
 
-const BACKEND_URL = 'https://course-js.javascript.ru/';
+const BACKEND_URL = process.env.BACKEND_URL;
 
 import fetchJson from '../../utils/fetch-json.js';
 
-export default class Page {
+export default class DashboardPage {
   constructor() {
 
     this.initComponents();
@@ -17,7 +17,6 @@ export default class Page {
   initComponents() {
     const from = new Date('2020-04-06');
     const to = new Date('2020-05-06');
-
 
     const sortableTable = new SortableTable(header, {
       url: `api/dashboard/bestsellers?from=${from}&to=${to}&_sort=title&_order=asc&_start=0&_end=30`,
@@ -64,7 +63,7 @@ export default class Page {
       ordersChart,
       salesChart,
       customersChart,
-    }
+    };
   }
 
   getTemplate() {
@@ -99,38 +98,49 @@ export default class Page {
     const subElementsFields = Object.keys(this.subElements);
 
     for (const index in subElementsFields) {
-      this.subElements[subElementsFields[index]].append(this.components[subElementsFields[index]].element);
+      const elementField = subElementsFields[index];
+
+      this.subElements[elementField].append(this.components[elementField].element);
     }
 
     return this.element;
   }
 
   async updateComponents(from, to) {
-    this.components.sortableTable.element.classList.add('sortable-table_loading');
+    const {
+      sortableTable,
+      ordersChart,
+      salesChart,
+      customersChart
+    } = this.components;
+
+    sortableTable.element.classList.add('sortable-table_loading');
 
     const data = await fetchJson(`${BACKEND_URL}api/dashboard/bestsellers?from=${from}&to=${to}&_sort=title&_order=asc&_start=0&_end=30`);
 
-    this.components.sortableTable.element.classList.add('sortable-table_loading');
+    sortableTable.element.classList.add('sortable-table_loading');
 
-    if(data.length > 0){
-      this.components.sortableTable.addRows(data);
-    }else{
-      this.components.sortableTable.element.classList.add('sortable-table_empty');
+    if (data.length) {
+      sortableTable.addRows(data);
+    } else {
+      sortableTable.element.classList.add('sortable-table_empty');
     }
 
-    this.components.ordersChart.update(from, to);
-    this.components.salesChart.update(from, to);
-    this.components.customersChart.update(from, to);
+    ordersChart.update(from, to);
+    salesChart.update(from, to);
+    customersChart.update(from, to);
   }
 
   initEventListeners() {
+    const { rangePicker } = this.components;
+
     const onUpdatePage = (event) => {
       const { from, to } = event.detail;
 
       this.updateComponents(from, to);
-    }
+    };
 
-    this.components.rangePicker.element.addEventListener('date-select', onUpdatePage);
+    rangePicker.element.addEventListener('date-select', onUpdatePage);
   }
 
   getSubElements(element) {

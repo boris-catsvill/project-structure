@@ -2,7 +2,7 @@ import SortableList from '../sortable-list/index.js';
 import fetchJson from '../../utils/fetch-json.js';
 
 const IMGUR_CLIENT_ID = '28aaa2e823b03b1';
-const BACKEND_URL = 'https://course-js.javascript.ru';
+const BACKEND_URL = process.env.BACKEND_URL;
 const IMGUR_BACKEND_URL = 'https://api.imgur.com/3/image';
 const API_URL_PRODUCTS = 'api/rest/products/';
 const API_URL_CATEGORIES = 'api/rest/categories/';
@@ -86,7 +86,7 @@ export default class ProductForm {
       rating: 5,
       status: 1,
       subcategory: "",
-    }
+    };
 
     this.initComponent();
     this.initEventListeners();
@@ -181,7 +181,8 @@ export default class ProductForm {
           <img src="icon-trash.svg" data-delete-handle="" alt="delete">
         </button>
       </li>
-    `
+    `;
+
     return wrapper.firstElementChild;
   }
 
@@ -250,7 +251,7 @@ export default class ProductForm {
   }
 
   async getCategories() {
-    const url = new URL(`${BACKEND_URL}/${API_URL_CATEGORIES}`);
+    const url = new URL(`${BACKEND_URL}${API_URL_CATEGORIES}`);
 
     const params = {
       _sort: 'weight',
@@ -263,7 +264,7 @@ export default class ProductForm {
   }
 
   async getProducts(productId) {
-    const url = new URL(`${BACKEND_URL}/${API_URL_PRODUCTS}`);
+    const url = new URL(`${BACKEND_URL}${API_URL_PRODUCTS}`);
 
     const params = {
       id: productId,
@@ -275,7 +276,7 @@ export default class ProductForm {
   }
 
   async addProduct(product) {
-    return await fetchJson(`${BACKEND_URL}/${API_URL_PRODUCTS}`, {
+    return await fetchJson(`${BACKEND_URL}${API_URL_PRODUCTS}`, {
       method: this.productId ? 'PATCH' : 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -314,7 +315,7 @@ export default class ProductForm {
       return {
         url: url.value,
         source: source.value,
-      }
+      };
     });
   }
 
@@ -327,7 +328,7 @@ export default class ProductForm {
     for (const index in fieldsProduct) {
       const field = fieldsProduct[index];
 
-      if (this.subElements.hasOwnProperty(field)) {
+      if (Object.prototype.hasOwnProperty.call(this.subElements, field)) {
         const value = this.subElements[field].value;
         const parseValue = +value;
 
