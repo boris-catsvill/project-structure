@@ -114,13 +114,17 @@ export default class SortableList {
 
     const upListener = () => {
       document.removeEventListener('pointermove', moveListener);
+
       this.restorePosition();
+
       this.currentPlaceholder.replaceWith(this.currentItem);
+
+      this.currentItem.classList.remove('sortable-list__item_dragging');
+
       this.element.dispatchEvent(new CustomEvent('sortable-list-reorder', {
         bubbles: true,
         detail: this.element
       }));
-      this.currentItem.classList.remove('sortable-list__item_dragging');
     };
 
     const deleteListener = (event) => {
