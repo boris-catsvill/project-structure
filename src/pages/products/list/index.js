@@ -44,8 +44,6 @@ export default class ProductsPage {
     this.element = element.firstElementChild;
     this.subElements = this.getSubElements(element);
 
-    await this.initComponents();
-
     const subElementsFields = Object.keys(this.subElements);
 
     for (const index in subElementsFields) {

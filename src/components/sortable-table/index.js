@@ -8,6 +8,7 @@ export default class SortableTable {
     data = [],
     sorted = {},
     isSortLocally = false,
+    loading = false,
     step = 20,
     start = 1,
     end = start + step
@@ -16,7 +17,7 @@ export default class SortableTable {
     this.url = url;
     this.data = data;
     this.isSortLocally = isSortLocally;
-
+    this.loading = loading;
     this.start = start;
     this.end = end;
     this.step = step;
@@ -76,10 +77,6 @@ export default class SortableTable {
     return rows.join('');
   }
 
-  updateBody(bodyData) {
-    this.subElements.body.innerHTML = this.getBody(bodyData);
-  }
-
   getTable() {
     const header = this.getHeader(this.headerData);
     return `
@@ -103,7 +100,7 @@ export default class SortableTable {
   addRows(data) {
     this.data = data;
 
-    this.updateBody(data);
+    this.update(data);
   }
 
   initComponent() {
@@ -142,6 +139,17 @@ export default class SortableTable {
     this.addRows([...this.data, ...data]);
   }
 
+  update(data) {
+    const rows = document.createElement('div');
+
+    this.data = [...this.data, ...data];
+    rows.innerHTML = this.getBody(data);
+
+    if(this.subElements.body){
+      this.subElements.body.append(...rows.childNodes);
+    }
+  }
+
   async sortOnServer(fieldValue, orderValue, start, end) {
     this.render(fieldValue, orderValue, start, end);
   }
@@ -172,11 +180,16 @@ export default class SortableTable {
       const { bottom } = this.element.getBoundingClientRect();
       const { id, order } = this.sorted;
 
-      if (bottom < document.documentElement.clientHeight && !this.sortLocally) {
+      if (bottom < document.documentElement.clientHeight && !this.loading && !this.sortLocally) {
         this.start = this.end;
         this.end = this.start + this.step;
 
-        this.render(id, order);
+        this.loading = true;
+
+        const data = await this.loadData(id, order, this.start, this.end);
+        this.update(data);
+
+        this.loading = false;
       }
     };
 
@@ -220,8 +233,13 @@ export default class SortableTable {
     return result;
   }
 
-  destroy() {
+  remove(){
     this.element.remove();
+    document.removeEventListener('scroll', this.onWindowScroll);
+  }
+
+  destroy() {
+    this.remove();
     this.subElements = {};
   }
 }
