@@ -3,6 +3,14 @@ import tooltip from './components/tooltip/index.js';
 
 tooltip.initialize();
 
+document.querySelector('.sidebar__toggler').addEventListener('pointerdown', (event)=>{
+  if(document.body.contains('is-collapsed-sidebar')){
+    document.body.remove('is-collapsed-sidebar')
+  } else{
+    document.body.add("is-collapsed-sidebar");
+  }
+});
+
 const router = Router.instance();
 
 router
