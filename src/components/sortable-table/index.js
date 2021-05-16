@@ -163,11 +163,22 @@ export default class SortableTable {
       </div>`;
   }
 
-  getTableRows(data) {
-    return data.map(item => `
-      <div class="sortable-table__row">
-        ${this.getTableRow(item, data)}
-      </div>`
+  getTableRows(data) { //TODO Плохой способ! Поправить
+    return data.map(item => {
+      if(item.hasOwnProperty('brand')) {
+        return `
+              <a href="/products/${item.id}" class="sortable-table__row">
+                ${this.getTableRow(item, data)}
+              </a>
+              `
+      } else {
+        return `
+              <div class="sortable-table__row">
+                ${this.getTableRow(item, data)}
+              </div>
+              `
+      }
+    }
     ).join('');
   }
 

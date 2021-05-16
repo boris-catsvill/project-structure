@@ -15,7 +15,14 @@ const header = [
       id: 'title',
       title: 'Name',
       sortable: true,
-      sortType: 'string'
+      sortType: 'string',
+      template: data => {
+        return `
+            <div class="sortable-table__cell">
+              ${data}
+            </div>
+        `
+      }
     },
     {
       id: 'subcategory',
@@ -23,9 +30,9 @@ const header = [
       sortable: false,
       template: data => {
         return `
-          <div class="sortable-table__cell">
-            ${data.category.title}
-          </div>
+            <div class="sortable-table__cell">
+              ${data.category.title}
+            </div>
         `;
       }
     },

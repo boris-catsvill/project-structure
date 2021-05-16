@@ -6,9 +6,25 @@ export default class Page {
   subElements = {};
   components = {};
 
+  constructor() {
+
+  }
+  
+  initComponents() {
+    const priceMin = 0;
+    const priceMax = 4000;
+  
+    this.components.sortableTable = new SortableTable(
+      header,
+      {
+        url: this.getProductUrl(priceMin, priceMax),
+      }
+    );
+  }
+
   getTemplate() {
     return `
-      <div class="products-list">
+    <div class="products-list">
         <div class="content__top-panel">
           <h1 class="page-title">Products</h1>
           <a href="/products/add" class="button-primary">Add product</a>
@@ -37,33 +53,25 @@ export default class Page {
       </div>
     `;
   }
+  
+  async renderComponents() {
+    const element = await this.components.sortableTable.element;
+    this.element.append(element);
+  }
 
   async render() {
     const element = document.createElement('div');
     element.innerHTML = this.getTemplate();
     this.element = element.firstElementChild;
-
     this.initComponents();
     await this.renderComponents();
-
+    
+    this.initEventListeners();
     return this.element;
   }
 
-  initComponents() {
-    const priceMin = 0;
-    const priceMax = 4000;
-
-    this.components.sortableTable = new SortableTable(
-      header,
-      {
-        url: this.getProductUrl(priceMin, priceMax),
-      }
-    );
-  }
-
-  async renderComponents() {
-    const element = await this.components.sortableTable.element;
-    this.element.append(element);
+  initEventListeners() {
+    console.log(this.components.sortableTable.element);
   }
 
   getProductUrl(priceMin, priceMax, filterName, status) {
