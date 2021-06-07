@@ -164,10 +164,17 @@ export default class SortableTable {
   }
 
   getTableRows(data) {
-    return data.map(item => `
-      <div class="sortable-table__row">
-        ${this.getTableRow(item, data)}
-      </div>`
+    if (window.location.pathname === '/sales') {
+      return data.map(item => `<div class="sortable-table__row">${this.getTableRow(item, data)}</div>`).join('');
+    }
+    return data.map(item => {
+      return `
+      <a href="products/${item.id}" class="">
+        <div class="sortable-table__row">
+          ${this.getTableRow(item, data)}
+        </div>
+      </a>`
+    }
     ).join('');
   }
 
