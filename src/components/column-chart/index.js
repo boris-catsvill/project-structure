@@ -31,14 +31,14 @@ export default class ColumnChart {
   }
 
   getLink() {
-    return this.link ? `<a class="column-chart__link" href="${this.link}">View all</a>` : '';
+    return this.link ? `<a class="column-chart__link" href="${this.link}">Подробнее</a>` : '';
   }
 
   get template () {
     return `
       <div class="column-chart column-chart_loading" style="--chart-height: ${this.chartHeight}">
         <div class="column-chart__title">
-          Total ${this.label}
+          ${this.label}
           ${this.getLink()}
         </div>
         <div class="column-chart__container">
