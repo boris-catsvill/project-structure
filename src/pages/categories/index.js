@@ -19,10 +19,6 @@ export default class Page {
     }
   };
 
-  constructor() {
-
-  }
-
   get template() {
     return `
       <div class="categories">
@@ -85,7 +81,7 @@ export default class Page {
   }
 
   initEventListeners() {
-    this.element.querySelector('[data-elem=categoriesContainer]').addEventListener('pointerdown', this.onCategoryClick)
+    this.element.querySelector('[data-elem=categoriesContainer]').addEventListener('pointerdown', this.onCategoryClick);
   }
 
   remove() {

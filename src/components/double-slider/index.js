@@ -5,16 +5,16 @@ export default class DoubleSlider {
   onThumbPointerMove = event => {
     event.preventDefault();
 
-    const { left: innerLeft, right: innerRight, width } = this.subElements.inner.getBoundingClientRect();
+    const { left: innerLeft, right: innerRight, width } = this.subElements['inner'].getBoundingClientRect();
 
-    if (this.dragging === this.subElements.thumbLeft) {
+    if (this.dragging === this.subElements['thumbLeft']) {
       let newLeft = (event.clientX - innerLeft + this.shiftX) / width;
 
       if (newLeft < 0) {
         newLeft = 0;
       }
       newLeft *= 100;
-      const right = parseFloat(this.subElements.thumbRight.style.right);
+      const right = parseFloat(this.subElements['thumbRight'].style.right);
 
       if (newLeft + right > 100) {
         newLeft = 100 - right;
@@ -24,7 +24,7 @@ export default class DoubleSlider {
       this.subElements.from.innerHTML = this.formatValue(this.getValue().from);
     }
 
-    if (this.dragging === this.subElements.thumbRight) {
+    if (this.dragging === this.subElements['thumbRight']) {
       let newRight = (innerRight - event.clientX - this.shiftX) / width;
 
       if (newRight < 0) {
@@ -32,7 +32,7 @@ export default class DoubleSlider {
       }
       newRight *= 100;
 
-      const left = parseFloat(this.subElements.thumbLeft.style.left);
+      const left = parseFloat(this.subElements['thumbLeft'].style.left);
 
       if (left + newRight > 100) {
         newRight = 100 - left;
@@ -74,15 +74,17 @@ export default class DoubleSlider {
   get template() {
     const { from, to } = this.selected;
 
-    return `<div class="range-slider">
-      <span data-element="from">${this.formatValue(from)}</span>
-      <div data-element="inner" class="range-slider__inner">
-        <span data-element="progress" class="range-slider__progress"></span>
-        <span data-element="thumbLeft" class="range-slider__thumb-left"></span>
-        <span data-element="thumbRight" class="range-slider__thumb-right"></span>
+    return `
+      <div class="range-slider">
+        <span data-element="from">${this.formatValue(from)}</span>
+        <div data-element="inner" class="range-slider__inner">
+          <span data-element="progress" class="range-slider__progress"></span>
+          <span data-element="thumbLeft" class="range-slider__thumb-left"></span>
+          <span data-element="thumbRight" class="range-slider__thumb-right"></span>
+        </div>
+        <span data-element="to">${this.formatValue(to)}</span>
       </div>
-      <span data-element="to">${this.formatValue(to)}</span>
-    </div>`;
+    `;
   }
 
   render() {
@@ -138,8 +140,8 @@ export default class DoubleSlider {
     this.subElements.progress.style.left = left;
     this.subElements.progress.style.right = right;
 
-    this.subElements.thumbLeft.style.left = left;
-    this.subElements.thumbRight.style.right = right;
+    this.subElements['thumbLeft'].style.left = left;
+    this.subElements['thumbRight'].style.right = right;
   }
 
   onThumbPointerDown(event) {
@@ -149,7 +151,7 @@ export default class DoubleSlider {
 
     const { left, right } = thumbElem.getBoundingClientRect();
 
-    if (thumbElem === this.subElements.thumbLeft) {
+    if (thumbElem === this.subElements['thumbLeft']) {
       this.shiftX = right - event.clientX;
     } else {
       this.shiftX = left - event.clientX;
@@ -165,8 +167,8 @@ export default class DoubleSlider {
 
   getValue() {
     const rangeTotal = this.max - this.min;
-    const { left } = this.subElements.thumbLeft.style;
-    const { right } = this.subElements.thumbRight.style;
+    const { left } = this.subElements['thumbLeft'].style;
+    const { right } = this.subElements['thumbRight'].style;
 
     const from = Math.round(this.min + parseFloat(left) * 0.01 * rangeTotal);
     const to = Math.round(this.max - parseFloat(right) * 0.01 * rangeTotal);

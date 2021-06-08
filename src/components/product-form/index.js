@@ -119,6 +119,8 @@ export default class ProductForm {
     }
 
     this.initEventListeners();
+
+    return this.element;
   }
 
   async getProductData(id = this.productId) {
@@ -180,7 +182,7 @@ export default class ProductForm {
       <div class="form-group form-group__wide" data-element="sortable-list-container">
         <label class="form-label">Фото</label>
         <div data-element="imageListContainer"></div>
-        <button type="button" id="uploadImage" class="button-primary-outline">
+        <button type="button" id="uploadImage" class="button-primary-outline fit-content">
           <span>Загрузить</span>
         </button>
       </div>
