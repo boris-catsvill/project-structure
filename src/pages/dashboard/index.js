@@ -51,7 +51,7 @@ export default class Page {
   }
 
   updateComponents({ from, to }) {
-    this.charts.forEach(chartType => this.components[`${chartType}Chart`].update(from, to));
+    Object.values(this.charts).forEach(chart => this.components[`${chart}Chart`].update(from, to));
 
     const tableComponent = this.components['sortableTable'];
     tableComponent.url.searchParams.set('from', from.toISOString());

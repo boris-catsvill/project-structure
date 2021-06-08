@@ -1,8 +1,7 @@
 /* eslint-disable no-undef */
 import RangePicker from '../../components/range-picker/index.js';
 import SortableTable from '../../components/sortable-table/index.js';
-import ColumnChart from '../../components/column-chart/index.js';
-import header from '../dashboard/bestsellers-header.js';
+import header from './sales-header.js';
 
 export default class Page {
   element;
@@ -13,29 +12,22 @@ export default class Page {
     this.updateComponents(detail);
   }
 
-  constructor() {
-    this.charts = ['orders', 'sales', 'customers'];
-  }
-
   get template() {
     return `
-      <div class="dashboard full-height flex-column">
+      <div class="sales full-height flex-column">
         <div class="content__top-panel">
-          <h2 class="page-title">Панель управления</h2>
+          <h1 class="page-title">Продажи</h1>
           <!-- Range Picker -->
         </div>
-        <div class="dashboard__charts">
-          <!-- Charts -->
+        <div data-elem="ordersContainer" class="full-height flex-column">
+          <!-- Table -->
         </div>
-        <h3 class="block-title">Лидеры продаж</h3>
-        <!-- Table -->
       </div>
     `;
   }
 
   initComponents() {
     this.initRangePicker();
-    this.initCharts();
     this.initTable();
 
     Object.entries(this.components).forEach(([key, value]) => this.subElements[key] = value.element);
@@ -43,19 +35,13 @@ export default class Page {
 
   renderComponents() {
     this.element.querySelector('.content__top-panel').append(this.subElements['rangePicker']);
-
-    const chartsContainer = this.element.querySelector('.dashboard__charts');
-    this.charts.forEach(chartType => chartsContainer.append(this.subElements[`${chartType}Chart`]));
-
-    this.element.append(this.subElements['sortableTable']);
+    this.element.querySelector('[data-elem=ordersContainer]').append(this.subElements['sortableTable']);
   }
 
   updateComponents({ from, to }) {
-    this.charts.forEach(chartType => this.components[`${chartType}Chart`].update(from, to));
-
     const tableComponent = this.components['sortableTable'];
-    tableComponent.url.searchParams.set('from', from.toISOString());
-    tableComponent.url.searchParams.set('to', to.toISOString());
+    tableComponent.url.searchParams.set('createdAt_gte', from.toISOString());
+    tableComponent.url.searchParams.set('createdAt_lte', to.toISOString());
     tableComponent.loadData().then(data => tableComponent.update(data));
   }
 
@@ -86,38 +72,17 @@ export default class Page {
     this.components['rangePicker'] = new RangePicker(this.range);
   }
 
-  initCharts() {
-    this.components[`ordersChart`] = new ColumnChart({
-      url: `api/dashboard/ordersChart`,
-      range: this.range,
-      label: 'Заказы',
-      link: '#',
-    });
-
-    this.components[`salesChart`] = new ColumnChart({
-      url: `api/dashboard/salesChart`,
-      range: this.range,
-      label: 'Продажи',
-      formatHeading: data => `$${data}`,
-    });
-
-    this.components[`customersChart`] = new ColumnChart({
-      url: `api/dashboard/customersChart`,
-      range: this.range,
-      label: 'Клиенты',
-    });
-
-    // this.components[`${chartType}Chart`].element.classList.add(`dashboard__chart_${chartType}`);
-  }
-
   initTable() {
-    const url = new URL('api/dashboard/bestsellers', process.env.BACKEND_URL);
-    url.searchParams.set('from', this.range.from.toISOString());
-    url.searchParams.set('to', this.range.to.toISOString());
+    const url = new URL('api/rest/orders', process.env.BACKEND_URL);
+    url.searchParams.set('createdAt_gte', this.range.from.toISOString());
+    url.searchParams.set('createdAt_lte', this.range.to.toISOString());
 
     this.components['sortableTable'] = new SortableTable(header, {
       url,
-      isSortLocally: true
+      sorted: {
+        id: 'createdAt',
+        order: 'desc'
+      }
     });
   }
 

@@ -2,7 +2,7 @@
 import fetchJson from "../../utils/fetch-json.js";
 
 export default class SortableTable {
-  static defaultSortOrder = 'asc';
+  static defaultSortOrder = 'desc';
 
   emptyTableClass = 'sortable-table_empty';
   loadingTableClass = 'sortable-table_loading';
@@ -48,7 +48,7 @@ export default class SortableTable {
 
     if (this.columnsSortTypes.get(id) && (this.currentSorting.id !== id || this.currentSorting.order === order)) {
       this.firstRecordToLoad = 0;
-      await this.sort(id, !order || order === SortableTable.defaultSortOrder ? 'desc' : 'asc');
+      await this.sort(id, !order || order === SortableTable.defaultSortOrder ? 'asc' : 'desc');
     }
   }
 
