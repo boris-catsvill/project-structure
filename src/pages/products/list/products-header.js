@@ -34,13 +34,19 @@ const header = [
     id: 'price',
     title: 'Цена',
     sortable: true,
-    sortType: 'number'
+    sortType: 'number',
+    template: data => `<div class="sortable-table__cell">$${data.toLocaleString()}</div>`
   },
   {
-    id: 'sales',
-    title: 'Продажи',
+    id: 'status',
+    title: 'Статус',
     sortable: true,
-    sortType: 'number'
+    sortType: 'number',
+    template: data => {
+      return `<div class="sortable-table__cell">
+          ${data > 0 ? 'Активен' : 'Неактивен'}
+        </div>`;
+    }
   },
 ];
 

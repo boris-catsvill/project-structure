@@ -1,7 +1,11 @@
 import Router from './router/index.js';
 import tooltip from './components/tooltip/index.js';
+import toggleSidebar from "./utils/toggleSidebar.js";
 
 tooltip.initialize();
+
+const sidebarToggler = document.body.querySelector('.sidebar__toggler');
+sidebarToggler.addEventListener('pointerdown', toggleSidebar);
 
 const router = Router.instance();
 
