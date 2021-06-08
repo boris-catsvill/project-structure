@@ -16,7 +16,7 @@ router
   .setNotFoundPagePath('error404')
   .listen();
 
-const onSidebarToggle = () => {
+const onSidebarToggleClick = () => {
   const documentBodyClassList = document.body.classList;
   const collapsedSidebarClass = 'is-collapsed-sidebar';
 
@@ -27,4 +27,4 @@ const onSidebarToggle = () => {
   }
 };
 
-document.querySelector('.sidebar__toggler').addEventListener('pointerdown', onSidebarToggle);
+document.querySelector('.sidebar__toggler').addEventListener('pointerdown', onSidebarToggleClick);
