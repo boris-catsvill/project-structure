@@ -3,149 +3,149 @@ import SortableTable from '../../components/sortable-table/index.js';
 import ColumnChart from '../../components/column-chart/index.js';
 import header from './bestsellers-header.js';
 
-import fetchJson from '../../utils/fetch-json.js';
-
 export default class Page {
-  element;
-  subElements = {};
   components = {};
+  subElements = {};
 
-  async getDataForColumnCharts (from, to) {
-    const ORDERS = `${process.env.BACKEND_URL}api/dashboard/orders?from=${from.toISOString()}&to=${to.toISOString()}`;
-    const SALES = `${process.env.BACKEND_URL}api/dashboard/sales?from=${from.toISOString()}&to=${to.toISOString()}`;
-    const CUSTOMERS = `${process.env.BACKEND_URL}api/dashboard/customers?from=${encodeURIComponent(from.toISOString())}&to=${encodeURIComponent(to.toISOString())}`;
+  handlerDateSelect = event => {
+    const { from, to } = event.detail;
 
-    const ordersData = fetchJson(ORDERS);
-    const salesData = fetchJson(SALES);
-    const customersData = fetchJson(CUSTOMERS);
+    // noinspection JSIgnoredPromiseFromCall
+    this.updateComponents(from, to);
+  };
 
-    const data = await Promise.all([ordersData, salesData, customersData]);
-    return data.map(item => Object.values(item));
-  }
-
-  async updateTableComponent (from, to) {
-    const data = await fetchJson(`${process.env.BACKEND_URL}api/dashboard/bestsellers?_start=1&_end=20&from=${from.toISOString()}&to=${to.toISOString()}`);
-    this.components.sortableTable.addRows(data);
-  }
-
-  async updateChartsComponents (from, to) {
-    const [ordersData, salesData, customersData] = await this.getDataForColumnCharts(from, to);
-    const ordersDataTotal = ordersData.reduce((accum, item) => accum + item);
-    const salesDataTotal = salesData.reduce((accum, item) => accum + item);
-    const customersDataTotal = customersData.reduce((accum, item) => accum + item);
-
-    this.components.ordersChart.update({headerData: ordersDataTotal, bodyData: ordersData});
-    this.components.salesChart.update({headerData: '$' + salesDataTotal, bodyData: salesData});
-    this.components.customersChart.update({headerData: customersDataTotal, bodyData: customersData});
-  }
-
-  async initComponents () {
-    const to = new Date();
-    const from = new Date(to.getTime() - (30 * 24 * 60 * 60 * 1000));
-    const [ordersData, salesData, customersData] = await this.getDataForColumnCharts(from, to);
-
-    const rangePicker = new RangePicker({
-      from,
-      to
-    });
-
-    const sortableTable = new SortableTable(header, {
-      url: `api/dashboard/bestsellers?_start=1&_end=20&from=${from.toISOString()}&to=${to.toISOString()}`,
-      isSortLocally: true
-    });
-
-    const ordersChart = new ColumnChart({
-      data: ordersData,
-      label: 'orders',
-      value: ordersData.reduce((accum, item) => accum + item),
-      link: '#'
-    });
-
-    const salesChart = new ColumnChart({
-      data: salesData,
-      label: 'sales',
-      value: '$' + salesData.reduce((accum, item) => accum + item),
-    });
-
-    const customersChart = new ColumnChart({
-      data: customersData,
-      label: 'customers',
-      value: customersData.reduce((accum, item) => accum + item),
-    });
-
-    this.components.sortableTable = sortableTable;
-    this.components.ordersChart = ordersChart;
-    this.components.salesChart = salesChart;
-    this.components.customersChart = customersChart;
-    this.components.rangePicker = rangePicker;
-  }
-
-  get template () {
-    return `<div class="dashboard">
-      <div class="content__top-panel">
-        <h2 class="page-title">Dashboard</h2>
-        <!-- RangePicker component -->
-        <div data-element="rangePicker"></div>
-      </div>
-      <div data-element="chartsRoot" class="dashboard__charts">
-        <!-- column-chart components -->
-        <div data-element="ordersChart" class="dashboard__chart_orders"></div>
-        <div data-element="salesChart" class="dashboard__chart_sales"></div>
-        <div data-element="customersChart" class="dashboard__chart_customers"></div>
-      </div>
-
-      <h3 class="block-title">Best sellers</h3>
-
-      <div data-element="sortableTable">
-        <!-- sortable-table component -->
-      </div>
-    </div>`;
-  }
-
-  async render () {
+  render() {
     const element = document.createElement('div');
-
-    element.innerHTML = this.template;
+    element.innerHTML = this.getTemplate();
 
     this.element = element.firstElementChild;
     this.subElements = this.getSubElements(this.element);
 
-    await this.initComponents();
+    const components = this.initComponents();
+    this.renderComponents(components);
+    this.components = components;
 
-    this.renderComponents();
-    this.initEventListeners();
+    this.addEventListeners();
 
     return this.element;
   }
 
-  renderComponents () {
-    Object.keys(this.components).forEach(component => {
+  initComponents() {
+    const date = new Date();
+    const period = {
+      from: new Date(date.setMonth(date.getMonth() - 1)),
+      to: new Date()
+    };
+
+    this.urlBestsellers =  new URL('/api/dashboard/bestsellers', process.env.BACKEND_URL);
+    this.urlBestsellers.searchParams.set('from', period.from.toISOString());
+    this.urlBestsellers.searchParams.set('to', period.to.toISOString());
+
+    // Компоненты
+    const rangePicker = new RangePicker(period);
+
+    const sortableTable = new SortableTable(header, {
+      url: this.urlBestsellers,
+      isSortLocally: true
+    });
+
+    const ordersChart = new ColumnChart({
+      label: 'orders',
+      url: 'api/dashboard/orders',
+      range: period
+    });
+    ordersChart.element.classList.add('dashboard__chart_orders');
+
+    const salesChart = new ColumnChart({
+      label: 'sales',
+      formatHeading: data => `$${data}`,
+      url: 'api/dashboard/sales',
+      range: period
+    });
+    salesChart.element.classList.add('dashboard__chart_sales');
+
+    const customersChart = new ColumnChart({
+      label: 'customers',
+      url: 'api/dashboard/customers',
+      range: period
+    });
+    customersChart.element.classList.add('dashboard__chart_customers');
+
+    return {
+      rangePicker,
+      sortableTable,
+      ordersChart,
+      salesChart,
+      customersChart
+    };
+  }
+
+  renderComponents(components) {
+    const keysComponents = Object.keys(components);
+
+    keysComponents.forEach(component => {
       const root = this.subElements[component];
-      const { element } = this.components[component];
+      const { element } = components[component];
 
       root.append(element);
     });
   }
 
-  getSubElements ($element) {
-    const elements = $element.querySelectorAll('[data-element]');
+  async updateComponents(from, to) {
+    const { sortableTable, ordersChart, salesChart, customersChart } = this.components;
 
-    return [...elements].reduce((accum, subElement) => {
-      accum[subElement.dataset.element] = subElement;
+    this.urlBestsellers.searchParams.set('from', from.toISOString());
+    this.urlBestsellers.searchParams.set('to', to.toISOString());
 
-      return accum;
-    }, {});
+    sortableTable.update(this.urlBestsellers);
+    ordersChart.update(from, to);
+    salesChart.update(from, to);
+    customersChart.update(from, to);
   }
 
-  initEventListeners () {
-    this.components.rangePicker.element.addEventListener('date-select', event => {
-      const { from, to } = event.detail;
-      this.updateChartsComponents(from, to);
-      this.updateTableComponent(from, to);
-    });
+  addEventListeners() {
+    const { rangePicker } = this.components;
+
+    rangePicker.element.addEventListener('date-select', this.handlerDateSelect);
   }
 
-  destroy () {
+  getSubElements(element) {
+    const result = {};
+    const elements = element.querySelectorAll('[data-element]');
+
+    for (const subElement of elements) {
+      const name = subElement.dataset.element;
+      result[name] = subElement;
+    }
+
+    return result;
+  }
+
+  getTemplate() {
+    return `
+      <div class="dashboard full-height flex-column">
+        <div class="content__top-panel">
+          <h2 class="page-title">Панель управления</h2>
+          <div data-element="rangePicker"></div>
+        </div>
+        <div class="dashboard__charts">
+          <div data-element="ordersChart"></div>
+          <div data-element="salesChart"></div>
+          <div data-element="customersChart"></div>
+        </div>
+        <h3 class="block-title">Лидеры продаж</h3>
+        <div data-element="sortableTable"></div>
+      </div>
+    `;
+  }
+
+  remove() {
+    this.element.remove();
+  }
+
+  destroy() {
+    this.remove();
+
     for (const component of Object.values(this.components)) {
       component.destroy();
     }
