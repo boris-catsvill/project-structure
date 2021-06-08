@@ -186,6 +186,7 @@ export default class SortableTable {
     // Статус загрузки: старт
     this.isLoading = true;
     this.element.classList.add('sortable-table_loading');
+    this.element.classList.remove('sortable-table_empty');
 
     // Получаем данные
     const data = await fetchJson(this.url);
@@ -193,6 +194,9 @@ export default class SortableTable {
     // Статус загрузки: завершена
     this.isLoading = false;
     this.element.classList.remove('sortable-table_loading');
+    if (!data.length) {
+      this.element.classList.add('sortable-table_empty');
+    }
 
     return data;
   }
