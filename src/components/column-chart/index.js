@@ -27,7 +27,7 @@ export default class ColumnChart {
   get template() {
     return `
       <div class="column-chart ${this.chartIsLoadingClass}" style="--chart-height: ${this.chartHeight}">
-        <div class="column-chart__title">Total ${this.label}${this.link ? this.linkTemplate : ''}</div>
+        <div class="column-chart__title">${this.label}${this.link ? this.linkTemplate : ''}</div>
         <div class="column-chart__container">
         <div data-element="header" class="column-chart__header"></div>
         <div data-element="body" class="column-chart__chart">

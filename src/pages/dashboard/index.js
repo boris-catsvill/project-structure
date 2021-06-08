@@ -14,7 +14,7 @@ export default class Page {
   }
 
   constructor() {
-    this.charts = ['orders', 'sales', 'customers'];
+    this.charts = { orders: 'orders', sales: 'sales', customers: 'customers' };
   }
 
   get template() {
@@ -45,7 +45,7 @@ export default class Page {
     this.element.querySelector('.content__top-panel').append(this.subElements['rangePicker']);
 
     const chartsContainer = this.element.querySelector('.dashboard__charts');
-    this.charts.forEach(chartType => chartsContainer.append(this.subElements[`${chartType}Chart`]));
+    Object.values(this.charts).forEach(chart => chartsContainer.append(this.subElements[`${chart}Chart`]));
 
     this.element.append(this.subElements['sortableTable']);
   }
@@ -87,17 +87,27 @@ export default class Page {
   }
 
   initCharts() {
-    this.charts.forEach(chartType => {
-      this.components[`${chartType}Chart`] = new ColumnChart({
-        url: `api/dashboard/${chartType}`,
-        range: this.range,
-        label: chartType,
-        link: chartType === 'orders' ? '#' : null,
-        formatHeading: chartType === 'sales' ? data => `$${data}` : null
-      });
-
-      this.components[`${chartType}Chart`].element.classList.add(`dashboard__chart_${chartType}`);
+    this.components[`${this.charts.orders}Chart`] = new ColumnChart({
+      url: `api/dashboard/${this.charts.orders}`,
+      range: this.range,
+      label: 'Заказы',
+      link: '#',
     });
+
+    this.components[`${this.charts.sales}Chart`] = new ColumnChart({
+      url: `api/dashboard/${this.charts.sales}`,
+      range: this.range,
+      label: 'Продажи',
+      formatHeading: data => `$${data}`,
+    });
+
+    this.components[`${this.charts.customers}Chart`] = new ColumnChart({
+      url: `api/dashboard/${this.charts.customers}`,
+      range: this.range,
+      label: 'Клиенты',
+    });
+
+    Object.values(this.charts).forEach(chart => this.components[`${chart}Chart`].element.classList.add(`dashboard__chart_${chart}`));
   }
 
   initTable() {
