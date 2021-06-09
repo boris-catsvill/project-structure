@@ -91,14 +91,14 @@ export default class Page {
       url: `api/dashboard/${this.charts.orders}`,
       range: this.range,
       label: 'Заказы',
-      link: '#',
+      link: '/sales',
     });
 
     this.components[`${this.charts.sales}Chart`] = new ColumnChart({
       url: `api/dashboard/${this.charts.sales}`,
       range: this.range,
       label: 'Продажи',
-      formatHeading: data => `$${data}`,
+      formatHeading: data => `$${data.toLocaleString()}`,
     });
 
     this.components[`${this.charts.customers}Chart`] = new ColumnChart({

@@ -2,7 +2,6 @@ import fetchJson from '../../utils/fetch-json.js';
 
 /* eslint-disable no-undef */
 export default class ColumnChart {
-  thousandsSeparatorRegExp = /\B(?=(\d{3})+(?!\d))/g;
   chartIsLoadingClass = 'column-chart_loading';
   chartHeight = 50;
 
@@ -30,21 +29,20 @@ export default class ColumnChart {
         <div class="column-chart__title">${this.label}${this.link ? this.linkTemplate : ''}</div>
         <div class="column-chart__container">
         <div data-element="header" class="column-chart__header"></div>
-        <div data-element="body" class="column-chart__chart">
-          ${this.bodyNodesTemplate}
-        </div>
+        <div data-element="body" class="column-chart__chart"></div>
       </div>
     `;
   }
 
   get linkTemplate() {
     return `
-       <a href="${this.link}" class="column-chart__link">View all</a>
+       <a href="${this.link}" class="column-chart__link">Подробнее</a>
     `;
   }
 
   getBodyNodesTemplate(data) {
-    return this.getColumnProps(data).map(prop => `<div style="--value: ${prop.value}" data-tooltip="${prop.percent}"></div>`).join('');
+    return this.getColumnProps(data)
+      .map(prop => `<div style="--value: ${prop.styleValue}" data-tooltip="<div><small>${prop.date}</small></div><strong>${prop.value}</strong>"></div>`).join('');
   }
 
   getDataFromServer(from, to) {
@@ -63,13 +61,16 @@ export default class ColumnChart {
   }
 
   getColumnProps(data) {
-    const maxValue = Math.max(...data);
+    const entries = Object.entries(data);
+
+    const maxValue = Math.max(...Object.values(data));
     const scale = this.chartHeight / maxValue;
 
-    return data.map(item => {
+    return entries.map(([date, value]) => {
       return {
-        percent: (item / maxValue * 100).toFixed(0) + '%',
-        value: String(Math.floor(item * scale))
+        date: new Date(date).toDateString().replace(/^\S+\s/, ''),
+        value: this.formatHeading ? this.formatHeading(value) : value,
+        styleValue: String(Math.floor(value * scale)),
       };
     });
   }
@@ -96,8 +97,8 @@ export default class ColumnChart {
 
       this.range = { from, to };
       this.value = dataValues.reduce((a, b) => a + b, 0);
-      this.subElements.header.textContent = this.formatHeading ? this.formatHeading(this.value).replace(this.thousandsSeparatorRegExp, ",") : this.value;
-      this.subElements.body.innerHTML = this.getBodyNodesTemplate(dataValues);
+      this.subElements.header.textContent = this.formatHeading ? this.formatHeading(this.value) : this.value;
+      this.subElements.body.innerHTML = this.getBodyNodesTemplate(data);
 
       if (dataValues.length) {
         this.element.classList.remove(this.chartIsLoadingClass);
