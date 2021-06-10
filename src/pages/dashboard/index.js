@@ -117,7 +117,8 @@ export default class Page {
 
     this.components['sortableTable'] = new SortableTable(header, {
       url,
-      isSortLocally: true
+      isSortLocally: true,
+      clickableRow: { isRowClickable: true, href: '/products/'}
     });
   }
 

@@ -82,7 +82,8 @@ export default class Page {
       sorted: {
         id: 'title',
         order: 'asc'
-      }
+      },
+      clickableRow: { isRowClickable: true, href: '/products/'}
     });
   }
 

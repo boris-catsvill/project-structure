@@ -60,13 +60,15 @@ export default class SortableTable {
         id: headerConfig.find(item => item.sortable).id,
         order: SortableTable.defaultSortOrder
       },
-      isSortLocally = false
+      isSortLocally = false,
+      clickableRow = { isRowClickable: false, href: null}
     } = {}
   ) {
     this.url = typeof url === 'string' ? new URL(url, process.env.BACKEND_URL) : url;
     this.headerConfig = headerConfig;
     this.isSortLocally = isSortLocally;
     this.sorted = sorted;
+    this.clickableRow = clickableRow;
 
     this.render();
   }
@@ -103,10 +105,10 @@ export default class SortableTable {
   }
 
   getBodyElementsTemplate(data) {
-    return data.map(product => `
-      <a href="/products/${product.id}" class="sortable-table__row">
-        ${this.headerConfig.map(column => column.template ? column.template(product[column.id]) : `<div class="sortable-table__cell">${product[column.id]}</div>`).join('')}
-      </a>
+    return data.map(item => `
+      <${this.clickableRow.isRowClickable ? `a href="${this.clickableRow.href}${item.id}"` : 'div'} class="sortable-table__row">
+        ${this.headerConfig.map(column => column.template ? column.template(item[column.id]) : `<div class="sortable-table__cell">${item[column.id]}</div>`).join('')}
+      </${this.clickableRow.isRowClickable ? 'a' : 'div'}>
     `).join('');
   }
 
