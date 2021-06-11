@@ -1,73 +1,49 @@
 .notification {
-  width: 200px;
-  margin: 10px 5px;
-  font-size: 14px;
-  box-shadow: 0 2px 4px 1px rgba(0, 0, 0, .5);
-  border-radius: 2px;
-  animation: calc(var(--value) * 0.1) ease-out calc(var(--value) * 0.9) fadeOut;
-  z-index: 1000;
+  background-color: var(--black);
+  opacity: 0.8;
+  border-radius: 4px;
+  position: fixed;
+  right: 75px;
+  bottom: 75px;
 }
 
-/* Success */
-.notification.success {
-  background: #cdfccd;
+.notification.show {
+  display: block;
+  animation: fadeIn 0.3s linear;
 }
 
-.notification.success .timer {
-  background: #86aa86;
+.notification__content {
+  padding: 16px 24px 16px 64px;
+  font-size: 16px;
+  line-height: 20px;
+  color: var(--white);
+  position: relative;
 }
 
-/* Error */
-.notification.error {
-  background: #ffe3e3;
+.notification .notification__content:before {
+  position: absolute;
+  left: 24px;
+  top: 50%;
+  width: 24px;
+  height: 24px;
+  transform: translate(0, -50%);
 }
 
-.notification.error .timer {
-  background: #c28585;
+.notification.notification_success .notification__content:before {
+  content: url(icons/icon-circle-check.svg);
 }
 
-/* Warning */
-.notification.warning {
-  background: #fff9c2;
+.notification.notification_error .notification__content:before {
+  content: url(icons/icon-error.svg);
 }
 
-.notification.warning .timer {
-  background: #c1c377;
-}
-
-.inner-wrapper {
-  padding: 5px;
-}
-
-.timer {
-  width: 100%;
-  height: 2px;
-  animation: progress var(--value) linear;
-}
-
-.close {
-  width: 12px;
-  height: 12px;
-  display: flex;
-  text-decoration: none;
-  align-items: center;
-  justify-content: center;
-  color: #ffe3e3;
-  font-weight: bold;
-  background: #c28585;
-  cursor: pointer;
-  border-radius: 50%;
-}
-
-.notification-header {
-  display: flex;
-  justify-content: space-between;
-  text-transform: capitalize;
-  font-size: 12px;
-}
-
-.notification-body {
-  font-weight: bold;
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.8;
+  }
 }
 
 @keyframes fadeOut {
@@ -76,14 +52,5 @@
   }
   to {
     opacity: 0;
-  }
-}
-
-@keyframes progress {
-  from {
-    width: 100%;
-  }
-  to {
-    width: 0;
   }
 }

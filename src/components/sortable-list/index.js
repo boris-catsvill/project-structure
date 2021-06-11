@@ -23,7 +23,7 @@ export default class SortableList {
 
   nodeStyle = {
     width: 0,
-    height: 60
+    height: 48
   };
 
   dragOffset = {
