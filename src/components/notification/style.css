@@ -30,11 +30,11 @@
 }
 
 .notification.notification_success .notification__content:before {
-  content: url(icons/icon-circle-check.svg);
+  content: url(../../assets/icons/icon-circle-check.svg);
 }
 
 .notification.notification_error .notification__content:before {
-  content: url(icons/icon-error.svg);
+  content: url(../../assets/icons/icon-error.svg);
 }
 
 @keyframes fadeIn {

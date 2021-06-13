@@ -1,5 +1,6 @@
 import Router from './router/index.js';
 import tooltip from './components/tooltip/index.js';
+import Sidebar from './components/sidebar';
 
 tooltip.initialize();
 
@@ -16,15 +17,10 @@ router
   .setNotFoundPagePath('error404')
   .listen();
 
-const onSidebarToggleClick = () => {
-  const documentBodyClassList = document.body.classList;
-  const collapsedSidebarClass = 'is-collapsed-sidebar';
+document.querySelector('.sidebar').replaceWith(new Sidebar([
+  { id: 'dashboard', href: '/', name: 'Панель управления', isActive: true },
+  { id: 'products', href: '/products', name: 'Товары', isActive: false },
+  { id: 'categories', href: '/categories', name: 'Категории', isActive: false },
+  { id: 'sales', href: '/sales', name: 'Продажи', isActive: false },
+]).render());
 
-  if (documentBodyClassList.contains(collapsedSidebarClass)) {
-    documentBodyClassList.remove(collapsedSidebarClass);
-  } else {
-    documentBodyClassList.add(collapsedSidebarClass);
-  }
-};
-
-document.querySelector('.sidebar__toggler').addEventListener('pointerdown', onSidebarToggleClick);
