@@ -29,7 +29,7 @@ export default class Page {
   onFilteredTitleChange = async ({ target }) => {
     const value = target.value;
 
-    if (value.length > 2) {
+    if (!value.length || value.length > 2) {
       this.sortBy.set('title_like', value);
       await this.filterData();
     }
