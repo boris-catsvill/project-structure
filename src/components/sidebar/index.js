@@ -27,7 +27,7 @@ class Sidebar {
         <h2 class="sidebar__title">
           <a href="/">shop admin</a>
         </h2>
-        <ul class="sidebar__nav sidebar__nav_main">${this.itemsTemplate}</ul>
+        <ul class="sidebar__nav">${this.itemsTemplate}</ul>
         <ul class="sidebar__nav sidebar__nav_bottom">
           <li>
             <button type="button" class="sidebar__toggler">
@@ -47,19 +47,20 @@ class Sidebar {
   render() {
     this.element = this.getElementFromTemplate();
     this.initEventListeners();
-    this.items = [...this.element.querySelector('.sidebar__nav_main').children];
+    this.items = [...this.element.querySelectorAll('a[data-page]')];
 
     return this.element;
   }
 
   setActiveItemByHref(href) {
     this.items.forEach(item => {
-      const a = item.querySelector('a');
+      const parent = item.closest('li');
+      const hrefAttribute = item.getAttribute('href');
 
-      if (href.includes(a.href)) {
-        item.classList.add('active');
+      if ((href.includes(hrefAttribute) && hrefAttribute !== '/') || (href === '/' && hrefAttribute === '/')) {
+        parent.classList.add('active');
       } else {
-        item.removeAttribute('class');
+        parent.removeAttribute('class');
       }
     });
   }
