@@ -116,7 +116,13 @@ export default class Page {
         id: 'title',
         order: 'asc'
       },
-      clickableRow: { isRowClickable: true, href: '/products/'}
+      clickableRow: { isRowClickable: true, href: '/products/'},
+      noDataTemplate: `
+        <div>
+          <p>Не найдено товаров удовлетворяющих выбранному критерию</p>
+          <button type="button" class="button-primary-outline">Очистить фильтры</button>
+        </div>
+      `
     });
   }
 

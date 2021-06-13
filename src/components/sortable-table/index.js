@@ -66,7 +66,8 @@ export default class SortableTable {
         order: SortableTable.defaultSortOrder
       },
       isSortLocally = false,
-      clickableRow = { isRowClickable: false, href: null}
+      clickableRow = { isRowClickable: false, href: null},
+      noDataTemplate = null
     } = {}
   ) {
     this.url = typeof url === 'string' ? new URL(url, process.env.BACKEND_URL) : url;
@@ -74,6 +75,7 @@ export default class SortableTable {
     this.isSortLocally = isSortLocally;
     this.sorted = sorted;
     this.clickableRow = clickableRow;
+    this.noDataTemplate = noDataTemplate;
 
     this.render();
   }
@@ -84,7 +86,7 @@ export default class SortableTable {
         <div data-element="header" class="sortable-table__header sortable-table__row">${this.headerElementsTemplate}</div>
         <div data-element="body" class="sortable-table__body">${this.getBodyElementsTemplate(this.data)}</div>
         <div data-elem="loading" class="loading-line sortable-table__loading-line"></div>
-        <div data-elem="emptyPlaceholder" class="sortable-table__empty-placeholder"><div>Нет данных</div></div>
+        <div data-elem="emptyPlaceholder" class="sortable-table__empty-placeholder">${this.noDataTemplate ? this.noDataTemplate : '<div>Нет данных</div>'}</div>
       </div>
     `;
   }

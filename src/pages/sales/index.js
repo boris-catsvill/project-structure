@@ -19,7 +19,7 @@ export default class Page {
           <h1 class="page-title">Продажи</h1>
           <!-- Range Picker -->
         </div>
-        <div data-elem="ordersContainer" class="full-height flex-column">
+        <div data-elem="ordersContainer" class="full-height flex-column orders-list">
           <!-- Table -->
         </div>
       </div>
@@ -82,7 +82,8 @@ export default class Page {
       sorted: {
         id: 'createdAt',
         order: 'desc'
-      }
+      },
+      noDataTemplate: '<div>Нет заказов</div>'
     });
   }
 

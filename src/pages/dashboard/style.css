@@ -1,3 +1,9 @@
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
 .dashboard__charts {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
