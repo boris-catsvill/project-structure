@@ -55,8 +55,8 @@ export default class DoubleSlider {
   };
 
   constructor({
-    min = 100,
-    max = 200,
+    min = 0,
+    max = 4000,
     formatValue = value => '$' + value,
     selected = {
       from: min,
@@ -130,6 +130,11 @@ export default class DoubleSlider {
     this.remove();
     document.removeEventListener('pointermove', this.onThumbPointerMove);
     document.removeEventListener('pointerup', this.onThumbPointerUp);
+  }
+
+  resetSelection() {
+    this.subElements['from'].innerHTML = this.formatValue(this.min);
+    this.subElements['to'].innerHTML = this.formatValue(this.max);
   }
 
   update() {

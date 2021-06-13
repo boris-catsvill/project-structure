@@ -85,8 +85,8 @@ export default class SortableTable {
       <div class="sortable-table">
         <div data-element="header" class="sortable-table__header sortable-table__row">${this.headerElementsTemplate}</div>
         <div data-element="body" class="sortable-table__body">${this.getBodyElementsTemplate(this.data)}</div>
-        <div data-elem="loading" class="loading-line sortable-table__loading-line"></div>
-        <div data-elem="emptyPlaceholder" class="sortable-table__empty-placeholder">${this.noDataTemplate ? this.noDataTemplate : '<div>Нет данных</div>'}</div>
+        <div data-element="loading" class="loading-line sortable-table__loading-line"></div>
+        <div data-element="emptyPlaceholder" class="sortable-table__empty-placeholder">${this.noDataTemplate ? this.noDataTemplate : '<div>Нет данных</div>'}</div>
       </div>
     `;
   }

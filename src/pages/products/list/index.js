@@ -35,6 +35,20 @@ export default class Page {
     }
   };
 
+  onClickClearFilters = async ({ target }) => {
+    if (target.closest('[data-element=emptyPlaceholder] button')) {
+      this.sortBy = new Map();
+      this.subElements['filterName'].value = '';
+      this.subElements['filterStatus'].value = '';
+
+      const slider = this.components.slider;
+      slider.resetSelection();
+      slider.update();
+
+      await this.filterData();
+    }
+  };
+
   constructor() {
     this.charts = { orders: 'orders', sales: 'sales', customers: 'customers' };
   }
@@ -57,15 +71,15 @@ export default class Page {
           <form class="form-inline">
             <div class="form-group">
               <label class="form-label">Сортировать по:</label>
-              <input type="text" data-elem="filterName" class="form-control" placeholder="Название товара">
+              <input type="text" data-element="filterName" class="form-control" placeholder="Название товара">
             </div>
-            <div class="form-group" data-elem="sliderContainer">
+            <div class="form-group" data-element="sliderContainer">
               <label class="form-label">Цена:</label>
               <!-- Double slider -->
             </div>
             <div class="form-group">
               <label class="form-label">Статус:</label>
-              <select class="form-control" data-elem="filterStatus">
+              <select class="form-control" data-element="filterStatus">
                 <option value="" selected="">Любой</option>
                 <option value="1">Активный</option>
                 <option value="0">Неактивный</option>
@@ -73,7 +87,7 @@ export default class Page {
             </div>
           </form>
         </div>
-        <div data-elem="productsContainer" class="products-list__container"><!-- Table --></div>
+        <div data-element="productsContainer" class="products-list__container"><!-- Table --></div>
       </div>
     `;
   }
@@ -86,13 +100,13 @@ export default class Page {
   }
 
   renderComponents() {
-    this.element.querySelector('[data-elem=productsContainer]').append(this.subElements['sortableTable']);
-    this.element.querySelector('[data-elem=sliderContainer]').append(this.subElements['slider']);
+    this.subElements['productsContainer'].append(this.subElements['sortableTable']);
+    this.subElements['sliderContainer'].append(this.subElements['slider']);
   }
 
   render() {
     this.element = this.getElementFromTemplate(this.template);
-
+    this.subElements = this.getSubElements();
     this.initComponents();
     this.renderComponents();
     this.initEventListeners();
@@ -127,13 +141,14 @@ export default class Page {
   }
 
   initDoubleSlider() {
-    this.components['slider'] = new DoubleSlider({ min: 0, max: 4000 });
+    this.components['slider'] = new DoubleSlider();
   }
 
   initEventListeners() {
-    this.element.querySelector('select[data-elem=filterStatus]').addEventListener('change', this.onFilteredStatusChange);
-    this.element.querySelector('input[data-elem=filterName]').addEventListener('input', this.onFilteredTitleChange);
-    this.element.querySelector('div.range-slider').addEventListener('range-select', this.onFilteredPriceChange);
+    this.subElements['filterStatus'].addEventListener('change', this.onFilteredStatusChange);
+    this.subElements['filterName'].addEventListener('input', this.onFilteredTitleChange);
+    this.subElements['slider'].addEventListener('range-select', this.onFilteredPriceChange);
+    this.subElements['productsContainer'].addEventListener('pointerdown', this.onClickClearFilters);
   }
 
   async filterData() {
@@ -154,6 +169,19 @@ export default class Page {
     table.update();
   }
 
+  getSubElements(element = this.element) {
+    const result = {};
+    const elements = element.querySelectorAll('[data-element]');
+
+    for (const subElement of elements) {
+      const name = subElement.dataset.element;
+
+      result[name] = subElement;
+    }
+
+    return result;
+  }
+
   remove() {
     this.element.remove();
   }
@@ -161,6 +189,7 @@ export default class Page {
   destroy() {
     this.remove();
     this.element = null;
+    this.subElements = {};
     Object.values(this.components).forEach(component => component.destroy());
   }
 }
