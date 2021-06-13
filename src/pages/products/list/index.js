@@ -9,16 +9,30 @@ export default class Page {
   subElements = {};
 
   sortBy = new Map([
-    ['name', ''],
-    ['priceFrom', 0],
-    ['priceTo', 0],
+    ['title_like', ''],
+    ['price_gte', 0],
+    ['price_lte', 4000],
     ['status', null]
   ]);
 
-  onStatusChange = async ({ target }) => {
+  onFilteredStatusChange = async ({ target }) => {
     this.sortBy.set('status', target.value);
-    this.components.sortableTable.avoidToLoadNewData = false;
     await this.filterData();
+  };
+
+  onFilteredPriceChange = async ({ detail }) => {
+    this.sortBy.set('price_gte', detail.from);
+    this.sortBy.set('price_lte', detail.to);
+    await this.filterData();
+  };
+
+  onFilteredTitleChange = async ({ target }) => {
+    const value = target.value;
+
+    if (value.length > 2) {
+      this.sortBy.set('title_like', value);
+      await this.filterData();
+    }
   };
 
   constructor() {
@@ -111,7 +125,9 @@ export default class Page {
   }
 
   initEventListeners() {
-    this.element.querySelector('select[data-elem=filterStatus]').addEventListener('change', this.onStatusChange);
+    this.element.querySelector('select[data-elem=filterStatus]').addEventListener('change', this.onFilteredStatusChange);
+    this.element.querySelector('input[data-elem=filterName]').addEventListener('input', this.onFilteredTitleChange);
+    this.element.querySelector('div.range-slider').addEventListener('range-select', this.onFilteredPriceChange);
   }
 
   async filterData() {
@@ -123,7 +139,9 @@ export default class Page {
         url.searchParams.set(key, value);
       }
     });
+
     table.url = url;
+    table.avoidToLoadNewData = false;
 
     table.setFirstRecordToLoad();
     await table.loadData();
