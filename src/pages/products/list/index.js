@@ -8,8 +8,28 @@ export default class Page {
   components = {};
   subElements = {};
 
+  sortBy = new Map([
+    ['name', ''],
+    ['priceFrom', 0],
+    ['priceTo', 0],
+    ['status', null]
+  ]);
+
+  onStatusChange = async ({ target }) => {
+    this.sortBy.set('status', target.value);
+    this.components.sortableTable.avoidToLoadNewData = false;
+    await this.filterData();
+  };
+
   constructor() {
     this.charts = { orders: 'orders', sales: 'sales', customers: 'customers' };
+  }
+
+  get url() {
+    const url = new URL('api/rest/products', process.env.BACKEND_URL);
+    url.searchParams.set('_embed', 'subcategory.category');
+
+    return url;
   }
 
   get template() {
@@ -74,8 +94,7 @@ export default class Page {
   }
 
   initTable() {
-    const url = new URL('api/rest/products', process.env.BACKEND_URL);
-    url.searchParams.set('_embed', 'subcategory.category');
+    const url = this.url;
 
     this.components['sortableTable'] = new SortableTable(header, {
       url,
@@ -91,7 +110,25 @@ export default class Page {
     this.components['slider'] = new DoubleSlider({ min: 0, max: 4000 });
   }
 
-  initEventListeners() {}
+  initEventListeners() {
+    this.element.querySelector('select[data-elem=filterStatus]').addEventListener('change', this.onStatusChange);
+  }
+
+  async filterData() {
+    const table = this.components.sortableTable;
+
+    const url = this.url;
+    this.sortBy.forEach((value, key) => {
+      if (value) {
+        url.searchParams.set(key, value);
+      }
+    });
+    table.url = url;
+
+    table.setFirstRecordToLoad();
+    await table.loadData();
+    table.update();
+  }
 
   remove() {
     this.element.remove();

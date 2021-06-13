@@ -14,7 +14,7 @@ export default class SortableTable {
     order: ''
   };
 
-  isLoading = false;
+  avoidToLoadNewData = false;
 
   data = [];
   subElements = {};
@@ -29,15 +29,20 @@ export default class SortableTable {
   onScroll = async () => {
     const windowHeight = document.documentElement.clientHeight;
     const leftToTableBottom = this.element.getBoundingClientRect().bottom;
-    const loadDataAtBeforeBottom = 100;
+    const loadDataAtBeforeBottom = 50;
 
-    if ((leftToTableBottom - windowHeight < loadDataAtBeforeBottom) && !this.isLoading) {
-      this.isLoading = true;
+    if ((leftToTableBottom - windowHeight < loadDataAtBeforeBottom) && !this.avoidToLoadNewData) {
+      this.avoidToLoadNewData = true;
 
       this.firstRecordToLoad += this.recordsToLoad;
-      this.update(await this.loadData(), false);
 
-      this.isLoading = false;
+      const data = await this.loadData();
+
+      if (data.length) {
+        this.update(data, false);
+      }
+
+      this.avoidToLoadNewData = data.length < this.recordsToLoad;
     }
   }
 
@@ -132,7 +137,7 @@ export default class SortableTable {
     return wrapper.firstElementChild;
   }
 
-  async sort (id, order) {
+  async sort(id, order) {
     if (this.currentSorting.id) {
       this.subElements.header.querySelector(`[data-id=${this.currentSorting.id}]`).removeAttribute('data-order');
     }
@@ -163,6 +168,10 @@ export default class SortableTable {
     return this.loadData(id, order);
   }
 
+  setFirstRecordToLoad(value = 0) {
+    this.firstRecordToLoad = value;
+  }
+
   async loadData(id = this.currentSorting.id, order = this.currentSorting.order, startFrom = this.firstRecordToLoad, endAt = this.firstRecordToLoad + this.recordsToLoad) {
     this.element.classList.add(this.loadingTableClass);
 
@@ -177,7 +186,7 @@ export default class SortableTable {
     return this.data;
   }
 
-  update(data, replaceData = true) {
+  update(data = this.data, replaceData = true) {
     if (data.length) {
       this.subElements.body.innerHTML = replaceData ? this.getBodyElementsTemplate(data) : this.subElements.body.innerHTML + this.getBodyElementsTemplate(data);
       this.element.classList.remove(this.emptyTableClass);

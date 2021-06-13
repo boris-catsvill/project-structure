@@ -52,12 +52,12 @@ class Sidebar {
     return this.element;
   }
 
-  setActiveItemByHref(href) {
+  setActiveItem(href) {
     this.items.forEach(item => {
       const parent = item.closest('li');
-      const hrefAttribute = item.getAttribute('href');
+      const hrefAttribute = item.getAttribute('href').substring(1);
 
-      if ((href.includes(hrefAttribute) && hrefAttribute !== '/') || (href === '/' && hrefAttribute === '/')) {
+      if ((hrefAttribute && href.includes(hrefAttribute)) || (!href && !hrefAttribute)) {
         parent.classList.add('active');
       } else {
         parent.removeAttribute('class');

@@ -1,3 +1,5 @@
+import Sidebar from '../components/sidebar';
+
 export default async function(path, match) {
   const main = document.querySelector('main');
 
@@ -13,6 +15,8 @@ export default async function(path, match) {
 
   contentNode.innerHTML = '';
   contentNode.append(element);
+
+  new Sidebar().setActiveItem(match[0]);
 
   return page;
 }

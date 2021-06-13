@@ -1,5 +1,4 @@
 import renderPage from './render-page.js';
-import Sidebar from '../components/sidebar';
 
 // performs routing on all links
 export default class Router {
@@ -19,8 +18,6 @@ export default class Router {
       if (href && href.startsWith('/')) {
         event.preventDefault();
         this.navigate(href);
-
-        new Sidebar().setActiveItemByHref(href);
       }
     });
   }
