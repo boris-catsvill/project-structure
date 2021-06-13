@@ -1,11 +1,20 @@
 import ProductForm from '../../../components/product-form/index.js';
+import NotificationMessage from '../../../components/notification/index.js';
 
 export default class Page {
   element;
   components = {};
 
-  constructor() {
-    this.initComponents();
+  onProductSaved = () => {
+    new NotificationMessage('Товар добавлен');
+  };
+
+  onProductUpdated = () => {
+    new NotificationMessage('Товар сохранён');
+  };
+
+  constructor(id = null) {
+    this.components['productForm'] = new ProductForm(id);
   }
 
   get template() {
@@ -23,10 +32,6 @@ export default class Page {
     `;
   }
 
-  initComponents() {
-    this.components['productForm'] = new ProductForm();
-  }
-
   async renderComponents() {
     this.element.querySelector('.content-box').append(await this.components['productForm'].render());
   }
@@ -41,7 +46,15 @@ export default class Page {
   async render() {
     this.element = this.getElementFromTemplate(this.template);
     await this.renderComponents();
+
+    this.initEventListeners();
     return this.element;
+  }
+
+  initEventListeners() {
+    const productForm = this.components['productForm'].element;
+    productForm.addEventListener('product-saved', this.onProductSaved);
+    productForm.addEventListener('product-updated', this.onProductUpdated);
   }
 
   remove() {

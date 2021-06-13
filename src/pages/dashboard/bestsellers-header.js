@@ -6,7 +6,7 @@ const header = [
     template: data => {
       return `
           <div class="sortable-table__cell">
-            <img class="sortable-table-image" alt="Image" src="${data[0].url}">
+            ${data[0] && 'url' in data[0] ? `<img class="sortable-table-image" alt="Image" src="${data[0].url}">` : ''}
           </div>
         `;
     }

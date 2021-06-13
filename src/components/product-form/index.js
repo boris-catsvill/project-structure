@@ -2,6 +2,7 @@
 import SortableList from '../sortable-list/index.js';
 import escapeHtml from '../../utils/escape-html.js';
 import fetchJson from '../../utils/fetch-json.js';
+import NotificationMessage from '../notification';
 
 export default class ProductForm {
   formFields = {
@@ -75,7 +76,7 @@ export default class ProductForm {
           this.productData.images.push(imageData);
           this.subElements['imageListContainer'].append(this.getElementFromTemplate(this.getImageTemplate(imageData)));
         } catch (e) {
-          console.error(e);
+          new NotificationMessage(e, { type: 'error' });
         } finally {
           uploadButton.classList.remove(loadingClass);
           uploadButton.disabled = false;
@@ -101,7 +102,7 @@ export default class ProductForm {
   }
 
   async render() {
-    await Promise.all([this.getCategories(), this.productId ? this.getProductData() : []]);
+    await Promise.all([this.getCategories(), this.productId ? this.getProductData() : [{ images: [] }]]);
 
     this.element = this.getElementFromTemplate(this.template);
     document.body.append(this.element);
@@ -248,12 +249,12 @@ export default class ProductForm {
         <input type="hidden" name="url" value="${url}">
         <input type="hidden" name="source" value="${source}">
         <span>
-          <img src="icon-grab.svg" data-grab-handle="" alt="grab">
+          <img src="/icons/icon-grab.svg" data-grab-handle="" alt="grab">
           <img class="sortable-table__cell-img" alt="${escapeHtml(source)}" src="${escapeHtml(url)}">
           <span>${escapeHtml(source)}</span>
         </span>
         <button type="button">
-          <img src="icon-trash.svg" data-delete-handle="" alt="delete">
+          <img src="/icons/icon-trash.svg" data-delete-handle="" alt="delete">
         </button>
       </li>
     `;
