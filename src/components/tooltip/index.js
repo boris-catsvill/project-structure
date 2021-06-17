@@ -1,78 +1,87 @@
-class Tooltip {
-  static instance;
+﻿class Tooltip {
+    
 
-  element;
+    static instance;
+    element;
 
-  onMouseOver = event => {
-    const element = event.target.closest('[data-tooltip]');
-
-    if (element) {
-      this.render(element.dataset.tooltip);
-      this.moveTooltip(event);
-
-      document.addEventListener('pointermove', this.onMouseMove);
+    handlerMove = (event) => {
+        this.moveAt(event);
     }
-  };
 
-  onMouseMove = event => {
-    this.moveTooltip(event);
-  };
+     handlerOut = (event) => {
+        this.remove();
+        document.body.removeEventListener('mousemove', this.handlerMove);
+    }
 
-  onMouseOut = () => {
-    this.removeTooltip();
-  };
+    handlerOver = (event) => {
+        let element; 
+        if (event.target.dataset.tooltip) {
+            element = event.target
+        } else {
+            element = event.target.closest('data-tooltip');
+        }
+        
+        if (element) {
+            this.render(element.dataset.tooltip);
+            document.body.addEventListener('mousemove', this.handlerMove);
+        }
+    }
 
-  removeTooltip() {
-    if (this.element) {
-      this.element.remove();
+    //tooltip - cинглтон (некоторый инстанс, который всегда возвращает один и тот же объект)
+    //при каждом new Tooltip будет возвращаться предыдущий объект
+    constructor() {
+       if (Tooltip.instance) {
+            return Tooltip.instance;
+        }
+
+        Tooltip.instance= this;
+    }
+
+    initialize() {
+        this.initEventListeners();
+     }
+
+     initEventListeners() {
+        document.body.addEventListener('pointerover', this.handlerOver);  //pointerout
+        document.body.addEventListener('pointerout', this.handlerOut);  
+     }
+
+     render(html) {
+          const hint = document.createElement('div'); // (*)
+          hint.innerHTML = `<div> ${html} </div>`;
+          const element = hint;  //hint.firstElementChild;
+          this.element = hint;  //element;
+//          this.element.ondragstart = function() {
+//              return false;
+//          };
+          this.element.classList.add('tooltip');
+          document.body.append(this.element);
+     }
+
+    moveAt (event) {
+
+         const shift = 10;
+         const left = event.clientX + shift;
+         const top = event.clientY + shift;
+       
+         this.element.style.left = `${left}px`;
+         this.element.style.top = `${top}px`;
+   }
+
+   remove() {
+      if(this.element) {
+          this.element.remove();
+      }
+   }
+
+    destroy() {
+      document.body.removeEventListener('pointerover', this.handlerOut);
+      document.body.removeEventListener('pointerout', this.handlerOut);
+      document.removeEventListener('mousemove', this.handlerMove);
+      this.remove();
       this.element = null;
-
-      document.removeEventListener('pointermove', this.onMouseMove);
-    }
-  }
-
-  constructor() {
-    if (Tooltip.instance) {
-      return Tooltip.instance;
-    }
-
-    Tooltip.instance = this;
-  }
-
-  initEventListeners() {
-    document.addEventListener('pointerover', this.onMouseOver);
-    document.addEventListener('pointerout', this.onMouseOut);
-  }
-
-  initialize () {
-    this.initEventListeners();
-  }
-
-  render(html) {
-    this.element = document.createElement('div');
-    this.element.className = 'tooltip';
-    this.element.innerHTML = html;
-
-    document.body.append(this.element);
-  }
-
-  moveTooltip(event) {
-    const left = event.clientX + 10;
-    const top = event.clientY + 10;
-
-    // TODO: Add logic for window borders
-
-    this.element.style.left = left + 'px';
-    this.element.style.top = top + 'px';
-  }
-
-  destroy() {
-    document.removeEventListener('pointerover', this.onMouseOver);
-    document.removeEventListener('pointerout', this.onMouseOut);
-    this.removeTooltip();
-  }
+   }
+   
 }
 
-const tooltip = new Tooltip();
-
-export default tooltip;
+export default Tooltip;

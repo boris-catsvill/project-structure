@@ -1,7 +1,7 @@
 {
   "name": "project-structure",
   "version": "1.0.0",
-  "description": "",
+  "description": "Данный проект был разработан в рамках курса [\"JavaScript/​DOM/​Интерфейсы\" для программистов](https://learn.javascript.ru/courses/js)\r проекта [learn.javascript.ru](https://learn.javascript.ru/)",
   "main": "index.js",
   "scripts": {
     "start": "npm run build && npm run static-server",
@@ -45,5 +45,13 @@
     "webpack-cli": "^3.3.11",
     "webpack-dev-server": "^3.10.3",
     "webpack-merge": "^4.2.2"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yura2015/project-structure.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yura2015/project-structure/issues"
+  },
+  "homepage": "https://github.com/yura2015/project-structure#readme"
 }
