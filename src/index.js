@@ -15,3 +15,16 @@ router
   .addRoute(/^404\/?$/, 'error404')
   .setNotFoundPagePath('error404')
   .listen();
+
+
+//todo возможно перенести в другое место
+const toggleButton = document.querySelector('[data-element="sidebarToggler"]');
+if (toggleButton) {
+  toggleButton.addEventListener('click', () => {
+    if (document.body.classList.contains('is-collapsed-sidebar')) {
+      document.body.classList.remove('is-collapsed-sidebar');
+    } else {
+      document.body.classList.add('is-collapsed-sidebar');
+    }
+  });
+}

@@ -1,4 +1,4 @@
-const header = [
+const columns = [
   {
     id: 'images',
     title: 'Фото',
@@ -40,12 +40,9 @@ const header = [
     sortType: 'number'
   },
   {
-    id: 'sales',
-    title: 'Продажи',
-    sortable: true,
-    sortType: 'number'
+    id: 'status',
+    title: 'Статус'
   }
-
 ];
 
-export default header;
+export default columns;
