@@ -1,188 +1,156 @@
+function getRandomColor() {
+  return `hsl(${ 360 * Math.random() },
+             ${ 70 + 70 * Math.random() }%,
+             ${ 85 + 10 * Math.random() }%)`;
+}
+
 export default class SortableList {
-  element;
+  currentItem = null;
+  placeholder = null;
+  potentialEl = null;
 
-  onDocumentPointerMove = ({clientX, clientY}) => {
-    this.moveDraggingAt(clientX, clientY);
-
-    const {firstElementChild, children} = this.element;
-    const {top: firstElementTop} = firstElementChild.getBoundingClientRect();
-    const {bottom} = this.element.getBoundingClientRect();
-
-    if (clientY < firstElementTop) {
-      this.movePlaceholderAt(0);
-    } else if (clientY > bottom) {
-      this.movePlaceholderAt(children.length);
-    } else {
-      for (let i = 0; i < children.length; i++) {
-        const li = children[i];
-
-        // ignore to prevent bugs when dragging between elements
-        if (li !== this.draggingElem) {
-          const {top, bottom} = li.getBoundingClientRect();
-          const {offsetHeight: height} = li;
-
-          if (clientY > top && clientY < bottom) {
-            // inside the element (y-axis)
-            if (clientY < top + height / 2) {
-              // upper half of the element
-              this.movePlaceholderAt(i);
-              break;
-            } else {
-              // lower half of the element
-              this.movePlaceholderAt(i + 1);
-              break;
-            }
-          }
-        }
-      }
+  onStartMove = (ev) => {
+    if (this.currentItem) {
+      return false;
     }
 
-    this.scrollIfCloseToWindowEdge(clientY);
+
+    const target = ev.target.closest('.sortable-list__item');
+    this.parent = target.parentNode;
+    target.addEventListener('mouseup', this.onMouseUp);
+    const width = target.offsetWidth;
+
+    this.placeholder = this.createPlaceholder(width, target.offsetHeight);
+    this.currentItem = this.element.replaceChild(this.placeholder, target);
+    this.element.append(this.currentItem);
+
+    this.currentItem.classList.add('sortable-list__item_dragging');
+    this.currentItem.style.width = `${ width }px`;
+    this.moveTarget(ev.clientX, ev.clientY);
+
+    document.addEventListener('mousemove', this.onMouseMove);
   };
 
-  onDocumentPointerUp = () => {
-    this.dragStop();
+  onMouseMove = (ev) => {
+    this.moveTarget(ev.clientX, ev.clientY);
+    const firstItem = this.element.firstElementChild;
+
+    this.currentItem.hidden = true;
+    const closestEl = document.elementFromPoint(ev.clientX, ev.clientY);
+    let closestListItem = closestEl.closest('.sortable-list__item');
+    const isPlaceholderAbove = closestEl.classList.contains('sortable-list__placeholder');
+
+    const hasPotentialSwapTarget = isPlaceholderAbove || !!closestListItem;
+
+    if (!hasPotentialSwapTarget) {
+      // проверяем, не ущли ли мы в самый верх списка
+      if (ev.clientY < this.element.firstElementChild.getBoundingClientRect().top) {
+        this.element.insertBefore(this.placeholder, firstItem);
+      }
+
+      return;
+    }
+
+    this.currentItem.hidden = false;
+    if (closestListItem && closestListItem.dataset.id !== this.currentItem.dataset.id) {
+      this.currentItem.hidden = false;
+
+      if (!this.potentialEl || closestListItem.dataset.id !== this.potentialEl.dataset.id) {
+        this.potentialEl = closestListItem;
+
+        this.element.insertBefore(this.placeholder, closestListItem.nextSibling);
+      }
+    }
   };
 
-  constructor({items = []} = {}) {
-    this.items = items;
+  onMouseUp = (ev) => {
+    this.currentItem.classList.remove('sortable-list__item_dragging');
+    this.currentItem.style.left = `unset`;
+    this.currentItem.style.top = `unset`;
+    this.element.insertBefore(this.currentItem, this.placeholder);
+    this.placeholder.style.display = 'none';
+
+    this.placeholder.remove();
+
+    this.currentItem = null;
+    this.potentialEl = null;
+    document.removeEventListener('mousemove', this.onMouseMove);
+
+    const newItems = this.element.querySelectorAll('li');
+    this.onOrderChanded(newItems);
+  };
+
+  onDeleteClick = (ev) => {
+    ev.stopPropagation();
+    const targetItem = ev.target.closest('.sortable-list__item');
+    if (targetItem) {
+      const itemId = targetItem.dataset.id;
+      targetItem.remove();
+      this.element.dispatchEvent(new CustomEvent('itemDeleted', {
+        deletedItemId: itemId
+      }));
+    }
+  };
+
+  constructor({ items, onOrderChanged }) {
+    this.listItems = items;
+    this.onOrderChanded = onOrderChanged;
 
     this.render();
   }
 
+  createPlaceholder(width = 0, height = 0) {
+    const placeholder = document.createElement('div');
+    placeholder.classList.add('sortable-list__placeholder');
+    placeholder.style.width = `${ width }px`;
+    placeholder.style.height = `${ height }px`;
+
+    return placeholder;
+  }
+
+  moveTarget(x, y) {
+    this.currentItem.style.left = `${ x }px`;
+    this.currentItem.style.top = `${ y }px`;
+  }
+
   render() {
-    this.element = document.createElement('ul');
-    this.element.className = 'sortable-list';
+    const container = document.createElement('div');
+    container.innerHTML = '<ul class="sortable-list"></ul>';
+    this.element = container.firstElementChild;
 
-    this.addItems();
-    this.initEventListeners();
-  }
-
-  initEventListeners() {
-    this.element.addEventListener('pointerdown', event => this.onPointerDown(event));
-  }
-
-  addItems() {
-    // item is a DOM element
-    for (let item of this.items) {
-      item.classList.add('sortable-list__item');
-    }
-
-    this.element.append(...this.items);
-  }
-
-  onPointerDown(event) {
-    if (event.which !== 1) { // must be left-button
-      return false;
-    }
-
-    const itemElem = event.target.closest('.sortable-list__item');
-
-    if (itemElem) {
-      if (event.target.closest('[data-grab-handle]')) {
-        event.preventDefault();
-
-        this.dragStart(itemElem, event);
+    this.listItems.forEach((node, index) => {
+      node.classList.add('sortable-list__item', 'data-grab-handle');
+      node.dataset.id = index + 1;
+      const deleteBtn = node.querySelector('[data-delete-handle]');
+      if (deleteBtn) {
+        deleteBtn.addEventListener('pointerdown', this.onDeleteClick);
+        deleteBtn.addEventListener('mouseup', (ev) => {
+          ev.stopPropagation();
+        });
       }
 
-      if (event.target.closest('[data-delete-handle]')) {
-        event.preventDefault();
-
-        itemElem.remove();
+      const moveBtn = node.querySelector('[data-grab-handle]');
+      if (moveBtn) {
+        moveBtn.addEventListener('pointerdown', this.onStartMove);
       }
-    }
-  }
 
-  dragStart(itemElem, {clientX, clientY}) {
-    this.elementInitialIndex = [...this.element.children].indexOf(itemElem);
+      node.style.background = getRandomColor();
 
-    this.pointerInitialShift = {
-      x: clientX - itemElem.getBoundingClientRect().x,
-      y: clientY - itemElem.getBoundingClientRect().y
-    };
+      node.addEventListener('dragstart', () => {
+        return false;
+      });
 
-    this.draggingElem = itemElem;
+      node.addEventListener('dragend', () => {
+        return false;
+      });
 
-    this.placeholderElem = document.createElement('li');
-    this.placeholderElem.className = 'sortable-list__placeholder';
-
-    // itemElem will get position:fixed
-    // so its width will be auto-set to fit the parent container
-    itemElem.style.width = `${itemElem.offsetWidth}px`;
-    itemElem.style.height = `${itemElem.offsetHeight}px`;
-
-    this.placeholderElem.style.width = itemElem.style.width;
-    this.placeholderElem.style.height = itemElem.style.height;
-
-    itemElem.classList.add('sortable-list__item_dragging');
-
-    itemElem.after(this.placeholderElem);
-
-    // move to the end, to be over other list elements
-    this.element.append(itemElem);
-
-    this.moveDraggingAt(clientX, clientY);
-
-    document.addEventListener('pointermove', this.onDocumentPointerMove);
-    document.addEventListener('pointerup', this.onDocumentPointerUp);
-  }
-
-  moveDraggingAt(clientX, clientY) {
-    this.draggingElem.style.left = clientX - this.pointerInitialShift.x + 'px';
-    this.draggingElem.style.top = clientY - this.pointerInitialShift.y + 'px';
-  }
-
-  scrollIfCloseToWindowEdge(clientY) {
-    const scrollingValue = 10;
-    const threshold = 20;
-
-    if (clientY < threshold) {
-      window.scrollBy(0, -scrollingValue);
-    } else if (clientY > document.documentElement.clientHeight - threshold) {
-      window.scrollBy(0, scrollingValue);
-    }
-  }
-
-  movePlaceholderAt(index) {
-    const currentElement = this.element.children[index];
-
-    if (currentElement !== this.placeholderElem) {
-      this.element.insertBefore(this.placeholderElem, currentElement);
-    }
-  }
-
-  dragStop() {
-    const placeholderIndex = [...this.element.children].indexOf(this.placeholderElem);
-
-    // drop element back
-    this.placeholderElem.replaceWith(this.draggingElem);
-    this.draggingElem.classList.remove('sortable-list__item_dragging');
-
-    this.draggingElem.style.left = '';
-    this.draggingElem.style.top = '';
-    this.draggingElem.style.width = '';
-    this.draggingElem.style.height = '';
-
-    document.removeEventListener('pointermove', this.onDocumentPointerMove);
-    document.removeEventListener('pointerup', this.onDocumentPointerUp);
-
-    this.draggingElem = null;
-
-    if (placeholderIndex !== this.elementInitialIndex) {
-      this.element.dispatchEvent(new CustomEvent('sortable-list-reorder', {
-        bubbles: true,
-        details: {
-          from: this.elementInitialIndex,
-          to: placeholderIndex
-        }
-      }));
-    }
+      this.element.append(node);
+    });
   }
 
   remove() {
     this.element.remove();
-    document.removeEventListener('pointermove', this.onDocumentPointerMove);
-    document.removeEventListener('pointerup', this.onDocumentPointerUp);
+    document.removeEventListener('mousemove', this.onMouseMove);
   }
 
   destroy() {
