@@ -1,7 +1,9 @@
+import Router from '../../../router/index.js';
 import SortableTable from '../../../components/sortable-table';
 import DoubleSlider from '../../../components/double-slider';
 import columns from './columns';
 
+const router = Router.instance();
 
 export default class ProductsPage {
   element = null;
@@ -79,6 +81,7 @@ export default class ProductsPage {
     return `<div class='products-list'>
       <div class='content__top-panel'>
          <h2 class='page-title'>Товары</h2>
+         <a href='/products/add' class='button-primary'>Добавить товар</a>
          </div>
          <div class='filter-form content-box content-box_small'>
             <form class='form form-inline'>
@@ -116,6 +119,13 @@ export default class ProductsPage {
 
     this.element.addEventListener('range-select', ({ detail }) => {
       this.onFiltersChange('price', detail);
+    });
+
+    this.subElements.productsContainer.addEventListener('click', (ev) => {
+      const rowClicked = ev.target.closest('.sortable-table__row');
+      if (rowClicked && rowClicked.dataset.id) {
+        router.navigate(`/products/${ rowClicked.dataset.id }`);
+      }
     });
   }
 

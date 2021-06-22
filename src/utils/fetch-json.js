@@ -2,14 +2,16 @@
 // status >= 400 is an error
 // network error / json error are errors
 
+import NotificationMessage from '../components/notification';
+
 export default async function(url, params) {
   let response;
 
   try {
     // NOTE: "toString" call needed for correct work of "jest-fetch-mock"
     response = await fetch(url.toString(), params);
-  } catch(err) {
-    throw new FetchError(response, "Network error has occurred.");
+  } catch (err) {
+    throw new FetchError(response, 'Network error has occurred.');
   }
 
   let body;
@@ -21,22 +23,23 @@ export default async function(url, params) {
       body = await response.json();
 
       errorText = (body.error && body.error.message) || (body.data && body.data.error && body.data.error.message) || errorText;
-    } catch (error) { /* ignore failed body */ }
+    } catch (error) { /* ignore failed body */
+    }
 
-    let message = `Error ${response.status}: ${errorText}`;
+    let message = `Error ${ response.status }: ${ errorText }`;
 
     throw new FetchError(response, body, message);
   }
 
   try {
     return await response.json();
-  } catch(err) {
+  } catch (err) {
     throw new FetchError(response, null, err.message);
   }
 }
 
 export class FetchError extends Error {
-  name = "FetchError";
+  name = 'FetchError';
 
   constructor(response, body, message) {
     super(message);
@@ -48,7 +51,11 @@ export class FetchError extends Error {
 // handle uncaught failed fetch through
 window.addEventListener('unhandledrejection', event => {
   if (event.reason instanceof FetchError) {
-    alert(event.reason.message);
+    const notification = new NotificationMessage(`Ошибка загрузки данных. ${ event.reason.body }`, {
+      type: 'error',
+      duration: 2 * 1000
+    });
+    notification.show();
   }
 });
 

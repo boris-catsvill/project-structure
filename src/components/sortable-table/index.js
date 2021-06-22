@@ -112,7 +112,7 @@ export default class SortableTable {
 
   get rowsTemplate() {
     return this.data.map((row) => (
-      `<div class='sortable-table__row'>
+      `<div class='sortable-table__row' data-id='${row.id}'>
             ${ this.getRowTemplate(row) }
       </div>`))
       .join('');

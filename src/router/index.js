@@ -26,7 +26,11 @@ export default class Router {
 
 
         // Добавляем выделение на новый пункт меню
-        link.closest('li').classList.add('active');
+        const selectedMenuItem = link.closest('li');
+        if (selectedMenuItem) {
+          selectedMenuItem.classList.add('active');
+        }
+
         this.navigate(href);
       }
     });
