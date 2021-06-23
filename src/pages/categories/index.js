@@ -1,9 +1,8 @@
-//import SortableList from "../components/sortable-list/index.js";
-//import fetchJson from "../utils/fetch-json.js";  
+
 import Categories from "../../components/categories/index.js";
 import fetchJson from "../../utils/fetch-json.js"; 
 
-const BACKEND_URL = 'https://course-js.javascript.ru';
+const BACKEND_URL = `${process.env.BACKEND_URL}`; 
 
 export default class Page {
 
@@ -15,10 +14,6 @@ export default class Page {
 
     }
 
-//    async updateComponents(from, to) {
-//        const data = await fetchJson(`${BACKEND_URL}/api/rest/categories`)
-//        this.components.categories.addRows(data);
-//    }
     initComponents() {
 
         const categories = new Categories( {
@@ -54,7 +49,6 @@ export default class Page {
         
         this.element = document.createElement('div'); // (*)
         this.element.innerHTML = this.template;
-        this.element = this.element.firstElementChild;
         this.subElements = this.getSubElements(this.element);
 
         this.initComponents();
@@ -86,7 +80,6 @@ export default class Page {
         }
      }
 
-      // NOTE: удаляем обработчики событий, если они есть
       destroy() {
         this.remove();
         for(let component in this.components) {

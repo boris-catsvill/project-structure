@@ -1,4 +1,5 @@
-﻿class Tooltip {
+﻿
+class Tooltip {
     
 
     static instance;
@@ -26,9 +27,6 @@
             document.body.addEventListener('mousemove', this.handlerMove);
         }
     }
-
-    //tooltip - cинглтон (некоторый инстанс, который всегда возвращает один и тот же объект)
-    //при каждом new Tooltip будет возвращаться предыдущий объект
     constructor() {
        if (Tooltip.instance) {
             return Tooltip.instance;
@@ -51,9 +49,7 @@
           hint.innerHTML = `<div> ${html} </div>`;
           const element = hint;  //hint.firstElementChild;
           this.element = hint;  //element;
-//          this.element.ondragstart = function() {
-//              return false;
-//          };
+
           this.element.classList.add('tooltip');
           document.body.append(this.element);
      }

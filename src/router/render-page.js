@@ -17,6 +17,5 @@ export default async function(path, match) {
 
   contentNode.innerHTML = '';
   contentNode.append(element);
-
   return page;
 }

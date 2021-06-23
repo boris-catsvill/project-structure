@@ -5,11 +5,6 @@
   <title>Админка для магазина</title>
   <link rel="apple-touch-icon-precomposed" href="/assets/favicon/apple-touch-icon-precomposed.png">
   <link rel="icon" href="/assets/favicon/favicon.png">
-  <link rel="stylesheet" href="./styles/all.css">//   
-  <link rel="stylesheet" href="./styles/common.css">
-  <link rel="stylesheet" href="./styles/form.css">
-  <link rel="stylesheet" href="./styles/variables.css">
-<!--  <script type="text/javascript" src = "./index.js"></script>-->
 </head>
 
 <body>
@@ -57,34 +52,4 @@
 
   </section>
 </main>
-
-<script type="module">
- import Page from './pages/dashboard/index.js';
- import Router from './router/index.js';
-
-  const router = Router.instance();
-  router
-  .addRoute(/^$/, 'dashboard')
-  .addRoute(/^products$/, 'products/list')
-  .addRoute(/^products\/add$/, 'products/edit')
-  .addRoute(/^products\/([\w()-]+)$/, 'products/edit')
-  .addRoute(/^sales$/, 'sales')
-  .addRoute(/^categories$/, 'categories')
-  .addRoute(/^404\/?$/, 'error404')
-  .setNotFoundPagePath('error404')
-  .listen();
- 
-  const contentNode = document.querySelector('#content');
-
-  async function initialize () {
-    const page = new Page();
-    const element = await page.render();
-
-    contentNode.innerHTML = '';
-    contentNode.append(element);
-
-  }
-
-  initialize();
-</script>
 </body>

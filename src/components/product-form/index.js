@@ -4,7 +4,7 @@ import escapeHtml from '../../utils/escape-html.js';
 import fetchJson from '../../utils/fetch-json.js';
 
 const IMGUR_CLIENT_ID = '28aaa2e823b03b1';
-const BACKEND_URL = 'https://course-js.javascript.ru';
+const BACKEND_URL = `${process.env.BACKEND_URL}`; 
 
 export default class ProductForm {
   element;
@@ -218,7 +218,7 @@ export default class ProductForm {
       const value = getValue(field);
 
       values[field] = formatToNumber.includes(field)
-        ? parseInt(value)
+        ? parseInt(value, 10)
         : value;
     }
 

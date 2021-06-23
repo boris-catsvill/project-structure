@@ -1,7 +1,7 @@
 ﻿import ProductForm from '../../../components/product-form/index.js';
 
-const IMGUR_CLIENT_ID = '28aaa2e823b03b1';
-const BACKEND_URL = 'https://course-js.javascript.ru';
+const IMGUR_CLIENT_ID = `${process.env.IMGUR_CLIENT_ID}`;
+const BACKEND_URL = `${process.env.BACKEND_URL}`; 
 
 export default class Page {
     element;
@@ -11,10 +11,7 @@ export default class Page {
     constructor(productId) {
         this.productId = productId;
   }
-
-   
-    ////api/rest/products
-
+  
   initComponents() {
         
         const productForm =  new ProductForm(this.productId);
@@ -57,16 +54,11 @@ export default class Page {
 
      getSubElements(element) {
          const elements = element.querySelectorAll('[data-element]');
-
          return [...elements].reduce((accum, subElement) => {
-          accum[subElement.dataset.element] = subElement;
-
-          return accum;
+            accum[subElement.dataset.element] = subElement;
+            return accum;
         }, {});
      }
-
-
-
 
       remove () {
         if (this.element) {
@@ -74,7 +66,6 @@ export default class Page {
         }
      }
 
-      // NOTE: удаляем обработчики событий, если они есть
       destroy() {
         this.remove();
         for(let component in this.components) {
@@ -83,6 +74,5 @@ export default class Page {
         this.element = null;
         this.subElements = {};
       }
-
 
 }

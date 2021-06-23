@@ -50,7 +50,7 @@ export default class RangePicker {
 
     this.initEventListeners();
   }
-
+  
   getSubElements(element) {
     const subElements = {};
 

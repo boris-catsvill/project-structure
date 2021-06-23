@@ -5,27 +5,15 @@ import escapeHtml from '../../../utils/escape-html.js';
 import fetchJson from '../../../utils/fetch-json.js';
 import header from './products-header.js';
 
-const IMGUR_CLIENT_ID = '28aaa2e823b03b1';
-const BACKEND_URL = 'https://course-js.javascript.ru';
+
+const IMGUR_CLIENT_ID = `${process.env.IMGUR_CLIENT_ID}`;  
+const BACKEND_URL = `${process.env.BACKEND_URL}`; 
 
 export default class Page {
   element;
   subElements = {};
   from = 0; 
   to = 4000;
-//  defaultFormData = {
-//    title: '',
-//    description: '',
-//    quantity: 1,
-//    subcategory: '',
-//    status: 1,
-//    images: [],
-//    price: 100,
-//    discount: 0
-//  };
-
-
-
   constructor() {
     this.render();
   }
@@ -37,16 +25,16 @@ export default class Page {
   }
 
   onProduct = async () => {
-       const data = await fetchJson(`${BACKEND_URL}/api/rest/products`)
+       const url = new URL(`api/rest/products`, BACKEND_URL);
+       const data = await fetchJson(url);
        const arr = data.filter(item => 
            item.quantity > this.from && item.quantity < this.to 
        );
        const formDoc = document.forms[0];
        const input = formDoc[0].value; 
        const arrTitle = arr.filter(item => 
-           item.title.toUpperCase().indexOf(escapeHtml(input).toUpperCase()) != -1   
+           item.title.toUpperCase().indexOf(escapeHtml(input).toUpperCase()) !== -1   
        );
-         //const select = formDoc[1].selectedIndex; 
        let arrSatus;
        switch(formDoc[1].selectedIndex) {
           case 0:
@@ -82,8 +70,6 @@ export default class Page {
             doubleSlider,
             sortableTable,
         };
-
- 
   }
 
   randerComponents() {
@@ -112,7 +98,7 @@ export default class Page {
                     <label class="form-label">Цена:</label>
                     <div data-element="doubleSlider">
                      </div>
-                   <!-- slider    -->
+                   
                   </div>
                   <div class="form-group">
                     <label class="form-label">Статус:</label>
@@ -127,9 +113,9 @@ export default class Page {
             <div data-elem="productsContainer" class="products-list__container">
                 <div data-element="sortableTable">
                 </div>
-                <!-- sortableTable    -->
+                
             </div>
-        </div>
+     
             `;
   }
 
@@ -162,7 +148,6 @@ export default class Page {
         this.randerComponents();
         this.initEventListener();
         return this.element;
-
   }
 
   renderForm() {
@@ -185,82 +170,6 @@ export default class Page {
   }
 
 
-
-//  getFormData() {
-//    const { imageListContainer, productForm } = this.subElements;
-//    const excludedFields = ['images'];
-//    const formatToNumber = ['price', 'quantity', 'discount', 'status'];
-//    const fields = Object.keys(this.defaultFormData).filter(item => !excludedFields.includes(item));
-//    const getValue = field => productForm.querySelector(`[name=${field}]`);
-//    const values = {};
-
-//    for (const field of fields) {
-//      const value = getValue(field);
-
-//      values[field] = formatToNumber.includes(field)
-//        ? parseInt(value)
-//        : value;
-//    }
-
-//    const imagesHTMLCollection = imageListContainer.querySelectorAll('.sortable-table__cell-img');
-
-//    values.images = [];
-//    values.id = this.productId;
-
-//    for (const image of imagesHTMLCollection) {
-//      values.images.push({
-//        url: image.src,
-//        source: image.alt
-//      });
-//    }
-
-//    return values;
-//  }
-
-//  dispatchEvent(id) {
-//    const event = this.productId
-//      ? new CustomEvent('product-updated', { detail: id })
-//      : new CustomEvent('product-saved');
-
-//    this.element.dispatchEvent(event);
-//  }
-
-//  setFormData() {
-//    const { productForm } = this.subElements;
-//    const excludedFields = ['images'];
-//    const fields = Object.keys(this.defaultFormData).filter(item => !excludedFields.includes(item));
-
-//    fields.forEach(item => {
-//      const element = productForm.querySelector(`#${item}`);
-
-//      element.value = this.formData[item] || this.defaultFormData[item];
-//    });
-//  }
-
-//  loadProductData(productId) {
-//    return fetchJson(`${BACKEND_URL}/api/rest/products?id=${productId}`);
-//  }
-
-//  loadCategoriesList() {
-//    return fetchJson(`${BACKEND_URL}/api/rest/categories?_sort=weight&_refs=subcategory`);
-//  }
-
-//  createCategoriesSelect() {
-//    const wrapper = document.createElement('div');
-
-//    wrapper.innerHTML = '<select class="form-control" id="subcategory" name="subcategory"></select>';
-
-//    const select = wrapper.firstElementChild;
-
-//    for (const category of this.categories) {
-//      for (const child of category.subcategories) {
-//        select.append(new Option(`${category.title} > ${child.title}`, child.id));
-//      }
-//    }
-
-//    return select.outerHTML;
-//  }
-
   getSubElements(element) {
     const subElements = {};
     const elements = element.querySelectorAll('[data-element]');
@@ -272,38 +181,6 @@ export default class Page {
     return subElements;
   }
 
-//  createImagesList() {
-//    const { imageListContainer } = this.subElements;
-//    const { images } = this.formData;
-
-//    const items = images.map(({ url, source }) => this.getImageItem(url, source));
-
-//    const sortableList = new SortableList({
-//      items
-//    });
-
-//    imageListContainer.append(sortableList.element);
-//  }
-
-//  getImageItem(url, name) {
-//    const wrapper = document.createElement('div');
-
-//    wrapper.innerHTML = `
-//      <li class="products-edit__imagelist-item sortable-list__item">
-//        <span>
-//          <img src="icon-grab.svg" data-grab-handle alt="grab">
-//          <img class="sortable-table__cell-img" alt="${escapeHtml(name)}" src="${escapeHtml(url)}">
-//          <span>${escapeHtml(name)}</span>
-//        </span>
-//        <button type="button">
-//          <img src="icon-trash.svg" alt="delete" data-delete-handle>
-//        </button>
-//      </li>`;
-
-//    return wrapper.firstElementChild;
-//  }
-
- 
 
   destroy() {
     this.remove();
@@ -335,9 +212,9 @@ export class SortableTableProducts extends SortableTable {
          const formDoc = document.forms[0];
          const input = formDoc[0].value; //const elem = document.querySelector("form-control");   ///document.forms[0];
          let arr = data.filter(item => 
-            item.title.toUpperCase().indexOf(escapeHtml(input).toUpperCase()) != -1   
+            item.title.toUpperCase().indexOf(escapeHtml(input).toUpperCase()) !== -1   
          );
-         //const select = formDoc[1].selectedIndex; 
+
          let arrSel;
          switch(formDoc[1].selectedIndex) {
             case 0:
@@ -351,7 +228,6 @@ export class SortableTableProducts extends SortableTable {
                 break;
          }
 
-//         this.subElements.body.innerHTML = this.getTableRows(arrSel);
          let from; let to;
          const elem = document.querySelector(".range-slider");
          for(let element of elem.children) {
@@ -369,8 +245,4 @@ export class SortableTableProducts extends SortableTable {
         
    }
   
-
-
-
-
 }
