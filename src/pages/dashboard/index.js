@@ -13,7 +13,7 @@ export default class Page {
     components = {};
 
     async updateComponents(from, to) {
-        const data = await fetchJson(`${BACKEND_URL}/api/dashboard/bestsellers`)
+        const data = await fetchJson(`${BACKEND_URL}api/dashboard/bestsellers`)   
        
         this.components.SortableTable.addRows(data);
 
@@ -24,13 +24,13 @@ export default class Page {
 
    initComponents() {
         let now = new Date(); 
-        let from = new Date(); 
-        const to = new Date( now.setMonth( now.getMonth() - 1 ) );
+        let to = new Date(); 
+        const from = new Date( now.setMonth( now.getMonth() - 1 ) );
         const rangePicker = new RangePicker( {from, to } );
 
         const sortableTable = new SortableTable(header, {
             url: `api/dashboard/bestsellers`,  
-            isSortlocaly: true
+            isSortlocally: true
         });
 
         const ordersChart = new ColumnChart( {
