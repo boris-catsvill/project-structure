@@ -63,7 +63,7 @@ export default class Page {
 
         const sortableTable = new SortableTableProducts(header, {
             url: `api/rest/products`,   
-            isSortlocaly: true
+            isSortlocally: true
         });
 
         this.components = {
@@ -83,22 +83,17 @@ export default class Page {
 
   template() {
     return `
-      <div class="products-list">
-            <div class="content__top-panel">
-                <h1 class="page_title">Товары</h1>
-                <a href="/products/add" class="button-primary">Добавить товар</a>
-             </div>
-             <div class="content-box.content-box_small">
-                <form class="form-inline">
+      <div class="products-list"><div class="content__top-panel">
+            <h1 class="page_title">Товары</h1>
+                <a href="/products/add" class="button-primary">Добавить товар</a></div>
+                <div class="content-box.content-box_small"><form class="form-inline">
                   <div class="form-group">
                     <label class="form-label">Сортировать по:</label>
-                    <input type="text" data-elem="filterName" class="form-control" placeholder="Название товара" >
+                    <input type="text" data-elem="filterName" class="form-control" placeholder="Название товара" ></input>
                   </div>
                   <div class="form-group" data-elem="sliderContainer">
                     <label class="form-label">Цена:</label>
-                    <div data-element="doubleSlider">
-                     </div>
-                   
+                    <div data-element="doubleSlider"></div>
                   </div>
                   <div class="form-group">
                     <label class="form-label">Статус:</label>
@@ -111,12 +106,8 @@ export default class Page {
                 </form>
             </div>
             <div data-elem="productsContainer" class="products-list__container">
-                <div data-element="sortableTable">
-                </div>
-                
-            </div>
-     
-            `;
+                <div data-element="sortableTable"></div>
+            </div>`;
   }
 
   
