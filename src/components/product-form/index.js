@@ -20,6 +20,12 @@ export default class ProductForm {
     discount: 0
   };
 
+   onSubmit = event => {
+    event.preventDefault();
+
+    this.save();
+  };
+
     uploadImage = () => {
     const fileInput = document.createElement('input');
 
@@ -80,7 +86,7 @@ export default class ProductForm {
               name="title"
               class="form-control"
               data-element="title"
-              placeholder="Название товара">
+              placeholder="Название товара"></input>
           </fieldset>
         </div>
         <div class="form-group form-group__wide">
@@ -111,7 +117,7 @@ export default class ProductForm {
               type="number"
               name="price"
               class="form-control"
-              placeholder="${this.defaultFormData.price}">
+              placeholder="${this.defaultFormData.price}"></input>
           </fieldset>
           <fieldset>
             <label class="form-label">Скидка ($)</label>
@@ -121,7 +127,7 @@ export default class ProductForm {
               type="number"
               name="discount"
               class="form-control"
-              placeholder="${this.defaultFormData.discount}">
+              placeholder="${this.defaultFormData.discount}"></input>
           </fieldset>
         </div>
         <div class="form-group form-group__part-half">
@@ -132,7 +138,7 @@ export default class ProductForm {
             type="number"
             class="form-control"
             name="quantity"
-            placeholder="${this.defaultFormData.quantity}">
+            placeholder="${this.defaultFormData.quantity}"></input>
         </div>
         <div class="form-group form-group__part-half">
           <label class="form-label">Статус</label>
