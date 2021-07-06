@@ -18,7 +18,7 @@ export default class Page {
     this.render();
   }
 
-  async onQuantity(from, to) {
+  async onPrice(from, to) {
         this.from = from;
         this.to = to;
         this.onProduct();
@@ -27,8 +27,8 @@ export default class Page {
   onProduct = async () => {
        const url = new URL(`api/rest/products`, BACKEND_URL);
        const data = await fetchJson(url);
-       const arr = data.filter(item => 
-           item.quantity > this.from && item.quantity < this.to 
+        const arr = data.filter(item => 
+           item.price > this.from && item.price < this.to 
        );
        const formDoc = document.forms[0];
        const input = formDoc[0].value; 
@@ -63,7 +63,7 @@ export default class Page {
 
         const sortableTable = new SortableTableProducts(header, {
             url: `api/rest/products`,   
-            isSortlocally: true
+            isSortlocaly: true
         });
 
         this.components = {
@@ -81,33 +81,38 @@ export default class Page {
         });
   }
 
-  template() {
-    return `
-      <div class="products-list"><div class="content__top-panel">
-            <h1 class="page_title">Товары</h1>
-                <a href="/products/add" class="button-primary">Добавить товар</a></div>
-                <div class="content-box.content-box_small"><form class="form-inline">
-                  <div class="form-group">
-                    <label class="form-label">Сортировать по:</label>
-                    <input type="text" data-elem="filterName" class="form-control" placeholder="Название товара" ></input>
-                  </div>
-                  <div class="form-group" data-elem="sliderContainer">
-                    <label class="form-label">Цена:</label>
-                    <div data-element="doubleSlider"></div>
-                  </div>
-                  <div class="form-group">
-                    <label class="form-label">Статус:</label>
-                    <select class="form-control" data-elem="filterStatus">
-                      <option value="" selected="">Любой</option>
-                      <option value="1">Активный</option>
-                      <option value="0">Неактивный</option>
-                    </select>
-                  </div>
-                </form>
-            </div>
-            <div data-elem="productsContainer" class="products-list__container">
-                <div data-element="sortableTable"></div>
-            </div>`;
+  get template() {
+    return `<div class="products-list">
+                <div class="content__top-panel">
+                    <h1 class="page_title">Товары</h1>
+                    <a href="products/add" class="button-primary">Добавить товар</a>
+                 </div>
+                 <div class="content-box content-box_small" >
+                    <form class="form-inline" >
+                      <div class="form-group" >
+                        <label class="form-label" >Сортировать по:</label>
+                        <input type="text" data-elem="filterName" class="form-control" placeholder="Название товара" ></input>
+                      </div>
+                      <div class="form-group" data-elem="sliderContainer" >
+                        <label class="form-label" >Цена:</label>
+                        <div data-element="doubleSlider" >
+                        </div>
+                      </div>
+                      <div class="form-group" >
+                        <label class="form-label" >Статус:</label>
+                        <select class="form-control" data-elem="filterStatus" >
+                          <option value selected > Любой </option>
+                          <option value="1" >Активный</option>
+                          <option value="0" >Неактивный</option>
+                        </select>
+                      </div>
+                    </form>
+                </div>
+                <div data-elem="productsContainer" class="products-list__container">
+                    <div data-element="sortableTable"></div>
+                </div>
+              </div>
+          </div>`;
   }
 
   
@@ -123,7 +128,7 @@ export default class Page {
         }
         this.components.doubleSlider.element.addEventListener('range-select', event => {  
             const {from, to } = event.detail;
-            this.onQuantity(from, to);
+            this.onPrice(from, to);
         });
   }
 
@@ -131,6 +136,7 @@ export default class Page {
   render() {
 
         this.element = document.createElement('div'); // (*)
+       
         this.element.innerHTML = this.template;
         this.element = this.element.firstElementChild;
         this.subElements = this.getSubElements(this.element);

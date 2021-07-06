@@ -13,10 +13,9 @@ export default class Page {
     components = {};
 
     async updateComponents(from, to) {
-        const data = await fetchJson(`${BACKEND_URL}api/dashboard/bestsellers`)   
-       
+     new URL(url, BACKEND_URL);
+        const data = await fetchJson( new URL(`api/dashboard/bestsellers`, BACKEND_URL) )  //(`${BACKEND_URL}/api/dashboard/bestsellers`
         this.components.SortableTable.addRows(data);
-
         this.components.ordersChart.update(from,to);
         this.components.salesChart.update(from,to);
         this.components.customsChart.update(from,to);
@@ -30,7 +29,7 @@ export default class Page {
 
         const sortableTable = new SortableTable(header, {
             url: `api/dashboard/bestsellers`,  
-            isSortlocally: true
+            isSortlocaly: true
         });
 
         const ordersChart = new ColumnChart( {

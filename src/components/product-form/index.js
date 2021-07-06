@@ -20,12 +20,6 @@ export default class ProductForm {
     discount: 0
   };
 
-   onSubmit = event => {
-    event.preventDefault();
-
-    this.save();
-  };
-
     uploadImage = () => {
     const fileInput = document.createElement('input');
 

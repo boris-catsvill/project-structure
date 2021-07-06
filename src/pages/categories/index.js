@@ -17,7 +17,7 @@ export default class Page {
     initComponents() {
 
         const categories = new Categories( {
-             url: '/api/rest/categories',   
+             url: 'api/rest/categories',   
              refs: 'subcategory',
              sort: 'weight'
         });

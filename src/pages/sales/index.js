@@ -35,7 +35,7 @@ export default class Page {
         const rangePicker = new RangePicker( {from, to } );
 
         const sortableTable = new SortableTable(header, {
-            url: `/api/rest/orders`,  
+            url: `api/rest/orders`,  
             isSortlocaly: true
         });
 
