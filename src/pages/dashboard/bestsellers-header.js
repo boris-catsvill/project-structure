@@ -1,7 +1,7 @@
 const header = [
   {
     id: 'images',
-    title: 'Image',
+    title: 'Фото',
     sortable: false,
     template: data => {
       return `
@@ -13,25 +13,25 @@ const header = [
   },
   {
     id: 'title',
-    title: 'Name',
+    title: 'Название',
     sortable: true,
     sortType: 'string'
   },
   {
     id: 'quantity',
-    title: 'Quantity',
+    title: 'Категория',
     sortable: true,
     sortType: 'number'
   },
   {
     id: 'price',
-    title: 'Price',
+    title: 'Цена',
     sortable: true,
     sortType: 'number'
   },
   {
     id: 'status',
-    title: 'Status',
+    title: 'Статус',
     sortable: true,
     sortType: 'number',
     template: data => {
