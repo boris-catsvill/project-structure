@@ -207,12 +207,12 @@ export default class ProductForm {
         <input type="hidden" name="url" value="${data.url}">
         <input type="hidden" name="source" value="${data.source}">
         <span>
-          <img src="icon-grab.svg" data-grab-handle="" alt="grab">
+          <img src="/icon-grab.svg" data-grab-handle="" alt="grab">
           <img class="sortable-table__cell-img" alt="Image" src="${data.url}">
           <span>${data.source}</span>
         </span>
         <button type="button" class="products-edit__remove-btn">
-          <img src="icon-trash.svg" data-delete-handle="" alt="delete">
+          <img src="/icon-trash.svg" data-delete-handle="" alt="delete">
         </button>
       `;
   }
