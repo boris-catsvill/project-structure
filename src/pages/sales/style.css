@@ -1,0 +1,5 @@
+.sales .sortable-table__row {
+  display: grid;
+  grid: auto-flow / 80px calc(50% - 80px) 24% 13% 13%;
+  text-decoration: none;
+}
