@@ -46,14 +46,15 @@ export default class Page {
     this.subElements = this.getSubElements(this.element);
     this.initComponents();
     this.renderComponents();
+    this.initEventListeners();
 
     return this.element
   }
 
   async updateTable(from, to) {
     const { sortableTable } = this.components;
-    sortableTable.url.searchParams.set('from', from.toISOString());
-    sortableTable.url.searchParams.set('to', to.toISOString());
+    sortableTable.url.searchParams.set('createdAt_gte', from.toISOString());
+    sortableTable.url.searchParams.set('createdAt_lte', to.toISOString());
     const newData = await sortableTable.loadData();
     sortableTable.addRows(newData);
   }
