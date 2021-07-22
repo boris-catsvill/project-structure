@@ -65,6 +65,16 @@ form .form-label {
   margin-bottom: 8px;
 }
 
+form #text-filter
+{
+  margin: 0px 0px 0px 10px;
+}
+
+form #status-filter
+{
+  margin: 0px 0px 0px 10px;
+}
+
 form .form-control {
   background-color: var(--white);
   border: 1px solid var(--grey-light);

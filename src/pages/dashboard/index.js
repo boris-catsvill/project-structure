@@ -56,20 +56,20 @@ export default class Page {
 
     const ordersChart = new ColumnChart({
       data: ordersData,
-      label: 'orders',
+      label: 'Заказы',
       value: ordersData.reduce((accum, item) => accum + item),
       link: '#'
     });
 
     const salesChart = new ColumnChart({
       data: salesData,
-      label: 'sales',
+      label: 'Продажи',
       value: '$' + salesData.reduce((accum, item) => accum + item),
     });
 
     const customersChart = new ColumnChart({
       data: customersData,
-      label: 'customers',
+      label: 'Клиенты',
       value: customersData.reduce((accum, item) => accum + item),
     });
 
@@ -83,7 +83,7 @@ export default class Page {
   get template () {
     return `<div class="dashboard">
       <div class="content__top-panel">
-        <h2 class="page-title">Dashboard</h2>
+        <h2 class="page-title">Панель управления</h2>
         <!-- RangePicker component -->
         <div data-element="rangePicker"></div>
       </div>
@@ -94,7 +94,7 @@ export default class Page {
         <div data-element="customersChart" class="dashboard__chart_customers"></div>
       </div>
 
-      <h3 class="block-title">Best sellers</h3>
+      <h3 class="block-title">Лидеры продаж</h3>
 
       <div data-element="sortableTable">
         <!-- sortable-table component -->
