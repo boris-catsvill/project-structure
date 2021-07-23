@@ -1,6 +1,6 @@
-import SortableTable from '../../../components/sortable-table';
 import { productsTableHeader } from '../../../constants';
 import DoubleSlider from '../../../components/double-slider';
+import ProductsTable from '../../../components/products-table';
 
 export default class Page {
   element;
@@ -16,18 +16,18 @@ export default class Page {
     this.initComponents();
   }
 
-  handleFilterChange = async (event) => {
+  handleFilterChange = (event) => {
     const { dataset, value } = event.target;
     const field = dataset.element;
     if (field) {
       this.filters[field] = value;
-      this.updateTable();
+      this.components.productsTable.updateFilters(this.filters);
     }
   }
 
   handleRangeSelect = (event) => {
     this.filters.filterRange = event.detail;
-    this.updateTable();
+    this.components.productsTable.updateFilters(this.filters);
   }
 
   async render() {
@@ -56,7 +56,7 @@ export default class Page {
           </div>
         </form>
         </div>
-        <div data-element='sortableTable'></div>
+        <div data-element='productsTable'></div>
       </div>`;
 
     this.element = element.firstElementChild;
@@ -73,10 +73,10 @@ export default class Page {
     const url = new URL('api/rest/products', process.env.BACKEND_URL);
     url.searchParams.set('_embed', 'subcategory.category');
 
-    const sortableTable = new SortableTable(productsTableHeader, { url });
+    const productsTable = new ProductsTable(productsTableHeader, { url });
     const doubleSlider = new DoubleSlider({min: 0, max: 4000})
 
-    this.components = { sortableTable, doubleSlider }
+    this.components = { productsTable, doubleSlider }
   }
 
   renderComponents () {
@@ -86,22 +86,6 @@ export default class Page {
 
       root.append(element);
     });
-  }
-
-  async updateTable() {
-    const { sortableTable } = this.components;
-    sortableTable.url.searchParams.set('price_gte', this.filters.filterRange.from)
-    sortableTable.url.searchParams.set('price_lte', this.filters.filterRange.to)
-    sortableTable.url.searchParams.set('title_like', this.filters.filterName)
-
-    if (!!this.filters.filterStatus) {
-      sortableTable.url.searchParams.set('status', this.filters.filterStatus)
-    } else {
-      sortableTable.url.searchParams.delete('status')
-    }
-
-    const newData = await sortableTable.loadData();
-    sortableTable.addRows(newData);
   }
 
   initEventListeners() {
