@@ -49,4 +49,13 @@ export default class Page {
       return accum;
     }, {});
   }
+
+  remove() {
+    if (this.element) {
+      this.element.remove();
+    }
+  }
+  destroy() {
+    Object.values(this.categories).forEach(category => category.destroy())
+  }
 }
