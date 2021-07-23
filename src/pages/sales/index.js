@@ -87,4 +87,17 @@ export default class Page {
 
     return url;
   }
+
+  remove() {
+    if (this.element) {
+      this.element.remove();
+    }
+  }
+  destroy() {
+    this.remove();
+    this.components.rangePicker.destroy();
+    this.components.sortableTable.destroy();
+    this.components = {};
+    this.subElements = {};
+  }
 }
