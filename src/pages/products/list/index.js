@@ -36,8 +36,8 @@ export default class Page {
     element.innerHTML = `
       <div class='products-list' data-role='products'>
         <div class="content__top-panel">
-          <h1 class="page-title">Products</h1>
-          <a href="/products/add" class="button-primary">Add Product</a>
+          <h1 class="page-title">Товары</h1>
+          <a href="/products/add" class="button-primary">Добавить товар</a>
         </div>
         <div class="content-box content-box_small">
           <form class="form-inline">

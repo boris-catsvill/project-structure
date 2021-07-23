@@ -11,8 +11,7 @@ export default class Page {
   initComponents() {
     const rangePicker = new RangePicker(this.currentRange);
     const sortableTable = new SortableTable(salesTableHeader, {start: 0, step: 30, url: this.tableUrl})
-    this.components.rangePicker = rangePicker;
-    this.components.sortableTable = sortableTable;
+    this.components = { rangePicker, sortableTable };
   }
 
   initEventListeners() {

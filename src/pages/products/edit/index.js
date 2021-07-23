@@ -23,7 +23,7 @@ export default class Page {
       <div class="products-edit" data-role='products'>
         <div class="content__top-panel">
           <h1 class="page-title">
-            <a href="/products" class="link">Товары</a> / ${this.productId ? 'Изменить' : 'Добавить'}
+            <a href="/products" class="link">Товары</a> / ${this.productId ? 'Редактировать' : 'Добавить'}
           </h1>
         </div>
         <div class="content-box" data-element='productForm'></div>
