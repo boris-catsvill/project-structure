@@ -244,7 +244,7 @@ export default class ProductForm {
   dispatchEvent(id) {
     const event = this.productId
       ? new CustomEvent('product-updated', {detail: id})
-      : new CustomEvent('product-saved');
+      : new CustomEvent('product-saved', {detail: id});
 
     this.element.dispatchEvent(event);
   }

@@ -1,4 +1,5 @@
 import ProductForm from '../../../components/product-form';
+import NotificationMessage from '../../../components/notification';
 
 export default class Page {
   element;
@@ -22,7 +23,7 @@ export default class Page {
       <div class="products-edit">
         <div class="content__top-panel">
           <h1 class="page-title">
-            <a href="/products" class="link">Товары</a> / Добавить
+            <a href="/products" class="link">Товары</a> / ${this.productId ? 'Изменить' : 'Добавить'}
           </h1>
         </div>
         <div class="content-box" data-element='productForm'></div>
@@ -34,7 +35,23 @@ export default class Page {
     this.initComponents();
     await this.components.productForm.render();
     this.subElements.productForm.append(this.components.productForm.element);
+    this.initEventListeners();
     return this.element;
+  }
+
+  initEventListeners () {
+    this.components.productForm.element.addEventListener("product-saved", () => {
+      const notification = new NotificationMessage("Товар добавлен");
+      notification.show();
+      window.history.pushState({}, undefined, '/products')
+      window.history.go();
+    });
+
+    this.components.productForm.element.addEventListener("product-updated", () => {
+      const notification = new NotificationMessage("Товар сохранен");
+      notification.show()
+    })
+
   }
 
   getSubElements ($element) {
