@@ -6,9 +6,28 @@ export default class Page {
   element;
   subElements = {};
   components = {};
+  filters = {
+    filterName: '',
+    filterStatus: undefined,
+    filterRange: { from: 0, to: 4000}
+  };
 
   constructor() {
     this.initComponents();
+  }
+
+  handleFilterChange = async (event) => {
+    const { dataset, value } = event.target;
+    const field = dataset.element;
+    if (field) {
+      this.filters[field] = value;
+      this.updateTable();
+    }
+  }
+
+  handleRangeSelect = (event) => {
+    this.filters.filterRange = event.detail;
+    this.updateTable();
   }
 
   async render() {
@@ -24,12 +43,12 @@ export default class Page {
           <form class="form-inline">
           <div class="form-group">
             <label class="form-label">Сортировать по:</label>
-            <input type="text" data-elem="filterName" class="form-control" placeholder="Название товара">
+            <input type="text" data-element="filterName" class="form-control" placeholder="Название товара">
           </div>
           <div class="form-group" data-element="doubleSlider"></div>
           <div class="form-group">
             <label class="form-label">Статус:</label>
-            <select class="form-control" data-elem="filterStatus">
+            <select class="form-control" data-element="filterStatus">
               <option value="" selected="">Любой</option>
               <option value="1">Активный</option>
               <option value="0">Неактивный</option>
@@ -45,6 +64,7 @@ export default class Page {
 
     this.initComponents();
     await this.renderComponents();
+    this.initEventListeners();
 
     return this.element;
   }
@@ -68,9 +88,47 @@ export default class Page {
     });
   }
 
+  async updateTable() {
+    const { sortableTable } = this.components;
+    sortableTable.url.searchParams.set('price_gte', this.filters.filterRange.from)
+    sortableTable.url.searchParams.set('price_lte', this.filters.filterRange.to)
+    sortableTable.url.searchParams.set('title_like', this.filters.filterName)
+
+    if (!!this.filters.filterStatus) {
+      sortableTable.url.searchParams.set('status', this.filters.filterStatus)
+    } else {
+      sortableTable.url.searchParams.delete('status')
+    }
+
+    const newData = await sortableTable.loadData();
+    sortableTable.addRows(newData);
+  }
+
+  initEventListeners() {
+    const { filterName, filterStatus } = this.subElements;
+    filterName.addEventListener('keyup', this.handleFilterChange);
+    filterStatus.addEventListener('change', this.handleFilterChange);
+    this.element.addEventListener('range-select', this.handleRangeSelect)
+  }
+
+  removeEventListeners() {
+    const { filterName, filterStatus } = this.subElements;
+    filterName.removeEventListener('keyup', this.handleFilterChange);
+    filterStatus.removeEventListener('change', this.handleFilterChange);
+    this.element.removeEventListener('range-select', this.handleRangeSelect)
+  }
+
   destroy() {
+    this.removeEventListeners();
     for (const component of Object.values(this.components)) {
       component.destroy();
+    }
+
+    this.subElements = {};
+    this.components = {}
+
+    if (this.element) {
+      this.element.remove();
     }
   }
 
