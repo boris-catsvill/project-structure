@@ -22,11 +22,9 @@ const highlightMenuItem = (event) => {
   const sidebarNav = document.querySelector('.sidebar__nav');
   const items = sidebarNav.querySelectorAll('li');
   [...items].forEach(item => {
-    item.classList.remove('active');
     const itemPage = item.firstElementChild.dataset.page;
-    if (itemPage === page) {
-      item.classList.add('active');
-    }
+    const action = itemPage === page ? 'add' : 'remove';
+    item.classList[action]('active');
   });
 };
 

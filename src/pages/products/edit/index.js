@@ -33,8 +33,8 @@ export default class Page {
     this.element = element.firstElementChild;
     this.subElements = this.getSubElements(this.element);
     this.initComponents();
-    await this.components.productForm.render();
-    this.subElements.productForm.append(this.components.productForm.element);
+    const productFormElement = await this.components.productForm.render();
+    this.subElements.productForm.append(productFormElement);
     this.initEventListeners();
     return this.element;
   }
