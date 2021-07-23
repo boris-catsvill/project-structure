@@ -62,7 +62,6 @@ export default class Page {
     this.element = element.firstElementChild;
     this.subElements = this.getSubElements(this.element);
 
-    this.initComponents();
     await this.renderComponents();
     this.initEventListeners();
 
@@ -73,7 +72,7 @@ export default class Page {
     const url = new URL('api/rest/products', process.env.BACKEND_URL);
     url.searchParams.set('_embed', 'subcategory.category');
 
-    const productsTable = new ProductsTable(productsTableHeader, { url });
+    const productsTable = new ProductsTable(productsTableHeader, { url, start: 0, step: 30 });
     const doubleSlider = new DoubleSlider({min: 0, max: 4000})
 
     this.components = { productsTable, doubleSlider }
