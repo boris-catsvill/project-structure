@@ -81,7 +81,7 @@ export default class Page {
   }
 
   get template () {
-    return `<div class="dashboard">
+    return `<div class="dashboard" data-role='dashboard'>
       <div class="content__top-panel">
         <h2 class="page-title">Dashboard</h2>
         <!-- RangePicker component -->

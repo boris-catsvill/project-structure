@@ -10,6 +10,7 @@ export default class Page {
   async render() {
     this.element = document.createElement('div');
     this.element.classList = 'categories';
+    this.element.dataset.role = 'categories'
     this.element.innerHTML = `
       <div class="content__top-panel">
         <h1 class="page-title">Категории товаров</h1>

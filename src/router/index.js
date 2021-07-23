@@ -78,7 +78,22 @@ export default class Router {
     return this;
   }
 
+  highlightMenuItem = (event) => {
+    const page = event.detail.page.element.dataset.role;
+    const sidebarNav = document.querySelector('.sidebar__nav');
+    const items = sidebarNav.querySelectorAll('li');
+    [...items].forEach( item => {
+      const itemPage = item.firstElementChild.dataset.page;
+      if (itemPage === page) {
+        item.classList.add('active')
+      } else {
+        item.classList.remove('active')
+      }
+    })
+  }
+
   listen () {
+    document.addEventListener('route', this.highlightMenuItem);
     window.addEventListener('popstate', () => this.route());
     this.route();
   }

@@ -20,7 +20,7 @@ export default class Page {
     const element = document.createElement('div');
 
     element.innerHTML = `
-      <div class="products-edit">
+      <div class="products-edit" data-role='products'>
         <div class="content__top-panel">
           <h1 class="page-title">
             <a href="/products" class="link">Товары</a> / ${this.productId ? 'Изменить' : 'Добавить'}

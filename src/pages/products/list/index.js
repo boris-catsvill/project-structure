@@ -34,7 +34,7 @@ export default class Page {
     const element = document.createElement('div');
 
     element.innerHTML = `
-      <div class='products-list'>
+      <div class='products-list' data-role='products'>
         <div class="content__top-panel">
           <h1 class="page-title">Products</h1>
           <a href="/products/add" class="button-primary">Add Product</a>

@@ -35,6 +35,7 @@ export default class Page {
   async render() {
     this.element = document.createElement('div');
     this.element.className = 'sales full-height flex-column';
+    this.element.dataset.role = 'sales';
     this.element.innerHTML = `
       <div class="content__top-panel">
         <h1 class="page-title">Продажи</h1>
