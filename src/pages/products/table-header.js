@@ -1,13 +1,12 @@
-const header = [
+const tableHeader = [
   {
     id: 'images',
     title: 'Фото',
     sortable: false,
     template: data => {
-      const url = data[0] ? data[0].url : '';
       return `
           <div class="sortable-table__cell">
-            <img class="sortable-table-image" alt="Image" src="${url}">
+            <img class="sortable-table-image" alt="Image" src="${data[0].url}">
           </div>
         `;
     }
@@ -17,6 +16,15 @@ const header = [
     title: 'Название',
     sortable: true,
     sortType: 'string'
+  },
+  {
+    id: 'subcategory',
+    title: 'Категория',
+    sortable: false,
+    sortType: 'string',
+    template: data => {
+      return `<div class="sortable-table__cell">${data.title}</div>`;
+    }
   },
   {
     id: 'quantity',
@@ -37,10 +45,10 @@ const header = [
     sortType: 'number',
     template: data => {
       return `<div class="sortable-table__cell">
-          ${data > 0 ? 'Активный' : 'Неактивный'}
+          ${data > 0 ? 'Активен' : 'Неактивен'}
         </div>`;
     }
   },
 ];
 
-export default header;
+export default tableHeader;

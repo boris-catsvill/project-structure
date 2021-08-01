@@ -249,7 +249,6 @@ export default class RangePicker {
 
   remove () {
     this.element.remove();
-    // TODO: Warning! To remove listener  MUST be passes the same event phase
     document.removeEventListener('click', this.onDocumentClick, true);
   }
 

@@ -83,7 +83,7 @@ export default class Page {
   get template () {
     return `<div class="dashboard">
       <div class="content__top-panel">
-        <h2 class="page-title">Dashboard</h2>
+        <h2 class="page-title">Панель управления</h2>
         <!-- RangePicker component -->
         <div data-element="rangePicker"></div>
       </div>
@@ -94,7 +94,7 @@ export default class Page {
         <div data-element="customersChart" class="dashboard__chart_customers"></div>
       </div>
 
-      <h3 class="block-title">Best sellers</h3>
+      <h3 class="block-title">Лидеры продаж</h3>
 
       <div data-element="sortableTable">
         <!-- sortable-table component -->
