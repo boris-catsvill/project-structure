@@ -28,6 +28,12 @@ export default class SortableTable {
     }
   };
 
+  resetFilters = () => {
+    this.element.dispatchEvent(new CustomEvent('reset-filters', {
+      bubbles: true
+    }));
+  }
+
   onSortClick = event => {
     const column = event.target.closest('[data-sortable="true"]');
     const toggleOrder = order => {
@@ -164,11 +170,11 @@ export default class SortableTable {
   }
 
   getTableRows(data) {
-    return data.map(item => `
-      <div class="sortable-table__row">
+    return data.map(item => {
+      return `<a href = "/products/${item.id}" class="sortable-table__row">
         ${this.getTableRow(item, data)}
-      </div>`
-    ).join('');
+      </a>`;
+    }).join('');
   }
 
   getTableRow(item) {
@@ -195,13 +201,15 @@ export default class SortableTable {
         <div data-element="loading" class="loading-line sortable-table__loading-line"></div>
 
         <div data-element="emptyPlaceholder" class="sortable-table__empty-placeholder">
-          No products
+          <p>Не найдено товаров удовлетворяющих выбранному критерию</p>
+          <button type="button" class="button-primary-outline">Очистить фильтры</button>
         </div>
       </div>`;
   }
 
   initEventListeners() {
     this.subElements.header.addEventListener('pointerdown', this.onSortClick);
+    this.subElements.emptyPlaceholder.addEventListener('pointerdown', this.resetFilters);
     document.addEventListener('scroll', this.onWindowScroll);
   }
 

@@ -1,38 +1,48 @@
 .notification {
-  width: 200px;
+  position: fixed;
+  bottom: 5rem;
+  right: 5rem;
+  min-width: 200px;
   margin: 10px 5px;
-  font-size: 14px;
-  box-shadow: 0 2px 4px 1px rgba(0, 0, 0, .5);
-  border-radius: 2px;
+  font-size: 1.1rem;
+  border-radius: .25rem;
+  border: 1px solid transparent;
+  padding: .75rem 1.25rem;
   animation: calc(var(--value) * 0.1) ease-out calc(var(--value) * 0.9) fadeOut;
   z-index: 1000;
 }
 
 /* Success */
 .notification.success {
-  background: #cdfccd;
+  color: #155724;
+  background-color: #d4edda;
+  border-color: #c3e6cb;
 }
 
 .notification.success .timer {
-  background: #86aa86;
+  background: #155724;
 }
 
 /* Error */
 .notification.error {
-  background: #ffe3e3;
+  color: #721c24;
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
 }
 
 .notification.error .timer {
-  background: #c28585;
+  background: #721c24;
 }
 
 /* Warning */
 .notification.warning {
-  background: #fff9c2;
+  color: #856404;
+  background-color: #fff3cd;
+  border-color: #ffeeba;
 }
 
 .notification.warning .timer {
-  background: #c1c377;
+  background: #856404;
 }
 
 .inner-wrapper {
@@ -64,10 +74,6 @@
   justify-content: space-between;
   text-transform: capitalize;
   font-size: 12px;
-}
-
-.notification-body {
-  font-weight: bold;
 }
 
 @keyframes fadeOut {
