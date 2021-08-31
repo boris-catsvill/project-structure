@@ -38,7 +38,7 @@
   border-top: none;
 }
 
-.sortable-table__header .sortable-table__cell[data-sortable] {
+.sortable-table__header .sortable-table__cell[data-sortable="true"] {
   cursor: pointer;
 }
 
