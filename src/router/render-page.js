@@ -4,7 +4,11 @@ export default async function(path, match) {
   main.classList.add('is-loading');
 
   const { default: Page } = await import(/* webpackChunkName: "[request]" */`../pages/${path}/index.js`);
-  const page = new Page();
+  if(match.length>1) {
+    match = match[1];
+  }
+  const page = new Page( match );
+ 
   const element = await page.render();
 
   main.classList.remove('is-loading');
@@ -13,6 +17,5 @@ export default async function(path, match) {
 
   contentNode.innerHTML = '';
   contentNode.append(element);
-
   return page;
 }
