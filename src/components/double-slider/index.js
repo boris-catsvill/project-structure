@@ -72,16 +72,14 @@ export default class DoubleSlider {
   }
 
   get template() {
-    const { from, to } = this.selected;
-
     return `<div class="range-slider">
-      <span data-element="from">${this.formatValue(from)}</span>
+      <span data-element="from"></span>
       <div data-element="inner" class="range-slider__inner">
         <span data-element="progress" class="range-slider__progress"></span>
         <span data-element="thumbLeft" class="range-slider__thumb-left"></span>
         <span data-element="thumbRight" class="range-slider__thumb-right"></span>
       </div>
-      <span data-element="to">${this.formatValue(to)}</span>
+      <span data-element="to"></span>
     </div>`;
   }
 
@@ -140,6 +138,15 @@ export default class DoubleSlider {
 
     this.subElements.thumbLeft.style.left = left;
     this.subElements.thumbRight.style.right = right;
+
+    this.subElements.from.innerHTML = this.formatValue(this.selected.from);
+    this.subElements.to.innerHTML = this.formatValue(this.selected.to);
+  }
+
+  resetSelected() {
+    this.selected.from = this.min;
+    this.selected.to = this.max;
+    this.update();
   }
 
   onThumbPointerDown(event) {

@@ -94,6 +94,7 @@ export default class Page {
     this.subElements.productsContainer.addEventListener('pointerdown', event => {
       if (event.target.hasAttribute('data-clear-filters')) {
         this.resetFilters();
+        this.updateComponents();
       }
     });
 
@@ -116,8 +117,7 @@ export default class Page {
 
     this.subElements.filterName.value = '';
     this.subElements.filterStatus.value = '';
-
-    this.updateComponents();
+    this.components.sliderContainer.resetSelected();
   }
 
   get template() {
@@ -147,7 +147,6 @@ export default class Page {
             </form>
           </div>
           <div data-element="productsContainer" class="products-list__container"></div>
-          </div>
         </div>`;
   }
 
