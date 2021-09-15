@@ -1,3 +1,5 @@
+import Helpers from '../../utils/helpers.js';
+
 const MONTHS_AT_ONE_TIME = 2;
 const LAST_DAY_IN_A_WEEK = 7;
 
@@ -50,7 +52,7 @@ export default class RangePicker {
   handleControlArrows = event => {
     const className = event.target.className;
     const direction = className.slice(className.lastIndexOf('-') + 1);
-    let month = this.showDateFrom.getMonth();
+    let month = this.showDateFrom.getUTCMonth();
 
     if (direction === 'right') {
       month += 1;
@@ -58,7 +60,7 @@ export default class RangePicker {
       month -= 1;
     }
 
-    this.showDateFrom.setMonth(month);
+    Helpers.setUTCMonthCorrectly(this.showDateFrom, month);
     this.renderSelector(this.showDateFrom);
   };
 
@@ -85,8 +87,12 @@ export default class RangePicker {
                 from = new Date(),
                 to = new Date()
               } = {}) {
-    this.selected = {from, to};
-    this.showDateFrom = new Date(from.getTime());
+
+    this.selected = {
+      from: this.getUTCMidnight(from),
+      to: this.getUTCMidnight(to)
+    };
+    this.showDateFrom = new Date(this.selected.from.getTime());
 
     this.render();
     this.initEventListeners();
@@ -176,11 +182,12 @@ export default class RangePicker {
   renderMonths(firstMonthDate) {
     const months = [];
     const initTime = firstMonthDate.getTime();
-    const month = firstMonthDate.getMonth();
+    const month = firstMonthDate.getUTCMonth();
 
     for (let i = 0; i < MONTHS_AT_ONE_TIME; i++) {
       let date = new Date(initTime);
-      date.setMonth(month + i);
+
+      Helpers.setUTCMonthCorrectly(date, month + i);
 
       months.push(this.renderOneMoth(date));
     }
@@ -193,7 +200,7 @@ export default class RangePicker {
       <div class="rangepicker__calendar">
         <div class="rangepicker__month-indicator">
           <time datetime="${this.toDateTime(date)}">
-            ${date.toLocaleString('ru', {month: 'long'})}
+            ${date.toLocaleDateString('ru', {month: 'long', timeZone: 'UTC'})}
           </time>
         </div>
         <div class="rangepicker__day-of-week">
@@ -212,7 +219,8 @@ export default class RangePicker {
     const dateButtons = [];
 
     for (let i = 1; i <= boundaryValues.lastDate; i++) {
-      date.setDate(i);
+      date.setUTCDate(i);
+
       dateButtons.push(`
             <button type="button"
                 class="rangepicker__cell"
@@ -229,11 +237,12 @@ export default class RangePicker {
   getBoundaryValues(initialDate) {
     const date = new Date(initialDate.getTime());
 
-    date.setDate(1);
-    const firstDayNumber = date.getDay();
+    date.setUTCDate(1);
+    const firstDayNumber = date.getUTCDay();
 
-    date.setMonth((date.getMonth() + 1), 0);
-    const lastDate = date.getDate();
+    Helpers.setUTCMonthCorrectly(date, (date.getUTCMonth() + 1));
+    date.setUTCDate(0);
+    const lastDate = date.getUTCDate();
 
     return {firstDayNumber, lastDate};
   }
@@ -250,13 +259,13 @@ export default class RangePicker {
   }
 
   formatDate(dateToTransform) {
-    return dateToTransform.toLocaleString('ru', {dateStyle: 'short'});
+    return dateToTransform.toLocaleDateString('ru', {dateStyle: 'short', timeZone: 'UTC'});
   }
 
   toDateTime(date) {
-    const month = date.getMonth() + 1;
+    const month = date.getUTCMonth() + 1;
 
-    return `${date.getFullYear()}-${('0' + month).slice(-2)}`;
+    return `${date.getUTCFullYear()}-${('0' + month).slice(-2)}`;
   }
 
   removeSelected() {
@@ -274,6 +283,10 @@ export default class RangePicker {
 
       return result;
     }, {});
+  }
+
+  getUTCMidnight(date) {
+    return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
   }
 
   remove() {

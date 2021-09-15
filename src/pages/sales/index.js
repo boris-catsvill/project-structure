@@ -2,10 +2,7 @@ import RangePicker from '../../components/range-picker/index.js';
 import SortableTable from '../../components/sortable-table/index.js';
 
 import header from './sales-header.js';
-
-import fetchJson from '../../utils/fetch-json.js';
-
-const BACKEND_URL = 'https://course-js.javascript.ru/';
+import Helpers from '../../utils/helpers';
 
 export default class Page {
   element = null;
@@ -13,11 +10,11 @@ export default class Page {
 
   constructor() {
     this.range = {
-      from: new Date,
-      to: new Date
+      from: new Date(),
+      to: new Date()
     }
 
-    this.range.from.setMonth(this.range.from.getMonth() - 1);
+    this.range.from = Helpers.setUTCMonthCorrectly(this.range.from, this.range.from.getUTCMonth() - 1);
   }
 
   render() {
@@ -37,7 +34,7 @@ export default class Page {
 
   get template() {
     return `
-        <div class="sales">
+        <div class="sales full-height flex-column">
 
             <div class="content__top-panel">
               <h2 class="page-title">Sales</h2>
@@ -45,26 +42,28 @@ export default class Page {
               <div data-element="rangePicker"></div>
             </div>
 
-            <!-- SortableTable -->
-            <div data-element="sortableTable"></div>
+            <!-- ordersContainer -->
+            <div data-element="ordersContainer" class="full-height flex-column"></div>
         </div>`;
   }
 
   initComponents() {
     const rangePicker = new RangePicker(this.range);
 
-    const sortableTable = new SortableTable(header, {
+    const ordersContainer = new SortableTable(header, {
       url: `api/rest/orders?createdAt_gte=${this.range.from.toISOString()}&createdAt_lte=${this.range.to.toISOString()}`,
       isSortLocally: false,
       sorted: {
         id: 'createdAt',
         order: 'desc'
-      }
+      },
+      emptyPlaceholder: '<div><p>No orders</p></div>',
+      isRowALink: false
     });
 
     this.components = {
       rangePicker,
-      sortableTable
+      ordersContainer
     };
   }
 
@@ -89,7 +88,7 @@ export default class Page {
 
     const url = `api/rest/orders?createdAt_gte=${fromISO}&createdAt_lte=${toISO}`;
 
-    this.components.sortableTable.update(url);
+    this.components.ordersContainer.update(url);
   }
 
   getSubElements(element) {

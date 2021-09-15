@@ -105,15 +105,18 @@ export default class ColumnChart {
     this.element = element.firstElementChild;
   }
 
-  _renderChart(data = []) {
-    if (!data) return;
-
+  _renderChart(data = {}) {
+    const header = this.subElements.header;
+    const columnChart = this.subElements.body;
     const dataValues = Object.values(data);
 
-    if (!dataValues.length) return;
+    if (dataValues.length === 0) {
+      columnChart.innerHTML = '';
+      header.innerHTML = this.formatHeading(0);
 
-    const columnChart = this.subElements.body;
-    const header = this.subElements.header;
+      return;
+    }
+
     const dataProps = this._getColumnProps(dataValues);
 
     header.innerHTML = this.formatHeading(dataValues.reduce((sum, dataValue) => sum + dataValue));

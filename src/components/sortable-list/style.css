@@ -81,4 +81,5 @@
   border: 1px solid var(--blue);
   margin: 3px 0;
   border-radius: 4px;
+  list-style: none;
 }

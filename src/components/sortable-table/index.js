@@ -48,15 +48,11 @@ export default class SortableTable {
 
       const loadedData = await this.loadData();
 
-      if (loadedData.length) {
-        if (loadedData.length < this.loadLength) {
-          document.removeEventListener('scroll', this.scrollHandler);
-        }
-
-        this.updateTableData([...this.data, ...loadedData]);
-      } else {
+      if (loadedData.length === 0 || loadedData.length < this.loadLength) {
         document.removeEventListener('scroll', this.scrollHandler);
       }
+
+      this.updateTableData([...this.data, ...loadedData]);
 
       this.isLoading = false;
     }
@@ -68,12 +64,16 @@ export default class SortableTable {
     sorted = {
       id: headersConfig.find(item => item.sortable).id,
       order: 'asc'
-    }
+    },
+    emptyPlaceholder = '<div><p>No data</p></div>',
+    isRowALink = true
   } = {}) {
     this.url = url;
     this.isSortLocally = isSortLocally;
     this.headerConfig = headersConfig;
     this.sorted = sorted;
+    this.emptyPlaceholder = emptyPlaceholder;
+    this.isRowALink = isRowALink;
 
     this.render();
   }
@@ -90,12 +90,9 @@ export default class SortableTable {
 
     this.subElements.header.innerHTML = this.getHeaderRow();
 
-    if (data.length) {
-      this.element.classList.remove('sortable-table_empty');
-      this.updateTableData(data);
-    } else {
-      this.element.classList.add('sortable-table_empty');
-    }
+    this.subElements.emptyPlaceholder.innerHTML = this.emptyPlaceholder;
+
+    this.updateTableData(data);
     this.initEventListeners();
   }
 
@@ -105,11 +102,7 @@ export default class SortableTable {
           <div data-element="header" class="sortable-table__header sortable-table__row"></div>
           <div data-element="body" class="sortable-table__body"></div>
           <div data-element="loading" class="loading-line sortable-table__loading-line"></div>
-          <div data-element="emptyPlaceholder" class="sortable-table__empty-placeholder">
-            <div>
-              <p>No items</p>
-            </div>
-          </div>
+          <div data-element="emptyPlaceholder" class="sortable-table__empty-placeholder"></div>
       </div>
     `;
   }
@@ -134,9 +127,9 @@ export default class SortableTable {
 
   getBodyRows(data) {
     return data.map(rowData => {
-      return `
-        <a href="/products/${rowData.id}" class="sortable-table__row">${this.getBodyRow(rowData)}</a>
-      `;
+      return this.isRowALink ?
+        `<a href="/products/${rowData.id}" class="sortable-table__row">${this.getBodyRow(rowData)}</a>` :
+        `<div class="sortable-table__row">${this.getBodyRow(rowData)}</div>`;
     }).join('');
   }
 
@@ -158,14 +151,24 @@ export default class SortableTable {
 
     if (loadedData.length) {
       document.addEventListener('scroll', this.scrollHandler);
-      this.updateTableData(loadedData);
     }
+    this.updateTableData(loadedData);
   }
 
   updateTableData(data) {
     this.data = data;
 
-    this.subElements.body.innerHTML = this.getBodyRows(data);
+    if (data.length) {
+      this.element.classList.remove('sortable-table_empty');
+
+      if (this.isSortLocally) {
+        Array.from(this.subElements.header.children).map(cell => cell.dataset.order = '');
+      }
+
+      this.subElements.body.innerHTML = this.getBodyRows(data);
+    } else {
+      this.element.classList.add('sortable-table_empty');
+    }
   }
 
   sortOnClient(id, order) {
@@ -181,8 +184,8 @@ export default class SortableTable {
 
     if (loadedData.length) {
       document.addEventListener('scroll', this.scrollHandler);
-      this.updateTableData(loadedData);
     }
+    this.updateTableData(loadedData);
   }
 
   sort(id, order) {

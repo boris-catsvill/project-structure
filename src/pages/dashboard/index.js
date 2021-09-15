@@ -1,11 +1,8 @@
 import RangePicker from '../../components/range-picker/index.js';
 import SortableTable from '../../components/sortable-table/index.js';
 import ColumnChart from '../../components/column-chart/index.js';
+import Helpers from '../../utils/helpers.js';
 import header from './bestsellers-header.js';
-
-import fetchJson from '../../utils/fetch-json.js';
-
-const BACKEND_URL = 'https://course-js.javascript.ru/';
 
 export default class Page {
   element = null;
@@ -16,8 +13,7 @@ export default class Page {
       from: new Date(),
       to: new Date(),
     };
-
-    this.range.from.setMonth(this.range.from.getMonth() - 1);
+    this.range.from = Helpers.setUTCMonthCorrectly(this.range.from, this.range.from.getUTCMonth() - 1);
   }
 
   render() {
@@ -80,7 +76,7 @@ export default class Page {
 
   get template() {
     return `
-        <div class="dashboard">
+        <div class="dashboard full-height flex-column">
 
             <div class="content__top-panel">
               <h2 class="page-title">Dashboard</h2>
@@ -98,7 +94,7 @@ export default class Page {
             <h3 class="block-title">Best sellers</h3>
 
             <!-- SortableTable -->
-            <div data-element="sortableTable"></div>
+            <div data-element="sortableTable" class="full-height flex-column"></div>
         </div>`;
   }
 

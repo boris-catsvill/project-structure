@@ -1,5 +1,6 @@
 import Router from './router/index.js';
 import tooltip from './components/tooltip/index.js';
+import './components/toggle-sidebar/index.js';
 
 tooltip.initialize();
 
