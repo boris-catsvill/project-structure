@@ -4,9 +4,10 @@ const header = [
     title: 'Image',
     sortable: false,
     template: data => {
+      const img = data[0] ? `<img class="sortable-table-image" alt="Image" src="${data[0].url}">` : ``;
       return `
           <div class="sortable-table__cell">
-            <img class="sortable-table-image" alt="Image" src="${data[0] ? data[0].url : ''}">
+            ${img}
           </div>`;
     }
   },
@@ -21,7 +22,14 @@ const header = [
     title: 'Category',
     sortable: false,
     template: data => {
-      return `<div class="sortable-table__cell">${data.title}</div>`;
+      return `<div class="sortable-table__cell">
+                <span data-tooltip="<div class='sortable-table-tooltip'>
+                            <span class='sortable-table-tooltip__category'>${data.category.title}</span> /
+                            <b class='sortable-table-tooltip__subcategory'>${data.title}</b>
+                          </div>">
+                  ${data.title}
+                </span>
+              </div>`;
     }
   },
   {

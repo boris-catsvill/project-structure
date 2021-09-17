@@ -75,6 +75,8 @@ export default class Page {
   }
 
   initEventListeners() {
+    let timerId;
+
     this.subElements.filterStatus.addEventListener('change', event => {
       this.filterStatus = event.target.value;
 
@@ -86,9 +88,13 @@ export default class Page {
     this.subElements.filterName.addEventListener('input', event => {
       this.filterTitle = event.target.value;
 
-      this.updateComponents({
-        filterTitle: this.filterTitle
-      });
+      clearTimeout(timerId);
+
+      timerId = setTimeout(() => {
+        this.updateComponents({
+          filterTitle: this.filterTitle
+        });
+      }, 100);
     });
 
     this.subElements.productsContainer.addEventListener('pointerdown', event => {
@@ -158,5 +164,21 @@ export default class Page {
 
       return result;
     }, {});
+  }
+
+  remove() {
+    if (this.element) {
+      this.element.remove();
+    }
+  }
+
+  destroy() {
+    this.remove();
+    this.element = null;
+    this.subElements = null;
+
+    for (const component of Object.values(this.components)) {
+      component.destroy();
+    }
   }
 }
