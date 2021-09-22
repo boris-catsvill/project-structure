@@ -1,8 +1,15 @@
 import Router from './router/index.js';
 import tooltip from './components/tooltip/index.js';
-import './components/toggle-sidebar/index.js';
+import sidebar from './components/sidebar/index.js';
 
 tooltip.initialize();
+sidebar.initialize();
+
+document.addEventListener('route', () => {
+  if (tooltip.element !== null) {
+    tooltip.element.remove();
+  }
+});
 
 const router = Router.instance();
 

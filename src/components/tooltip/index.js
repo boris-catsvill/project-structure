@@ -58,8 +58,17 @@ class Tooltip {
   }
 
   _moveTo(pageX, pageY) {
-    this.element.style.left = pageX + this.SHIFT + 'px';
-    this.element.style.top = pageY + this.SHIFT + 'px';
+    const elementWidth = this.element.offsetWidth;
+    const elementHeight = this.element.offsetHeight;
+
+    const documentWidth = document.documentElement.clientWidth;
+    const documentHeight = document.documentElement.clientHeight;
+
+    const left = documentWidth - pageX - this.SHIFT - elementWidth;
+    const top = documentHeight - pageY - this.SHIFT - elementHeight;
+
+    this.element.style.left = (left > 0 ? pageX + this.SHIFT : documentWidth - elementWidth) + 'px';
+    this.element.style.top = (top > 0 ? pageY + this.SHIFT : documentHeight - elementHeight) + 'px';
   }
 
   remove() {

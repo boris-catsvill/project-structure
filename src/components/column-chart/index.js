@@ -1,6 +1,6 @@
 import fetchJson from "../../utils/fetch-json.js";
 
-const BACKEND_URL = 'https://course-js.javascript.ru';
+const BACKEND_URL = process.env.BACKEND_URL;
 
 export default class ColumnChart {
   element = null;
@@ -24,6 +24,7 @@ export default class ColumnChart {
     this.formatHeading = formatHeading;
 
     this.render();
+    this.initEventListeners();
     this.update(this.range.from, this.range.to);
   }
 
@@ -108,21 +109,29 @@ export default class ColumnChart {
   _renderChart(data = {}) {
     const header = this.subElements.header;
     const columnChart = this.subElements.body;
-    const dataValues = Object.values(data);
+    const dataProps = this._getColumnProps(data);
 
-    if (dataValues.length === 0) {
+    if (dataProps.length === 0) {
       columnChart.innerHTML = '';
       header.innerHTML = this.formatHeading(0);
 
       return;
     }
 
-    const dataProps = this._getColumnProps(dataValues);
+    header.innerHTML = this.formatHeading(Object.values(data).reduce((sum, value) => sum + value));
 
-    header.innerHTML = this.formatHeading(dataValues.reduce((sum, dataValue) => sum + dataValue));
+    const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
 
-    columnChart.innerHTML = dataProps.map(dataProp => {
-      return `<div style="--value: ${dataProp.value}" data-tooltip="${dataProp.percent}"></div>`;
+    columnChart.innerHTML = dataProps.map(item => {
+      const date = new Date(item.date);
+      const itemDate = date.toLocaleDateString('ru', dateOptions);
+
+      return `<div style="--value: ${item.relativeValue}"
+                   data-tooltip="<div>
+                                   <small>${itemDate}</small>
+                                 </div>
+                                 <strong>${this.formatHeading(item.value)}</strong>">
+              </div>`
     }).join('');
   }
 
@@ -131,14 +140,32 @@ export default class ColumnChart {
     this.to = to;
   }
 
+  initEventListeners() {
+    this.subElements.body.addEventListener('mouseover', event => {
+      if (event.target.hasAttribute('data-tooltip') ) {
+        event.currentTarget.classList.add('has-hovered');
+        event.target.classList.add('is-hovered');
+      }
+    });
+
+    this.subElements.body.addEventListener('mouseout', event => {
+      if (event.target.hasAttribute('data-tooltip') ) {
+        event.currentTarget.classList.remove('has-hovered');
+        event.target.classList.remove('is-hovered');
+      }
+    });
+  }
+
   _getColumnProps(data) {
-    const maxValue = Math.max(...data);
+    const dataValues = Object.values(data);
+    const maxValue = Math.max(...dataValues);
     const scale = this.chartHeight / maxValue;
 
-    return data.map(item => {
+    return Object.entries(data).map(([date, value]) => {
       return {
-        percent: (item / maxValue * 100).toFixed(0) + '%',
-        value: String(Math.floor(item * scale))
+        date,
+        value,
+        relativeValue: String(Math.floor(value * scale)),
       };
     });
   }

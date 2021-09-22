@@ -34,23 +34,27 @@ export default class Router {
       .replace(/^\/|\/$/, '');
 
     let match;
+    let path;
 
     for (let route of this.routes) {
       match = strippedPath.match(route.pattern);
 
       if (match) {
         this.page = await this.changePage(route.path, match);
+        path = route.path;
         break;
       }
     }
 
     if (!match) {
       this.page = await this.changePage(this.notFoundPagePath);
+      path = this.notFoundPagePath;
     }
 
     document.dispatchEvent(new CustomEvent('route', {
       detail: {
-        page: this.page
+        page: this.page,
+        path
       }
     }));
   }
