@@ -2,7 +2,7 @@ import RangePicker from '../../components/range-picker/index.js';
 import SortableTable from '../../components/sortable-table/index.js';
 
 import header from './sales-header.js';
-import Helpers from '../../utils/helpers';
+import setUTCMonthCorrectly from '../../utils/helpers';
 
 export default class Page {
   element = null;
@@ -14,7 +14,7 @@ export default class Page {
       to: new Date()
     }
 
-    this.range.from = Helpers.setUTCMonthCorrectly(this.range.from, this.range.from.getUTCMonth() - 1);
+    this.range.from = setUTCMonthCorrectly(this.range.from, this.range.from.getUTCMonth() - 1);
   }
 
   render() {

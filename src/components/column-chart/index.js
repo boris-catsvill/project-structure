@@ -29,16 +29,16 @@ export default class ColumnChart {
   }
 
   render() {
-    this._renderElement();
-    this.subElements = this._getSubElements(this.element);
+    this.renderElement();
+    this.subElements = this.getSubElements(this.element);
   }
 
   async update(from, to) {
-    this._setLoadingInd();
-    const data = await this._loadData(from, to);
-    this._renderChart(data);
+    this.setLoadingInd();
+    const data = await this.loadData(from, to);
+    this.renderChart(data);
     this.setNewRange(from, to);
-    this._removeLoadingInd();
+    this.removeLoadingInd();
 
     return data;
   }
@@ -55,7 +55,7 @@ export default class ColumnChart {
     this.subElements = {};
   }
 
-  async _loadData(from, to) {
+  async loadData(from, to) {
     const url = new URL(this.url, BACKEND_URL);
 
     url.searchParams.set('from', from.toISOString());
@@ -64,7 +64,7 @@ export default class ColumnChart {
     return await fetchJson(url.href);
   }
 
-  _getSubElements(parentElement) {
+  getSubElements(parentElement) {
     const elements = parentElement.querySelectorAll('[data-element]');
 
     return [...elements].reduce((accum, element) => {
@@ -74,11 +74,11 @@ export default class ColumnChart {
     }, {});
   }
 
-  _setLoadingInd() {
+  setLoadingInd() {
     this.element.classList.add('column-chart_loading');
   }
 
-  _removeLoadingInd() {
+  removeLoadingInd() {
     this.element.classList.remove('column-chart_loading');
   }
 
@@ -86,7 +86,7 @@ export default class ColumnChart {
     return this.link ? `<a href="${this.link}" class="column-chart__link">View all</a>` : '';
   }
 
-  _renderElement() {
+  renderElement() {
     const element = document.createElement('div'); // (*)
 
     element.innerHTML = `
@@ -106,10 +106,10 @@ export default class ColumnChart {
     this.element = element.firstElementChild;
   }
 
-  _renderChart(data = {}) {
+  renderChart(data = {}) {
     const header = this.subElements.header;
     const columnChart = this.subElements.body;
-    const dataProps = this._getColumnProps(data);
+    const dataProps = this.getColumnProps(data);
 
     if (dataProps.length === 0) {
       columnChart.innerHTML = '';
@@ -156,7 +156,7 @@ export default class ColumnChart {
     });
   }
 
-  _getColumnProps(data) {
+  getColumnProps(data) {
     const dataValues = Object.values(data);
     const maxValue = Math.max(...dataValues);
     const scale = this.chartHeight / maxValue;

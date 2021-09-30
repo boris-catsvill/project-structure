@@ -1,4 +1,4 @@
-import Helpers from '../../utils/helpers.js';
+import setUTCMonthCorrectly from '../../utils/helpers.js';
 
 const MONTHS_AT_ONE_TIME = 2;
 const LAST_DAY_IN_A_WEEK = 7;
@@ -60,7 +60,7 @@ export default class RangePicker {
       month -= 1;
     }
 
-    Helpers.setUTCMonthCorrectly(this.showDateFrom, month);
+    setUTCMonthCorrectly(this.showDateFrom, month);
     this.renderSelector(this.showDateFrom);
   };
 
@@ -187,7 +187,7 @@ export default class RangePicker {
     for (let i = 0; i < MONTHS_AT_ONE_TIME; i++) {
       let date = new Date(initTime);
 
-      Helpers.setUTCMonthCorrectly(date, month + i);
+      setUTCMonthCorrectly(date, month + i);
 
       months.push(this.renderOneMoth(date));
     }
@@ -240,7 +240,7 @@ export default class RangePicker {
     date.setUTCDate(1);
     const firstDayNumber = date.getUTCDay();
 
-    Helpers.setUTCMonthCorrectly(date, (date.getUTCMonth() + 1));
+    setUTCMonthCorrectly(date, (date.getUTCMonth() + 1));
     date.setUTCDate(0);
     const lastDate = date.getUTCDate();
 

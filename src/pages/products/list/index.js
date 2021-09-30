@@ -4,6 +4,7 @@ import header from './products-header.js';
 
 const DEFAULT_FILTER_FROM = 0;
 const DEFAULT_FILTER_TO = 4000;
+const BACKEND_URL = process.env.BACKEND_URL;
 
 export default class Page {
   element = null;
@@ -63,13 +64,18 @@ export default class Page {
     filterFrom = this.filterFrom,
     filterTo = this.filterTo
   } = {}) {
-    const filterTitleSearchParam = filterTitle ? `&title_like=${filterTitle}`: ``;
-    const filterStatusSearchParam = filterStatus ? `&status=${filterStatus}`: ``;
-    const url = `api/rest/products?_embed=subcategory.category` +
-      `&price_gte=${filterFrom}` +
-      `&price_lte=${filterTo}` +
-      filterStatusSearchParam +
-      filterTitleSearchParam;
+    const url = new URL(`/api/rest/products`, BACKEND_URL);
+
+    url.searchParams.set('_embed', 'subcategory.category');
+    url.searchParams.set('price_gte', String(filterFrom));
+    url.searchParams.set('price_lte', String(filterTo));
+
+    if (filterTitle) {
+      url.searchParams.set('title_like', filterTitle);
+    }
+    if (filterStatus) {
+      url.searchParams.set('status', filterStatus);
+    }
 
     this.components.productsContainer.update(url);
   }

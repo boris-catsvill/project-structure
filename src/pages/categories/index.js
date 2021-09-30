@@ -19,8 +19,6 @@ export default class Page {
     this.updateCategoryOrder(event.target);
   };
 
-  constructor() {}
-
   async render() {
     const wrapper = document.createElement('div');
 

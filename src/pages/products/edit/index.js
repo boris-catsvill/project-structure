@@ -6,14 +6,10 @@ export default class Page {
   subElements = {};
   components = {};
 
-  constructor() {
-    const pathName = window.location.pathname.replace(/^\/|\/$/, '').split('/').pop();
+  constructor(path) {
+    const pathName = path.split('/').pop();
 
-    if (pathName === 'add') {
-      this.productId = null;
-    } else {
-      this.productId = pathName;
-    }
+    this.productId = (pathName === 'add') ? null : pathName;
   }
 
   async render() {

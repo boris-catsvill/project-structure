@@ -40,7 +40,7 @@ export default class Router {
       match = strippedPath.match(route.pattern);
 
       if (match) {
-        this.page = await this.changePage(route.path, match);
+        this.page = await this.changePage(route.path, strippedPath, match);
         path = route.path;
         break;
       }
