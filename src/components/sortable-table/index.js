@@ -82,6 +82,11 @@ export default class SortableTable {
     this.render();
   }
 
+  updateUrl (from, to) {
+    this.url.searchParams.set('createdAt_gte', from.toISOString());
+    this.url.searchParams.set('createdAt_lte', to.toISOString());
+  }
+
   async render() {
     const {id, order} = this.sorted;
     const wrapper = document.createElement('div');
