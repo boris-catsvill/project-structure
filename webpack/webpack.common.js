@@ -65,7 +65,7 @@ module.exports = {
         from: path.join(__dirname, '../src/assets')
       },
       {
-        from: path.join(__dirname, '../src/components/product-form/*.svg'),
+        from: path.join(__dirname, '../src/components/*/*.svg'),
         flatten: true
       }
     ])

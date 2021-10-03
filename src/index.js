@@ -15,3 +15,9 @@ router
   .addRoute(/^404\/?$/, 'error404')
   .setNotFoundPagePath('error404')
   .listen();
+
+// toggle sidebar
+document.querySelector('.sidebar__toggler').addEventListener('click', event => {
+  event.preventDefault();
+  document.body.classList.toggle('is-collapsed-sidebar');
+});

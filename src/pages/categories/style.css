@@ -1,0 +1,27 @@
+.categories.categories_empty {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.categories form input {
+  margin-right: 12px;
+}
+
+.categories__sortable-list {
+  margin: 0;
+}
+
+.categories__sortable-list-item {
+  margin: 12px 0;
+  padding: 12px 16px;
+  min-height: 48px;
+}
+
+.categories__sortable-list-item > strong {
+  color: var(--dark-blue);
+}
+
+.categories__sortable-list-item > span {
+  color: var(--grey);
+}

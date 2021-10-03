@@ -8,9 +8,10 @@
 
 .sortable-table__row {
   display: grid;
-  grid: auto-flow / 80px calc(50% - 80px) 20% 15% 15%;
+  grid: auto-flow / 80px calc(50% - 80px) 20% 10% 10% 10%;
   text-decoration: none;
 }
+
 .sortable-table__row.bold {
   font-weight: bold;
 }
@@ -22,7 +23,8 @@
   color: var(--table-black);
   display: flex;
   align-items: center;
-  border-top: 1px solid var(--grey-light);
+  text-align: initial;
+  border-top: 1px solid var(--grey-extra-light);
 }
 
 .sortable-table__cell:first-child {
@@ -42,8 +44,20 @@
   cursor: pointer;
 }
 
+.sortable-table__header .sortable-table__cell[data-sortable]:hover {
+  color: var(--grey);
+}
+
 .sortable-table__cell-img {
   height: 40px;
+  max-width: 100%;
+  padding: 4px;
+  border: 1px solid var(--grey-light);
+  border-radius: 2px;
+}
+
+.sortable-table-image {
+  max-height: 80px;
   max-width: 100%;
   padding: 4px;
   border: 1px solid var(--grey-light);
@@ -106,24 +120,20 @@
   align-items: center;
   justify-content: center;
   color: var(--grey);
-}
-
-.sortable-table-image {
-  height: 40px;
-  max-width: 100%;
-  padding: 4px;
-  border: 1px solid var(--grey-light);
-  border-radius: 2px;
-}
-
-.sortable-table-tooltip__category {
-  color: var(--grey);
-}
-
-.sortable-field-tooltip__subcategory {
-  color: var(--dark-blue);
+  text-align: center;
 }
 
 .sortable-table .sortable-table__loading-line {
   display: none;
+}
+
+.sortable-table__loading-line {
+  grid-column: 1 / 7;
+  display: none;
+  margin: 16px;
+  --loading-line-height: 20px;
+}
+
+.sortable-table.sortable-table_loading .sortable-table__loading-line {
+  display: grid;
 }

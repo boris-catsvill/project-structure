@@ -5,18 +5,16 @@
 
 body {
   font-family: "Source Sans Pro", sans-serif;
+  margin: 0;
 }
 
 * {
   box-sizing: border-box;
 }
 
-body {
-  margin: 0;
-}
-
 .button-primary,
 .button-primary-outline {
+  min-height: 38px;
   outline: none;
   font-weight: 600;
   font-size: 16px;
@@ -47,6 +45,18 @@ body {
   background-color: var(--white);
 }
 
+.button-primary-outline:hover,
+.button-primary-outline:focus,
+.button-primary-outline:active,
+.button-primary-outline.active {
+  border-color: var(--light-blue);
+}
+
+button.fit-content {
+  width: -moz-fit-content;
+  width: fit-content;
+}
+
 button.is-loading::before {
   content: "";
   display: grid;
@@ -62,14 +72,12 @@ button.is-loading::before {
 }
 
 .button-primary.is-loading::before {
-  background: url("/components/product-form/icon-loading-circle-white.svg") center
-    no-repeat;
+  background: url(/icons/icon-loading-circle-white.svg) center no-repeat;
   background-size: cover;
 }
 
 .button-primary-outline.is-loading::before {
-  background: url("/components/product-form/icon-loading-circle-blue.svg") center
-    no-repeat;
+  background: url(/icons/icon-loading-circle-blue.svg) center no-repeat;
   background-size: cover;
 }
 
