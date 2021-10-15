@@ -1,5 +1,5 @@
 import BasePage from '../../base-page/index.js';
-import ProductForm from '../../../components/product-form';
+import ProductForm from '../../../components/product-form/index.js';
 
 export default class Page extends BasePage {
   constructor(path) {

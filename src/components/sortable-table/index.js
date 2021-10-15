@@ -1,6 +1,6 @@
 import Notification from '../notification/index.js';
 import fetchJson from '../../utils/fetch-json.js';
-import { NOTIFICATION_TYPE, BACKEND_URL } from '../../constants';
+import { NOTIFICATION_TYPE, BACKEND_URL } from '../../constants/index.js';
 
 export default class SortableTable {
   element;
@@ -8,13 +8,19 @@ export default class SortableTable {
   pageSize = 30;
 
   onWindowScroll = () => {
-    if (!this.isRunning && window.scrollY + window.innerHeight >= document.documentElement.scrollHeight) {
+    if (this.isRunning) {
+      return;
+    }
+
+    const isScrolledToBottom = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight;
+
+    if (isScrolledToBottom) {
       this.isRunning = true;
 
       const start = this.data.length;
       const end = this.data.length + this.pageSize;
 
-      this.loadData(start, end,true)
+      this.loadData(start, end, true)
         .catch(error => new Notification(error.message, {type: NOTIFICATION_TYPE.error}).show())
         .finally(() => this.isRunning = false);
     }
@@ -43,7 +49,7 @@ export default class SortableTable {
       order: 'asc'
     },
     scrollable = true,
-    rowUrl = ''
+    rowUrl = null
   } = {}) {
     this.headerConfig = headerConfig;
     this.rowUrl = rowUrl;
@@ -57,13 +63,12 @@ export default class SortableTable {
   }
 
   sortOnClient(id, order) {
-    this.sorted = {id, order};
-    this.updateTable(this.sortData(id, order));
+    this.updateSort(id, order);
+    this.renderRows(this.sortData(id, order));
   }
 
   sortOnServer(id, order) {
-    this.sorted = {id, order};
-
+    this.updateSort(id, order);
     this.loadData()
       .catch(error => new Notification(error.message, {type: NOTIFICATION_TYPE.error}).show());
   }
@@ -95,7 +100,12 @@ export default class SortableTable {
     this.element.classList.add('sortable-table_loading');
 
     const data = await fetchJson(this.url);
-    this.updateTable(data, append);
+
+    if (append) {
+      this.appendRows(data);
+    } else {
+      this.renderRows(data);
+    }
 
     this.element.classList.remove('sortable-table_loading');
   }
@@ -113,35 +123,41 @@ export default class SortableTable {
     await this.loadData();
   }
 
-  updateTable(data, append = false) {
-    this.updateHeader();
-    this.updateBody(data, append);
+  updateSort(id, order) {
+    this.sorted = {id, order};
+
+    const {header, arrow} = this.subElements;
+
+    header.querySelectorAll('[data-sortable]')
+      .forEach(column => {
+        column.dataset.order = order;
+      });
+
+    header.querySelector(`[data-id="${id}"]`).appendChild(arrow);
   }
 
-  updateHeader() {
-    const sortableColumns = this.subElements.header.querySelectorAll('[data-sortable]');
-    const sortedColumn = this.subElements.header.querySelector(`[data-id="${this.sorted.id}"]`);
-
-    sortableColumns.forEach(column => {
-      column.dataset.order = this.sorted.order;
-    });
-
-    sortedColumn.appendChild(this.subElements.arrow);
-  }
-
-  updateBody(data, append = false) {
-    if (append) {
-      this.data.push(...data);
-      this.subElements.body.innerHTML = this.subElements.body.innerHTML.concat(this.getTableRows(data));
-    } else {
-      this.data = data;
-      this.subElements.body.innerHTML = this.getTableRows(this.data);
-    }
-    if (!this.data.length) {
-      this.element.classList.add('sortable-table_empty');
-    } else {
+  toggleEmpty() {
+    if (this.data.length) {
       this.element.classList.remove('sortable-table_empty');
+    } else {
+      this.element.classList.add('sortable-table_empty');
     }
+  }
+
+  renderRows(data) {
+    this.data = data;
+    this.subElements.body.innerHTML = this.getTableRows(data);
+    this.toggleEmpty();
+  }
+
+  appendRows(data) {
+    this.data.push(...data);
+
+    const rows = document.createElement('div');
+    rows.innerHTML = this.getTableRows(data);
+    this.subElements.body.append(...rows.childNodes);
+
+    this.toggleEmpty();
   }
 
   get template() {
@@ -180,18 +196,24 @@ export default class SortableTable {
 
   getRowTemplate(row) {
     if (this.rowUrl) {
-      //const id = row.id.replace(/[^A-Z0-9]+/ig, "-");
-      return `<a class="sortable-table__row" href="${this.rowUrl}/${row.id}">${this.getTableRow(row)}</a>`;
-    }
-    else {
-      return `<div class="sortable-table__row">${this.getTableRow(row)}</div>`;
+      return `
+        <a class="sortable-table__row" href="${this.rowUrl(row)}">
+          ${this.getTableRow(row)}
+        </a>
+      `;
+    } else {
+      return `
+        <div class="sortable-table__row">
+          ${this.getTableRow(row)}
+        </div>
+      `;
     }
   }
 
   getTableRow(data) {
-    return this.headerConfig.map(({id, template}) =>
-      template ? template(data[id]) : `<div class='sortable-table__cell'>${data[id]}</div>`
-    ).join('');
+    return this.headerConfig
+      .map(({id, template}) => template ? template(data[id]) : `<div class='sortable-table__cell'>${data[id]}</div>`)
+      .join('');
   }
 
   getSubElements(parent) {

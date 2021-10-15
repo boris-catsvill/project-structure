@@ -3,7 +3,7 @@ import Notification from '../notification/index.js';
 import escapeHtml from '../../utils/escape-html.js';
 import fetchJson from '../../utils/fetch-json.js';
 
-import { NOTIFICATION_TYPE, CATEGORIES_REST_URL, SUBCATEGORIES_REST_URL, BACKEND_URL } from '../../constants';
+import { NOTIFICATION_TYPE, CATEGORIES_REST_URL, SUBCATEGORIES_REST_URL, BACKEND_URL } from '../../constants/index.js';
 
 export default class Categories {
   element;
@@ -118,13 +118,13 @@ class Category {
   }
 
   async saveOrder() {
-    const order = [];
-
-    this.element.querySelectorAll('.sortable-list__item')
-      .forEach((element, index) => order.push({
-        id: element.dataset.id,
-        weight: index + 1
-      }));
+    const order = [...this.element.querySelectorAll('.sortable-list__item')]
+      .map((element, index) => {
+        return {
+          id: element.dataset.id,
+          weight: index + 1
+        };
+      });
 
     this.data.subcategories = await fetchJson(new URL(SUBCATEGORIES_REST_URL, BACKEND_URL), {
       method: 'PATCH',

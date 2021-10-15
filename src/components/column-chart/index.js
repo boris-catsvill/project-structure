@@ -1,7 +1,7 @@
 import Notification from '../notification/index.js';
 import escapeHtml from '../../utils/escape-html.js';
 import fetchJson from '../../utils/fetch-json.js';
-import { NOTIFICATION_TYPE, BACKEND_URL, LOCALE } from '../../constants';
+import { NOTIFICATION_TYPE, BACKEND_URL, LOCALE } from '../../constants/index.js';
 
 export default class ColumnChart {
   element;
@@ -132,8 +132,9 @@ export default class ColumnChart {
   }
 
   updateChart() {
-    this.subElements.header.textContent = this.formatHeading(this.calculateValue());
-    this.subElements.body.innerHTML = this.getChartColumns();
+    const {header, body} = this.subElements;
+    header.textContent = this.formatHeading(this.calculateValue());
+    body.innerHTML = this.getChartColumns();
   }
 
   calculateValue() {

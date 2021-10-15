@@ -4,7 +4,7 @@ import SortableTable from '../../components/sortable-table/index.js';
 import ColumnChart from '../../components/column-chart/index.js';
 import Notification from '../../components/notification/index.js';
 import header from './bestsellers-header.js';
-import { NOTIFICATION_TYPE, ORDERS_URL, SALES_URL, CUSTOMERS_URL, BESTSELLERS_URL } from '../../constants';
+import { LOCALE, NOTIFICATION_TYPE, ORDERS_URL, SALES_URL, CUSTOMERS_URL, BESTSELLERS_URL } from '../../constants/index.js';
 
 export default class Page extends BasePage {
   onDateSelect = event => {
@@ -56,7 +56,7 @@ export default class Page extends BasePage {
       url: SALES_URL,
       label: 'Продажи',
       range: {from, to},
-      formatHeading: data => `$${data.toLocaleString()}`
+      formatHeading: data => `$${data.toLocaleString(LOCALE)}`
     });
 
     const customersChart = new ColumnChart({
@@ -69,7 +69,7 @@ export default class Page extends BasePage {
       url: `${BESTSELLERS_URL}?from=${from.toISOString()}&to=${to.toISOString()}`,
       sortLocally: true,
       scrollable: false,
-      rowUrl: '/products'
+      rowUrl: row => `/products/${row.id}`
     });
 
     return {

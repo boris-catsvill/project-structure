@@ -1,4 +1,4 @@
-import { LOCALE } from '../../constants';
+import { LOCALE } from '../../constants/index.js';
 
 const header = [
   {
@@ -22,7 +22,7 @@ const header = [
     template: data => {
       return `
         <div class='sortable-table__cell'>
-          ${new Date(data).toLocaleDateString(LOCALE, {year: 'numeric', month: 'long', day: 'numeric'})}
+          ${new Date(data).toLocaleDateString(LOCALE, { year: 'numeric', month: 'long', day: 'numeric' })}
         </div>
       `;
     }
@@ -35,7 +35,7 @@ const header = [
     template: data => {
       return `
         <div class='sortable-table__cell'>
-          $${data.toLocaleString()}
+          $${data.toLocaleString(LOCALE)}
         </div>
       `;
     }

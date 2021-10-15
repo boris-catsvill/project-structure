@@ -1,15 +1,20 @@
 export default class DoubleSlider {
   element;
-  left;
-  right;
+  subElements = {};
 
   onPointerDown = event => {
     this.target = event.target;
+    this.element.classList.add('range-slider_dragging');
+
+    document.addEventListener('pointerup', this.onPointerUp);
     this.element.addEventListener('pointermove', this.onPointerMove);
   }
 
-  onPointerUp = event => {
+  onPointerUp = () => {
     this.element.removeEventListener('pointermove', this.onPointerMove);
+    document.removeEventListener('pointerup', this.onPointerUp);
+
+    this.element.classList.remove('range-slider_dragging');
     this.target = null;
 
     this.element.dispatchEvent(new CustomEvent('range-select', {
@@ -22,22 +27,15 @@ export default class DoubleSlider {
   }
 
   onPointerMove = event => {
-    const range = this.element.querySelector('.range-slider__inner');
-    const rect = range.getBoundingClientRect();
+    const {left, right, width} = this.subElements.inner.getBoundingClientRect();
     const x = event.clientX;
 
-    if (x < rect.left || x > rect.right) {
-      return;
+    if (this.target === this.subElements.thumbLeft) {
+      this.updateLeft(x < left ? 0 : (x - left) / width);
     }
 
-    if (this.target === this.left) {
-      const percent = (x - rect.left) / rect.width;
-      this.updateLeft(percent);
-    }
-
-    if (this.target === this.right) {
-      const percent = (rect.right - x) / rect.width;
-      this.updateRight(percent);
+    if (this.target === this.subElements.thumbRight) {
+      this.updateRight(x > right ? 0 : (right - x) / width);
     }
   }
 
@@ -60,25 +58,33 @@ export default class DoubleSlider {
   }
 
   render() {
-    const left = this.getLeft();
-    const right = this.getRight();
+    const left = this.getPercentLeft();
+    const right = this.getPercentRight();
 
-    const wrapper = document.createElement('div');
-    wrapper.innerHTML = `
-        <div class="range-slider">
-            <span data-element="from">${this.formatValue(this.selected.from)}</span>
-            <div class="range-slider__inner">
-                <span class="range-slider__progress" style="left: ${left}; right: ${right}"></span>
-                <span class="range-slider__thumb-left" style="left: ${left}"></span>
-                <span class="range-slider__thumb-right" style="right: ${right}"></span>
-            </div>
-            <span data-element="to">${this.formatValue(this.selected.to)}</span>
+    this.element = document.createElement('div');
+    this.element.innerHTML = `
+      <div class="range-slider">
+        <span data-element="from">${this.formatValue(this.selected.from)}</span>
+        <div data-element="inner" class="range-slider__inner">
+          <span data-element="progress" class="range-slider__progress" style="left: ${left}; right: ${right}"></span>
+          <span data-element="thumbLeft" class="range-slider__thumb-left" style="left: ${left}"></span>
+          <span data-element="thumbRight" class="range-slider__thumb-right" style="right: ${right}"></span>
         </div>
+        <span data-element="to">${this.formatValue(this.selected.to)}</span>
+      </div>
     `;
 
-    this.element = wrapper.firstElementChild;
-    this.left = this.element.querySelector('.range-slider__thumb-left');
-    this.right = this.element.querySelector('.range-slider__thumb-right');
+    this.element = this.element.firstElementChild;
+    this.subElements = this.getSubElements(this.element);
+  }
+
+  getSubElements(element) {
+    const result = {};
+
+    for (const subElement of element.querySelectorAll('[data-element]')) {
+      result[subElement.dataset.element] = subElement;
+    }
+    return result;
   }
 
   reset() {
@@ -87,45 +93,44 @@ export default class DoubleSlider {
   }
 
   initEventListeners() {
-    this.left.addEventListener('pointerdown', this.onPointerDown);
-    this.right.addEventListener('pointerdown', this.onPointerDown);
-    this.element.addEventListener('pointerup', this.onPointerUp);
+    this.subElements.thumbLeft.addEventListener('pointerdown', this.onPointerDown);
+    this.subElements.thumbRight.addEventListener('pointerdown', this.onPointerDown);
   }
 
-  updateLeft(percent) {
-    this.calculateSelectedFrom(percent);
-    this.element.querySelector('[data-element="from"]').textContent = this.formatValue(this.selected.from);
+  updateLeft(ratio) {
+    this.selected.from = this.calculateSelectedFrom(ratio);
+    this.subElements.from.textContent = this.formatValue(this.selected.from);
 
-    const left = this.getLeft();
-    this.element.querySelector('.range-slider__progress').style.left = left;
-    this.element.querySelector('.range-slider__thumb-left').style.left = left;
+    const left = this.getPercentLeft();
+    this.subElements.progress.style.left = left;
+    this.subElements.thumbLeft.style.left = left;
   }
 
-  updateRight(percent) {
-    this.calculateSelectedTo(percent);
-    this.element.querySelector('[data-element="to"]').textContent = this.formatValue(this.selected.to);
+  updateRight(ratio) {
+    this.selected.to = this.calculateSelectedTo(ratio);
+    this.subElements.to.textContent = this.formatValue(this.selected.to);
 
-    const right = this.getRight();
-    this.element.querySelector('.range-slider__progress').style.right = right;
-    this.element.querySelector('.range-slider__thumb-right').style.right = right;
+    const right = this.getPercentRight();
+    this.subElements.progress.style.right = right;
+    this.subElements.thumbRight.style.right = right;
   }
 
-  getLeft() {
-    return (100 * (this.selected.from - this.min) / (this.max - this.min)).toFixed(0) + '%';
+  getPercentLeft() {
+    return 100 * (this.selected.from - this.min) / (this.max - this.min) + '%';
   }
 
-  getRight() {
-    return (100 * (this.max - this.selected.to) / (this.max - this.min)).toFixed(0) + '%';
+  getPercentRight() {
+    return 100 * (this.max - this.selected.to) / (this.max - this.min) + '%';
   }
 
-  calculateSelectedFrom(percent) {
-    const range = this.max - this.min;
-    this.selected.from = Math.min(this.selected.to, this.min + Math.round(percent * range));
+  calculateSelectedFrom(ratio) {
+    const from = this.min + (this.max - this.min) * ratio;
+    return Math.min(this.selected.to, Math.round(from));
   }
 
-  calculateSelectedTo(percent) {
-    const range = this.max - this.min;
-    this.selected.to = Math.max(this.selected.from, this.max - Math.round(percent * range));
+  calculateSelectedTo(ratio) {
+    const to = this.max - (this.max - this.min) * ratio;
+    return Math.max(this.selected.from, Math.round(to));
   }
 
   remove() {
@@ -137,5 +142,6 @@ export default class DoubleSlider {
   destroy() {
     this.remove();
     this.element = null;
+    this.subElements = {};
   }
 }

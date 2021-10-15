@@ -3,7 +3,7 @@ import Notification from '../notification/index.js';
 import escapeHtml from '../../utils/escape-html.js';
 import fetchJson from '../../utils/fetch-json.js';
 
-import { NOTIFICATION_TYPE, PRODUCTS_REST_URL, CATEGORIES_REST_URL, BACKEND_URL, IMGUR_UPLOAD_URL, IMGUR_CLIENT_ID } from '../../constants';
+import { NOTIFICATION_TYPE, PRODUCTS_REST_URL, CATEGORIES_REST_URL, BACKEND_URL, IMGUR_UPLOAD_URL, IMGUR_CLIENT_ID } from '../../constants/index.js';
 
 export default class ProductForm {
   element;
@@ -123,7 +123,7 @@ export default class ProductForm {
     this.element.dispatchEvent(new CustomEvent(eventType, {
       bubbles: true,
       detail: {
-        response: response
+        response
       }
     }));
   }

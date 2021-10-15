@@ -2,12 +2,13 @@ import BasePage from '../../base-page/index.js';
 import DoubleSlider from '../../../components/double-slider/index.js';
 import SortableTable from '../../../components/sortable-table/index.js';
 import Notification from '../../../components/notification/index.js';
-import { NOTIFICATION_TYPE, PRODUCTS_REST_URL } from '../../../constants';
+import { NOTIFICATION_TYPE, PRODUCTS_REST_URL } from '../../../constants/index.js';
 import header from './products-header.js';
 
 export default class Page extends BasePage {
   onRangeSelect = event => {
-    this.updateComponents({price_gte: event.detail.from, price_lte: event.detail.to});
+    const {from, to} = event.detail;
+    this.updateComponents({price_gte: from, price_lte: to});
   }
 
   onFilterStatus = event => {
@@ -31,7 +32,7 @@ export default class Page extends BasePage {
 
     const sortableTable = new SortableTable(header, {
       url: `${PRODUCTS_REST_URL}?_embed=subcategory.category`,
-      rowUrl: '/products'
+      rowUrl: row => `/products/${row.id}`
     });
 
     sortableTable.subElements.emptyPlaceholder.innerHTML = `

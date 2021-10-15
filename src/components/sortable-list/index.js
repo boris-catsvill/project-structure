@@ -108,10 +108,7 @@ export default class SortableList {
 
   stopDragging(element) {
     element.classList.remove('sortable-list__item_dragging');
-    element.style.width = '';
-    element.style.height = '';
-    element.style.left = '';
-    element.style.top = '';
+    element.style.cssText = '';
 
     const placeholder = this.element.querySelector('.sortable-list__placeholder');
     placeholder.before(element);

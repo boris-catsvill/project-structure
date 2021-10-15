@@ -2,7 +2,7 @@ import BasePage from '../base-page/index.js';
 import RangePicker from '../../components/range-picker/index.js';
 import SortableTable from '../../components/sortable-table/index.js';
 import Notification from '../../components/notification/index.js';
-import { NOTIFICATION_TYPE, ORDERS_REST_URL } from '../../constants';
+import { NOTIFICATION_TYPE, ORDERS_REST_URL } from '../../constants/index.js';
 import header from './sales-header.js';
 
 export default class Page extends BasePage {

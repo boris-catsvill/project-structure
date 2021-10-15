@@ -31,8 +31,9 @@ export default class Notification {
   }
 
   remove() {
-    if (this.element)
+    if (this.element) {
       this.element.remove();
+    }
     clearTimeout(this.timeoutId);
   }
 

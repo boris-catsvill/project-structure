@@ -1,10 +1,20 @@
-import { WEEKDAYS, MONTHS, LOCALE } from '../../constants';
+import { LOCALE } from '../../constants/index.js';
+
+const getWeekday = date => (date.getDay() + 7 - 1) % 7;
+
+const WEEKDAYS = new Array(7)
+  .fill(1)
+  .map((_, index) => new Date(new Date().setDate(index)))
+  .sort((d1, d2) => getWeekday(d1) - getWeekday(d2))
+  .map(date => date.toLocaleDateString(LOCALE, { weekday: 'short' }));
+
+const MONTHS = new Array(12)
+  .fill(1)
+  .map((_, index) => new Date(new Date().setMonth(index)).toLocaleDateString(LOCALE, { month: 'long'}))
 
 export default class RangePicker {
   element;
-  subElements;
-  selectedRange;
-  selection;
+  subElements = {};
 
   onInputClick = () => {
     if (!this.element.classList.contains('rangepicker_open')) {
@@ -23,10 +33,10 @@ export default class RangePicker {
 
     const selectedDate = new Date(button.dataset.value);
 
-    if (this.selection.to) {
+    if (!this.selectionStarted) {
       // start new selection
-      this.selection.from = selectedDate;
-      this.selection.to = null;
+      this.selectionStarted = true;
+      this.selectionFrom = selectedDate;
 
       this.clearSelection();
       button.classList.add('rangepicker__selected-from');
@@ -34,14 +44,15 @@ export default class RangePicker {
     }
 
     // finish selection
-    // NB! the assignment order "to" -> "from" is important,
-    // otherwise "from" date may be overwritten before "to" date is determined
-    this.selection.to = new Date(Math.max(this.selection.from.getTime(), selectedDate.getTime()));
-    this.selection.from = new Date(Math.min(this.selection.from.getTime(), selectedDate.getTime()));
+    this.selectionStarted = false;
 
-    // need to clear previous selection in case first selected date > second selected date
+    const getSelection = type => new Date(Math[type](this.selectionFrom.getTime(), selectedDate.getTime()));
+
+    this.selectedRange.from = getSelection('min');
+    this.selectedRange.to = getSelection('max');
+
+    // clear previous selection in case first selected date > second selected date
     this.clearSelection(['rangepicker__selected-from']);
-
     this.doSelection();
     this.updateInput();
     this.closeSelector();
@@ -68,8 +79,7 @@ export default class RangePicker {
                 from = new Date(),
                 to = new Date()
               }) {
-    this.selectedRange = {from: from, to: to};
-    this.selection = {from: from, to: to};
+    this.selectedRange = {from, to};
     this.calendarVisibleFrom = this.firstDayOfMonth(from);
 
     this.render();
@@ -95,31 +105,33 @@ export default class RangePicker {
   }
 
   render() {
-    const wrapper = document.createElement('div');
-    wrapper.innerHTML = `
-        <div class="rangepicker">
-            <div class="rangepicker__input" data-element="input">
-                <span data-element="from">${new Intl.DateTimeFormat(LOCALE).format(this.selectedRange.from)}</span> -
-                <span data-element="to">${new Intl.DateTimeFormat(LOCALE).format(this.selectedRange.to)}</span>
-            </div>
-            <div class="rangepicker__selector" data-element="selector"></div>
+    const {from, to} = this.selectedRange;
+
+    this.element = document.createElement('div');
+    this.element.innerHTML = `
+      <div class="rangepicker">
+        <div class="rangepicker__input" data-element="input">
+          <span data-element="from">${new Intl.DateTimeFormat(LOCALE).format(from)}</span> -
+          <span data-element="to">${new Intl.DateTimeFormat(LOCALE).format(to)}</span>
         </div>
+        <div class="rangepicker__selector" data-element="selector"></div>
+      </div>
     `;
-    this.element = wrapper.firstElementChild;
+    this.element = this.element.firstElementChild;
     this.subElements = this.getSubElements(this.element);
   }
 
   buildSelector(dateFrom) {
     this.subElements.selector.innerHTML = `
-        <div class="rangepicker__selector-arrow"></div>
-        <div class="rangepicker__selector-control-left"></div>
-        <div class="rangepicker__selector-control-right"></div>
-        <div class="rangepicker__calendar">
-            ${this.getCalendarMonth(this.firstDayOfMonth(dateFrom))}
-        </div>
-        <div class="rangepicker__calendar">
-            ${this.getCalendarMonth(this.firstDayOfMonth(this.addMonth(dateFrom)))}
-        </div>
+      <div class="rangepicker__selector-arrow"></div>
+      <div class="rangepicker__selector-control-left"></div>
+      <div class="rangepicker__selector-control-right"></div>
+      <div class="rangepicker__calendar">
+        ${this.getCalendarMonth(this.firstDayOfMonth(dateFrom))}
+      </div>
+      <div class="rangepicker__calendar">
+        ${this.getCalendarMonth(this.firstDayOfMonth(this.addMonth(dateFrom)))}
+      </div>
     `;
 
     this.doSelection();
@@ -142,52 +154,37 @@ export default class RangePicker {
 
   getCalendarMonth(date) {
     return `
-        <div class="rangepicker__month-indicator">
-            <time dateTime="${MONTHS[date.getMonth()]}">${MONTHS[date.getMonth()]}</time>
-        </div>
-        ${this.getDaysOfWeek()}
-        ${this.getDaysOfMonth(date)}
+      <div class="rangepicker__month-indicator">
+        <time dateTime="${MONTHS[date.getMonth()]}">${MONTHS[date.getMonth()]}</time>
+      </div>
+      <div class="rangepicker__day-of-week">
+        ${WEEKDAYS.map(value => `<div>${value}</div>`).join('')}
+      </div>
+      <div class="rangepicker__date-grid">
+        ${this.getDates(date).map(value => this.renderDate(value)).join('')}
+      </div>
     `;
   }
 
-  getDaysOfWeek() {
-    return `
-        <div class="rangepicker__day-of-week">
-            ${WEEKDAYS.map(day => `<div>${day}</div>`).join('')}
-        </div>
-    `;
-  }
+  getDates(fromDate) {
+    const dates = [];
 
-  getDaysOfMonth(date) {
-    const result = [];
-
-    let current = date;
-    while (current < this.addMonth(date)) {
-      result.push(this.getDate(current));
+    let current = fromDate;
+    while (current < this.addMonth(fromDate)) {
+      dates.push(current);
       current = this.addDay(current);
     }
 
-    return `
-        <div class="rangepicker__date-grid">
-            ${result.join('')}
-        </div>
-      `;
+    return dates;
   }
 
-  getDate(date) {
-    const style = date.getDate() === 1 ? `style="--start-from: ${this.getWeekday(date)}"` : '';
+  renderDate(date) {
+    const style = date.getDate() === 1 ? `style="--start-from: ${getWeekday(date)}"` : '';
     return `
-        <button type="button" class="rangepicker__cell" data-value="${date.toISOString()}" ${style}>
-            ${date.getDate()}
-        </button>
-  `;
-  }
-
-  getWeekday(date) {
-    // get day of week starting from a Sunday and transform it to the one starting from a Monday, i.e.:
-    // Sunday: from 0 to 6
-    // Monday - Saturday: from 1 - 6 to 0 - 5
-    return (date.getDay() + WEEKDAYS.length - 1) % WEEKDAYS.length;
+      <button type="button" class="rangepicker__cell" data-value="${date.toISOString()}" ${style}>
+        ${date.getDate()}
+      </button>
+    `;
   }
 
   getSubElements(parent) {
@@ -217,18 +214,14 @@ export default class RangePicker {
   }
 
   updateInput() {
-    this.selectedRange.from = this.selection.from;
-    this.selectedRange.to = this.selection.to;
+    const {from, to} = this.selectedRange;
 
-    this.subElements.from.textContent = new Intl.DateTimeFormat(LOCALE).format(this.selectedRange.from);
-    this.subElements.to.textContent = new Intl.DateTimeFormat(LOCALE).format(this.selectedRange.to);
+    this.subElements.from.textContent = new Intl.DateTimeFormat(LOCALE).format(from);
+    this.subElements.to.textContent = new Intl.DateTimeFormat(LOCALE).format(to);
 
     this.element.dispatchEvent(new CustomEvent('date-select', {
       bubbles: true,
-      detail: {
-        from: this.selectedRange.from,
-        to: this.selectedRange.to
-      }
+      detail: {from, to}
     }));
   }
 
@@ -247,8 +240,7 @@ export default class RangePicker {
   }
 
   doSelection() {
-    const from = this.selection.from;
-    const to = this.selection.to;
+    const {from, to} = this.selectedRange;
 
     this.subElements.selector.querySelectorAll('.rangepicker__cell')
       .forEach(value => {
@@ -273,9 +265,10 @@ export default class RangePicker {
   }
 
   destroy() {
+    document.removeEventListener('click', this.onExternalClick, { capture: true });
+
     this.remove();
     this.element = null;
     this.subElements = {};
-    document.removeEventListener('click', this.onExternalClick, {capture: true});
   }
 }

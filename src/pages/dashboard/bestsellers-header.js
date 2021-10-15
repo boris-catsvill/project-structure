@@ -1,4 +1,5 @@
 import escapeHtml from '../../utils/escape-html.js';
+import { LOCALE } from '../../constants/index.js';
 
 const header = [
   {
@@ -45,7 +46,7 @@ const header = [
     template: data => {
       return `
         <div class="sortable-table__cell">
-          $${data.toLocaleString()}
+          $${data.toLocaleString(LOCALE)}
         </div>
       `;
     }
