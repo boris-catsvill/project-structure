@@ -87,7 +87,7 @@ export default class ColumnChart {
   }
 
   renderElement() {
-    const element = document.createElement('div'); // (*)
+    const element = document.createElement('div');
 
     element.innerHTML = `
     <div class="column-chart column-chart_loading" style="--chart-height: ${this.chartHeight}">

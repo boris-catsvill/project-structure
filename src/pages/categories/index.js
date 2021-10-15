@@ -14,9 +14,20 @@ export default class Page {
     }
   };
 
-  onOrderChange = event => {
-    this.showNotification('success', 'Category order saved');
-    this.updateCategoryOrder(event.target);
+  onOrderChange = async (event) => {
+    const newOrder = [...event.target.children].map((listItem, index) => {
+      return {
+        id: listItem.dataset.id,
+        weight: index + 1
+      };
+    });
+
+    try {
+      await this.send(newOrder);
+      this.showNotification('success', 'Category order saved');
+    } catch(error) {
+      this.showNotification('error', `Server side error! ${error}`);
+    }
   };
 
   async render() {
@@ -112,6 +123,19 @@ export default class Page {
     document.addEventListener('sortable-list-reorder', this.onOrderChange);
   }
 
+  async send(payload) {
+    const url = new URL('api/rest/subcategories', BACKEND_URL);
+    const params = {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json;charset=utf-8'
+      },
+      body: JSON.stringify(payload)
+    };
+
+    await fetchJson(url, params);
+  }
+
   showNotification(type, message) {
     const notification = new Notification(message, {
       duration: 3000,
@@ -119,28 +143,6 @@ export default class Page {
     });
 
     notification.show();
-  }
-
-  updateCategoryOrder(categoriesList) {
-    const newOrder = [];
-    const url = new URL('api/rest/subcategories', BACKEND_URL);
-
-    [...categoriesList.children].forEach((listItem, index) => {
-      newOrder.push({
-        id: listItem.dataset.id,
-        weight: index + 1
-      });
-    });
-
-    const params = {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json;charset=utf-8'
-      },
-      body: JSON.stringify(newOrder)
-    };
-
-    fetchJson(url, params);
   }
 
   getSubElements(element) {
