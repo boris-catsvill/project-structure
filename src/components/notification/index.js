@@ -1,8 +1,11 @@
 export default class NotificationMessage {
-  constructor(text, params) {
-
+  constructor(text = '', {
+    duration = 2000,
+    type = 'success',
+  } = {}) {
     this.text = text;
-    Object.assign(this, {duration: 1000, type: 'success'}, params);
+    this.type = type;
+    this.duration = duration;
     this.render();
   }
 
@@ -36,13 +39,13 @@ export default class NotificationMessage {
     this.initEventListeners();
   }
 
-  initEventListeners () {
+  initEventListeners() {
     this.timer = setTimeout(() => {
       this.destroy();
     }, this.duration);
   }
 
-  remove () {
+  remove() {
     this.element.remove();
   }
 

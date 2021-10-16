@@ -63,7 +63,6 @@ export default class SortableList {
     }
 
     this.element.append(...this.items);
-    console.log(this.element)
   }
 
   initEventListeners() {

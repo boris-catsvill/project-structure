@@ -9,13 +9,20 @@ export default class Sales {
 
   async updateTableComponent(from, to) {
     this.components.sortableTable.updateUrl(from, to);
-    const data = await this.components.sortableTable.loadData(this.components.sortableTable.sorted.id, this.components.sortableTable.sorted.order, )
+    const { id, order } = this.components.sortableTable.sorted;
+    const data = await this.components.sortableTable.loadData(id, order);
     this.components.sortableTable.addRows(data);
   }
 
-  async initComponents() {
+  getMinusMonth() {
+   const date = new Date();
+   date.setMonth(date.getMonth() - 1);
+   return date;
+  }
+
+  initComponents() {
     const to = new Date();
-    const from = new Date(to.getTime() - (30 * 24 * 60 * 60 * 1000));
+    const from = this.getMinusMonth();
 
     const rangePicker = new RangePicker({
       from,
@@ -25,7 +32,11 @@ export default class Sales {
     const sortableTable = new SortableTable([
         {id: 'id', title: 'ID', sortable: true},
         {id: 'user', title: 'Client', sortable: true},
-        {id: 'createdAt', title: 'Date', sortable: true},
+        {id: 'createdAt', title: 'Date', sortable: true, template: (el) => {
+            const date = new Date(el);
+            const dateString = `${('0' + date.getDay()).slice(-2)}-${('0' + date.getMonth()).slice(-2)}-${date.getFullYear()}`;
+            return `<div class="sortable-table__cell">${dateString}</div>`;
+        }},
         {id: 'totalCost', title: 'Cost', sortable: true},
         {id: 'delivery', title: 'Status', sortable: true}],  {
       url: `/api/rest/orders?createdAt_gte=${from.toISOString()}&createdAt_lte=${to.toISOString()}`,
@@ -48,7 +59,7 @@ export default class Sales {
     </div>`;
   }
 
-  async render() {
+  render() {
     const element = document.createElement('div');
 
     element.innerHTML = this.template;
@@ -56,7 +67,7 @@ export default class Sales {
     this.element = element.firstElementChild;
     this.subElements = this.getSubElements(this.element);
 
-    await this.initComponents();
+    this.initComponents();
 
     this.renderComponents();
     return this.element;
@@ -64,7 +75,6 @@ export default class Sales {
 
   renderComponents() {
     Object.keys(this.components).forEach(component => {
-        console.log(this.subElements)
       const root = this.subElements[component];
       const {element} = this.components[component];
 
@@ -85,7 +95,6 @@ export default class Sales {
   initEventListeners() {
     this.components.rangePicker.element.addEventListener('date-select', event => {
       const {from, to} = event.detail;
-      console.log(from, to)
       this.updateTableComponent(from, to);
     });
   }

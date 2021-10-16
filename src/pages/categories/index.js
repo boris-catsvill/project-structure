@@ -21,12 +21,10 @@ export default class Page {
 
         const categories = fetchJson(CATEGORIES);
         const data = await categories;
-        console.log(data)
         return data;
     }
 
-    async initComponents() {
-        this.data = await this.getData();
+    initComponents() {
         const categoryWrapper = this.data.map((item) => {
             return `<div class="category category_open" data-id="${item.id}" data-element="subcategoryList">
         <header class="category__header">
@@ -36,16 +34,9 @@ export default class Page {
         const categoryWrapperDiv = document.createElement('div');
         categoryWrapperDiv.innerHTML = categoryWrapper;
         this.element.append(categoryWrapperDiv);
-
-
-        // const sortableList = new SortableList({items: [...newel.children]});
-        this.components = {
-            //   SortableList: sortableList,
-        }
     }
 
     createSubcategoryList() {
-        //   console.log(this.data)
         return this.data.map((item) => {
             const newel = document.createElement('div');
             newel.innerHTML = item.subcategories.map((sub) => {
@@ -72,7 +63,6 @@ export default class Page {
     }
 
     renderComponents() {
-        console.log(this.subElements)
         Object.keys(this.components).forEach(component => {
             const root = this.subElements[component];
             const {element} = this.components[component];
@@ -89,8 +79,8 @@ export default class Page {
 
         this.element = element.firstElementChild;
         this.subElements = this.getSubElements(this.element);
-
-        await this.initComponents();
+        this.data = await this.getData();
+        this.initComponents();
         this.renderComponents();
         this.appendSubcategoryDraggableList();
         this.initEventListeners();
