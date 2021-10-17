@@ -8,6 +8,9 @@ class MainPage {
     this.tooltip = Tooltip.instance();
     this.router = Router.instance();
 
+    this.path = sessionStorage.redirect;
+    delete sessionStorage.redirect;
+
     this.render();
     this.initEventListeners();
   }
@@ -78,7 +81,8 @@ class MainPage {
       .addRoute(new RegExp(`^${URL_PATH}categories$`), 'categories')
       .addRoute(/^404\/?$/, 'error404')
       .setNotFoundPagePath('error404')
-      .listen();
+      .listen()
+      .route(this.path);
   }
 
   initEventListeners() {
