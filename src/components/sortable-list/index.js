@@ -3,17 +3,18 @@ export default class SortableList {
 
   onPointerDown = event => {
     const item = event.target.closest('.sortable-list__item');
+    if (!item) {
+      return;
+    }
 
-    if (item) {
-      if (event.target.closest('[data-grab-handle]')) {
-        event.preventDefault();
-        this.startDragging(event.clientX, event.clientY, item);
-      }
+    if (event.target.closest('[data-grab-handle]')) {
+      event.preventDefault();
+      this.startDragging(event.clientX, event.clientY, item);
+    }
 
-      if (event.target.closest('[data-delete-handle]')) {
-        event.preventDefault();
-        item.remove();
-      }
+    if (event.target.closest('[data-delete-handle]')) {
+      event.preventDefault();
+      item.remove();
     }
   }
 
@@ -51,6 +52,8 @@ export default class SortableList {
     if (!item) {
       return;
     }
+
+    event.preventDefault();
 
     this.stopDragging(item);
   }
@@ -102,20 +105,20 @@ export default class SortableList {
     // move to the bottom of the list
     element.parentElement.append(element);
 
-    document.addEventListener('pointermove', this.onPointerMove);
     document.addEventListener('pointerup', this.onPointerUp);
+    document.addEventListener('pointermove', this.onPointerMove);
   }
 
   stopDragging(element) {
+    document.removeEventListener('pointermove', this.onPointerMove);
+    document.removeEventListener('pointerup', this.onPointerUp);
+
     element.classList.remove('sortable-list__item_dragging');
     element.style.cssText = '';
 
     const placeholder = this.element.querySelector('.sortable-list__placeholder');
     placeholder.before(element);
     placeholder.remove();
-
-    document.removeEventListener('pointermove', this.onPointerMove);
-    document.removeEventListener('pointerdown', this.onPointerDown);
 
     const indexTo = this.getIndex(element);
 
