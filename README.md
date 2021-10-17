@@ -32,7 +32,7 @@
 ## To deploy project to GitHub Pages
 
 * `npm run build` - "соберет" проект в "production" режиме.
-* `npm run deploy` - "зальет" содержимое директории build на GitHub Pages, после чего проект будет доступен по адресу https://<ваш nickname на github>.github.io/course-js.javascript.ru
+* `npm run deploy` - "зальет" содержимое директории build на GitHub Pages, после чего проект будет доступен по адресу https://<ваш nickname на github>.github.io/<repository name>
 
 
 ## Teacher
