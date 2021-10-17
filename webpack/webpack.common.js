@@ -4,12 +4,10 @@ const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const jsLoaders = require('./loaders/js-loaders');
 const cssLoaders = require('./loaders/css-loaders');
-const fontLoaders = require('./loaders/font-loaders');
-const imageLoaders = require('./loaders/image-loaders');
+const fileLoaders = require('./loaders/file-loaders');
 
 module.exports = {
   target: 'web',
@@ -19,20 +17,20 @@ module.exports = {
   },
   output: {
     publicPath: '/',
-    filename: '[name].bundle.js',
     path: path.join(__dirname, '../dist'),
-    chunkFilename: '[name]-[id].js'
+    filename: '[name].bundle.js',
+    chunkFilename: '[id].js'
   },
   module: {
     rules: [
       {
         test: /\.(png|jpe?g|gif|svg)$/i,
-        use: imageLoaders
+        use: fileLoaders
       },
       {
         // | svg - add in case when we need load svg font
         test: /\.(woff|woff2|ttf|eot)(\?v=\d+\.\d+\.\d+)?$/,
-        use: fontLoaders
+        use: fileLoaders
       },
       {
         test: /\.css$/i,
@@ -42,6 +40,22 @@ module.exports = {
         test: /\.(js)?$/,
         use: jsLoaders,
         exclude: [/(node_modules)/]
+      },
+      {
+        test: /\.html$/i,
+        loader: 'html-loader',
+        options: {
+          attributes: {
+            list: [
+              "...",
+              {
+                tag: "link",
+                attribute: "href",
+                type: "src"
+              }
+            ]
+          }
+        }
       }
     ]
   },
@@ -49,9 +63,9 @@ module.exports = {
     new webpack.DefinePlugin({
       'process.env.URL_PATH': JSON.stringify(process.env.URL_PATH || ''),
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
+      'process.env.BACKEND_URL': JSON.stringify(process.env.BACKEND_URL),
       'process.env.IMGUR_UPLOAD_URL': JSON.stringify(process.env.IMGUR_UPLOAD_URL),
       'process.env.IMGUR_CLIENT_ID': JSON.stringify(process.env.IMGUR_CLIENT_ID),
-      'process.env.BACKEND_URL': JSON.stringify(process.env.BACKEND_URL),
       'process.env.LOCALE': JSON.stringify(process.env.LOCALE)
     }),
     new HtmlWebpackPlugin({
@@ -62,15 +76,6 @@ module.exports = {
       // both options are optional
       filename: '[name].css',
       chunkFilename: '[id].css',
-    }),
-    new CopyWebpackPlugin([
-      {
-        from: path.join(__dirname, '../src/assets')
-      },
-      {
-        from: path.join(__dirname, '../src/components/*/*.svg'),
-        flatten: true
-      }
-    ])
+    })
   ]
 };

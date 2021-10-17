@@ -5,6 +5,8 @@ import Notification from '../../../components/notification/index.js';
 import { NOTIFICATION_TYPE, PRODUCTS_REST_URL } from '../../../constants/index.js';
 import header from './products-header.js';
 
+const URL_PATH = process.env.URL_PATH;
+
 export default class Page extends BasePage {
   onRangeSelect = event => {
     const {from, to} = event.detail;
@@ -32,7 +34,7 @@ export default class Page extends BasePage {
 
     const sortableTable = new SortableTable(header, {
       url: `${PRODUCTS_REST_URL}?_embed=subcategory.category`,
-      rowUrl: row => `/products/${row.id}`
+      rowUrl: row => `/${URL_PATH}products/${row.id}`
     });
 
     sortableTable.subElements.emptyPlaceholder.innerHTML = `
@@ -81,7 +83,7 @@ export default class Page extends BasePage {
       <div class="products-list">
         <div class="content__top-panel">
           <h1 class="page-title">Товары</h1>
-          <a href="/products/add" class="button-primary">Добавить товар</a>
+          <a href="/${URL_PATH}products/add" class="button-primary">Добавить товар</a>
         </div>
         <div class="content-box content-box_small">
           <form class="form-inline">

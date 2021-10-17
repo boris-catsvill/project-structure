@@ -72,12 +72,12 @@ button.is-loading::before {
 }
 
 .button-primary.is-loading::before {
-  background: url(/icons/icon-loading-circle-white.svg) center no-repeat;
+  background: url(../assets/icons/icon-loading-circle-white.svg) center no-repeat;
   background-size: cover;
 }
 
 .button-primary-outline.is-loading::before {
-  background: url(/icons/icon-loading-circle-blue.svg) center no-repeat;
+  background: url(../assets/icons/icon-loading-circle-blue.svg) center no-repeat;
   background-size: cover;
 }
 

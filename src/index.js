@@ -1,18 +1,15 @@
 import Router from './router/index.js';
-import tooltip from './components/tooltip/index.js';
+import Tooltip from './components/tooltip/index.js';
 
 const URL_PATH = process.env.URL_PATH;
 
-console.error('URL_PATH', URL_PATH);
-
 class MainPage {
   constructor () {
-    tooltip.initialize();
-
+    this.tooltip = Tooltip.instance();
     this.router = Router.instance();
-    this.render();
 
-    this.addEventListeners();
+    this.render();
+    this.initEventListeners();
   }
 
   render() {
@@ -31,26 +28,26 @@ class MainPage {
         </div>
         <aside class="sidebar">
           <h2 class="sidebar__title">
-            <a href="/">shop admin</a>
+            <a href="/${URL_PATH}">shop admin</a>
           </h2>
           <ul class="sidebar__nav">
             <li>
-              <a href="/" data-page="dashboard">
+              <a href="/${URL_PATH}" data-page="dashboard">
                 <i class="icon-dashboard"></i> <span>Панель управления</span>
               </a>
             </li>
             <li>
-              <a href="/products" data-page="products">
+              <a href="/${URL_PATH}products" data-page="products">
                 <i class="icon-products"></i> <span>Товары</span>
               </a>
             </li>
             <li>
-              <a href="/categories" data-page="categories">
+              <a href="/${URL_PATH}categories" data-page="categories">
                 <i class="icon-categories"></i> <span>Категории</span>
               </a>
             </li>
             <li>
-              <a href="/sales" data-page="sales">
+              <a href="/${URL_PATH}sales" data-page="sales">
                 <i class="icon-sales"></i> <span>Продажи</span>
               </a>
             </li>
@@ -70,7 +67,8 @@ class MainPage {
     `;
   }
 
-  initializeRouter() {
+  initialise() {
+    this.tooltip.initialize();
     this.router
       .addRoute(new RegExp(`^${URL_PATH}$`), 'dashboard')
       .addRoute(new RegExp(`^${URL_PATH}products$`), 'products/list')
@@ -78,12 +76,12 @@ class MainPage {
       .addRoute(new RegExp(`^${URL_PATH}products/([\\w()-]+)$`), 'products/edit')
       .addRoute(new RegExp(`^${URL_PATH}sales$`), 'sales')
       .addRoute(new RegExp(`^${URL_PATH}categories$`), 'categories')
-      .addRoute(/404\/?$/, 'error404')
+      .addRoute(/^404\/?$/, 'error404')
       .setNotFoundPagePath('error404')
       .listen();
   }
 
-  addEventListeners() {
+  initEventListeners() {
     this.element.querySelector('.sidebar__toggler').addEventListener('click', event => {
       event.preventDefault();
       document.body.classList.toggle('is-collapsed-sidebar');
@@ -92,7 +90,4 @@ class MainPage {
 }
 
 const mainPage = new MainPage();
-
-document.body.append(mainPage.element);
-
-mainPage.initializeRouter();
+mainPage.initialise();

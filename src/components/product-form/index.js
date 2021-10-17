@@ -2,6 +2,8 @@ import SortableList from '../sortable-list/index.js';
 import Notification from '../notification/index.js';
 import escapeHtml from '../../utils/escape-html.js';
 import fetchJson from '../../utils/fetch-json.js';
+import iconGrab from './icon-grab.svg';
+import iconTrash from './icon-trash.svg';
 
 import { NOTIFICATION_TYPE, PRODUCTS_REST_URL, CATEGORIES_REST_URL, BACKEND_URL, IMGUR_UPLOAD_URL, IMGUR_CLIENT_ID } from '../../constants/index.js';
 
@@ -221,11 +223,11 @@ export default class ProductForm {
         <input type="hidden" name="url" value="${url}">
         <input type="hidden" name="source" value="${source}">
         <span>
-           <img src="/icon-grab.svg" data-grab-handle="" alt="grab">
+           <img src="${iconGrab}" data-grab-handle="" alt="grab">
            <img class="sortable-table__cell-img" alt="Image" src="${url}"><span>${source}</span>
         </span>
         <button type="button">
-           <img src="/icon-trash.svg" data-delete-handle="" alt="delete">
+           <img src="${iconTrash}" data-delete-handle="" alt="delete">
         </button>
       </li>
     `;

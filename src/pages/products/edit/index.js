@@ -1,6 +1,8 @@
 import BasePage from '../../base-page/index.js';
 import ProductForm from '../../../components/product-form/index.js';
 
+const URL_PATH = process.env.URL_PATH;
+
 export default class Page extends BasePage {
   constructor(path) {
     super(path);
@@ -20,7 +22,7 @@ export default class Page extends BasePage {
       <div class="products-edit">
         <div class="content__top-panel">
           <h1 class="page-title">
-            <a href="/products" class="link">Товары</a> / ${this.productId ? 'Редактировать' : 'Добавить'}
+            <a href="/${URL_PATH}products" class="link">Товары</a> / ${this.productId ? 'Редактировать' : 'Добавить'}
           </h1>
         </div>
         <div class="content-box">

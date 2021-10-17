@@ -6,6 +6,8 @@ import Notification from '../../components/notification/index.js';
 import header from './bestsellers-header.js';
 import { LOCALE, NOTIFICATION_TYPE, ORDERS_URL, SALES_URL, CUSTOMERS_URL, BESTSELLERS_URL } from '../../constants/index.js';
 
+const URL_PATH = process.env.URL_PATH;
+
 export default class Page extends BasePage {
   onDateSelect = event => {
     this.updateComponents(event.detail.from, event.detail.to);
@@ -49,7 +51,7 @@ export default class Page extends BasePage {
       url: ORDERS_URL,
       label: 'Заказы',
       range: {from, to},
-      link: '/sales'
+      link: `/${URL_PATH}sales`
     });
 
     const salesChart = new ColumnChart({
@@ -69,7 +71,7 @@ export default class Page extends BasePage {
       url: `${BESTSELLERS_URL}?from=${from.toISOString()}&to=${to.toISOString()}`,
       sortLocally: true,
       scrollable: false,
-      rowUrl: row => `/products/${row.id}`
+      rowUrl: row => `/${URL_PATH}products/${row.id}`
     });
 
     return {

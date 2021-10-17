@@ -1,6 +1,4 @@
-class Tooltip {
-  static instance;
-
+export default class Tooltip {
   element;
 
   onPointerOver = event => {
@@ -21,11 +19,11 @@ class Tooltip {
     this.move(event.clientX, event.clientY);
   }
 
-  constructor() {
-    if (Tooltip.instance) {
-      return Tooltip.instance;
+  static instance() {
+    if (!this._instance) {
+      this._instance = new Tooltip();
     }
-    Tooltip.instance = this;
+    return this._instance;
   }
 
   render(tooltip = '') {
@@ -62,12 +60,7 @@ class Tooltip {
   destroy() {
     document.removeEventListener('pointerover', this.onPointerOver);
     document.removeEventListener('pointerout', this.onPointerOut);
-
     this.remove();
-    Tooltip.instance = null;
+    this._instance = null;
   }
 }
-
-const tooltip = new Tooltip();
-
-export default tooltip;
