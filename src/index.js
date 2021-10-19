@@ -13,6 +13,12 @@ document.addEventListener('route', () => {
 
 const router = Router.instance();
 
+if (process.env.URL_PATH) {
+  const pattern = process.env.URL_PATH.replace(/^\/|\/$/g, '');
+
+  router.addRoute(new RegExp("^" + pattern + "$"), 'dashboard');
+}
+
 router
   .addRoute(/^$/, 'dashboard')
   .addRoute(/^products$/, 'products/list')

@@ -31,7 +31,7 @@ export default class Router {
 
   async route() {
     let strippedPath = decodeURI(window.location.pathname)
-      .replace(/^\/|\/$/, '');
+      .replace(/^\/|\/$/g, '');
 
     let match;
     let path;
