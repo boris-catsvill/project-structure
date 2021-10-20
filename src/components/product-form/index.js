@@ -188,7 +188,7 @@ export default class ProductForm {
     const fields = Object.keys(this.defaultProduct).filter(field => !excludedFields.includes(field));
 
     fields.forEach(field => {
-      form.elements[field]['value'] = object[field] || this.defaultProduct[field];
+      form.elements[field]['value'] = object.hasOwnProperty(field) ? object[field] : this.defaultProduct[field];
     });
   }
 
