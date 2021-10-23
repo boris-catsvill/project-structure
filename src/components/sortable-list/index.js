@@ -1,6 +1,21 @@
 export default class SortableList {
   element;
 
+  onTouchStart = event => {
+    event.preventDefault();
+    this.onPointerDown(event);
+  }
+
+  onTouchMove = event => {
+    event.preventDefault();
+    this.onPointerMove(event);
+  }
+
+  onTouchEnd = event => {
+    event.preventDefault();
+    this.onPointerUp(event);
+  }
+
   onPointerDown = event => {
     const item = event.target.closest('.sortable-list__item');
     if (!item) {
@@ -77,8 +92,14 @@ export default class SortableList {
   }
 
   initEventListeners() {
-    this.element.addEventListener('pointerdown', this.onPointerDown);
     this.element.addEventListener('dragstart', () => false);
+
+    this.element.addEventListener('mousedown', this.onPointerDown);
+    this.element.addEventListener('touchstart', this.onTouchStart);
+
+    this.element.addEventListener('pointercancel', () => {
+      alert('pointercancel');
+    });
   }
 
   moveAt(x, y, element) {
@@ -105,13 +126,19 @@ export default class SortableList {
     // move to the bottom of the list
     element.parentElement.append(element);
 
-    document.addEventListener('pointerup', this.onPointerUp);
-    document.addEventListener('pointermove', this.onPointerMove);
+    this.element.addEventListener('touchend', this.onTouchEnd);
+    this.element.addEventListener('touchmove', this.onTouchMove);
+
+    this.element.addEventListener('mouseup', this.onPointerUp);
+    this.element.addEventListener('mousemove', this.onPointerMove);
   }
 
   stopDragging(element) {
-    document.removeEventListener('pointermove', this.onPointerMove);
-    document.removeEventListener('pointerup', this.onPointerUp);
+    this.element.removeEventListener('touchmove', this.onTouchMove);
+    this.element.removeEventListener('touchend', this.onTouchEnd);
+
+    this.element.removeEventListener('mousemove', this.onPointerMove);
+    this.element.removeEventListener('mouseup', this.onPointerUp);
 
     element.classList.remove('sortable-list__item_dragging');
     element.style.cssText = '';
