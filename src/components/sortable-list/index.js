@@ -41,12 +41,14 @@ export default class SortableList {
 
     event.preventDefault();
 
+    let x, y;
+
     if (event.clientX) {
-      const x = event.clientX - this.shiftX;
-      const y = event.clientY - this.shiftY;
+      x = event.clientX - this.shiftX;
+      y = event.clientY - this.shiftY;
     } else {
-      const x = event.changedTouches[0].clientX - this.shiftX;
-      const y = event.changedTouches[0].clientY - this.shiftY;
+      x = event.changedTouches[0].clientX - this.shiftX;
+      y = event.changedTouches[0].clientY - this.shiftY;
     }
 
     this.moveAt(x, y, item);
