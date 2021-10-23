@@ -41,8 +41,14 @@ export default class SortableList {
 
     event.preventDefault();
 
-    const x = event.clientX - this.shiftX;
-    const y = event.clientY - this.shiftY;
+    if (event.clientX) {
+      const x = event.clientX - this.shiftX;
+      const y = event.clientY - this.shiftY;
+    } else {
+      const x = event.changedTouches[0].clientX - this.shiftX;
+      const y = event.changedTouches[0].clientY - this.shiftY;
+    }
+
     this.moveAt(x, y, item);
 
     const placeholder = this.element.querySelector('.sortable-list__placeholder');
