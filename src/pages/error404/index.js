@@ -6,8 +6,8 @@ export default class {
 
     element.innerHTML = `
       <div class="error-404">
-        <h1 class="page-title">Страница не найдена</h1>
-        <p>Извините, страница не существует</p>
+        <h1 class="page-title">Page not found</h1>
+        <p>Sorry, the page does not exist</p>
       </div>
     `;
 

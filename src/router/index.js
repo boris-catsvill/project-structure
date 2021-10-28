@@ -31,36 +31,40 @@ export default class Router {
 
   async route() {
     let strippedPath = decodeURI(window.location.pathname)
-      .replace(/^\/|\/$/, '');
+      .replace(/^\/|\/$/g, '');
 
     let match;
+    let path;
 
     for (let route of this.routes) {
       match = strippedPath.match(route.pattern);
 
       if (match) {
-        this.page = await this.changePage(route.path, match);
+        this.page = await this.changePage(route.path, match[0]);
+        path = route.path;
         break;
       }
     }
 
     if (!match) {
       this.page = await this.changePage(this.notFoundPagePath);
+      path = this.notFoundPagePath;
     }
 
     document.dispatchEvent(new CustomEvent('route', {
       detail: {
-        page: this.page
+        page: this.page,
+        path
       }
     }));
   }
 
-  async changePage (path, match) {
+  async changePage (routPath, urlPath) {
     if (this.page && this.page.destroy) {
       this.page.destroy();
     }
 
-    return await renderPage(path, match);
+    return await renderPage(routPath, urlPath);
   }
 
   navigate (path) {

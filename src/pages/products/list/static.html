@@ -1,0 +1,48 @@
+<div class="products-list">
+  <div class="content__top-panel">
+    <h1 class="page-title">Products</h1>
+    <a href="/products/add" class="button-primary">Add product</a>
+  </div>
+  <div class="content-box content-box_small">
+    <form class="form-inline">
+      <div class="form-group">
+        <label class="form-label">Sort by:</label>
+        <input type="text" data-elem="filterName" class="form-control" placeholder="Product name">
+      </div>
+      <div class="form-group" data-elem="sliderContainer">
+        <label class="form-label">Price:</label>
+        <div class="range-slider">
+          <span data-elem="from">$0</span>
+          <div data-elem="inner" class="range-slider__inner">
+            <span data-elem="progress" class="range-slider__progress" style="left: 0%; right: 0%;"></span>
+            <span data-elem="thumbLeft" class="range-slider__thumb-left" style="left: 0%;"></span>
+            <span data-elem="thumbRight" class="range-slider__thumb-right" style="right: 0%;"></span>
+          </div>
+          <span data-elem="to">$4000</span>
+        </div></div>
+      <div class="form-group">
+        <label class="form-label">Status:</label>
+        <select class="form-control" data-elem="filterStatus">
+          <option value="" selected="">Any</option>
+          <option value="1">Active</option>
+          <option value="0">Not active</option>
+        </select>
+      </div>
+    </form>
+  </div>
+  <div data-elem="productsContainer" class="products-list__container">
+    <div class="sortable-table">
+
+
+    <div data-elem="emptyPlaceholder" class="sortable-table__empty-placeholder"><div>
+      <p>Не найдено товаров удовлетворяющих выбранному критерию</p>
+      <button type="button" class="button-primary-outline">Очистить фильтры</button>
+    </div></div>
+  </div>
+  </div>
+</div>
+
+<div>
+  <p>Не найдено товаров удовлетворяющих выбранному критерию</p>
+  <button type="button" class="button-primary-outline">Очистить фильтры</button>
+</div>
