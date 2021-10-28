@@ -115,3 +115,12 @@ button.is-loading > span {
     background-position: -100%;
   }
 }
+
+.products-list {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.products-list .products-list__container {
+  height: 100%;
+}

@@ -1,9 +1,15 @@
 import Router from './router/index.js';
-import tooltip from './components/tooltip/index.js';
+import Tooltip from './components/tooltip/index.js';
+import Sidebar from './components/sidebar/index.js';
 
+const tooltip = new Tooltip();
 tooltip.initialize();
 
 const router = Router.instance();
+
+const sidebar = new Sidebar();
+
+document.querySelector('[data-sidebar]').replaceWith(sidebar.element);
 
 router
   .addRoute(/^$/, 'dashboard')
