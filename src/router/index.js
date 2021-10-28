@@ -29,9 +29,12 @@ export default class Router {
     return this._instance;
   }
 
-  async route() {
-    let strippedPath = decodeURI(window.location.pathname)
-      .replace(/^\/|\/$/, '');
+  async route(path = window.location.pathname) {
+    if (path !== window.location.pathname) {
+      history.replaceState(null, null, path);
+    }
+
+    const strippedPath = decodeURI(path).replace(/^\/|\/$/, '');
 
     let match;
 
@@ -80,6 +83,6 @@ export default class Router {
 
   listen () {
     window.addEventListener('popstate', () => this.route());
-    this.route();
+    return this;
   }
 }

@@ -1,18 +1,35 @@
-export default class Page {
-  element;
-  subElements = {};
-  components = {};
+import BasePage from '../../base-page/index.js';
+import ProductForm from '../../../components/product-form/index.js';
 
-  async render() {
-    const element = document.createElement('div');
+const URL_PATH = process.env.URL_PATH;
 
-    element.innerHTML = `
-      <div>
-        <h1>Edit page</h1>
-      </div>`;
+export default class Page extends BasePage {
+  constructor(path) {
+    super(path);
+    this.productId = path[1];
+  }
 
-    this.element = element.firstElementChild;
+  async getComponents() {
+    const productForm = new ProductForm(this.productId);
 
-    return this.element;
+    return {
+      productForm
+    };
+  }
+
+  get template() {
+    return `
+      <div class="products-edit">
+        <div class="content__top-panel">
+          <h1 class="page-title">
+            <a href="/${URL_PATH}products" class="link">Товары</a> / ${this.productId ? 'Редактировать' : 'Добавить'}
+          </h1>
+        </div>
+        <div class="content-box">
+          <div data-element="productForm"></div>
+        </div>
+      </div>
+    `;
   }
 }
+

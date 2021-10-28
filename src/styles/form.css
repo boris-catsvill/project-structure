@@ -77,6 +77,10 @@ form .form-control {
   outline: none;
 }
 
+form .form-control::placeholder {
+  color: var(--grey-light);
+}
+
 form.form-grid .form-control {
   width: 100%;
 }
@@ -116,3 +120,4 @@ form.form-inline .form-group {
     transform: rotate(360deg);
   }
 }
+
