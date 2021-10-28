@@ -57,16 +57,8 @@ export default class SortableList {
 
   initEventListeners() {
     this.element.addEventListener('dragstart', () => false);
-
     this.element.addEventListener('touchstart', this.onPointerDown);
     this.element.addEventListener('mousedown', this.onPointerDown);
-
-    //this.element.addEventListener('pointerdown', this.onPointerDown);
-
-    // should not fire
-    this.element.addEventListener('pointercancel', () => {
-      alert('pointercancel');
-    });
   }
 
   moveAt(x, y, element) {
@@ -119,10 +111,6 @@ export default class SortableList {
     // mouse events
     this.element.addEventListener('mouseup', this.onPointerUp);
     this.element.addEventListener('mousemove', this.onPointerMove);
-
-    // pointer events
-    //this.element.addEventListener('pointerup', this.onPointerUp);
-    //this.element.addEventListener('pointermove', this.onPointerMove);
   }
 
   stopDragging(element) {
@@ -149,10 +137,6 @@ export default class SortableList {
     // mouse events
     this.element.removeEventListener('mousemove', this.onPointerMove);
     this.element.removeEventListener('mouseup', this.onPointerUp);
-
-    // pointer events
-    //this.element.removeEventListener('pointermove', this.onPointerMove);
-    //this.element.removeEventListener('pointerup', this.onPointerUp);
   }
 
   createPlaceholder(width, height) {
