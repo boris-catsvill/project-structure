@@ -1,4 +1,4 @@
-import comma from "../../utils/comma.js";
+import comma from "../../../utils/comma.js";
 
 const header = [
   {
@@ -52,7 +52,7 @@ const header = [
       return `<div class="sortable-table__cell">${comma(price)}$</div>`;
     },
   },
-  /*{
+  {
     id: "status",
     title: "Status",
     sortable: true,
@@ -61,13 +61,7 @@ const header = [
       return `<div class="sortable-table__cell">
           ${data > 0 ? "Active" : "Inactive"}
         </div>`;
-    }
-  },*/
-  {
-    id: "sales",
-    title: "Sales",
-    sortable: true,
-    sortType: "number",
+    },
   },
 ];
 

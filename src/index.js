@@ -1,10 +1,31 @@
 import Router from './router/index.js';
-import tooltip from './components/tooltip/index.js';
+import SidePanel from './components/side-panel/index.js';
 
-tooltip.initialize();
+const panel = new SidePanel('shop admin', [
+  {
+    path: '',
+    id: 'dashboard',
+    text: 'Dashboard'
+  },
+  {
+    path: 'products',
+    id: 'products',
+    text: 'Products'
+  },
+  {
+    path: 'categories',
+    id: 'categories',
+    text: 'Categories'
+  },
+  {
+    path: 'sales',
+    id: 'sales',
+    text: 'Sales'
+  }
+]);
+document.querySelector('#main').append(panel.element);
 
 const router = Router.instance();
-
 router
   .addRoute(/^$/, 'dashboard')
   .addRoute(/^products$/, 'products/list')
