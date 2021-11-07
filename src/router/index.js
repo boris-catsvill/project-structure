@@ -15,7 +15,7 @@ export default class Router {
 
       const href = link.getAttribute('href');
 
-      if (href && href.startsWith('/')) {
+      if (href && !href.includes(link.protocol)) {
         event.preventDefault();
         this.navigate(href);
       }

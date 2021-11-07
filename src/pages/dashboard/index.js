@@ -45,14 +45,14 @@ export default class Page {
       isSortLocally: true,
       scrollLoad: false,
       rowTemplate: (data, item) =>
-        `<a href="/products/${item.id}" class="sortable-table__row">${data}</a>`
+        `<a href="products/${item.id}" class="sortable-table__row">${data}</a>`
     });
 
     const ordersChart = new ColumnChart({
       url: 'api/dashboard/orders',
       range: { from, to },
       label: 'orders',
-      link: '/sales'
+      link: 'sales'
     });
 
     const salesChart = new ColumnChart({

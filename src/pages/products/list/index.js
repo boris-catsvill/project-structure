@@ -56,7 +56,7 @@ export default class Page {
       isSortLocally: false,
       scrollLoad: true,
       rowTemplate: (data, item) =>
-        `<a href="/products/${item.id}" class="sortable-table__row">${data}</a>`
+        `<a href="products/${item.id}" class="sortable-table__row">${data}</a>`
     });
 
     const sliderContainer = new DoubleSlider({ min: 0, max: 4000 });
@@ -84,7 +84,7 @@ export default class Page {
       <div class="products-list">
         <div class="content__top-panel">
           <h1 class="page-title">Products</h1>
-          <a href="/products/add" class="button-primary">Add product</a>
+          <a href="products/add" class="button-primary">Add product</a>
         </div>
         <div class="content-box content-box_small">
           <form data-element="form" class="form-inline">

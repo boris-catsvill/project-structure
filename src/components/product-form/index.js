@@ -286,12 +286,12 @@ export default class ProductForm {
     wrapper.innerHTML = `
     <li class="products-edit__imagelist-item sortable-list__item">
       <span>
-        <img src="/icons/icon-grab.svg" data-grab-handle alt="grab">
+        <img src="icons/icon-grab.svg" data-grab-handle alt="grab">
         <img class="sortable-table__cell-img" alt="${escapeHtml(name)}" src="${escapeHtml(url)}">
         <span>${escapeHtml(name)}</span>
       </span>
       <button type="button">
-        <img src="/icons/icon-trash.svg" alt="delete" data-delete-handle>
+        <img src="icons/icon-trash.svg" alt="delete" data-delete-handle>
       </button>
     </li>
     `;
