@@ -13,7 +13,7 @@ class SidePanel {
     Object.values(this.subElements).some(element => {
       if (
         location.pathname === element.getAttribute('href') ||
-        (element.getAttribute('href').length > 1 &&
+        (element.getAttribute('href').length >= location.pathname.length &&
           location.pathname.includes(element.getAttribute('href')))
       ) {
         const closest = element.closest('li');

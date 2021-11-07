@@ -30,7 +30,7 @@ export default class Page {
       <div class="products-edit">
         <div class="content__top-panel">
           <h1 class="page-title">
-            <a href="products" class="link">Products</a> / ${
+            <a href="../products" class="link">Products</a> / ${
               this.match && this.match[1] ? 'Edit' : 'Add'
             }
           </h1>
