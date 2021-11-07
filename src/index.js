@@ -1,24 +1,26 @@
 import Router from './router/index.js';
 import SidePanel from './components/side-panel/index.js';
 
+const URL_PATH = process.env.URL_PATH;
+
 const panel = new SidePanel('shop admin', [
   {
-    path: '',
+    path: URL_PATH,
     id: 'dashboard',
     text: 'Dashboard'
   },
   {
-    path: 'products',
+    path: `${URL_PATH}/products`,
     id: 'products',
     text: 'Products'
   },
   {
-    path: 'categories',
+    path: `${URL_PATH}/categories`,
     id: 'categories',
     text: 'Categories'
   },
   {
-    path: 'sales',
+    path: `${URL_PATH}/sales`,
     id: 'sales',
     text: 'Sales'
   }
@@ -27,12 +29,12 @@ document.querySelector('#main').append(panel.element);
 
 const router = Router.instance();
 router
-  .addRoute(/^$/, 'dashboard')
-  .addRoute(/^products$/, 'products/list')
-  .addRoute(/^products\/add$/, 'products/edit')
-  .addRoute(/^products\/([\w()-]+)$/, 'products/edit')
-  .addRoute(/^sales$/, 'sales')
-  .addRoute(/^categories$/, 'categories')
-  .addRoute(/^404\/?$/, 'error404')
+  .addRoute(new RegExp(`^${URL_PATH}$`), 'dashboard')
+  .addRoute(new RegExp(`^${URL_PATH}products$`), 'products/list')
+  .addRoute(new RegExp(`^${URL_PATH}products\/add$`), 'products/edit')
+  .addRoute(new RegExp(`^${URL_PATH}products\/([\w()-]+)$`), 'products/edit')
+  .addRoute(new RegExp(`^${URL_PATH}sales$`), 'sales')
+  .addRoute(new RegExp(`^${URL_PATH}categories$`), 'categories')
+  .addRoute(new RegExp(`^${URL_PATH}404\/?$`), 'error404')
   .setNotFoundPagePath('error404')
   .listen();
