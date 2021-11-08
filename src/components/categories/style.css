@@ -76,6 +76,7 @@
 }
 .category.category_open .category__body {
   height: auto;
+  overflow: unset;
 }
 .subcategory-list {
   padding: 0 16px 24px 40px;

@@ -1,14 +1,15 @@
 // same as fetch, but throws FetchError in case of errors
 // status >= 400 is an error
 // network error / json error are errors
+import Notification from "../components/notification/index.js";
 
-export default async function(url, params) {
+export default async function (url, params) {
   let response;
 
   try {
-    // NOTE: "toString" call needed for correct work of "jest-fetch-mock"
+    // TODO: "toString" call needed for correct work of "jest-fetch-mock"
     response = await fetch(url.toString(), params);
-  } catch(err) {
+  } catch (err) {
     throw new FetchError(response, "Network error has occurred.");
   }
 
@@ -20,8 +21,13 @@ export default async function(url, params) {
     try {
       body = await response.json();
 
-      errorText = (body.error && body.error.message) || (body.data && body.data.error && body.data.error.message) || errorText;
-    } catch (error) { /* ignore failed body */ }
+      errorText =
+        (body.error && body.error.message) ||
+        (body.data && body.data.error && body.data.error.message) ||
+        errorText;
+    } catch (error) {
+      /* ignore failed body */
+    }
 
     let message = `Error ${response.status}: ${errorText}`;
 
@@ -30,7 +36,7 @@ export default async function(url, params) {
 
   try {
     return await response.json();
-  } catch(err) {
+  } catch (err) {
     throw new FetchError(response, null, err.message);
   }
 }
@@ -46,9 +52,13 @@ export class FetchError extends Error {
 }
 
 // handle uncaught failed fetch through
-window.addEventListener('unhandledrejection', event => {
+window.addEventListener("unhandledrejection", (event) => {
   if (event.reason instanceof FetchError) {
-    alert(event.reason.message);
+    ///alert(event.reason.message);
+      const notification = new Notification(event.reason.message, {
+        duration: 3000,
+        type: 'error'
+      });
+      notification.show();
   }
 });
-

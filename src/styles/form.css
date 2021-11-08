@@ -81,9 +81,28 @@ form.form-grid .form-control {
   width: 100%;
 }
 
+form .form-control::-webkit-input-placeholder {
+  color: var(--grey-light);
+}
+
+form .form-control::-moz-placeholder {
+  color: var(--grey-light);
+}
+
+form .form-control:-ms-input-placeholder {
+  color: var(--grey-light);
+}
+
+form .form-control::-ms-input-placeholder {
+  color: var(--grey-light);
+}
+
+form .form-control::placeholder {
+  color: var(--grey-light);
+}
+
 form textarea {
-  resize: none;
-  min-height: 186px;
+  min-height: 250px;
 }
 
 form select.form-control {
@@ -106,6 +125,15 @@ form.form-inline {
 
 form.form-inline .form-group {
   margin-bottom: 0;
+}
+
+@-webkit-keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes spin {
