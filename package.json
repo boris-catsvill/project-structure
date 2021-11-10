@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "homepage": "https://AlexandrKrymov.github.io/course-js.javascript.ru",
   "scripts": {
     "start": "npm run build && npm run static-server",
     "develop": "cross-env NODE_ENV=development webpack-dev-server --config ./webpack/webpack.dev.js",
