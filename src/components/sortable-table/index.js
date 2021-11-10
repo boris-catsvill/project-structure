@@ -200,7 +200,7 @@ export default class SortableTable {
       this.removeLoader();
       return data;
     } catch (error) {
-      console.error('loadData', error);
+      console.error('Loading data error in sortable table', error);
     }
   }
 

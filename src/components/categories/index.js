@@ -92,7 +92,7 @@ export default class Categories {
       const data = await response.json();
       return data;
     } catch (error) {
-      console.error('loadData', error);
+      console.error('Loading categories data error', error);
     }
   }
 
