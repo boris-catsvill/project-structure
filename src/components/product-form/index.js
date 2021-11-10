@@ -1,16 +1,13 @@
-import SortableList from '../sortable-list/index.js';
-import escapeHtml from './utils/escape-html.js';
-
-const IMGUR_CLIENT_ID = '28aaa2e823b03b1';
-const BACKEND_URL = 'https://course-js.javascript.ru';
+import SortableList from '~components/sortable-list/index.js';
+import escapeHtml from '~utils/escape-html.js';
 
 export default class ProductForm {
-  onSubmit = (event) => {
+  onSubmit = event => {
     event.preventDefault();
     this.save();
-  }
+  };
 
-  addImage = (event) => {
+  addImage = event => {
     event.preventDefault();
 
     const imageInput = document.createElement('input');
@@ -21,9 +18,9 @@ export default class ProductForm {
 
     this.subElements.imageListContainer.append(imageInput);
     imageInput.click();
-  }
+  };
 
-  uploadImage = async (event) => {
+  uploadImage = async event => {
     const input = event.target;
     const file = input.files[0];
     const data = new FormData();
@@ -33,18 +30,17 @@ export default class ProductForm {
     this.subElements.productForm.uploadImage.disabled = true;
 
     try {
-      const response = await fetch('https://api.imgur.com/3/image',
-        {
-          method: 'POST',
-          headers: {
-            Authorization: `Client-ID ${IMGUR_CLIENT_ID}`,
-          },
-          body: data,
-        });
+      const response = await fetch('https://api.imgur.com/3/image', {
+        method: 'POST',
+        headers: {
+          Authorization: `Client-ID ${process.env.IMGUR_CLIENT_ID}`
+        },
+        body: data
+      });
       const image = await response.json();
       this.images.push({
         source: image.data.name,
-        url: image.data.link,
+        url: image.data.link
       });
       this.renderImagesList();
     } catch (error) {
@@ -53,26 +49,25 @@ export default class ProductForm {
       this.subElements.productForm.uploadImage.classList.remove('is-loading');
       this.subElements.productForm.uploadImage.disabled = false;
     }
-  }
+  };
 
-  constructor (productId) {
+  constructor(productId) {
     this.productId = productId;
     this.images = [];
-    this.productsUrl = new URL('api/rest/products  ', BACKEND_URL);
-    this.categoriesUrl = new URL('api/rest/categories  ', BACKEND_URL);
+    this.productsUrl = new URL('api/rest/products  ', process.env.BACKEND_URL);
+    this.categoriesUrl = new URL('api/rest/categories  ', process.env.BACKEND_URL);
   }
 
-  async render () {
-    const requests = [
-      this.loadCategories(),
-    ];
+  async render() {
+    const requests = [this.loadCategories()];
     if (this.productId) requests.push(this.loadProductData());
 
     const [categories, productData = {}] = await Promise.all(requests);
 
     if (productData.images) this.images = productData.images;
 
-    if (this.element) this.element.replaceWith(this.toHTML(this.getTemplate(productData, categories)));
+    if (this.element)
+      this.element.replaceWith(this.toHTML(this.getTemplate(productData, categories)));
     else this.element = this.toHTML(this.getTemplate(productData, categories));
 
     this.subElements = this.getSubElements(this.element);
@@ -114,54 +109,30 @@ export default class ProductForm {
   }
 
   async save() {
+    const url = this.productsUrl.toString();
+    const method = this.productId ? 'PATCH' : 'PUT';
     const formData = this.getFormData();
+    const eventName = this.productId ? 'product-updated' : 'product-saved';
 
-    if (this.productId) {
-      await this.update(formData, this.productsUrl.toString());
-    } else {
-      await this.create(formData, this.productsUrl.toString());
-    }
-  }
-
-  async create(data, url) {
     try {
       const response = await fetch(url, {
-        method: 'PUT',
+        method: method,
         headers: {
           'Content-Type': 'application/json'
         },
-        body: data,
+        body: formData
       });
       const product = await response.json();
 
-      document.dispatchEvent(new CustomEvent('product-saved', {
-        detail: { product }
-      }));
+      document.dispatchEvent(
+        new CustomEvent(eventName, {
+          detail: { product }
+        })
+      );
 
       return product;
     } catch (error) {
-      console.error('Create product', error);
-    }
-  }
-
-  async update(data, url) {
-    try {
-      const response = await fetch(url, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: data,
-      });
-      const product = await response.json();
-
-      document.dispatchEvent(new CustomEvent('product-updated', {
-        detail: { product }
-      }));
-
-      return product;
-    } catch (error) {
-      console.error('Update product', error);
+      console.error('Save product', error);
     }
   }
 
@@ -176,7 +147,7 @@ export default class ProductForm {
       discount: parseInt(formData.get('discount')),
       quantity: parseInt(formData.get('quantity')),
       status: parseInt(formData.get('status')),
-      images: this.getImagesData(formData),
+      images: this.getImagesData(formData)
     };
     if (this.productData && this.productData.id) data.id = this.productData.id;
     return JSON.stringify(data);
@@ -193,27 +164,34 @@ export default class ProductForm {
     });
   }
 
-  getTemplate({
-    title = '',
-    description = '',
-    price = 0,
-    discount = 0,
-    quantity = 0,
-    status = '',
-    subcategory = '',
-  } = {}, categories) {
+  getTemplate(
+    {
+      title = '',
+      description = '',
+      price = 0,
+      discount = 0,
+      quantity = 0,
+      status = '',
+      subcategory = ''
+    } = {},
+    categories
+  ) {
     return `
       <div class="product-form">
         <form data-element="productForm" class="form-grid">
           <div class="form-group form-group__half_left">
             <fieldset>
               <label class="form-label">Название товара</label>
-              <input required="" value="${escapeHtml(title)}" id="title" type="text" name="title" class="form-control" placeholder="Название товара">
+              <input required="" value="${escapeHtml(
+                title
+              )}" id="title" type="text" name="title" class="form-control" placeholder="Название товара">
             </fieldset>
           </div>
           <div class="form-group form-group__wide">
             <label class="form-label">Описание</label>
-            <textarea required="" class="form-control" id="description" name="description" data-element="productDescription" placeholder="Описание товара">${escapeHtml(description)}</textarea>
+            <textarea required="" class="form-control" id="description" name="description" data-element="productDescription" placeholder="Описание товара">${escapeHtml(
+              description
+            )}</textarea>
           </div>
           <div class="form-group form-group__wide" data-element="sortable-list-container">
             <label class="form-label">Фото</label>
@@ -257,16 +235,18 @@ export default class ProductForm {
 
   getCategoriesSelectTemplate(categories = [], currentSubcategory = '') {
     const createOptions = () => {
-      const options = categories.map((category) => {
-        const subcategories = category.subcategories.map((subcategory) => {
+      const options = categories.map(category => {
+        const subcategories = category.subcategories.map(subcategory => {
           const title = escapeHtml(`${category.title} > ${subcategory.title}`);
           const isSelected = subcategory.id === currentSubcategory;
-          return `<option value="${subcategory.id}" ${isSelected ? 'selected' : ''}>${title}</option>`;
+          return `<option value="${subcategory.id}" ${
+            isSelected ? 'selected' : ''
+          }>${title}</option>`;
         });
         return subcategories.join('');
       });
       return options.join('');
-    }
+    };
     return `
       <select class="form-control" id="subcategory" name="subcategory" id="subcategory">
         ${createOptions()}
@@ -275,14 +255,16 @@ export default class ProductForm {
   }
 
   getImagesList(images = []) {
-    const imagesList = images.map((image) => {
+    const imagesList = images.map(image => {
       return `
         <li class="products-edit__imagelist-item" style="">
           <input type="hidden" name="url" value="${escapeHtml(image.url)}">
           <input type="hidden" name="source" value="${escapeHtml(image.source)}">
           <span>
             <img src="/icons/icon-grab.svg" data-grab-handle alt="grab">
-            <img class="sortable-table__cell-img" alt="${escapeHtml(image.source)}" src="${escapeHtml(image.url)}">
+            <img class="sortable-table__cell-img" alt="${escapeHtml(
+              image.source
+            )}" src="${escapeHtml(image.url)}">
             <span>${escapeHtml(image.source)}</span>
           </span>
           <button type="button">
@@ -294,17 +276,14 @@ export default class ProductForm {
     return this.createSortableList(imagesList);
   }
 
-  createSortableList(list) {
-    const sortableList = new SortableList({
-      items: list
-    });
-
+  createSortableList(items) {
+    const sortableList = new SortableList({ items });
     return sortableList.element;
   }
 
   getSubElements(root) {
     const subElements = {};
-    [...root.querySelectorAll('[data-element]')].forEach((el) => {
+    [...root.querySelectorAll('[data-element]')].forEach(el => {
       subElements[el.dataset.element] = el;
     });
     return subElements;
@@ -312,12 +291,12 @@ export default class ProductForm {
 
   addEventListeners() {
     this.subElements.productForm.addEventListener('submit', this.onSubmit);
-    this.subElements.imageUploadBtn.addEventListener('click', this.addImage);
+    this.subElements.imageUploadBtn.addEventListener('pointerup', this.addImage);
   }
 
   removeEventListeners() {
     this.subElements.productForm.removeEventListener('submit', this.onSubmit);
-    this.subElements.imageUploadBtn.removeEventListener('click', this.addImage);
+    this.subElements.imageUploadBtn.removeEventListener('pointerup', this.addImage);
   }
 
   remove() {

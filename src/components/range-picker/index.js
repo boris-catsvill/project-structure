@@ -66,9 +66,9 @@ export default class RangePicker {
   initEventListeners () {
     const {input, selector} = this.subElements;
 
-    document.addEventListener('click', this.onDocumentClick, true);
-    input.addEventListener('click', () => this.toggle());
-    selector.addEventListener('click', event => this.onSelectorClick(event));
+    document.addEventListener('pointerup', this.onDocumentClick, true);
+    input.addEventListener('pointerup', () => this.toggle());
+    selector.addEventListener('pointerup', event => this.onSelectorClick(event));
   }
 
   toggle() {
@@ -104,8 +104,8 @@ export default class RangePicker {
     const controlLeft = selector.querySelector('.rangepicker__selector-control-left');
     const controlRight = selector.querySelector('.rangepicker__selector-control-right');
 
-    controlLeft.addEventListener('click', () => this.prev());
-    controlRight.addEventListener('click', () => this.next());
+    controlLeft.addEventListener('pointerup', () => this.prev());
+    controlRight.addEventListener('pointerup', () => this.next());
 
     this.renderHighlight();
   }
@@ -250,7 +250,7 @@ export default class RangePicker {
   remove () {
     this.element.remove();
     // TODO: Warning! To remove listener  MUST be passes the same event phase
-    document.removeEventListener('click', this.onDocumentClick, true);
+    document.removeEventListener('pointerup', this.onDocumentClick, true);
   }
 
   destroy() {

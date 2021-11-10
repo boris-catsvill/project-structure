@@ -1,12 +1,14 @@
-import RangePicker from '../../components/range-picker/index.js';
-import SortableTable from '../../components/sortable-table/index.js';
+import RangePicker from '~components/range-picker/index.js';
+import SortableTable from '~components/sortable-table/index.js';
 import header from './header.js';
-
-const BACKEND_URL = 'https://course-js.javascript.ru/';
 
 export default class Page {
   components = {};
-  from = new Date('09.24.2021');
+  from = (() => {
+    const date = new Date();
+    date.setMonth(date.getMonth() - 1);
+    return date;
+  })();
   to = new Date();
 
   onChangeRange = event => {
@@ -51,7 +53,7 @@ export default class Page {
   }
 
   initSortableTable() {
-    const bestsellersUrl = new URL('api/rest/orders', BACKEND_URL);
+    const bestsellersUrl = new URL('api/rest/orders', process.env.BACKEND_URL);
     bestsellersUrl.searchParams.set('createdAt_gte', this.from.toISOString());
     bestsellersUrl.searchParams.set('createdAt_lte', this.to.toISOString());
     const sortableTable = new SortableTable(header, {
@@ -59,7 +61,7 @@ export default class Page {
       sorted: {
         id: 'createdAt',
         order: 'desc'
-      },
+      }
     });
     sortableTable.element.dataset.element = 'sortableTable';
 

@@ -1,13 +1,15 @@
-import RangePicker from '../../components/range-picker/index.js';
-import SortableTable from '../../components/sortable-table/index.js';
-import ColumnChart from '../../components/column-chart/index.js';
+import RangePicker from '~components/range-picker/index.js';
+import SortableTable from '~components/sortable-table/index.js';
+import ColumnChart from '~components/column-chart/index.js';
 import header from './bestsellers-header.js';
-
-const BACKEND_URL = 'https://course-js.javascript.ru/';
 
 export default class Page {
   components = {};
-  from = new Date('10.24.2021');
+  from = (() => {
+    const date = new Date();
+    date.setMonth(date.getMonth() - 1);
+    return date;
+  })();
   to = new Date();
 
   onChangeRange = event => {
@@ -85,7 +87,7 @@ export default class Page {
   }
 
   initSortableTable() {
-    const bestsellersUrl = new URL('api/dashboard/bestsellers', BACKEND_URL);
+    const bestsellersUrl = new URL('api/dashboard/bestsellers', process.env.BACKEND_URL);
     bestsellersUrl.searchParams.set('from', this.from.toISOString());
     bestsellersUrl.searchParams.set('to', this.to.toISOString());
     const sortableTable = new SortableTable(header, {

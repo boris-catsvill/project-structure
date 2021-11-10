@@ -68,11 +68,11 @@ export default class Sidebar {
   }
 
   addEventListeners() {
-    this.subElements.toggleBtn.addEventListener('click', this.onToggleSidebar);
+    this.subElements.toggleBtn.addEventListener('pointerup', this.onToggleSidebar);
   }
 
   removeEventListeners() {
-    this.subElements.toggleBtn.removeEventListener('click', this.onToggleSidebar);
+    this.subElements.toggleBtn.removeEventListener('pointerup', this.onToggleSidebar);
   }
 
   getSubElements(root) {
@@ -84,6 +84,7 @@ export default class Sidebar {
   }
 
   remove() {
+    if (this.element) this.element.remove();
     this.element = null;
   }
 

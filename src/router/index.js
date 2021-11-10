@@ -1,4 +1,4 @@
-import renderPage from './render-page.js';
+import renderPage from '~/router/render-page.js';
 
 // performs routing on all links
 export default class Router {
@@ -9,7 +9,7 @@ export default class Router {
   }
 
   initEventListeners () {
-    document.addEventListener('click', (event) => {
+    document.addEventListener('pointerup', (event) => {
       const link = event.target.closest('a');
       if (!link) return;
 

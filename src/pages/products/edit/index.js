@@ -1,6 +1,6 @@
-import ProductForm from '../../../components/product-form';
-import NotificationMessage from '../../../components/notification';
-import Router from '../../../router/index.js';
+import ProductForm from '~components/product-form/index.js';
+import NotificationMessage from '~components/notification/index.js';
+import Router from '~/router/index.js';
 const router = Router.instance();
 
 export default class Page {
@@ -8,20 +8,11 @@ export default class Page {
   productId = this.getProductId();
 
   onProductUpdate = () => {
-    const notification = new NotificationMessage('Товар сохранен', {
-      duration: 2000,
-      type: 'success'
-    });
-    notification.show();
+    this.notyShow('Товар сохранен');
   };
 
   onProductSave = (event) => {
-    const notification = new NotificationMessage('Товар создан', {
-      duration: 2000,
-      type: 'success'
-    });
-    notification.show();
-
+    this.notyShow('Товар создан');
     router.navigate(`/products/${event.detail.product.id}`);
   };
 
@@ -73,6 +64,14 @@ export default class Page {
       subElements[el.dataset.element] = el;
     });
     return subElements;
+  }
+
+  notyShow(message = '', type = 'success', timeout = 2000) {
+    const notification = new NotificationMessage(message, {
+      duration: timeout,
+      type
+    });
+    notification.show();
   }
 
   addEventListeners() {

@@ -1,6 +1,6 @@
 import Router from './router/index.js';
-import Tooltip from './components/tooltip/index.js';
-import Sidebar from './components/sidebar/index.js';
+import Tooltip from '~components/tooltip/index.js';
+import Sidebar from '~components/sidebar/index.js';
 
 const tooltip = new Tooltip();
 tooltip.initialize();

@@ -1,8 +1,6 @@
-import SortableTable from '../../../components/sortable-table/index.js';
-import RangeSlider from '../../../components/double-slider/index.js';
+import SortableTable from '~components/sortable-table/index.js';
+import RangeSlider from '~components/double-slider/index.js';
 import header from './products-header.js';
-
-const BACKEND_URL = 'https://course-js.javascript.ru/';
 
 export default class Page {
   components = {};
@@ -116,7 +114,7 @@ export default class Page {
     status = this.status,
     titleLike = this.titleLike
   ) {
-    const productsUrl = new URL('api/rest/products', BACKEND_URL);
+    const productsUrl = new URL('api/rest/products', process.env.BACKEND_URL);
     productsUrl.searchParams.set('_embed', 'subcategory.category');
     if (price_gte) productsUrl.searchParams.set('price_gte', price_gte);
     if (price_lte) productsUrl.searchParams.set('price_lte', price_lte);
@@ -175,12 +173,12 @@ export default class Page {
     document.addEventListener('range-select', this.onChangeRange);
     this.subElements.filterStatus.addEventListener('change', this.onChangeStatus);
     this.subElements.filterName.addEventListener('input', this.onInputTitle);
-    document.addEventListener('click', this.onFilterReset);
+    document.addEventListener('pointerup', this.onFilterReset);
   }
 
   removeEventListeners() {
     document.removeEventListener('range-select', this.onChangeRange);
-    document.removeEventListener('click', this.onFilterReset);
+    document.removeEventListener('pointerup', this.onFilterReset);
   }
 
   remove() {

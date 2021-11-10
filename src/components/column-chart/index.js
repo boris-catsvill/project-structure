@@ -1,6 +1,4 @@
-import fetchJson from './utils/fetch-json.js';
-
-const BACKEND_URL = 'https://course-js.javascript.ru/';
+import fetchJson from '~utils/fetch-json.js';
 
 export default class ColumnChart {
   constructor({
@@ -19,14 +17,13 @@ export default class ColumnChart {
     this.link = link;
     this.formatHeading = formatHeading;
     this.chartHeight = 50;
-    // this.maxValue = Math.max(...this.data);
 
     this.render();
     this.update(this.range.from, this.range.to);
   }
 
   async update(from, to) {
-    const url = new URL(this.url, BACKEND_URL);
+    const url = new URL(this.url, process.env.BACKEND_URL);
     url.searchParams.set('from', from);
     url.searchParams.set('to', to);
 
@@ -98,6 +95,7 @@ export default class ColumnChart {
   }
 
   remove() {
+    if (this.element) this.element.remove();
     this.element = null;
   }
 

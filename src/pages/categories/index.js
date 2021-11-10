@@ -1,4 +1,4 @@
-import Categories from '../../components/categories';
+import Categories from '~components/categories/index.js';
 
 export default class Page {
   conponents;
@@ -46,14 +46,6 @@ export default class Page {
       subElements[el.dataset.element] = el;
     });
     return subElements;
-  }
-
-  addEventListeners() {
-
-  }
-
-  removeEventListeners() {
-
   }
 
   remove() {

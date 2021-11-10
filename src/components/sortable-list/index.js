@@ -1,23 +1,10 @@
 export default class SortableList {
-  CLASSES = {
-    list: 'sortable-list',
-    listItem: 'sortable-list__item',
-    dragged: 'sortable-list__item_dragging',
-  };
-
-  SELECTORS = {
-    list: `.${this.CLASSES.list}`,
-    listItem: `.${this.CLASSES.listItem}`,
-    grabHandle: '[data-grab-handle]',
-    deleteHandle: '[data-delete-handle]',
-  };
-
   onPointerDown = (event) => {
-    const item = event.target.closest(this.SELECTORS.listItem);
+    const item = event.target.closest('.sortable-list__item');
     if (!item) return;
     event.preventDefault();
-    const handleGrab = event.target.closest(this.SELECTORS.grabHandle);
-    const handleDelete = event.target.closest(this.SELECTORS.deleteHandle);
+    const handleGrab = event.target.closest('[data-grab-handle]');
+    const handleDelete = event.target.closest('[data-delete-handle]');
 
     if (handleGrab) {
       this.dragstart(item, event);
@@ -49,7 +36,7 @@ export default class SortableList {
     }
 
     // Элемент над которым находится курсор в данный момент перетаскивания
-    const droppable = elementBellow.closest(this.SELECTORS.listItem);
+    const droppable = elementBellow.closest('.sortable-list__item');
 
     // Если в этот элемент нельзя сбросить, то завершаем функцию
     if (!droppable || droppable === this.currentDroppable) {
@@ -80,7 +67,7 @@ export default class SortableList {
 
   render() {
     const list = document.createElement('ul');
-    list.classList.add(this.CLASSES.list);
+    list.classList.add('sortable-list');
     const elements = this.elements.map((element) => this.getListItem(element));
     list.append(...elements);
     this.placeholder = this.getPlaceholder();
@@ -89,7 +76,7 @@ export default class SortableList {
 
   getListItem(elem) {
     const element = typeof elem === 'object' ? elem : this.toHTML(elem); // Добавил поддержку строк, а не только DOM элеиментов
-    element.classList.add(this.CLASSES.listItem);
+    element.classList.add('sortable-list__item');
     return element;
   }
 
@@ -134,7 +121,7 @@ export default class SortableList {
     });
 
     this.insertPlaceholder(this.dragged);
-    this.dragged.classList.add(this.CLASSES.dragged);
+    this.dragged.classList.add('sortable-list__item_dragging');
 
     this.element.addEventListener('pointermove', this.onPointerMove);
   }

@@ -121,6 +121,7 @@ export default class DoubleSlider {
     }
 
     remove() {
+      if (this.element) this.element.remove();
       this.element.remove();
     }
 

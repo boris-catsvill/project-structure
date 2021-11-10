@@ -1,7 +1,5 @@
-import SortableList from '../sortable-list/index.js';
-import NotificationMessage from '../../components/notification';
-
-const BACKEND_URL = 'https://course-js.javascript.ru/';
+import SortableList from '~components/sortable-list/index.js';
+import NotificationMessage from '~components/notification/index.js';
 
 export default class Categories {
   onClickOpen = event => {
@@ -9,7 +7,7 @@ export default class Categories {
     event.target.closest('.category').classList.toggle('category_open');
   };
 
-  onDragend = async categoryId => {
+  onDragEnd = async categoryId => {
     const category = this.categories.find(category => category.id === categoryId);
     const categoryBlock = document.querySelector(`[data-id="${categoryId}"]`);
     const subcategories = categoryBlock.querySelectorAll('.categories__sortable-list-item');
@@ -19,15 +17,11 @@ export default class Categories {
       subcategory.weight = index + 1;
     });
     await this.saveCategoryOrder(category.subcategories);
-    const notification = new NotificationMessage('Позиции сохранены', {
-      duration: 2000,
-      type: 'success'
-    });
-    notification.show();
+    this.notyShow('Позиции сохранены');
   };
 
   constructor() {
-    this.url = new URL('api/rest/categories', BACKEND_URL);
+    this.url = new URL('api/rest/categories', process.env.BACKEND_URL);
   }
 
   async render() {
@@ -42,6 +36,14 @@ export default class Categories {
     return this.element;
   }
 
+  notyShow(message = '', type = 'success', timeout = 2000) {
+    const notification = new NotificationMessage(message, {
+      duration: timeout,
+      type
+    });
+    notification.show();
+  }
+
   getCategoriesList(categories) {
     const categoriesList = [];
     for (const category of categories) {
@@ -49,19 +51,15 @@ export default class Categories {
       const sortableList = this.getSubcategoriesList(category.subcategories);
       categoryItem.querySelector('.subcategory-list').append(sortableList);
       categoriesList.push(categoryItem);
-      sortableList.addEventListener('dragend', () => this.onDragend(category.id));
+      sortableList.addEventListener('dragend', () => this.onDragEnd(category.id));
     }
     return categoriesList;
   }
 
   getSubcategoriesList(subcategories) {
-    const subcategoriesList = [];
-    for (const subcategory of subcategories) {
-      const subcategoryItem = this.toHTML(
-        this.getTemplateListItem(subcategory.title, subcategory.id, subcategory.count)
-      );
-      subcategoriesList.push(subcategoryItem);
-    }
+    const subcategoriesList = subcategories.map(subcategory =>
+      this.toHTML(this.getTemplateListItem(subcategory.title, subcategory.id, subcategory.count))
+    );
     return this.createSortableList(subcategoriesList);
   }
 
@@ -98,31 +96,25 @@ export default class Categories {
     }
   }
 
-  createSortableList(list) {
-    const sortableList = new SortableList({
-      items: list
-    });
-
+  createSortableList(items) {
+    const sortableList = new SortableList({ items });
     return sortableList.element;
   }
 
   async saveCategoryOrder(categories) {
-    const url = new URL('api/rest/subcategories', BACKEND_URL);
+    const url = new URL('api/rest/subcategories', process.env.BACKEND_URL);
     const response = await fetch(url, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(categories),
+      body: JSON.stringify(categories)
     });
     const data = await response.json();
   }
 
   addEventListeners() {
-    this.element.addEventListener('click', this.onClickOpen);
-  }
-
-  removeEventListeners() {
+    this.element.addEventListener('pointerup', this.onClickOpen);
   }
 
   getSubElements(root) {
@@ -134,6 +126,7 @@ export default class Categories {
   }
 
   remove() {
+    if (this.element) this.element.remove();
     this.element = null;
   }
 
