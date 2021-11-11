@@ -127,6 +127,10 @@ export default class Page {
     document.addEventListener('date-select', this.onChangeRange);
   }
 
+  removeEventListeners() {
+    document.removeEventListener('date-select', this.onChangeRange);
+  }
+
   remove() {
     if (this.element) this.element.remove();
     this.element = null;
@@ -134,6 +138,7 @@ export default class Page {
 
   destroy() {
     this.remove();
+    this.removeEventListeners();
     for (const component of Object.values(this.components)) {
       component.destroy();
     }
