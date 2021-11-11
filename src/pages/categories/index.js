@@ -54,7 +54,6 @@ export default class Page {
 
   destroy() {
     this.remove();
-    this.removeEventListeners();
     for (const component of Object.values(this.components)) {
       component.destroy();
     }
