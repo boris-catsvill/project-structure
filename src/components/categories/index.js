@@ -132,7 +132,6 @@ export default class Categories {
 
   destroy() {
     this.remove();
-    this.removeEventListeners();
   }
 
   toHTML(htmlString) {
