@@ -8,7 +8,7 @@ module.exports = merge(common, {
   mode: 'production',
   devtool: 'source-map',
   output: {
-    publicPath: process.env.PUBLIC_PATH,
+    publicPath: `${process.env.PUBLIC_PATH}/`,
     path: path.resolve(__dirname, '../build')
   },
   optimization: {
