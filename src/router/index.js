@@ -13,7 +13,9 @@ export default class Router {
       const link = event.target.closest('a');
       if (!link) return;
 
-      const href = `${process.env.PUBLIC_PATH}${link.getAttribute('href')}`;
+      const url = new URL(link.getAttribute('href'), process.env.PUBLIC_PATH);
+      const href = url.pathname;
+      console.log(href);
 
       if (href && href.startsWith('/')) {
         event.preventDefault();
