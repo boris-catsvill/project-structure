@@ -17,10 +17,10 @@ export default class Router {
       const href = url.pathname;
       console.log(href);
 
-      if (href && href.startsWith('/')) {
-        event.preventDefault();
-        this.navigate(href);
-      }
+      // if (href && href.startsWith('/')) {
+      //   event.preventDefault();
+      //   this.navigate(href);
+      // }
     });
   }
 
