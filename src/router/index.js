@@ -9,18 +9,16 @@ export default class Router {
   }
 
   initEventListeners() {
-    document.addEventListener('pointerup', event => {
+    document.addEventListener('click', event => {
       const link = event.target.closest('a');
       if (!link) return;
 
-      const url = new URL(link.getAttribute('href'), process.env.PUBLIC_PATH);
-      const href = url.pathname;
-      console.log(href);
+      const href = `${process.env.PUBLIC_PATH}${link.getAttribute('href')}`.replace('//', '/');
 
-      // if (href && href.startsWith('/')) {
-      //   event.preventDefault();
-      //   this.navigate(href);
-      // }
+      if (href && href.startsWith('/')) {
+        event.preventDefault();
+        this.navigate(href);
+      }
     });
   }
 
@@ -32,7 +30,9 @@ export default class Router {
   }
 
   async route() {
-    let strippedPath = decodeURI(window.location.pathname).replace(/^\/|\/$/, '');
+    let strippedPath = decodeURI(window.location.pathname)
+      .replace(process.env.PUBLIC_PATH, '')
+      .replace(/^\/|\/$/, '');
 
     let match;
 

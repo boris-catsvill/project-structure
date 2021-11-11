@@ -8,7 +8,6 @@ export default class Page {
     this.element = this.toHTML(this.getTemplate());
     this.renderComponents();
     this.subElements = this.getSubElements(this.element);
-    this.addEventListeners();
     return this.element;
   }
 
