@@ -1,3 +1,31 @@
+/* Common styles */
+@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap');
+
+body {
+  font-family: 'Source Sans Pro', sans-serif;
+}
+
+:root {
+  --blue: #109cf1;
+  --dark-blue: #334d6e;
+  --light-blue: #cfebfc;
+  --middle-blue: #9fd7f9;
+  --yellow: #ffb946;
+  --red: #f7685b;
+  --green: #2ed47a;
+  --purple: #885af8;
+  --black: #192a3e;
+  --table-black: #323c47;
+  --table-grey: #707683;
+  --grey: #90a0b7;
+  --grey-light: #c2cfe0;
+  --grey-extra-light: #eff1f4;
+  --grey-skeleton: #f5f6f8;
+  --grey-middle: #e0e4eb;
+  --white: #ffffff;
+}
+
+/* NotificationMessage styles */
 .notification {
   width: 200px;
   margin: 10px 5px;
@@ -26,13 +54,91 @@
   background: #c28585;
 }
 
-/* Warning */
-.notification.warning {
-  background: #fff9c2;
+.notification {
+  background-color: var(--black);
+  opacity: 0.8;
+  border-radius: 4px;
+  -webkit-animation: fadeOut 0.3s linear;
+          animation: fadeOut 0.3s linear;
+  display: none;
+  position: fixed;
+  right: 75px;
+  bottom: 75px;
 }
 
-.notification.warning .timer {
-  background: #c1c377;
+.notification.show {
+  display: block;
+  -webkit-animation: fadeIn 0.3s linear;
+          animation: fadeIn 0.3s linear;
+}
+
+.notification__content {
+  padding: 16px 24px 16px 64px;
+  font-size: 16px;
+  line-height: 20px;
+  color: var(--white);
+  position: relative;
+}
+
+.notification.notification_success .notification__content:after,
+.notification.notification_error .notification__content:after {
+  content: "";
+  position: absolute;
+  left: 24px;
+  top: 50%;
+  width: 24px;
+  height: 24px;
+  transform: translate(0, -50%);
+  background-size: 24px 24px;
+}
+
+.notification.notification_success .notification__content:after {
+  background: url(/icons/icon-circle-check.svg) center no-repeat;
+}
+
+.notification.notification_error .notification__content:after {
+  background: url(/icons/icon-error.svg) center no-repeat;
+}
+
+.notification__content a {
+  color: var(--middle-blue);
+  text-decoration: none;
+}
+
+@-webkit-keyframes fadeOut {
+  from {
+    opacity: 0.8;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 0.8;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@-webkit-keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.8;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.8;
+  }
 }
 
 .inner-wrapper {
@@ -45,23 +151,7 @@
   animation: progress var(--value) linear;
 }
 
-.close {
-  width: 12px;
-  height: 12px;
-  display: flex;
-  text-decoration: none;
-  align-items: center;
-  justify-content: center;
-  color: #ffe3e3;
-  font-weight: bold;
-  background: #c28585;
-  cursor: pointer;
-  border-radius: 50%;
-}
-
 .notification-header {
-  display: flex;
-  justify-content: space-between;
   text-transform: capitalize;
   font-size: 12px;
 }

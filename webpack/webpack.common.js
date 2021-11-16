@@ -23,6 +23,14 @@ module.exports = {
     path: path.join(__dirname, '../dist'),
     chunkFilename: '[name]-[id].js'
   },
+  resolve: {
+    alias: {
+      '~': path.resolve(__dirname, '../src'),
+      '~components': path.resolve(__dirname, '../src/components'),
+      '~pages': path.resolve(__dirname, '../src/pages'),
+      '~utils': path.resolve(__dirname, '../src/utils'),
+    },
+  },
   module: {
     rules: [
       {
@@ -49,7 +57,8 @@ module.exports = {
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
       'process.env.IMGUR_CLIENT_ID': JSON.stringify(process.env.IMGUR_CLIENT_ID),
-      'process.env.BACKEND_URL': JSON.stringify(process.env.BACKEND_URL)
+      'process.env.BACKEND_URL': JSON.stringify(process.env.BACKEND_URL),
+      'process.env.PUBLIC_PATH': JSON.stringify(process.env.PUBLIC_PATH)
     }),
     new HtmlWebpackPlugin({
       template: path.join(__dirname, '../src/index.html')
