@@ -12,6 +12,8 @@ export default class Categories {
 
     if (!element) return;
 
+    event.preventDefault();
+
     element.parentElement.classList.toggle('category_open');
   }
 
