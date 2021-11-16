@@ -1,4 +1,4 @@
-import renderPage from './render-page.js';
+import renderPage from '@/router/render-page.js';
 
 // performs routing on all links
 export default class Router {
