@@ -190,11 +190,11 @@ body {
     border-top: none;
 }
 
-.sortable-table__header .sortable-table__cell[data-sortable] {
+.sortable-table__header .sortable-table__cell[data-sortable='true'] {
     cursor: pointer;
 }
 
-.sortable-table__header .sortable-table__cell[data-sortable]:hover {
+.sortable-table__header .sortable-table__cell[data-sortable='true']:hover {
     color: var(--grey);
 }
 
@@ -469,12 +469,12 @@ button.is-loading::before {
 }
 
 .button-primary.is-loading::before {
-    background: url("./icon-loading-circle-white.svg") center no-repeat;
+    background: url("icon-loading-circle-white.svg") center no-repeat;
     background-size: cover;
 }
 
 .button-primary-outline.is-loading::before {
-    background: url("./icon-loading-circle-blue.svg") center no-repeat;
+    background: url("icon-loading-circle-blue.svg") center no-repeat;
     background-size: cover;
 }
 

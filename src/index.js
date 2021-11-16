@@ -1,9 +1,13 @@
-import Router from './router/index.js';
-import tooltip from './components/tooltip/index.js';
+import Router from '@/router/index.js';
+import Tooltip from '@/components/tooltip/index.js';
+import Sidebar from '@/components/sidebar/index.js';
+
+const tooltip = new Tooltip();
+const sidebar = new Sidebar({ title: 'shop admin' });
+const router = Router.instance();
 
 tooltip.initialize();
-
-const router = Router.instance();
+sidebar.initialize();
 
 router
   .addRoute(/^$/, 'dashboard')

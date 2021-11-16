@@ -38,7 +38,7 @@
   border-top: none;
 }
 
-.sortable-table__header .sortable-table__cell[data-sortable] {
+.sortable-table__header .sortable-table__cell[data-sortable='true'] {
   cursor: pointer;
 }
 
@@ -106,6 +106,7 @@
   align-items: center;
   justify-content: center;
   color: var(--grey);
+  text-align: center;
 }
 
 .sortable-table-image {
