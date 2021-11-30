@@ -47,12 +47,6 @@ export default class Router {
     if (!match) {
       this.page = await this.changePage(this.notFoundPagePath);
     }
-
-    document.dispatchEvent(new CustomEvent('route', {
-      detail: {
-        page: this.page
-      }
-    }));
   }
 
   async changePage (path, match) {
