@@ -5,7 +5,7 @@ export default class SortableList {
       const target = e.target.closest('.sortable-list__item');
       const elementWidth = target.offsetWidth;
       const elementHeight = target.offsetHeight;
-      this.draggingElement = e.target.closest('.sortable-list__item');
+      this.draggingElement = target;
 
       const elementIndex = [...this.element.children].indexOf(this.draggingElement);
 
@@ -24,8 +24,8 @@ export default class SortableList {
       this.element.append(this.draggingElement);
 
       const onPointerMove = (e) => {
-        const clientX = e.clientX - shiftY;
-        const clientY = e.clientY - shiftX;
+        const clientX = e.clientX - shiftX;
+        const clientY = e.clientY - shiftY;
         this.draggingElement.style.top = clientY + 'px';
         this.draggingElement.style.left = clientX + 'px';
 
@@ -126,10 +126,12 @@ export default class SortableList {
   render() {
     this.element = document.createElement('ul');
     this.element.classList.add('sortable-list');
-    this.items.forEach((item) => {
-      item.classList.add('sortable-list__item');
-      this.element.append(item);
-    });
+    if (this.items) {
+      this.items.forEach((item) => {
+        item.classList.add('sortable-list__item');
+        this.element.append(item);
+      });
+    }
 
     this.addEventListeners();
   }

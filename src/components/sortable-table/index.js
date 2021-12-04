@@ -168,7 +168,12 @@ export default class SortableTable {
   }
 
   downloadListener = async () => {
-    if (this.subElements.body.getBoundingClientRect().bottom < document.documentElement.clientHeight + 200 && !this.loading) {
+    const scrollHeight = Math.max(
+      document.body.scrollHeight, document.documentElement.scrollHeight,
+      document.body.offsetHeight, document.documentElement.offsetHeight,
+      document.body.clientHeight, document.documentElement.clientHeight
+    );
+    if (document.documentElement.scrollTop + document.documentElement.clientHeight + 200 > scrollHeight && !this.loading) {
       this.loading = true;
       const data = await this.loadData(this.latestId, this.latestOrder, this.offset, this.offset + this.limit, this.costFrom, this.costTo, this.searchString);
       this.offset += this.limit;

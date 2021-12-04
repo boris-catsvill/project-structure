@@ -1,4 +1,7 @@
 .notification {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
   width: 200px;
   margin: 10px 5px;
   font-size: 14px;
@@ -9,7 +12,7 @@
 }
 
 /* Success */
-.notification.success {
+.notification.notification_success {
   background: #cdfccd;
 }
 
