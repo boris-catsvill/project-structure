@@ -1,12 +1,11 @@
 import fetchJson from '../../utils/fetch-json';
-import { BACKEND_URL } from '../../utils/constants';
 import RangePicker from '../../components/range-picker';
 import SortableTable from '../../components/sortable-table';
 import header from '../sales-header';
 
 export default class Page {
   components;
-  url = new URL('api/rest/orders', BACKEND_URL);
+  url = new URL('api/rest/orders', process.env.BACKEND_URL);
 
   constructor() {
     this.render();
@@ -57,7 +56,8 @@ export default class Page {
 
     const sortableTable = new SortableTable(header, {
       url: `api/rest/orders?_start=1&_end=30&createdAt_gte=${from.toISOString()}&createdAt_lte=${to.toISOString()}`,
-      isSortLocally: false
+      isSortLocally: false,
+      page: 'sales',
     });
 
     this.components = {

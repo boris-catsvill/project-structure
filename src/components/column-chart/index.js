@@ -1,6 +1,5 @@
 import fetchJson from '../../utils/fetch-json.js';
-
-const BACKEND_URL = 'https://course-js.javascript.ru';
+import getSubElements from '../../utils/getSubElements';
 
 export default class ColumnChart {
   element;
@@ -19,7 +18,7 @@ export default class ColumnChart {
                 label = '',
                 link = '',
               } = {}) {
-    this.url = new URL(url, BACKEND_URL);
+    this.url = new URL(url, process.env.BACKEND_URL);
     this.range = range;
     this.label = label;
     this.link = link;
@@ -35,13 +34,19 @@ export default class ColumnChart {
 
   getColumnBody(data) {
     const values = Object.values(data);
+    const entries = Object.entries(data);
 
     const maxValue = Math.max(...values);
     const proportion = this.chartHeight / maxValue;
-    const arr = values.map((item) => {
-      const value = Math.floor(item * proportion);
-      const percent = (item / maxValue * 100).toFixed(0);
-      return `<div style="--value: ${value}" data-tooltip="${percent}%"></div>`;
+    const arr = entries.map(([key, value]) => {
+      const date = new Date(key);
+      const dateString = date.toLocaleDateString('ru-RU', {
+        year: 'numeric',
+        day: 'numeric',
+        month: 'short',
+      });
+      const currentValue = Math.floor(value * proportion);
+      return `<div style="--value: ${currentValue}" data-tooltip="<div><small>${dateString}</small></div><strong>${this.formatHeading(value)}</strong>"></div>`;
     });
     return arr.join('');
   }
@@ -63,28 +68,6 @@ export default class ColumnChart {
         </div>
       </div>
     `;
-  }
-
-  getSubElements(element) {
-    const elements = {};
-
-    const subElements = element.querySelectorAll('[data-element]');
-
-    for (const subElement of subElements) {
-      elements[subElement.dataset.element] = subElement;
-    }
-
-    return elements;
-  }
-
-  render() {
-    const element = document.createElement('div');
-
-    element.innerHTML = this.getTemplate();
-
-    this.element = element.firstElementChild;
-
-    this.subElements = this.getSubElements(this.element);
   }
 
   getTotalSum(data) {
@@ -110,6 +93,30 @@ export default class ColumnChart {
 
       this.element.classList.remove('column-chart_loading');
     }
+  }
+
+  initEventListeners() {
+    this.subElements.body.addEventListener('mouseover', (e) => {
+      this.subElements.body.classList.add('has-hovered');
+      e.target.classList.add('is-hovered');
+    });
+
+    this.subElements.body.addEventListener('mouseout', (e) => {
+      this.subElements.body.classList.remove('has-hovered');
+      e.target.classList.remove('is-hovered');
+    });
+  }
+
+  render() {
+    const element = document.createElement('div');
+
+    element.innerHTML = this.getTemplate();
+
+    this.element = element.firstElementChild;
+
+    this.subElements = getSubElements(this.element, 'element');
+
+    this.initEventListeners();
   }
 
   remove() {

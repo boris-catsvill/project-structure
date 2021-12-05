@@ -1,8 +1,11 @@
 import Router from './router/index.js';
 import Tooltip from './components/tooltip/index.js';
+import sidebarToggler from './utils/sidebarToggler';
 
 const tooltip = new Tooltip();
 tooltip.initialize();
+
+sidebarToggler();
 
 const router = Router.instance();
 

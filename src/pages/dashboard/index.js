@@ -5,14 +5,12 @@ import header from '../bestsellers-header';
 
 import fetchJson from '../../utils/fetch-json.js';
 
-const BACKEND_URL = 'https://course-js.javascript.ru/';
-
 export default class Page {
 
   element;
   subElements = {};
   components = {};
-  url = new URL('api/dashboard/bestsellers', BACKEND_URL);
+  url = new URL('api/dashboard/bestsellers', process.env.BACKEND_URL);
 
   async updateComponents (from, to) {
     const data = await this.loadData(from, to);
@@ -69,7 +67,8 @@ export default class Page {
 
     const sortableTable = new SortableTable(header, {
       url: `api/dashboard/bestsellers?_start=1&_end=20&from=${from.toISOString()}&to=${to.toISOString()}`,
-      isSortLocally: true
+      isSortLocally: true,
+      page: 'dashboard',
     });
 
     const ordersChart = new ColumnChart({
@@ -79,7 +78,7 @@ export default class Page {
         to
       },
       label: 'orders',
-      link: '#'
+      link: '/sales'
     });
 
     const salesChart = new ColumnChart({
@@ -88,6 +87,10 @@ export default class Page {
       range: {
         from,
         to
+      },
+      formatHeading: (text) => {
+        const value = new Intl.NumberFormat('ru-RU').format(text);
+        return `$${value}`;
       }
     });
 

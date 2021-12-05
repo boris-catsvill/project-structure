@@ -1,4 +1,5 @@
 import SortableList from '../../components/sortable-list';
+import getSubElements from '../../utils/getSubElements';
 
 export default class CategorySection {
   data;
@@ -6,16 +7,6 @@ export default class CategorySection {
   constructor(data) {
     this.data = data;
     this.render();
-  }
-
-  getSubElements (element) {
-    const elements = element.querySelectorAll('[data-elem]');
-
-    return [...elements].reduce((accum, subElement) => {
-      accum[subElement.dataset.elem] = subElement;
-
-      return accum;
-    }, {});
   }
 
   getSubcategoryItem(subcategory) {
@@ -58,7 +49,7 @@ export default class CategorySection {
     return element.firstElementChild;
   }
 
-  hideCategoryBody = (e) => {
+  toggleCategoryBody = () => {
     if (this.element.classList.contains('category_open')) {
       this.element.classList.remove('category_open');
     } else {
@@ -67,7 +58,7 @@ export default class CategorySection {
   }
 
   initEventListeners() {
-    this.subElements.categoryHeader.addEventListener('click', this.hideCategoryBody);
+    this.subElements.categoryHeader.addEventListener('click', this.toggleCategoryBody);
   }
 
   async render() {
@@ -76,7 +67,7 @@ export default class CategorySection {
     element.append(this.getCategorySection(this.data));
 
     this.element = element.firstElementChild;
-    this.subElements = this.getSubElements(this.element);
+    this.subElements = getSubElements(this.element, 'elem');
 
     this.initEventListeners();
   }
@@ -88,5 +79,4 @@ export default class CategorySection {
   destroy () {
     this.remove();
   }
-
 }

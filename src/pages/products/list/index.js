@@ -1,6 +1,7 @@
 import SortableTable from '../../../components/sortable-table/index';
 import ProductInput from '../../../components/product-input/index';
 import header from '../../bestsellers-header';
+import getSubElements from '../../../utils/getSubElements';
 
 export default class Page {
   element;
@@ -27,23 +28,11 @@ export default class Page {
 
     this.element = element.firstElementChild;
 
-    this.subElements = this.getSubElements(this.element);
+    this.subElements = getSubElements(this.element, 'elem');
     this.initComponents();
     await this.renderComponents();
 
     return this.element;
-  }
-
-  getSubElements(element) {
-    const elements = {};
-
-    const subElements = element.querySelectorAll('[data-elem]');
-
-    for (const subElement of subElements) {
-      elements[subElement.dataset.elem] = subElement;
-    }
-
-    return elements;
   }
 
   initComponents() {
@@ -62,7 +51,12 @@ export default class Page {
     this.subElements.contentBox.append(productInputElement);
   }
 
+  remove () {
+    this.element.remove();
+  }
+
   destroy() {
+    this.remove();
     for (const component of Object.values(this.components)) {
       component.destroy();
     }

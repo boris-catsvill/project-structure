@@ -1,7 +1,6 @@
 class Tooltip {
+  static _instance;
   element;
-
-  tooltipText = '';
 
   constructor() {
     if (Tooltip._instance) {
@@ -12,16 +11,12 @@ class Tooltip {
     this.render();
   }
 
-  render() {
-    const element = document.createElement('div');
-    element.innerHTML = `<div class="tooltip">${this.tooltipText}</div>`;
-    this.element = element.firstElementChild;
-  }
+  render(html = '') {
+    this.element = document.createElement('div');
+    this.element.className = 'tooltip';
+    this.element.innerHTML = html;
 
-  remove() {
-    if (this.element) {
-      this.element.remove();
-    }
+    document.body.append(this.element);
   }
 
   onPointerMove = (e) => {
@@ -43,9 +38,14 @@ class Tooltip {
   }
 
   initialize() {
-    document.body.append(this.element);
     document.addEventListener('pointerover', this.onPointerOver);
     document.addEventListener('pointerout', this.onPointerOut);
+  }
+
+  remove() {
+    if (this.element) {
+      this.element.remove();
+    }
   }
 
   destroy() {

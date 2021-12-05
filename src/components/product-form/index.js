@@ -1,9 +1,8 @@
 import SortableList from '../sortable-list/index';
 import escapeHtml from '../../utils/escape-html';
 import fetchJson from '../../utils/fetch-json';
-
-const IMGUR_CLIENT_ID = '28aaa2e823b03b1';
-const BACKEND_URL = 'https://course-js.javascript.ru';
+import iconGrab from './icon-grab.svg';
+import iconTrash from './icon-trash.svg';
 
 export default class ProductForm {
   element;
@@ -66,12 +65,12 @@ export default class ProductForm {
     element.classList.add('products-edit__imagelist-item', 'sortable-list__item');
     element.innerHTML = `
       <span>
-        <img src="icon-grab.svg" data-grab-handle="" alt="grab">
+        <img src="${iconGrab}" data-grab-handle="" alt="grab">
         <img class="sortable-table__cell-img" alt="Image" src="${escapeHtml(imageInfo.url)}">
         <span>${escapeHtml(imageInfo.source)}</span>
       </span>
       <button type="button">
-          <img src="icon-trash.svg" data-delete-handle="" alt="delete">
+          <img src="${iconTrash}" data-delete-handle="" alt="delete">
       </button>
     `;
     return element;
@@ -201,7 +200,7 @@ export default class ProductForm {
       const result = await fetchJson(url, {
         method: 'POST',
         headers: {
-          Authorization: `Client-ID ${IMGUR_CLIENT_ID}`,
+          Authorization: `Client-ID ${process.env.IMGUR_CLIENT_ID}`,
           Referer: '',
         },
         body: formData,
@@ -253,14 +252,14 @@ export default class ProductForm {
   }
 
   loadProductInfo(id) {
-    const productUrl = new URL(`${BACKEND_URL}/api/rest/products`);
+    const productUrl = new URL(`${process.env.BACKEND_URL}api/rest/products`);
     productUrl.searchParams.set('id', id);
 
     return fetchJson(productUrl);
   }
 
   loadCategoriesInfo() {
-    const categoriesUrl = new URL(`${BACKEND_URL}/api/rest/categories`);
+    const categoriesUrl = new URL(`${process.env.BACKEND_URL}api/rest/categories`);
     categoriesUrl.searchParams.set('_sort', 'weight');
     categoriesUrl.searchParams.set('_refs', 'subcategory');
     return fetchJson(categoriesUrl);
@@ -301,7 +300,7 @@ export default class ProductForm {
 
   async sendProductInfo(e) {
     e.preventDefault();
-    const url = `${BACKEND_URL}/api/rest/products`;
+    const url = `${process.env.BACKEND_URL}api/rest/products`;
     const data = this.getFormData();
     try {
       const result = await fetchJson(url, {

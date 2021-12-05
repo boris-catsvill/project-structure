@@ -1,7 +1,6 @@
 import NotificationMessage from '../../components/notification';
 import CategorySection from '../../components/category-section';
 import fetchJson from '../../utils/fetch-json';
-import { BACKEND_URL } from '../../utils/constants';
 
 export default class Page {
   subElements;
@@ -51,7 +50,8 @@ export default class Page {
   }
 
   async loadData() {
-    const url = new URL('/api/rest/categories', BACKEND_URL);
+    const url = new URL('/api/rest/categories', process.env.BACKEND_URL);
+
     url.searchParams.set('_sort', 'weight');
     url.searchParams.set('_refs', 'subcategory');
 

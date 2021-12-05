@@ -1,7 +1,5 @@
 import fetchJson from '../../utils/fetch-json.js';
 
-const BACKEND_URL = 'https://course-js.javascript.ru';
-
 export default class SortableTable {
   element;
   subElements = {};
@@ -20,14 +18,16 @@ export default class SortableTable {
     {
       url = '',
       isSortLocally = false,
+      page = 'sales',
     },
     sorted = {}) {
     this.headerConfig = headerConfig;
-    this.url = new URL(url, BACKEND_URL);
+    this.url = new URL(url, process.env.BACKEND_URL);
     const { id, order } = sorted;
     this.latestOrder = order;
     this.latestId = id;
     this.isSortLocally = isSortLocally;
+    this.page = page;
 
     this.render();
   }
@@ -74,10 +74,17 @@ export default class SortableTable {
 
   getBodyRows(data) {
     return data.map((item) => {
-      return `
-        <a href="${BACKEND_URL}/products/${item.id}" class="sortable-table__row">
+      if (this.page === 'dashboard') {
+        return `
+        <a href="/products/${item.id}" class="sortable-table__row">
           ${this.getBodyRow(item)}
         </a>
+      `;
+      }
+      return `
+        <div class="sortable-table__row">
+          ${this.getBodyRow(item)}
+        </div>
       `;
     }).join('');
   }
