@@ -33,6 +33,10 @@ export default class Page {
   };
 
   constructor() {
+    //this.createComponents();
+  }
+
+  async createComponents() {
     const today = new Date();
     this.timeOffset = today.getTimezoneOffset();
     today.setMinutes(today.getMinutes() + this.timeOffset);
@@ -74,6 +78,34 @@ export default class Page {
       }
     });
 
+    this.categoriesNSubcategoriesUrl = new URL(`api/rest/categories`, BACKEND_URL);
+
+    const categoriesNSubcategories = await this.loadCategoriesNSubcategories();
+
+    const subcategoryItem = header.find(item => item.id === 'subcategory');
+
+    if (subcategoryItem) {
+      subcategoryItem.template = data => {
+        const category = Object.values(categoriesNSubcategories)
+          .find(category => {
+              return category.subcategories.find(subcategory =>
+                subcategory.id === data.id);
+            }
+          );
+        const subcategory = category.subcategories.find(subcategory =>
+          subcategory.id === data.id);
+        return `
+          <div class="sortable-table__cell">
+          <span data-tooltip='
+        <div class="sortable-table-tooltip">
+          <span class="sortable-table-tooltip__category">${category.title}</span> /
+          <b class="sortable-table-tooltip__subcategory">${subcategory.title}</b>
+        </div>'>${subcategory.title}</span>
+          </div>
+        `;
+      };
+    }
+
     const url = new URL('api/dashboard/bestsellers', BACKEND_URL);
     url.searchParams.set('from', this.from.toISOString());
     url.searchParams.set('to', this.to.toISOString());
@@ -81,6 +113,12 @@ export default class Page {
       url: url.toString(),
       isSortLocally: true
     });
+  }
+
+  async loadCategoriesNSubcategories() {
+    this.categoriesNSubcategoriesUrl.searchParams.set('_sort', 'weight');
+    this.categoriesNSubcategoriesUrl.searchParams.set('_refs', 'subcategory');
+    return await fetchJson(this.categoriesNSubcategoriesUrl);
   }
 
   get template() {
@@ -95,6 +133,8 @@ export default class Page {
   }
 
   async render() {
+    await this.createComponents();
+
     const element = document.createElement('div');
 
     element.innerHTML = this.template;

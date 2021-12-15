@@ -1,12 +1,21 @@
-import fetchJson from '../../utils/fetch-json.js';
 import Categories from "../../components/categories";
+import NotificationMessage from "../../components/notification";
 
-const BACKEND_URL = 'https://course-js.javascript.ru/';
 const CATEGORY_URL = 'api/rest/categories';
 
 export default class Page {
   element;
   categoriesElement;
+
+  onNotificate = event => {
+    console.log(event);
+    const notification = new NotificationMessage(event.detail.note, {
+      duration: 200000,
+      type: 'success'
+    });
+
+    notification.show();
+  };
 
   constructor() {
     this.render();
@@ -37,7 +46,7 @@ export default class Page {
   }
 
   initEventListeners() {
-    //this.element.addEventListener('date-select', this.onDateSelect);
+    document.addEventListener('subcategories-sorted', this.onNotificate);
   }
 
   remove () {
@@ -47,6 +56,8 @@ export default class Page {
   }
 
   destroy() {
+    document.removeEventListener('subcategories-sorted', this.onNotificate);
+
     this.remove();
     this.element = null;
   }

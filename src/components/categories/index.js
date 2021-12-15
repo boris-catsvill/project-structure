@@ -3,22 +3,66 @@ import SortableList from "../../components/sortable-list";
 
 const BACKEND_URL = 'https://course-js.javascript.ru/';
 
+// PATCH https://course-js.javascript.ru/api/rest/subcategories
+//json - [{"id":"tovary-dlya-doma","weight":1},{"id":"krasota-i-zdorove","weight":2},{"id":"tovary-dlya-kuxni","weight":3}]
+//weight должна сохраняться!!! по событию SortableList "sortable-list-reorder"
+/*this.element.dispatchEvent(new CustomEvent('sortable-list-reorder', {
+  bubbles: true,
+  details: {
+    from: this.elementInitialIndex,
+    to: placeholderIndex
+  }
+}));*/
+
 export default class Categories {
   element;
   categoriesNSubcategories;
 
   onHeaderClick = event => {
-    const category = event.target.closest('.category');
-
-    if (!category) {
+    if (!event.target.classList.contains('category__header')) {
       return;
     }
 
-    category.classList.toggle('category_open');
+    const category = event.target.closest('.category');
+    if (category) {
+      category.classList.toggle('category_open');
+    }
+  };
+
+    onSorted = async event => {
+      let subcategories = [];
+
+      for (let order = 0; order < event.target.children.length; order++) {
+        subcategories.push({'id': event.target.children[order].dataset.id, "weight": order + 1})
+      }
+
+    try {
+      const response = await fetch(this.subcategoriesUrl.toString(), {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(subcategories),
+        referrer: ''
+      });
+
+      this.element.dispatchEvent(new CustomEvent('subcategories-sorted',
+        {
+          bubbles: true,
+          detail: {
+            note: 'Порядок категорий сохранён'
+          }
+        }));
+
+      return await response.json();
+    } catch (error) {
+      return Promise.reject(error);
+    }
   };
 
   constructor(url) {
     this.categoriesNSubcategoriesUrl = new URL(url, BACKEND_URL);
+    this.subcategoriesUrl = new URL('api/rest/subcategories', BACKEND_URL);
     this.render();
   }
 
@@ -46,10 +90,10 @@ export default class Categories {
 
         const subcategoryList = element.querySelector('.subcategory-list');
 
-       const subcategoryElement = new SortableList({
-      items: category.subcategories
-        .map(subcategory => this.renderSubcategory(subcategory))
-    });
+        const subcategoryElement = new SortableList({
+          items: category.subcategories
+            .map(subcategory => this.renderSubcategory(subcategory))
+        });
         subcategoryList.append(subcategoryElement.element);
 
         this.element.append(element);
@@ -63,7 +107,7 @@ export default class Categories {
     element.dataset.id = subcategory.id;
     element.innerHTML
       = `<strong>${subcategory.title}</strong>
-      <span><b>${subcategory.count}</b> products</span>`
+      <span><b>${subcategory.count}</b> products</span>`;
     return element;
   }
 
@@ -89,9 +133,10 @@ export default class Categories {
 
   initEventListeners() {
     this.element.addEventListener('click', this.onHeaderClick);
+    this.element.addEventListener('sortable-list-reorder', this.onSorted);
   }
 
-  remove () {
+  remove() {
     if (this.element) {
       this.element.remove();
     }

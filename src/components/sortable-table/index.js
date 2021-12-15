@@ -72,7 +72,8 @@ export default class SortableTable {
     isSortLocally = false,
     step = 20,
     start = 1,
-    end = start + step
+    end = start + step,
+    edited = false
   } = {}) {
 
     this.headersConfig = headersConfig;
@@ -82,6 +83,16 @@ export default class SortableTable {
     this.step = step;
     this.start = start;
     this.end = end;
+    this.edited = edited;
+
+    if (this.edited) {
+      const href = url.split('/')[2] || '';
+
+      if (href !== '') {
+        this.editUrl = href;
+      }
+    }
+
 
     this.render();
   }
@@ -106,30 +117,36 @@ export default class SortableTable {
   async loadData(
     id = this.sorted.id, order = this.sorted.order,
     start = this.start, end = this.end,
-    title_like = '', price_gte = '0', price_lte = '4000', status = '') {
+    title_like, price_gte, price_lte, status, createdAt_gte, createdAt_lte) {
     this.url.searchParams.set('_sort', id);
     this.url.searchParams.set('_order', order);
     this.url.searchParams.set('_start', start);
     this.url.searchParams.set('_end', end);
-    if (title_like !== '') {
-      this.url.searchParams.set('title_like', title_like);
-    } else {
-      this.url.searchParams.delete('title_like');
-    }
-    if (price_gte >= 0) {
+    if (price_gte !== undefined && price_gte >= 0) {
       this.url.searchParams.set('price_gte', price_gte);
     } else {
       this.url.searchParams.delete('price_gte');
     }
-    if (price_lte >= 0) {
+    if (price_lte !== undefined && price_lte >= 0) {
       this.url.searchParams.set('price_lte', price_lte);
     } else {
       this.url.searchParams.delete('price_lte');
     }
-    if (status !== '') {
+    if (title_like !== undefined && title_like !== '') {
+      this.url.searchParams.set('title_like', title_like);
+    } else {
+      this.url.searchParams.delete('title_like');
+    }
+    if (status !== undefined && status !== '') {
       this.url.searchParams.set('status', status);
     } else {
       this.url.searchParams.delete('status');
+    }
+    if (createdAt_gte && this.url.searchParams.has('createdAt_gte')) {
+      this.url.searchParams.set('createdAt_gte', createdAt_gte);
+    }
+    if (createdAt_lte && this.url.searchParams.has('createdAt_lte')) {
+      this.url.searchParams.set('createdAt_lte', createdAt_lte);
     }
 
     this.element.classList.add('sortable-table_loading');
@@ -157,9 +174,7 @@ export default class SortableTable {
   }
 
   async filter(filter){
-    console.log(filter);
     const {title_like, priceSelect, status} = filter;
-    console.log(title_like, priceSelect, status);
     const data = await this.loadData(this.sorted.id, this.sorted.id,
       this.start, this.end,
       title_like, priceSelect.from, priceSelect.to, status);
@@ -176,8 +191,10 @@ export default class SortableTable {
   getHeaderRow({id, title, sortable}) {
     const order = this.sorted.id === id ? this.sorted.order : 'asc';
 
-    return `
-      <div class="sortable-table__cell" data-id="${id}" data-sortable="${sortable}" data-order="${order}">
+    return `<div class="sortable-table__cell"
+      data-id="${id}"
+      ${sortable ? `data-sortable="${sortable}"` : ''}
+      ${sortable ? `data-order="${order}"` : ''}>
         <span>${title}</span>
         ${this.getHeaderSortingArrow(id)}
       </div>
@@ -202,10 +219,11 @@ export default class SortableTable {
   }
 
   getTableRows(data) {
-    return data.map(item => `
-      <div class="sortable-table__row">
+    return data.map(item => {
+        return `<${this.edited ? 'a' : 'div'} class="sortable-table__row" ${this.edited ? 'href="' + this.editUrl + '/' + item.id + '"' : ''}>
         ${this.getTableRow(item, data)}
-      </div>`
+      </${this.edited ? 'a' : 'div'}>`
+    }
     ).join('');
   }
 

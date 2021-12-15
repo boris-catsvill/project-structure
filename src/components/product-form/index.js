@@ -109,12 +109,12 @@ export default class ProductForm {
     element.innerHTML = `<input type="hidden" name="url" value="${url}">
              <input type="hidden" name="source" value="${source}">
               <span>
-                <img src="icon-grab.svg" data-grab-handle="" alt="grab">
+                <img src="/icon-grab.svg" data-grab-handle="" alt="grab">
                 <img class="sortable-table__cell-img" alt="Image" src="${url}">
                 <span>${source}</span>
               </span>
               <button type="button">
-                <img src="icon-trash.svg" data-delete-handle="" alt="delete">
+                <img src="/icon-trash.svg" data-delete-handle="" alt="delete">
               </button>`;
 
     return element;
@@ -208,7 +208,7 @@ export default class ProductForm {
 
     this.subElements.imageListContainer.append(this.sortableList.element);
     this.initEventListeners();
-    document.body.append(this.element);
+    return this.element;
   }
 
   getSubElements(element) {
