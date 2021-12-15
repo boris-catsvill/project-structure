@@ -10,6 +10,10 @@ export default class SortableTable {
   step = 20;
   start = 1;
   end = this.start + this.step;
+  title_like;
+  price_gte;
+  price_lte;
+  status;
 
   onWindowScroll = async() => {
     const { bottom } = this.element.getBoundingClientRect();
@@ -99,11 +103,18 @@ export default class SortableTable {
     this.initEventListeners();
   }
 
-  async loadData(id, order, start = this.start, end = this.end) {
+  async loadData(
+    id = this.sorted.id, order = this.sorted.order,
+    start = this.start, end = this.end,
+    title_like = '', price_gte = '0', price_lte = '4000', status = '') {
     this.url.searchParams.set('_sort', id);
     this.url.searchParams.set('_order', order);
     this.url.searchParams.set('_start', start);
     this.url.searchParams.set('_end', end);
+    this.url.searchParams.set('title_like', title_like);
+    this.url.searchParams.set('price_gte', price_gte);
+    this.url.searchParams.set('price_lte', price_lte);
+    this.url.searchParams.set('status', status);
 
     this.element.classList.add('sortable-table_loading');
 
@@ -127,6 +138,14 @@ export default class SortableTable {
     rows.innerHTML = this.getTableRows(data);
 
     this.subElements.body.append(...rows.childNodes);
+  }
+
+  async filter({title_like, priceSelect, status}){
+    const data = await this.loadData(this.sorted.id, this.sorted.id,
+      this.start, this.end,
+      title_like, priceSelect.from, priceSelect.to, status);
+
+    this.addRows(data);
   }
 
   getTableHeader() {

@@ -2,8 +2,60 @@ export default class DoubleSlider {
   element;
   subElements = {};
 
+  onThumbPointerMove = event => {
+    event.preventDefault();
+
+    const { left: innerLeft, right: innerRight, width } = this.subElements.inner.getBoundingClientRect();
+
+    if (this.dragging === this.subElements.thumbLeft) {
+      let newLeft = (event.clientX - innerLeft + this.shiftX) / width;
+
+      if (newLeft < 0) {
+        newLeft = 0;
+      }
+      newLeft *= 100;
+      const right = parseFloat(this.subElements.thumbRight.style.right);
+
+      if (newLeft + right > 100) {
+        newLeft = 100 - right;
+      }
+
+      this.dragging.style.left = this.subElements.progress.style.left = newLeft + '%';
+      this.subElements.from.innerHTML = this.formatValue(this.getValue().from);
+    }
+
+    if (this.dragging === this.subElements.thumbRight) {
+      let newRight = (innerRight - event.clientX - this.shiftX) / width;
+
+      if (newRight < 0) {
+        newRight = 0;
+      }
+      newRight *= 100;
+
+      const left = parseFloat(this.subElements.thumbLeft.style.left);
+
+      if (left + newRight > 100) {
+        newRight = 100 - left;
+      }
+      this.dragging.style.right = this.subElements.progress.style.right = newRight + '%';
+      this.subElements.to.innerHTML = this.formatValue(this.getValue().to);
+    }
+  };
+
+  onThumbPointerUp = () => {
+    this.element.classList.remove('range-slider_dragging');
+
+    document.removeEventListener('pointermove', this.onThumbPointerMove);
+    document.removeEventListener('pointerup', this.onThumbPointerUp);
+
+    this.element.dispatchEvent(new CustomEvent('range-select', {
+      detail: this.getValue(),
+      bubbles: true
+    }));
+  };
+
   constructor({
-    min = 10,
+    min = 100,
     max = 200,
     formatValue = value => '$' + value,
     selected = {
@@ -16,31 +68,21 @@ export default class DoubleSlider {
     this.formatValue = formatValue;
     this.selected = selected;
 
-    this.moveLeft = this.moveLeft.bind(this);
-    this.moveRight = this.moveRight.bind(this);
-
     this.render();
-    this.initEventListeners();
-  }
-
-  get selectedPercent() {
-    return {
-      from: parseInt(((this.selected.from - this.min) / (this.max - this.min) * 100).toFixed()),
-      to: 100 - (this.selected.to / this.max * 100).toFixed()
-    };
   }
 
   get template() {
+    const { from, to } = this.selected;
+
     return `<div class="range-slider">
-    <span data-element="from">${this.formatValue(this.selected.from)}</span>
-    <div class="range-slider__inner">
-      <span class="range-slider__progress"
-      style="left: ${this.selectedPercent.from}%; right: ${this.selectedPercent.to}%"></span>
-      <span class="range-slider__thumb-left" style="left: ${this.selectedPercent.from}%"></span>
-      <span class="range-slider__thumb-right" style="right: ${this.selectedPercent.to}%"></span>
-    </div>
-    <span data-element="to">${this.formatValue(this.selected.to)}</span>
-  </div>`;
+      <span data-element="from">${this.formatValue(from)}</span>
+      <div data-element="inner" class="range-slider__inner">
+        <span data-element="progress" class="range-slider__progress"></span>
+        <span data-element="thumbLeft" class="range-slider__thumb-left"></span>
+        <span data-element="thumbRight" class="range-slider__thumb-right"></span>
+      </div>
+      <span data-element="to">${this.formatValue(to)}</span>
+    </div>`;
   }
 
   render() {
@@ -49,110 +91,86 @@ export default class DoubleSlider {
     element.innerHTML = this.template;
 
     this.element = element.firstElementChild;
+    this.element.ondragstart = () => false;
 
-    this.subElements = this.getSubElements(this.element);
+    this.subElements = this.getSubElements(element);
+
+    this.initEventListeners();
+
+    this.update();
+  }
+
+  initEventListeners() {
+    const { thumbLeft, thumbRight } = this.subElements;
+
+    thumbLeft.addEventListener('pointerdown', event => this.onThumbPointerDown(event));
+    thumbRight.addEventListener('pointerdown', event => this.onThumbPointerDown(event));
   }
 
   getSubElements(element) {
     const result = {};
+    const elements = element.querySelectorAll('[data-element]');
 
-    result.rangeSlider = element.querySelector('.range-slider');
-    result.inner = element.querySelector('.range-slider__inner');
-    result.from = element.querySelector('[data-element="from"]');
+    for (const subElement of elements) {
+      const name = subElement.dataset.element;
 
-    result.progress = element.querySelector('.range-slider__progress');
-    result.thumbLeft = element.querySelector('.range-slider__thumb-left');
-    result.thumbRight = element.querySelector('.range-slider__thumb-right');
-
-    result.to = element.querySelector('[data-element="to"]');
+      result[name] = subElement;
+    }
 
     return result;
   }
 
-  leftPointerdown() {
-    this.element.removeEventListener('pointermove', this.moveRight);
-    this.element.addEventListener('pointermove', this.moveLeft);
-
-    this.element.addEventListener('pointerup', () => {
-      const { from, to } = this.selected;
-      this.element.dispatchEvent(new CustomEvent('range-select',
-        {
-          bubbles: true,
-          detail: {
-            from: parseInt(from),
-            to: parseInt(to),
-          }
-        }));
-      this.element.removeEventListener('pointermove', this.moveLeft);
-    });
-  }
-
-  rightPointerdown() {
-    this.element.removeEventListener('pointermove', this.moveLeft);
-    this.element.addEventListener('pointermove', this.moveRight);
-
-    this.element.addEventListener('pointerup', () => {
-      const { from, to } = this.selected;
-      this.element.dispatchEvent(new CustomEvent('range-select',
-        {
-          bubbles: true,
-          detail: {
-            from: parseInt(from),
-            to: parseInt(to),
-          }
-        }));
-      this.element.removeEventListener('pointermove', this.moveRight);
-    });
-  }
-
-  moveLeft(event) {
-    const coordinates = this.subElements.inner.getBoundingClientRect();
-    const progressWidth = coordinates.width;
-    const nextLeft = coordinates.x ? event.clientX - coordinates.x : event.clientX;
-
-    if (nextLeft >= 0 && nextLeft <= progressWidth) {
-      const nextLeftPart = progressWidth !== 0 ? nextLeft / progressWidth : nextLeft;
-
-      this.selected.from = (nextLeftPart * (this.max - this.min) + this.min).toFixed();
-      this.subElements.thumbLeft.style.left = this.selectedPercent.from + '%';
-      this.subElements.progress.style.left = this.selectedPercent.from + '%';
-      this.subElements.from.innerHTML = this.formatValue(this.selected.from);
-    }
-  }
-
-  moveRight(event) {
-    const coordinates = this.subElements.inner.getBoundingClientRect();
-    const progressWidth = coordinates.width;
-    const nextLeft = coordinates.x ? event.clientX - coordinates.x : event.clientX;
-
-    if (nextLeft >= 0 && nextLeft <= progressWidth) {
-      const nextLeftPart = progressWidth !== 0 ? nextLeft / progressWidth : nextLeft;
-
-      this.selected.to = (nextLeftPart * this.max).toFixed();
-      this.subElements.thumbRight.style.right = this.selectedPercent.to + '%';
-      this.subElements.progress.style.right = this.selectedPercent.to + '%';
-      this.subElements.to.innerHTML = this.formatValue(this.selected.to);
-    }
-  }
-
-  initEventListeners() {
-    this.subElements.thumbLeft.addEventListener('pointerdown', (event) => {
-      this.leftPointerdown(event);
-    });
-
-    this.subElements.thumbRight.addEventListener('pointerdown', (event) => {
-      this.rightPointerdown(event);
-    });
-  }
-
   remove() {
-    if (this.element) {
-      this.element.remove();
-    }
+    this.element.remove();
   }
 
   destroy() {
     this.remove();
-    this.element = null;
+    document.removeEventListener('pointermove', this.onThumbPointerMove);
+    document.removeEventListener('pointerup', this.onThumbPointerUp);
+  }
+
+  update() {
+    const rangeTotal = this.max - this.min;
+    const left = Math.floor((this.selected.from - this.min) / rangeTotal * 100) + '%';
+    const right = Math.floor((this.max - this.selected.to) / rangeTotal * 100) + '%';
+
+    this.subElements.progress.style.left = left;
+    this.subElements.progress.style.right = right;
+
+    this.subElements.thumbLeft.style.left = left;
+    this.subElements.thumbRight.style.right = right;
+  }
+
+  onThumbPointerDown(event) {
+    const thumbElem = event.target;
+
+    event.preventDefault();
+
+    const { left, right } = thumbElem.getBoundingClientRect();
+
+    if (thumbElem === this.subElements.thumbLeft) {
+      this.shiftX = right - event.clientX;
+    } else {
+      this.shiftX = left - event.clientX;
+    }
+
+    this.dragging = thumbElem;
+
+    this.element.classList.add('range-slider_dragging');
+
+    document.addEventListener('pointermove', this.onThumbPointerMove);
+    document.addEventListener('pointerup', this.onThumbPointerUp);
+  }
+
+  getValue() {
+    const rangeTotal = this.max - this.min;
+    const { left } = this.subElements.thumbLeft.style;
+    const { right } = this.subElements.thumbRight.style;
+
+    const from = Math.round(this.min + parseFloat(left) * 0.01 * rangeTotal);
+    const to = Math.round(this.max - parseFloat(right) * 0.01 * rangeTotal);
+
+    return { from, to };
   }
 }
