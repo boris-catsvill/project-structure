@@ -111,10 +111,26 @@ export default class SortableTable {
     this.url.searchParams.set('_order', order);
     this.url.searchParams.set('_start', start);
     this.url.searchParams.set('_end', end);
-    this.url.searchParams.set('title_like', title_like);
-    this.url.searchParams.set('price_gte', price_gte);
-    this.url.searchParams.set('price_lte', price_lte);
-    this.url.searchParams.set('status', status);
+    if (title_like !== '') {
+      this.url.searchParams.set('title_like', title_like);
+    } else {
+      this.url.searchParams.delete('title_like');
+    }
+    if (price_gte >= 0) {
+      this.url.searchParams.set('price_gte', price_gte);
+    } else {
+      this.url.searchParams.delete('price_gte');
+    }
+    if (price_lte >= 0) {
+      this.url.searchParams.set('price_lte', price_lte);
+    } else {
+      this.url.searchParams.delete('price_lte');
+    }
+    if (status !== '') {
+      this.url.searchParams.set('status', status);
+    } else {
+      this.url.searchParams.delete('status');
+    }
 
     this.element.classList.add('sortable-table_loading');
 
@@ -140,7 +156,10 @@ export default class SortableTable {
     this.subElements.body.append(...rows.childNodes);
   }
 
-  async filter({title_like, priceSelect, status}){
+  async filter(filter){
+    console.log(filter);
+    const {title_like, priceSelect, status} = filter;
+    console.log(title_like, priceSelect, status);
     const data = await this.loadData(this.sorted.id, this.sorted.id,
       this.start, this.end,
       title_like, priceSelect.from, priceSelect.to, status);

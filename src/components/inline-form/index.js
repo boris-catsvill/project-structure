@@ -14,7 +14,8 @@ export default class InlineForm {
   onFilterNameChange = async (event) => {
     event.preventDefault();
     this.filterName = event.target.value;
-    this.filterEvent.detail.filterName = this.filterName;
+
+    this.filterEvent.detail.title_like = this.filterName;
     this.element.dispatchEvent(this.filterEvent);
   }
 
@@ -23,6 +24,7 @@ export default class InlineForm {
 
     this.priceSelect = event.detail;
     this.filterEvent.detail.priceSelect = this.priceSelect;
+
     this.element.dispatchEvent(this.filterEvent);
   }
 
@@ -30,7 +32,7 @@ export default class InlineForm {
     event.preventDefault();
 
     this.filterStatus = event.target.value;
-    this.filterEvent.detail.filterStatus = this.filterStatus;
+    this.filterEvent.detail.status = this.filterStatus;
     this.element.dispatchEvent(this.filterEvent);
   }
 
@@ -43,9 +45,9 @@ export default class InlineForm {
       {
         bubbles: true,
         detail: {
-          filterName: this.filterName,
+          title_like: this.filterName,
           priceSelect: this.doubleSlider.selected,
-          filterStatus: this.filterStatus,
+          status: this.filterStatus,
         }
       });
     this.render();
@@ -102,7 +104,7 @@ export default class InlineForm {
   }
 
   initEventListeners() {
-    this.subElements.filterName.addEventListener('change', this.onFilterNameChange);
+    this.subElements.filterName.addEventListener('input', this.onFilterNameChange);
     this.subElements.sliderContainer.addEventListener('range-select', this.onRangeSelect);
     this.subElements.filterStatus.addEventListener('change', this.onFilterStatusSelect);
   }

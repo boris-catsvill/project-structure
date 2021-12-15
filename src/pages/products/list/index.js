@@ -12,7 +12,7 @@ export default class Page {
 
   onFilterSelect = event => {
     const filter = event.detail;
-    this.subElements.sortableTable.filter(filter);
+    this.components.sortableTable.filter(filter);
   };
 
   get template() {
@@ -69,7 +69,7 @@ export default class Page {
   }
 
   initEventListeners() {
-    this.components.sortableTable.element.addEventListener('filter-select', this.onFilterSelect);
+    document.addEventListener('filter-select', this.onFilterSelect);
   }
 
   destroy() {
