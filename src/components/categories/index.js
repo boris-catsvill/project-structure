@@ -3,17 +3,6 @@ import SortableList from "../../components/sortable-list";
 
 const BACKEND_URL = 'https://course-js.javascript.ru/';
 
-// PATCH https://course-js.javascript.ru/api/rest/subcategories
-//json - [{"id":"tovary-dlya-doma","weight":1},{"id":"krasota-i-zdorove","weight":2},{"id":"tovary-dlya-kuxni","weight":3}]
-//weight должна сохраняться!!! по событию SortableList "sortable-list-reorder"
-/*this.element.dispatchEvent(new CustomEvent('sortable-list-reorder', {
-  bubbles: true,
-  details: {
-    from: this.elementInitialIndex,
-    to: placeholderIndex
-  }
-}));*/
-
 export default class Categories {
   element;
   categoriesNSubcategories;

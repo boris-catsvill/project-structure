@@ -74,15 +74,13 @@ export default class Page {
           );
         const subcategory = category.subcategories.find(subcategory =>
           subcategory.id === data);
-        return `
-          <div class="sortable-table__cell">
+        return `<div class="sortable-table__cell">
           <span data-tooltip='
         <div class="sortable-table-tooltip">
           <span class="sortable-table-tooltip__category">${category.title}</span> /
           <b class="sortable-table-tooltip__subcategory">${subcategory.title}</b>
         </div>'>${subcategory.title}</span>
-          </div>
-        `;
+          </div>`;
       };
     }
 
