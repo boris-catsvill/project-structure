@@ -60,7 +60,7 @@ export default class Page {
 
     this.components.salesColumnChart = new ColumnChart({
       label: 'Продажи',
-      formatHeading: data => data,
+      formatHeading: data => '$' + parseInt(data).toLocaleString('en'),
       url: 'api/dashboard/sales',
       range: {
         from: this.from,
