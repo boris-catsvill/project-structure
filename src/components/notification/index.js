@@ -17,7 +17,7 @@ export default class NotificationMessage {
 
   get template() {
     return `
-    <div class="notification notification-${this.type} show" style="--value:${(this.duration/1000).toFixed()}s">
+    <div class="notification ${this.type}" style="--value:${(this.duration/1000).toFixed()}s">
     <div class="timer"></div>
     <div class="inner-wrapper">
       <div class="notification-header">${this.type}</div>

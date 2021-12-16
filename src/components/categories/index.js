@@ -50,12 +50,21 @@ export default class Categories {
         {
           bubbles: true,
           detail: {
-            note: 'Порядок категорий сохранён'
+            note: 'Порядок категорий сохранён',
+            type: 'success'
           }
         }));
 
       return await response.json();
     } catch (error) {
+      this.element.dispatchEvent(new CustomEvent('subcategories-sorted',
+        {
+          bubbles: true,
+          detail: {
+            note: 'Во время сохранения произошла ошибка',
+            type: 'error'
+          }
+        }));
       return Promise.reject(error);
     }
   };

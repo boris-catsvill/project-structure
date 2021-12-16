@@ -5,7 +5,7 @@ export default async function(path, match) {
 
   const { default: Page } = await import(/* webpackChunkName: "[request]" */`../pages/${path}/index.js`);
 
-  const page = match.length > 1 ? new Page(match[match.length - 1]) : new Page();
+  const page = Array.isArray(match) && match.length > 1 ? new Page(match[match.length - 1]) : new Page();
   const element = await page.render();
 
   main.classList.remove('is-loading');

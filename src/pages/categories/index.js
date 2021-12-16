@@ -7,11 +7,10 @@ export default class Page {
   element;
   categoriesElement;
 
-  onNotificate = event => {
-    console.log(event);
+  onNotice = event => {
     const notification = new NotificationMessage(event.detail.note, {
-      duration: 200000,
-      type: 'success'
+      duration: 2000,
+      type: event.detail.type
     });
 
     notification.show();
@@ -46,7 +45,7 @@ export default class Page {
   }
 
   initEventListeners() {
-    document.addEventListener('subcategories-sorted', this.onNotificate);
+    document.addEventListener('subcategories-sorted', this.onNotice);
   }
 
   remove () {
@@ -56,7 +55,7 @@ export default class Page {
   }
 
   destroy() {
-    document.removeEventListener('subcategories-sorted', this.onNotificate);
+    document.removeEventListener('subcategories-sorted', this.onNotice);
 
     this.remove();
     this.element = null;

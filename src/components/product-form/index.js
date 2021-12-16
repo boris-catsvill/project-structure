@@ -1,6 +1,7 @@
 import SortableList from '../sortable-list/index.js';
 import escapeHtml from '../../utils/escape-html.js';
 import fetchJson from '../../utils/fetch-json.js';
+import renderPage from '../../router/render-page.js';
 
 const IMGUR_CLIENT_ID = '28aaa2e823b03b1';
 const BACKEND_URL = 'https://course-js.javascript.ru';
@@ -191,6 +192,11 @@ export default class ProductForm {
 
     const [categoriesNSubcategories, product]
       = await Promise.all([categoriesNSubcategoriesPromise, productPromise]);
+
+    if (!product) {
+      await renderPage('error404');
+    }
+
     [this.product] = product;
     this.categoriesNSubcategories = categoriesNSubcategories;
     const element = document.createElement('div');
@@ -278,10 +284,26 @@ export default class ProductForm {
       this.element.dispatchEvent(new CustomEvent(this.product.id ? 'product-updated' : 'product-saved',
         {
           bubbles: true,
+          detail: {
+            note: this.product.id
+              ? 'Товар обновлён'
+              : 'Товар сохранён',
+            type: 'success'
+          }
         }));
 
       return await response.json();
     } catch (error) {
+      this.element.dispatchEvent(new CustomEvent(this.product.id ? 'product-updated' : 'product-saved',
+        {
+          bubbles: true,
+          detail: {
+            note: this.product.id
+              ? 'Во время обновления произошла ошибка'
+              : 'Во время сохранения произошла ошибка',
+            type: 'error'
+          }
+        }));
       return Promise.reject(error);
     }
   }

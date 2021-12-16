@@ -175,8 +175,8 @@ export default class SortableTable {
 
   async filter(filter){
     const {title_like, priceSelect, status} = filter;
-    const data = await this.loadData(this.sorted.id, this.sorted.id,
-      this.start, this.end,
+    const data = await this.loadData(this.sorted.id, this.sorted.order,
+      0, this.step,
       title_like, priceSelect.from, priceSelect.to, status);
 
     this.addRows(data);
