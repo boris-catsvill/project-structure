@@ -484,16 +484,6 @@ button.is-loading::before {
     z-index: 1;
 }
 
-.button-primary.is-loading::before {
-    background: url("./icon-loading-circle-white.svg") center no-repeat;
-    background-size: cover;
-}
-
-.button-primary-outline.is-loading::before {
-    background: url("./icon-loading-circle-blue.svg") center no-repeat;
-    background-size: cover;
-}
-
 button.is-loading {
     pointer-events: none;
     cursor: default;

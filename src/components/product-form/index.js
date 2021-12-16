@@ -2,6 +2,8 @@ import SortableList from '../sortable-list/index.js';
 import escapeHtml from '../../utils/escape-html.js';
 import fetchJson from '../../utils/fetch-json.js';
 import renderPage from '../../router/render-page.js';
+import changePage from '../../router/index.js';
+import Router from "../../router/index.js";
 
 const IMGUR_CLIENT_ID = '28aaa2e823b03b1';
 const BACKEND_URL = 'https://course-js.javascript.ru';
@@ -193,8 +195,9 @@ export default class ProductForm {
     const [categoriesNSubcategories, product]
       = await Promise.all([categoriesNSubcategoriesPromise, productPromise]);
 
-    if (!product) {
-      await renderPage('error404');
+    if (!product || (Array.isArray(product) && product.length === 0)) {
+      const router = Router.instance();
+      await router.changePage('error404');
     }
 
     [this.product] = product;

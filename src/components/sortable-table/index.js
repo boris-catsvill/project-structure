@@ -14,6 +14,8 @@ export default class SortableTable {
   price_gte;
   price_lte;
   status;
+  createdAt_gte;
+  createdAt_lte;
 
   onWindowScroll = async() => {
     const { bottom } = this.element.getBoundingClientRect();
@@ -58,7 +60,7 @@ export default class SortableTable {
       if (this.isSortLocally) {
         this.sortOnClient(id, newOrder);
       } else {
-        this.sortOnServer(id, newOrder, 1, 1 + this.step);
+        this.sortOnServer(id, newOrder, 0, this.step);
       }
     }
   };
@@ -117,7 +119,9 @@ export default class SortableTable {
   async loadData(
     id = this.sorted.id, order = this.sorted.order,
     start = this.start, end = this.end,
-    title_like, price_gte, price_lte, status, createdAt_gte, createdAt_lte) {
+    title_like = this.title_like, price_gte = this.price_gte,
+    price_lte = this.price_lte, status = this.status,
+    createdAt_gte = this.createdAt_gte, createdAt_lte = this.createdAt_lte) {
     this.url.searchParams.set('_sort', id);
     this.url.searchParams.set('_order', order);
     this.url.searchParams.set('_start', start);
@@ -143,9 +147,11 @@ export default class SortableTable {
       this.url.searchParams.delete('status');
     }
     if (createdAt_gte && this.url.searchParams.has('createdAt_gte')) {
+      this.createdAt_gte = createdAt_gte;
       this.url.searchParams.set('createdAt_gte', createdAt_gte);
     }
     if (createdAt_lte && this.url.searchParams.has('createdAt_lte')) {
+      this.createdAt_lte = createdAt_lte;
       this.url.searchParams.set('createdAt_lte', createdAt_lte);
     }
 
@@ -175,6 +181,10 @@ export default class SortableTable {
 
   async filter(filter){
     const {title_like, priceSelect, status} = filter;
+    this.title_like = title_like;
+    this.price_gte = priceSelect.from;
+    this.price_lte = priceSelect.to;
+    this.status = status;
     const data = await this.loadData(this.sorted.id, this.sorted.order,
       0, this.step,
       title_like, priceSelect.from, priceSelect.to, status);

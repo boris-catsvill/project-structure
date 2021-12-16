@@ -7,7 +7,6 @@ export default class Page {
   components = {};
 
   onNotice = event => {
-    console.log(event);
     const notification = new NotificationMessage(event.detail.note, {
       duration: 2000,
       type: event.detail.type

@@ -140,6 +140,32 @@
   width: 50%;
 }
 
+form.form-inline {
+  display: grid;
+  grid: auto-flow / repeat(auto-fit, minmax(50px, 1fr));
+  grid-gap: 16px;
+}
+
+form.form-inline .form-group {
+  margin-bottom: 0;
+}
+
+.products-list form.form-inline {
+  grid-template-columns: 3fr 3fr 2fr;
+  grid-gap: 46px;
+}
+
+.products-list form.form-inline .form-label {
+  margin-bottom: 0;
+  margin-right: 16px;
+}
+
+.products-list form.form-inline .form-group {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+}
+
 .page-title {
   font-weight: 600;
   font-size: 28px;

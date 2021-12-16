@@ -1,6 +1,5 @@
 import renderPage from './render-page.js';
 
-// performs routing on all links
 export default class Router {
   constructor() {
     this.routes = [];
