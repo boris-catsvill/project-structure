@@ -58,45 +58,30 @@ export default class Page {
       },
         filterStatus: '' });
 
-    this.categoriesNSubcategoriesUrl = new URL(`api/rest/categories`, BACKEND_URL);
-
-    const categoriesNSubcategories = await this.loadCategoriesNSubcategories();
-
     const subcategoryItem = header.find(item => item.id === 'subcategory');
 
     if (subcategoryItem) {
       subcategoryItem.template = data => {
-        const category = Object.values(categoriesNSubcategories)
-          .find(category => {
-              return category.subcategories.find(subcategory =>
-                subcategory.id === data);
-            }
-          );
-        const subcategory = category.subcategories.find(subcategory =>
-          subcategory.id === data);
         return `<div class="sortable-table__cell">
           <span data-tooltip='
         <div class="sortable-table-tooltip">
-          <span class="sortable-table-tooltip__category">${category.title}</span> /
-          <b class="sortable-table-tooltip__subcategory">${subcategory.title}</b>
-        </div>'>${subcategory.title}</span>
+          <span class="sortable-table-tooltip__category">${data.category.title}</span> /
+          <b class="sortable-table-tooltip__subcategory">${data.title}</b>
+        </div>'>${data.title}</span>
           </div>`;
       };
     }
 
+    const productsUrl = new URL('api/rest/products', BACKEND_URL);
+    productsUrl.searchParams.set('_embed', 'subcategory.category');
+
     this.components.sortableTable = new SortableTable(header, {
-      url: 'api/rest/products',
-      edited: true,
+      url: productsUrl.toString(),
+      editUrl: 'products',
       step: 30,
       start: 0,
       end: 30
     });
-  }
-
-  async loadCategoriesNSubcategories() {
-    this.categoriesNSubcategoriesUrl.searchParams.set('_sort', 'weight');
-    this.categoriesNSubcategoriesUrl.searchParams.set('_refs', 'subcategory');
-    return await fetchJson(this.categoriesNSubcategoriesUrl);
   }
 
   async renderComponents() {

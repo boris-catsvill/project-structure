@@ -75,7 +75,7 @@ export default class SortableTable {
     step = 20,
     start = 1,
     end = start + step,
-    edited = false
+    editUrl = ''
   } = {}) {
 
     this.headersConfig = headersConfig;
@@ -85,16 +85,7 @@ export default class SortableTable {
     this.step = step;
     this.start = start;
     this.end = end;
-    this.edited = edited;
-
-    if (this.edited) {
-      const href = url.split('/')[2] || '';
-
-      if (href !== '') {
-        this.editUrl = href;
-      }
-    }
-
+    this.editUrl = editUrl;
 
     this.render();
   }
@@ -230,11 +221,10 @@ export default class SortableTable {
 
   getTableRows(data) {
     return data.map(item => {
-        return `<${this.edited ? 'a' : 'div'} class="sortable-table__row" ${this.edited ? 'href="' + this.editUrl + '/' + item.id + '"' : ''}>
+        return `<${this.editUrl !== '' ? 'a' : 'div'} class="sortable-table__row" ${this.editUrl !== '' ? 'href="' + this.editUrl + '/' + item.id + '"' : ''}>
         ${this.getTableRow(item, data)}
-      </${this.edited ? 'a' : 'div'}>`
-    }
-    ).join('');
+      </${this.editUrl !== '' ? 'a' : 'div'}>`
+    }).join('');
   }
 
   getTableRow(item) {

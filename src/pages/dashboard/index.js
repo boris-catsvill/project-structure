@@ -78,47 +78,29 @@ export default class Page {
       }
     });
 
-    this.categoriesNSubcategoriesUrl = new URL(`api/rest/categories`, BACKEND_URL);
-
-    const categoriesNSubcategories = await this.loadCategoriesNSubcategories();
-
     const subcategoryItem = header.find(item => item.id === 'subcategory');
 
     if (subcategoryItem) {
       subcategoryItem.template = data => {
-        const category = Object.values(categoriesNSubcategories)
-          .find(category => {
-              return category.subcategories.find(subcategory =>
-                subcategory.id === data.id);
-            }
-          );
-        const subcategory = category.subcategories.find(subcategory =>
-          subcategory.id === data.id);
-        return `
-          <div class="sortable-table__cell">
+        return `<div class="sortable-table__cell">
           <span data-tooltip='
         <div class="sortable-table-tooltip">
-          <span class="sortable-table-tooltip__category">${category.title}</span> /
-          <b class="sortable-table-tooltip__subcategory">${subcategory.title}</b>
-        </div>'>${subcategory.title}</span>
-          </div>
-        `;
+          <span class="sortable-table-tooltip__category">${data.category.title}</span> /
+          <b class="sortable-table-tooltip__subcategory">${data.title}</b>
+        </div>'>${data.title}</span>
+          </div>`;
       };
     }
 
-    const url = new URL('api/dashboard/bestsellers', BACKEND_URL);
-    url.searchParams.set('from', this.from.toISOString());
-    url.searchParams.set('to', this.to.toISOString());
+    const bestsellersUrl = new URL('api/dashboard/bestsellers', BACKEND_URL);
+    bestsellersUrl.searchParams.set('from', this.from.toISOString());
+    bestsellersUrl.searchParams.set('to', this.to.toISOString());
+    bestsellersUrl.searchParams.set('_embed', 'subcategory.category');
+
     this.components.sortableTable = new SortableTable(header, {
-      url: url.toString(),
+      url: bestsellersUrl.toString(),
       isSortLocally: true
     });
-  }
-
-  async loadCategoriesNSubcategories() {
-    this.categoriesNSubcategoriesUrl.searchParams.set('_sort', 'weight');
-    this.categoriesNSubcategoriesUrl.searchParams.set('_refs', 'subcategory');
-    return await fetchJson(this.categoriesNSubcategoriesUrl);
   }
 
   get template() {
