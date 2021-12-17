@@ -1,7 +1,7 @@
 import fetchJson from '../../utils/fetch-json.js';
 import SortableList from "../../components/sortable-list";
 
-const BACKEND_URL = 'https://course-js.javascript.ru/';
+const BACKEND_URL = process.env.BACKEND_URL;
 
 export default class Categories {
   element;

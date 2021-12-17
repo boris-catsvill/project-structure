@@ -5,8 +5,8 @@ import renderPage from '../../router/render-page.js';
 import changePage from '../../router/index.js';
 import Router from "../../router/index.js";
 
-const IMGUR_CLIENT_ID = '28aaa2e823b03b1';
-const BACKEND_URL = 'https://course-js.javascript.ru';
+const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID;
+const BACKEND_URL = process.env.BACKEND_URL;
 
 export default class ProductForm {
 

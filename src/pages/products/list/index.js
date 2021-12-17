@@ -3,7 +3,7 @@ import InlineForm from "../../../components/inline-form";
 import header from './products-header.js';
 import fetchJson from "../../../utils/fetch-json";
 
-const BACKEND_URL = 'https://course-js.javascript.ru/';
+const BACKEND_URL = process.env.BACKEND_URL;
 const MIN_PRICE = 0;
 const MAX_PRICE = 4000;
 
