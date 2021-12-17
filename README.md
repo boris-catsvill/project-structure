@@ -1,5 +1,12 @@
 # Admin Dashboard
 
+**Important!**
+
+For correct build via Webpack you must have:
+
+* nodejs >=16.13.1
+* npm >= 7.10.0
+
 Данный проект был разработан в рамках курса ["JavaScript/​DOM/​Интерфейсы" для программистов](https://learn.javascript.ru/courses/js)
 проекта [learn.javascript.ru](https://learn.javascript.ru/)
 

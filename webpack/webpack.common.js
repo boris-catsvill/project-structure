@@ -60,14 +60,17 @@ module.exports = {
       filename: '[name].css',
       chunkFilename: '[id].css',
     }),
-    new CopyWebpackPlugin([
-      {
-        from: path.join(__dirname, '../src/assets')
-      },
-      {
-        from: path.join(__dirname, '../src/components/product-form/*.svg'),
-        flatten: true
-      }
-    ])
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: path.join(__dirname, '../src/assets'),
+          to: "assets/[path][name][ext]",
+        },
+        {
+          from: path.join(__dirname, '../src/components/product-form/*.svg'),
+          to: "[name][ext]",
+        }
+      ]
+    })
   ]
 };
