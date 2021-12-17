@@ -20,8 +20,7 @@ const header = [
   {
     id: 'subcategory',
     title: 'Категория',
-    sortable: true,
-    sortType: 'string'
+    sortable: false
   },
   {
     id: 'quantity',

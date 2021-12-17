@@ -61,14 +61,27 @@ module.exports = {
       filename: '[name].css',
       chunkFilename: '[id].css',
     }),
-    new CopyWebpackPlugin([
-      {
-        from: path.join(__dirname, '../src/assets')
-      },
-      {
-        from: path.join(__dirname, '../src/components/product-form/*.svg'),
-        flatten: true
-      },
-    ])
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: path.join(__dirname, '../src/assets'),
+          to: "assets/[path][name][ext]",
+        },
+        {
+          from: path.posix.join(
+            path.resolve(__dirname, "../src/components/product-form").replace(/\\/g, "/"),
+            "*.svg"
+          ),
+          to: "[name][ext]",
+        },
+        {
+          from: path.posix.join(
+            path.resolve(__dirname, "../src/assets/favicon").replace(/\\/g, "/"),
+            "*.png"
+          ),
+          to: "[name][ext]",
+        }
+      ]
+    })
   ]
 };

@@ -6,10 +6,7 @@ const styleLoader = {
 };
 
 const MiniCssExtractPluginLoader = {
-  loader: MiniCssExtractPlugin.loader,
-  options: {
-    chunkFilename: '[id].css'
-  }
+  loader: MiniCssExtractPlugin.loader
 };
 
 module.exports = [
