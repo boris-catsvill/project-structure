@@ -79,7 +79,7 @@ module.exports = {
             path.resolve(__dirname, "../src/assets/favicon").replace(/\\/g, "/"),
             "*.png"
           ),
-          to: "[name][ext]",
+          to: "favicon/[name][ext]",
         }
       ]
     })
