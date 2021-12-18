@@ -1,3 +1,5 @@
+import getSubElements from '../../utils/getSubElements';
+
 export default class ProductInput {
   element;
   subElements = {};
@@ -42,18 +44,6 @@ export default class ProductInput {
         </form>
       </div>
     `
-  }
-
-  getSubElements(element) {
-    const elements = {};
-
-    const subElements = element.querySelectorAll('[data-elem]');
-
-    for (const subElement of subElements) {
-      elements[subElement.dataset.elem] = subElement;
-    }
-
-    return elements;
   }
 
   dispatchEvent () {
@@ -124,7 +114,7 @@ export default class ProductInput {
 
     this.element = element.firstElementChild;
 
-    this.subElements = this.getSubElements(this.element);
+    this.subElements = getSubElements(this.element, 'elem');
 
     this.subElements.thumbLeft.addEventListener('pointerdown', this.onPointerDownThumbLeft);
     this.subElements.thumbRight.addEventListener('pointerdown', this.onPointerDownThumbRight);

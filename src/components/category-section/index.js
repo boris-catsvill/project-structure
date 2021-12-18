@@ -61,7 +61,7 @@ export default class CategorySection {
     this.subElements.categoryHeader.addEventListener('click', this.toggleCategoryBody);
   }
 
-  async render() {
+  render() {
     const element = document.createElement('div');
 
     element.append(this.getCategorySection(this.data));
@@ -73,7 +73,9 @@ export default class CategorySection {
   }
 
   remove () {
-    this.element.remove();
+    if (this.element) {
+      this.element.remove();
+    }
   }
 
   destroy () {

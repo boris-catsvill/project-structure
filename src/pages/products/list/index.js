@@ -38,6 +38,7 @@ export default class Page {
   initComponents() {
     this.components.sortableTable = new SortableTable(header, {
       url: 'api/rest/products',
+      page: 'products',
     });
 
     this.components.productInput = new ProductInput();
@@ -52,7 +53,9 @@ export default class Page {
   }
 
   remove () {
-    this.element.remove();
+    if (this.element) {
+      this.element.remove();
+    }
   }
 
   destroy() {

@@ -1,25 +1,12 @@
 import NotificationMessage from '../../components/notification';
 import CategorySection from '../../components/category-section';
 import fetchJson from '../../utils/fetch-json';
+import getSubElements from '../../utils/getSubElements';
 
 export default class Page {
   subElements;
   categories;
   message;
-
-  constructor() {
-    this.render();
-  }
-
-  getSubElements (element) {
-    const elements = element.querySelectorAll('[data-elem]');
-
-    return [...elements].reduce((accum, subElement) => {
-      accum[subElement.dataset.elem] = subElement;
-
-      return accum;
-    }, {});
-  }
 
   renderCategorySections(data) {
     const categorySections = data.map((category) => {
@@ -68,7 +55,7 @@ export default class Page {
     element.innerHTML = this.getTemplate();
 
     this.element = element.firstElementChild;
-    this.subElements = this.getSubElements(this.element);
+    this.subElements = getSubElements(this.element, 'elem');
 
     const data = await this.loadData();
 

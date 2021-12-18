@@ -1,7 +1,20 @@
 export default class SortableList {
+  element;
+  draggingElement;
+  constructor({ items }) {
+    this.items = items;
+    this.render();
+  }
 
   onPointerDown = (e) => {
-    if (e.target.dataset.grabHandle !== undefined) {
+    if (!e.target.closest('.sortable-list__item')) return;
+
+    if (e.target.dataset.deleteHandle !== undefined) {
+      e.target.closest('.sortable-list__item').remove();
+    }
+
+    if ((e.target.dataset.grabHandle !== undefined
+      || e.target.closest('.sortable-list__item').dataset.grabHandle !== undefined)) {
       const target = e.target.closest('.sortable-list__item');
       const elementWidth = target.offsetWidth;
       const elementHeight = target.offsetHeight;
@@ -54,10 +67,9 @@ export default class SortableList {
         }
 
         if (nextElem) {
-          const { top, height } = nextElem.getBoundingClientRect();
-          const middleNextElem = top + height / 2;
+          const { top } = nextElem.getBoundingClientRect();
 
-          if (clientY > middleNextElem) {
+          if (clientY > top) {
             return nextElem.after(placeholder);
           }
         }
@@ -92,16 +104,6 @@ export default class SortableList {
       document.addEventListener('mousemove', onPointerMove);
       document.addEventListener('pointerup', onPointerUp);
     }
-    if (e.target.dataset.deleteHandle !== undefined) {
-      e.target.closest('.sortable-list__item').remove();
-    }
-  }
-
-  element;
-  draggingElement;
-  constructor({ items }) {
-    this.items = items;
-    this.render();
   }
 
   dispatchEvent (type, details) {

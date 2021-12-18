@@ -48,7 +48,7 @@ export class FetchError extends Error {
 // handle uncaught failed fetch through
 window.addEventListener('unhandledrejection', event => {
   if (event.reason instanceof FetchError) {
-    alert(event.reason.message);
+    console.error(event.reason.message);
   }
 });
 

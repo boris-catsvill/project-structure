@@ -2,24 +2,11 @@ import fetchJson from '../../utils/fetch-json';
 import RangePicker from '../../components/range-picker';
 import SortableTable from '../../components/sortable-table';
 import header from '../sales-header';
+import getSubElements from '../../utils/getSubElements';
 
 export default class Page {
-  components;
+  components = {};
   url = new URL('api/rest/orders', process.env.BACKEND_URL);
-
-  constructor() {
-    this.render();
-  }
-
-  getSubElements (element) {
-    const elements = element.querySelectorAll('[data-element]');
-
-    return [...elements].reduce((accum, subElement) => {
-      accum[subElement.dataset.element] = subElement;
-
-      return accum;
-    }, {});
-  }
 
   getTemplate() {
     return `
@@ -49,21 +36,16 @@ export default class Page {
     const to = new Date();
     const from = new Date(now.setMonth(now.getMonth() - 1));
 
-    const rangePicker = new RangePicker({
+    this.components.rangePicker = new RangePicker({
       from,
       to
     });
 
-    const sortableTable = new SortableTable(header, {
+    this.components.sortableTable = new SortableTable(header, {
       url: `api/rest/orders?_start=1&_end=30&createdAt_gte=${from.toISOString()}&createdAt_lte=${to.toISOString()}`,
       isSortLocally: false,
       page: 'sales',
     });
-
-    this.components = {
-      sortableTable,
-      rangePicker
-    };
   }
 
   async updateComponents (from, to) {
@@ -81,9 +63,12 @@ export default class Page {
     });
   }
 
-  renderComponents () {
-    this.subElements.rangePicker.append(this.components.rangePicker.element);
-    this.subElements.ordersContainer.append(this.components.sortableTable.element);
+  async renderComponents () {
+    const { element: sortableTableElement  } = await this.components.sortableTable;
+    const { element: rangePickerElement } = this.components.rangePicker;
+
+    this.subElements.rangePicker.append(rangePickerElement);
+    this.subElements.ordersContainer.append(sortableTableElement);
   }
 
   async render() {
@@ -92,10 +77,10 @@ export default class Page {
     element.innerHTML = this.getTemplate();
 
     this.element = element.firstElementChild;
-    this.subElements = this.getSubElements(this.element);
+    this.subElements = getSubElements(this.element, 'element');
 
     this.initComponents();
-    this.renderComponents();
+    await this.renderComponents();
     this.initEventListeners();
 
     return this.element;

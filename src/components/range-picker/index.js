@@ -1,3 +1,5 @@
+import getSubElements from '../../utils/getSubElements';
+
 export default class RangePicker {
   element = null;
   subElements = {};
@@ -8,7 +10,7 @@ export default class RangePicker {
   };
 
   static formatDate (date) {
-    return date.toLocaleString('ru', {dateStyle: 'short'})
+    return date.toLocaleString('ru', { dateStyle: 'short' })
   }
 
   onDocumentClick = event => {
@@ -46,21 +48,11 @@ export default class RangePicker {
     element.innerHTML = this.template;
 
     this.element = element.firstElementChild;
-    this.subElements = this.getSubElements(element);
+    this.subElements = getSubElements(element, 'elem');
 
     this.initEventListeners();
 
     return Promise.resolve(this.element);
-  }
-
-  getSubElements (element) {
-    const subElements = {};
-
-    for (const subElement of element.querySelectorAll('[data-elem]')) {
-      subElements[subElement.dataset.elem] = subElement;
-    }
-
-    return subElements;
   }
 
   initEventListeners () {

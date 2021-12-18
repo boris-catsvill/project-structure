@@ -3,11 +3,12 @@ import escapeHtml from '../../utils/escape-html';
 import fetchJson from '../../utils/fetch-json';
 import iconGrab from './icon-grab.svg';
 import iconTrash from './icon-trash.svg';
+import getSubElements from '../../utils/getSubElements';
+import NotificationMessage from '../notification';
 
 export default class ProductForm {
   element;
   subElements;
-  productInfo;
   imagesArray;
 
   defaultProductInfo = {
@@ -26,18 +27,6 @@ export default class ProductForm {
 
     this.render()
       .then(() => {});
-  }
-
-  getSubElements(element) {
-    const elements = {};
-
-    const subElements = element.querySelectorAll('[data-element]');
-
-    for (const subElement of subElements) {
-      elements[subElement.dataset.element] = subElement;
-    }
-
-    return elements;
   }
 
   getTitleInput() {
@@ -62,12 +51,14 @@ export default class ProductForm {
 
   getImageItem(imageInfo) {
     const element = document.createElement('li');
+    const imageSrc = imageInfo.url ? escapeHtml(imageInfo.url) : '';
+    const imageSource = imageInfo.source ? escapeHtml(imageInfo.source) : '';
     element.classList.add('products-edit__imagelist-item', 'sortable-list__item');
     element.innerHTML = `
       <span>
         <img src="${iconGrab}" data-grab-handle="" alt="grab">
-        <img class="sortable-table__cell-img" alt="Image" src="${escapeHtml(imageInfo.url)}">
-        <span>${escapeHtml(imageInfo.source)}</span>
+        <img class="sortable-table__cell-img" alt="Image" src="${imageSrc}">
+        <span>${imageSource}</span>
       </span>
       <button type="button">
           <img src="${iconTrash}" data-delete-handle="" alt="delete">
@@ -78,7 +69,7 @@ export default class ProductForm {
 
   getImageListInner(imageInfoArr) {
     if (!imageInfoArr || !imageInfoArr.length) {
-      return '<div></div>';
+      return;
     }
     const items = imageInfoArr.map(imageInfo => {
       return this.getImageItem(imageInfo);
@@ -186,7 +177,7 @@ export default class ProductForm {
     `;
   }
 
-  async uploadImage(e) {
+  uploadImage = async (e) => {
     e.preventDefault();
     const [file] = e.target.files;
 
@@ -201,15 +192,15 @@ export default class ProductForm {
         method: 'POST',
         headers: {
           Authorization: `Client-ID ${process.env.IMGUR_CLIENT_ID}`,
-          Referer: '',
         },
         body: formData,
+        referrer: '',
       });
 
-      const newImage = this.getImageItem({
+      const newImage = {
         url: result.data.link,
         source: file.name,
-      });
+      }
 
       this.imagesArray.push(newImage);
       this.updateImageList(this.imagesArray);
@@ -221,7 +212,7 @@ export default class ProductForm {
     }
   }
 
-  showInputFile() {
+  showInputFile = () => {
     const inputFile = document.createElement('input');
     inputFile.type = 'file';
     inputFile.accept = 'image/*';
@@ -229,18 +220,22 @@ export default class ProductForm {
     document.body.append(inputFile);
     inputFile.click();
 
-    inputFile.addEventListener('change', (e) => this.uploadImage(e));
+    inputFile.addEventListener('change', this.uploadImage);
   }
 
   updateImageList(data) {
     this.subElements.imageListContainer.innerHTML = '';
-    this.subElements.imageListContainer.append(this.getImageListInner(data));
+    if (data.length) {
+      this.subElements.imageListContainer.append(this.getImageListInner(data));
+    }
   }
 
   updateProductInfo(productInfo) {
+    this.imagesArray = productInfo.images;
+    this.updateImageList(this.imagesArray);
+
     this.subElements.productForm.title.value = productInfo.title;
     this.subElements.productForm.description.value = productInfo.description;
-    this.updateImageList(productInfo.images);
     this.subElements.productForm.price.value = productInfo.price;
     this.subElements.productForm.quantity.value = productInfo.quantity;
     this.subElements.productForm.discount.value = productInfo.discount;
@@ -267,6 +262,7 @@ export default class ProductForm {
 
   getFormData() {
     const data = {};
+    data.id = this.productId || this.subElements.productForm.title.value;
     data.title = this.subElements.productForm.title.value;
     data.description = this.subElements.productForm.description.value;
     data.subcategory = this.subElements.productForm.subcategory.value;
@@ -274,18 +270,7 @@ export default class ProductForm {
     data.discount = Number.parseInt(this.subElements.productForm.discount.value);
     data.quantity = Number.parseInt(this.subElements.productForm.quantity.value);
     data.status = Number.parseInt(this.subElements.productForm.status.value);
-
-    const imageList = this.subElements.imageListContainer.firstElementChild.children;
-    const imageListArray = [];
-    for (const imageItem of imageList) {
-      const inputs = imageItem.querySelectorAll('input');
-      const inputInfo = {};
-      inputs.forEach((input) => {
-        inputInfo[input.name] = input.value;
-      });
-      imageListArray.push(inputInfo);
-    }
-    data.images = imageListArray;
+    data.images = this.imagesArray;
 
     return data;
   }
@@ -298,7 +283,7 @@ export default class ProductForm {
     this.element.dispatchEvent(event);
   }
 
-  async sendProductInfo(e) {
+  sendProductInfo = async (e) => {
     e.preventDefault();
     const url = `${process.env.BACKEND_URL}api/rest/products`;
     const data = this.getFormData();
@@ -319,8 +304,18 @@ export default class ProductForm {
   }
 
   addEventListeners() {
-    this.subElements.productForm.uploadImage.addEventListener('click', () => this.showInputFile());
-    this.subElements.productForm.addEventListener('submit', (e) => this.sendProductInfo(e));
+    this.subElements.productForm.uploadImage.addEventListener('click', this.showInputFile);
+    this.subElements.productForm.addEventListener('submit', this.sendProductInfo);
+
+    this.element.addEventListener('product-updated', () => {
+      this.message = new NotificationMessage('Товар сохранен', { duration: 1500, type: 'notification_success'});
+      this.message.show();
+    });
+
+    this.element.addEventListener('product-saved', () => {
+      this.message = new NotificationMessage('Товар добавлен', { duration: 1500, type: 'notification_success'});
+      this.message.show();
+    });
   }
 
   async render () {
@@ -328,9 +323,9 @@ export default class ProductForm {
     element.innerHTML = this.getTemplate();
     this.element = element.firstElementChild;
 
-    this.subElements = this.getSubElements(element);
+    this.subElements = getSubElements(element, 'element');
 
-    const productPromise = this.productId ? this.loadProductInfo(this.productId) : [this.defaultProductInfo];
+    const productPromise = this.productId ? await this.loadProductInfo(this.productId) : [this.defaultProductInfo];
     const categoriesPromise = this.loadCategoriesInfo();
     const [productInfo, categoriesInfo] = await Promise.all([productPromise, categoriesPromise]);
 

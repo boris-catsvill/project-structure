@@ -2,6 +2,7 @@ import RangePicker from '../../components/range-picker/index';
 import SortableTable from '../../components/sortable-table/index.js';
 import ColumnChart from '../../components/column-chart/index.js';
 import header from '../bestsellers-header';
+import getSubElements from '../../utils/getSubElements';
 
 import fetchJson from '../../utils/fetch-json.js';
 
@@ -41,7 +42,7 @@ export default class Page {
     return `
     <div class="dashboard">
       <div class="content__top-panel">
-        <h2 class="page-title">Dashboard</h2>
+        <h2 class="page-title">Панель управления</h2>
         <div data-element="rangePicker"></div>
       </div>
       <div data-element="chartsRoot" class="dashboard__charts">
@@ -49,7 +50,7 @@ export default class Page {
         <div data-element="salesChart" class="dashboard__chart_sales"></div>
         <div data-element="customersChart" class="dashboard__chart_customers"></div>
       </div>
-      <h3 class="block-title">Best sellers</h3>
+      <h3 class="block-title">Лидеры продаж</h3>
       <div data-element="sortableTable">
       </div>
     </div>`;
@@ -130,23 +131,13 @@ export default class Page {
     });
   }
 
-  getSubElements (element) {
-    const elements = element.querySelectorAll('[data-element]');
-
-    return [...elements].reduce((accum, subElement) => {
-      accum[subElement.dataset.element] = subElement;
-
-      return accum;
-    }, {});
-  }
-
   render() {
     const element = document.createElement('div');
 
     element.innerHTML = this.getTemplate();
 
     this.element = element.firstElementChild;
-    this.subElements = this.getSubElements(this.element);
+    this.subElements = getSubElements(this.element, 'element');
 
     this.initComponents();
     this.renderComponents();

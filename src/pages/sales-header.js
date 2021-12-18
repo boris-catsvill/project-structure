@@ -29,13 +29,13 @@ const header = [
   },
   {
     id: 'totalCost',
-    title: 'Price',
+    title: 'Стоимость',
     sortable: true,
     sortType: 'number'
   },
   {
     id: 'delivery',
-    title: 'Status',
+    title: 'Статус',
     sortable: true,
     sortType: 'number',
     template: data => {
