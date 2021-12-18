@@ -112,6 +112,13 @@
   color: var(--dark-blue);
 }
 
+.rangepicker__year-indicator {
+  text-align: center;
+  font-weight: 600;
+  font-size: 20px;
+  color: var(--dark-blue);
+}
+
 .rangepicker__selector-control-left,
 .rangepicker__selector-control-right {
   position: absolute;

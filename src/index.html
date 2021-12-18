@@ -2,7 +2,7 @@
 <meta charset="utf-8">
 
 <head>
-  <title>Админка для магазина</title>
+  <title>Online Shop Admin Panel</title>
   <link rel="apple-touch-icon-precomposed" href="/assets/favicon/apple-touch-icon-precomposed.png">
   <link rel="icon" href="/assets/favicon/favicon.png">
 </head>
@@ -41,10 +41,20 @@
     </ul>
     <ul class="sidebar__nav sidebar__nav_bottom">
       <li>
-      <!-- TODO: implement toggling  -->
-        <button type="button" class="sidebar__toggler">
-          <i class="icon-toggle-sidebar"></i> <span>Toggle sidebar</span>
-        </button>
+        <input disabled type="checkbox" class="custom-checkbox" id="sorting" name="sorting">
+        <label class='sidebar__toggler_sorting-type'
+               data-tooltip='Check to sort fetched data directly on local machine'
+               for="sorting">
+          <span data-tooltip='Check to sort fetched data directly on local machine'>Sort Data Locally</span>
+        </label>
+      </li>
+      <li>
+        <input disabled type="checkbox" class="custom-checkbox" id="visible" name="visible">
+        <label class='sidebar__toggler_visible'
+               data-tooltip='Check to hide sidebar menu'
+               for="visible">
+          <span data-tooltip='Check to hide sidebar menu'>Toggle Sidebar</span>
+        </label>
       </li>
     </ul>
   </aside>

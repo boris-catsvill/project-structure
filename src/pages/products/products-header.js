@@ -42,14 +42,18 @@ const header = [
     id: 'price',
     title: 'Price',
     sortable: true,
-    sortType: 'number',
-    template: data => `<div class="sortable-table__cell">$${data}</div>`
+    sortType: 'number'
   },
   {
-    id: 'sales',
-    title: 'Sales',
+    id: 'status',
+    title: 'Status',
     sortable: true,
     sortType: 'number',
+    template: data => {
+      return `<div class="sortable-table__cell">
+          ${data > 0 ? 'Active' : 'Inactive'}
+        </div>`;
+    }
   },
 ];
 
