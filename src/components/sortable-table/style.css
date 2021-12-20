@@ -8,7 +8,7 @@
 
 .sortable-table__row {
   display: grid;
-  grid: auto-flow / 80px calc(50% - 80px) 20% 15% 15%;
+  grid: auto-flow / 80px calc(50% - 80px) 20% 10% 10% 10%;
   text-decoration: none;
 }
 .sortable-table__row.bold {
@@ -22,7 +22,8 @@
   color: var(--table-black);
   display: flex;
   align-items: center;
-  border-top: 1px solid var(--grey-light);
+  text-align: initial;
+  border-top: 1px solid var(--grey-extra-light);
 }
 
 .sortable-table__cell:first-child {
@@ -38,8 +39,12 @@
   border-top: none;
 }
 
-.sortable-table__header .sortable-table__cell[data-sortable] {
+.sortable-table__header .sortable-table__cell[data-sortable="true"] {
   cursor: pointer;
+}
+
+.sortable-table__header .sortable-table__cell[data-sortable="true"]:hover {
+  color: var(--grey);
 }
 
 .sortable-table__cell-img {
@@ -76,8 +81,19 @@
   grid-template-columns: auto;
 }
 
+.sortable-table__loading-line {
+  grid-column: 1 / 7;
+  display: none;
+  margin: 16px;
+  --loading-line-height: 20px;
+}
+
 .sortable-table__body .sortable-table__row:hover {
   background-color: var(--grey-skeleton);
+}
+
+.sortable-table.sortable-table_loading .sortable-table__loading-line {
+  display: grid;
 }
 
 .sortable-table_empty {
@@ -87,7 +103,11 @@
 }
 
 .sortable-table__empty-placeholder p {
-  margin: 0 0 12px;
+  margin: 10px 0;
+}
+
+.sortable-table__empty-placeholder button {
+  margin-bottom: 10px;
 }
 
 .sortable-table__empty-placeholder,
@@ -105,6 +125,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  text-align: center;
   color: var(--grey);
 }
 

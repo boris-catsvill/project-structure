@@ -62,13 +62,13 @@ button.is-loading::before {
 }
 
 .button-primary.is-loading::before {
-  background: url("/components/product-form/icon-loading-circle-white.svg") center
+  background: url("../components/product-form/icon-loading-circle-white.svg") center
     no-repeat;
   background-size: cover;
 }
 
 .button-primary-outline.is-loading::before {
-  background: url("/components/product-form/icon-loading-circle-blue.svg") center
+  background: url("../components/product-form/icon-loading-circle-blue.svg") center
     no-repeat;
   background-size: cover;
 }
@@ -80,6 +80,7 @@ button.is-loading {
   overflow: hidden;
   text-indent: -9999px;
   position: relative;
+  padding-top: 30px;
 }
 
 button.is-loading > span {
