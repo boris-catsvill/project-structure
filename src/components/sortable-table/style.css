@@ -102,9 +102,11 @@
   border-radius: 4px;
   flex: 1 0 auto;
   display: flex;
+  height: calc(100vh - 164px);
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  text-align: center;
   color: var(--grey);
 }
 
@@ -127,3 +129,5 @@
 .sortable-table .sortable-table__loading-line {
   display: none;
 }
+
+

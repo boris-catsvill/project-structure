@@ -1,9 +1,13 @@
 import Router from './router/index.js';
-import tooltip from './components/tooltip/index.js';
+import tooltip from './components/tooltip/index';
+import {listenChangeRoute, toggleDrawer} from './utils/drawer';
 
 tooltip.initialize();
 
 const router = Router.instance();
+
+listenChangeRoute();
+toggleDrawer();
 
 router
   .addRoute(/^$/, 'dashboard')

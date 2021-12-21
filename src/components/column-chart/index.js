@@ -1,89 +1,177 @@
-export default class ColumnChart {
-  element;
-  subElements = {};
-  chartHeight = 50;
+import Component from '../../utils/component';
+import fetchJson from '../../utils/fetch-json';
 
-  constructor({
-    data = [],
-    label = '',
-    link = '',
-    value = 0
-  } = {}) {
+const BACKEND_URL = `https://course-js.javascript.ru/`;
+
+const MONTH_NAMES = [
+  'янв',
+  'фев',
+  'март',
+  'апр',
+  'май',
+  'июнь',
+  'июль',
+  'авг',
+  'сент',
+  'окт',
+  'нояб',
+  'дек'
+]
+
+export default class ColumnChart extends Component {
+  constructor(
+    {
+      data = [], 
+      url = '', 
+      label = '', 
+      formatHeading = (it) => it, 
+      link = '', 
+      range = {
+        from: new Date(),
+        to: new Date(),
+      },
+      value = 0
+    } = {}
+  ) {
+    super();
+
     this.data = data;
-    this.label = label;
-    this.link = link;
     this.value = value;
+    this.label = label;
 
-    this.render();
+
+    this.url = new URL(url, BACKEND_URL);
+    this.range = range;
+
+
+    this.link = link;
+    this.formatHeading = formatHeading;
+
+    this.maxHeight = 50;
   }
 
-  getColumnBody(data) {
-    const maxValue = Math.max(...data);
 
-    return data
-    .map(item => {
-      const scale = this.chartHeight / maxValue;
-      const percent = (item / maxValue * 100).toFixed(0);
-
-      return `<div style="--value: ${Math.floor(item * scale)}" data-tooltip="${percent}%"></div>`;
-    })
-    .join('');
+  initEventListeners() {
+    this.getChildElementByName('body').addEventListener('pointermove', this.handleHoverChart);
   }
 
-  getLink() {
-    return this.link ? `<a class="column-chart__link" href="${this.link}">View all</a>` : '';
+  removeEventListeners() {
+    this.getChildElementByName('body').removeEventListener('pointermove', this.handleHoverChart);
   }
 
-  get template () {
-    return `
-      <div class="column-chart column-chart_loading" style="--chart-height: ${this.chartHeight}">
-        <div class="column-chart__title">
-          Total ${this.label}
-          ${this.getLink()}
-        </div>
-        <div class="column-chart__container">
-          <div data-element="header" class="column-chart__header">
-            ${this.value}
+  handleHoverChart = ({ target }) => {
+    const el = target.closest('[data-tooltip]');
+    const body = this.getChildElementByName('body');
+
+    if(el) {
+      el.addEventListener('pointermove', () => {
+        el.classList.add('is-hovered');
+        body.classList.add('has-hovered')
+      })
+
+      el.addEventListener('pointerleave', () => {
+        el.classList.remove('is-hovered');
+        body.classList.remove('has-hovered')
+      })
+    }
+  }
+
+  async handleLoadData(from, to) {
+    this.url.searchParams.set('to', new Date(to).toISOString());
+    this.url.searchParams.set('from', new Date(from).toISOString());
+
+    const data = await fetchJson(this.url);
+
+    return Object.values(data).length 
+      ? data
+      : {};
+  }
+
+  get chartHeight() {
+    return this.maxHeight;
+  }
+
+  get template() { 
+    return (
+      `<div class="column-chart column-chart_loading" style="--chart-height: ${this.chartHeight}">
+          <div class="column-chart__title">
+            ${this.getLabel()}
+            ${this.getLink()}
           </div>
-          <div data-element="body" class="column-chart__chart">
-            ${this.getColumnBody(this.data)}
+          <div class="column-chart__container">
+            <div data-element="header" class="column-chart__header"></div>
+              <div data-element="body" class="column-chart__chart"></div>
           </div>
-        </div>
-      </div>
-    `;
+      </div>`
+    );
   }
 
   async render() {
-    const element = document.createElement('div');
+    const { from, to } = this.range;
+    
+    const data = await this.handleLoadData(from, to);
+    this.data = data;
+    
+    
+    if (data) {
+      this.refToElement.classList.remove('column-chart_loading');
+      this.getChildElementByName('body').innerHTML = this.getColumnChart(data);
+      this.getChildElementByName('header').innerHTML = this.getHeader(data);
+    }
+  }
 
-    element.innerHTML = this.template;
-    this.element = element.firstElementChild;
+  async update(from, to) {
+    const data = await this.handleLoadData(from, to);
+    this.range = { from, to };
+    this.getChildElementByName('body').innerHTML = this.getColumnChart(data);
+    this.getChildElementByName('header').innerHTML = this.getHeader(data);
 
-    if (this.data.length) {
-      this.element.classList.remove(`column-chart_loading`);
+    this.data = data;
+    return data;
+  }
+
+  static formatDate(date) {
+    const dateInstance = new Date(date);
+    const day = dateInstance.getDate();
+    const monht = dateInstance.getMonth();
+    const year = dateInstance.getFullYear();
+
+    return `${day} ${MONTH_NAMES[monht]}. ${year} г.`
+  }
+
+  getColumnChart(data) {
+    const viewData = this.getDataFromView(data);
+    const max = Math.max(...viewData.map(({value}) => value));
+    const scale = this.chartHeight / max;
+
+    const getTooltipData = ({ key, value }) => {
+      return `<div><small>${ColumnChart.formatDate(key)}</small></div><strong>${this.formatHeading(value)}</strong>`
     }
 
-    this.subElements = this.getSubElements(this.element);
-
-    return this.element;
+    return viewData
+      .map(
+        ({ key, value }) => (`<div style="--value: ${Math.floor(value * scale)}" data-tooltip="${getTooltipData({ key, value })}"></div>`)
+      )
+      .join('');
   }
 
-  getSubElements (element) {
-    const elements = element.querySelectorAll('[data-element]');
-
-    return [...elements].reduce((accum, subElement) => {
-      accum[subElement.dataset.element] = subElement;
-
-      return accum;
-    }, {});
+  getLink() {
+    return this.link ? `<a href="/${this.link}" class="column-chart__link">Подробнее</a>` : '';
   }
 
-  update ({headerData, bodyData}) {
-    this.subElements.header.textContent = headerData;
-    this.subElements.body.innerHTML = this.getColumnBody(bodyData);
+  getHeader(data) {
+    const max = this.getDataFromView(data).reduce((acc, { value }) => acc + value, 0);
+  
+    return this.formatHeading(max);
   }
 
-  destroy() {
-    this.element.remove();
+  getLabel() {
+    return this.label ? this.label : '';
+  }
+
+  getDataFromView(data) {
+    return Object.values(data).length 
+      ? Object.entries(data).map(([key, value]) => ({ key, value }))
+      : [];
   }
 }

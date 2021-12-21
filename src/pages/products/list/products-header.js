@@ -4,60 +4,63 @@ const header = [
     title: 'Фото',
     sortable: false,
     template: data => {
-      return `
-          <div class="sortable-table__cell">
-            <img class="sortable-table-image" alt="Image" src="${data[0].url}">
-          </div>
-        `;
+      if(data.length) {
+        return `<div class="sortable-table__cell">
+                  <img class="sortable-table-image" alt="Image" src="${data[0].url}">
+                </div>`;
+      }
+      return ``;
     }
   },
   {
     id: 'title',
     title: 'Название',
     sortable: true,
-    sortType: 'string'
   },
   {
     id: 'subcategory',
     title: 'Категория',
+    sortable: true,
     template: data => {
       const { title, category } = data;
-      return (
-        `<div class="sortable-table__cell">
+
+      if(title && category) {
+        return (
+          `<div class="sortable-table__cell">
           <span data-tooltip='
           <div class="sortable-table-tooltip">
           <span class="sortable-table-tooltip__category">${category.title}</span> /
           <b class="sortable-table-tooltip__subcategory">${title}</b>
           </div>'>${title}</span>
-        </div>`
-      );
+          </div>`
+          );
+      }
+
+      return ''
     }
   },
   {
     id: 'quantity',
     title: 'Количество',
     sortable: true,
-    sortType: 'number'
   },
   {
     id: 'price',
     title: 'Цена',
     sortable: true,
-    sortType: 'number',
+  },
+  {
+    id: 'status',
+    title: 'Статус',
+    sortable: true,
     template: data => {
       return `
           <div class="sortable-table__cell">
-            $${data}
+            ${Boolean(data) ? 'активен' : 'не активен'}
           </div>
         `;
     }
   },
-  {
-    id: 'sales',
-    title: 'Продажи',
-    sortable: true,
-    sortType: 'number'
-    },
 ];
 
 export default header;

@@ -9,6 +9,9 @@
     "ecmaVersion": 2020,
     "sourceType": "module"
   },
+
+  "parser": "@babel/eslint-parser",
+
   "rules": {
     "no-debugger": "error",
     "no-dupe-keys": "warn",
@@ -32,6 +35,7 @@
     "indent": ["warn", 2, {
       "MemberExpression": "off"
     }],
+
 
     "array-bracket-spacing": ["warn", "never"],
     "comma-spacing": "warn",

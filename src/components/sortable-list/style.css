@@ -4,6 +4,10 @@
   margin: 12px 0;
 }
 
+ul {
+  list-style: none;
+}
+
 .sortable-list__item {
   min-height: 60px;
   background-color: var(--white);

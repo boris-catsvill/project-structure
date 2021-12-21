@@ -88,6 +88,24 @@ body {
     position: relative;
 }
 
+.sortable-list__icon {
+    width: 15px;
+    height: 15px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;   
+}
+
+.sortable-list__grab {
+    background-image: url(./icon-grab.svg);
+    cursor: grab;
+}
+
+.sortable-list__delete {
+    background-image: url(./icon-trash.svg);
+    cursor: grab;
+}
+
 .sortable-list__item[data-grab-handle],
 .sortable-list__item [data-grab-handle] {
     cursor: grab;
@@ -334,7 +352,7 @@ form.form-grid .form-group__two-col {
     grid-template-columns: auto 1fr;
     grid-gap: 16px;
 }
-
+/* align-items: center; */
 form .form-label {
     font-weight: normal;
     font-size: 16px;
@@ -383,7 +401,19 @@ form .form-buttons {
 form.form-inline {
     display: grid;
     grid: auto-flow / repeat(auto-fit, minmax(50px, 1fr));
-    grid-gap: 16px;
+}
+
+.form-group--slider {
+    display: flex;
+    align-items: center;
+}
+
+.form--slider {
+    width: 100%;
+}
+.form-label--slider {
+    margin-top: 10px;
+    display: block;
 }
 
 form.form-inline .form-group {
