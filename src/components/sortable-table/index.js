@@ -221,7 +221,7 @@ export default class SortableTable {
 
   getTableRows(data) {
     return data.map(item => {
-        return `<${this.editUrl !== '' ? 'a' : 'div'} class="sortable-table__row" ${this.editUrl !== '' ? 'href="' + this.editUrl + '/' + item.id + '"' : ''}>
+        return `<${this.editUrl !== '' ? 'a' : 'div'} class="sortable-table__row" ${this.editUrl !== '' ? 'href="/' + this.editUrl + '/' + item.id + '"' : ''}>
         ${this.getTableRow(item, data)}
       </${this.editUrl !== '' ? 'a' : 'div'}>`
     }).join('');
