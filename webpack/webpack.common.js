@@ -52,7 +52,8 @@ module.exports = {
       'process.env.BACKEND_URL': JSON.stringify(process.env.BACKEND_URL)
     }),
     new HtmlWebpackPlugin({
-      template: path.join(__dirname, '../src/index.html')
+      template: path.join(__dirname, '../src/index.html'),
+      favicon: path.join(__dirname, '../src/assets/favicon/favicon.png')
     }),
     new MiniCssExtractPlugin({
       // Options similar to the same options in webpackOptions.output
@@ -67,8 +68,18 @@ module.exports = {
           to: "assets/[path][name][ext]",
         },
         {
-          from: path.join(__dirname, '../src/components/product-form/*.svg'),
+          from: path.posix.join(
+            path.resolve(__dirname, "../src/components/product-form").replace(/\\/g, "/"),
+            "*.svg"
+          ),
           to: "[name][ext]",
+        },
+        {
+          from: path.posix.join(
+            path.resolve(__dirname, "../src/assets/favicon").replace(/\\/g, "/"),
+            "*.png"
+          ),
+          to: "favicon/[name][ext]",
         }
       ]
     })
