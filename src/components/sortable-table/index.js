@@ -99,7 +99,7 @@ export default class SortableTable {
     this.initEventListeners();
   }
 
-  async loadData(id, order, start = this.start, end = this.end) {
+  async loadData(id = this.sorted.id, order = this.sorted.order, start = this.start, end = this.end) {
     this.url.searchParams.set('_sort', id);
     this.url.searchParams.set('_order', order);
     this.url.searchParams.set('_start', start);
