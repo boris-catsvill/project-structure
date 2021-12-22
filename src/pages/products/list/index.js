@@ -1,36 +1,83 @@
-import ProductForm from "../../../components/product-form";
+import SortableTable from "../../../components/sortable-table";
+import header from "./products-header.js";
 
 export default class Page {
   element;
   subElements = {};
   components = {};
 
+  constructor() {
+
+  }
+  
+  initComponents() {
+    const priceMin = 0;
+    const priceMax = 4000;
+  
+    this.components.sortableTable = new SortableTable(
+      header,
+      {
+        url: this.getProductUrl(priceMin, priceMax),
+      }
+    );
+  }
+
+  getTemplate() {
+    return `
+    <div class="products-list">
+        <div class="content__top-panel">
+          <h1 class="page-title">Products</h1>
+          <a href="/products/add" class="button-primary">Add product</a>
+        </div>
+        <div class="content-box content-box_small">
+          <form class="form-inline">
+            <div class="form-group">
+              <label class="form-label">Filter:</label>
+              <input type="text" data-element="filterName" class="form-control" placeholder="Product name">
+            </div>
+            <div class="form-group" data-element="slider">
+              <label class="form-label">Price:</label>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Status:</label>
+              <select class="form-control" data-element="filterStatus">
+                <option value="" selected="">Any</option>
+                <option value="1">Active</option>
+                <option value="0">Inactive</option>
+              </select>
+            </div>
+          </form>
+        </div>
+        <div class="products-list__container" data-element="sortableTable">
+        </div>
+      </div>
+    `;
+  }
+  
+  async renderComponents() {
+    const element = await this.components.sortableTable.element;
+    this.element.append(element);
+  }
+
   async render() {
     const element = document.createElement('div');
-
-    element.innerHTML = `
-      <div>
-        <h1>List page</h1>
-      </div>`;
-
+    element.innerHTML = this.getTemplate();
     this.element = element.firstElementChild;
-
     this.initComponents();
     await this.renderComponents();
-
+    
+    this.initEventListeners();
     return this.element;
   }
 
-  initComponents() {
-    const productId = '101-planset-lenovo-yt3-x90l-64-gb-3g-lte-cernyj';
-
-    this.components.productFrom = new ProductForm(productId);
+  initEventListeners() {
+    console.log(this.components.sortableTable.element);
   }
 
-  async renderComponents() {
-    const element = await this.components.productFrom.render();
-
-    this.element.append(element);
+  getProductUrl(priceMin, priceMax, filterName, status) {
+    return `api/rest/products?_embed=subcategory.category&price_gte=${priceMin}&price_lte=${priceMax}`
+      + (filterName ? `&title_like=${encodeURIComponent(filterName)}` : '')
+      + (status ? `&status=${status}` : '');
   }
 
   destroy() {

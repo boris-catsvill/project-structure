@@ -163,12 +163,27 @@ export default class SortableTable {
       </div>`;
   }
 
-  getTableRows(data) {
-    return data.map(item => `
-      <div class="sortable-table__row">
-        ${this.getTableRow(item, data)}
-      </div>`
-    ).join('');
+  getTableRows(data) { //TODO Плохой способ! Поправить
+    const {pathname} = window.location;
+    return data.map(item => {
+      switch(pathname) {
+        case '/products': {
+          return `
+                <a href="/products/${item.id}" class="sortable-table__row">
+                  ${this.getTableRow(item, data)}
+                </a>
+                `
+        }
+        default: {
+          return `
+                <div class="sortable-table__row">
+                  ${this.getTableRow(item, data)}
+                </div>
+                `
+
+        }
+      }
+    }).join('');
   }
 
   getTableRow(item) {
