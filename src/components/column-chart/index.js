@@ -58,20 +58,27 @@ export default class ColumnChart extends Component {
     this.getChildElementByName('body').removeEventListener('pointermove', this.handleHoverChart);
   }
 
+  handlePointerMove = () => {
+    this.currentChart.classList.add('is-hovered');
+    this.subElements.body.classList.add('has-hovered')
+  }
+
+  handlePointerLeave = () => {
+    this.currentChart.classList.remove('is-hovered');
+    this.subElements.body.classList.remove('has-hovered');
+
+    this.currentChart.removeEventListener('pointermove', this.handlePointerMove);
+    this.currentChart.removeEventListener('pointerleave', this.handlePointerLeave);
+    this.currentChart = null;
+  }
+
   handleHoverChart = ({ target }) => {
     const el = target.closest('[data-tooltip]');
-    const body = this.getChildElementByName('body');
 
     if(el) {
-      el.addEventListener('pointermove', () => {
-        el.classList.add('is-hovered');
-        body.classList.add('has-hovered')
-      })
-
-      el.addEventListener('pointerleave', () => {
-        el.classList.remove('is-hovered');
-        body.classList.remove('has-hovered')
-      })
+      this.currentChart = el;
+      this.currentChart.addEventListener('pointermove', this.handlePointerMove);
+      this.currentChart.addEventListener('pointerleave', this.handlePointerLeave);
     }
   }
 
