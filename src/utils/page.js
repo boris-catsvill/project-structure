@@ -37,16 +37,16 @@ export default class PageComponent extends Component {
   initComponents() {}
 
   renderComponent() {
-    if(!Object.values(this.instanceConponents).length) {
+    if(!Object.values(this.instanceComponents || {}).length) {
       return;
     };
 
     Object.keys(this.subElements).forEach(key => {
-      if (this.instanceComponent[key]) {
+      if (this.instanceComponents[key]) {
         const root = this.subElements[key];
 
-        if(this.instanceComponent[key].element) {
-          root.append(this.instanceComponent[key].element);
+        if(this.instanceComponents[key].element) {
+          root.append(this.instanceComponents[key].element);
         }
       }
     });

@@ -3,7 +3,6 @@ import SortableTable from "../../../components/sortable-table";
 import ProductsFilters from "../../../components/filters";
 
 import header from "./products-header";
-import fetchJson from "../../../utils/fetch-json";
 
 export default class ProductsPage extends PageComponent {
   url = new URL(`${process.env.BACKEND_URL}api/rest/products`);
@@ -42,12 +41,11 @@ export default class ProductsPage extends PageComponent {
 
     const productsFilters = new ProductsFilters();
 
-    this.instanceComponent = {
+    this.instanceComponents = {
       sortableTable,
       productsFilters
     };
 
-    this.instanceConponents = this.instanceComponent;
   }
 
   getBaseQuerySearchParams() {
@@ -70,9 +68,9 @@ export default class ProductsPage extends PageComponent {
   }
 
   handleClearFilter = () => {
-    const { doubleSlider: { setInitalState } } = this.instanceComponent.productsFilters;
-    this.instanceComponent.productsFilters.getChildElementByName('filterName').value = '';
-    this.instanceComponent.productsFilters.getChildElementByName('filterStatus').value = '';
+    const { doubleSlider: { setInitalState } } = this.instanceComponents.productsFilters;
+    this.instanceComponents.productsFilters.getChildElementByName('filterName').value = '';
+    this.instanceComponents.productsFilters.getChildElementByName('filterStatus').value = '';
 
     setInitalState({ from: 0, to: 4000 });
     this.clearAllQueryParams();
@@ -84,16 +82,16 @@ export default class ProductsPage extends PageComponent {
     this.url.searchParams.set('price_gte', 0);
     this.url.searchParams.set('price_lte', 4000);
     
-    this.instanceComponent.sortableTable.deleteUrl('status');
-    this.instanceComponent.sortableTable.deleteUrl('title_like');
-    this.instanceComponent.sortableTable.updateUrl({'price_gte': 0, 'price_lte': 4000 });
+    this.instanceComponents.sortableTable.deleteUrl('status');
+    this.instanceComponents.sortableTable.deleteUrl('title_like');
+    this.instanceComponents.sortableTable.updateUrl({'price_gte': 0, 'price_lte': 4000 });
 
     await this.updateTableData();
   }
 
   async updateTableData() {
     const data = await this.loadData();
-    this.instanceComponent.sortableTable.update(data);
+    this.instanceComponents.sortableTable.update(data);
   }
 
   listenChangeStatusValue = async ({detail}) => {
@@ -101,10 +99,10 @@ export default class ProductsPage extends PageComponent {
 
     if(status) {
       this.url.searchParams.set('status', status);
-      this.instanceComponent.sortableTable.updateUrl({'status': status});
+      this.instanceComponents.sortableTable.updateUrl({'status': status});
     } else {
       this.url.searchParams.delete('status');
-      this.instanceComponent.sortableTable.deleteUrl('status');
+      this.instanceComponents.sortableTable.deleteUrl('status');
     }
 
     await this.updateTableData();
@@ -115,7 +113,7 @@ export default class ProductsPage extends PageComponent {
 
     this.url.searchParams.set('price_gte', from);
     this.url.searchParams.set('price_lte', to);
-    this.instanceComponent.sortableTable.updateUrl({'price_gte': from, 'price_lte': to });
+    this.instanceComponents.sortableTable.updateUrl({'price_gte': from, 'price_lte': to });
 
     await this.updateTableData();
   }
@@ -125,10 +123,10 @@ export default class ProductsPage extends PageComponent {
 
     if(value) {
       this.url.searchParams.set('title_like', value);
-      this.instanceComponent.sortableTable.updateUrl({'title_like': value});
+      this.instanceComponents.sortableTable.updateUrl({'title_like': value});
     } else {
       this.url.searchParams.delete('title_like');
-      this.instanceComponent.sortableTable.deleteUrl('title_like');
+      this.instanceComponents.sortableTable.deleteUrl('title_like');
     }
 
     this.updateTableData();
@@ -136,6 +134,6 @@ export default class ProductsPage extends PageComponent {
 
   async loadData() {
     this.getBaseQuerySearchParams();
-    return await fetchJson(this.url);
+    return await this.fetchJson(this.url);
   }
 }

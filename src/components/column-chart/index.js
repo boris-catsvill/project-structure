@@ -1,7 +1,6 @@
 import Component from '../../utils/component';
-import fetchJson from '../../utils/fetch-json';
 
-const BACKEND_URL = `https://course-js.javascript.ru/`;
+const BACKEND_URL = `${process.env.BACKEND_URL}`;
 
 const MONTH_NAMES = [
   'янв',
@@ -80,7 +79,7 @@ export default class ColumnChart extends Component {
     this.url.searchParams.set('to', new Date(to).toISOString());
     this.url.searchParams.set('from', new Date(from).toISOString());
 
-    const data = await fetchJson(this.url);
+    const data = await this.fetchJson(this.url);
 
     return Object.values(data).length 
       ? data

@@ -38,8 +38,6 @@ export default class ProductsFilters extends Component {
     this.emitEvent('change-status-filter', { status: value }, true);
   }
 
- 
-
   get template() {
     return (
       `<form class="form-inline">

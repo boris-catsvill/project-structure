@@ -1,5 +1,4 @@
 import SortableList from "../../components/sortable-list";
-import fetchJson from "../../utils/fetch-json";
 import NotificationMessage from "../../components/notification";
 import PageComponent from "../../utils/page";
 import CategoryExpandPanel from "../../components/categories";
@@ -20,7 +19,7 @@ export default class CategoriesPage extends PageComponent {
 
   async updateReorderCategory(updateCategoryList) {
     try {
-      await fetchJson(`${process.env.BACKEND_URL}api/rest/subcategories`, {
+      await this.fetchJson(`${process.env.BACKEND_URL}api/rest/subcategories`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json'
@@ -64,7 +63,7 @@ export default class CategoriesPage extends PageComponent {
 
 
   async loadData() {
-    const data = await fetchJson(this.url);
+    const data = await this.fetchJson(this.url);
 
     const categories = data.reduce((acc, { subcategories, id, title }) => {
       acc[id] = { subcategories, title }

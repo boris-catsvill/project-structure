@@ -1,7 +1,7 @@
 import Component from '../../utils/component';
 import SortableList from '../sortable-list';
 import escapeHtml from '../../utils/escape-html';
-import fetchJson from '../../utils/fetch-json';
+
 import flatten from '../../utils/flatten';
 import NotificationMessage from '../notification';
 
@@ -57,7 +57,7 @@ export default class ProductForm extends Component {
 
         formData.append('image', file);
 
-        const response = await fetchJson('https://api.imgur.com/3/image', {
+        const response = await this.fetchJson('https://api.imgur.com/3/image', {
           method: 'POST',
           headers: {
             Authorization: `Client-ID ${IMGUR_CLIENT_ID}`,
@@ -99,7 +99,7 @@ constructor (productId) {
 }
 
 async loadCategories() {
-  const categories = await fetchJson(`${BACKEND_URL}api/rest/categories?_sort=weight&_refs=subcategory`);
+  const categories = await this.fetchJson(`${BACKEND_URL}api/rest/categories?_sort=weight&_refs=subcategory`);
 
   return categories.map((category) => {
     const { subcategories } = category;
@@ -111,7 +111,7 @@ async loadCategories() {
 }
 
 async loadProduct() {
-  const [product] = await fetchJson(`https://course-js.javascript.ru/api/rest/products?id=${this.productId}`);
+  const [product] = await this.fetchJson(`https://course-js.javascript.ru/api/rest/products?id=${this.productId}`);
 
   const keys = Object.keys(this.form);
 
@@ -297,7 +297,7 @@ async save() {
   const headers = {'Content-Type': 'application/json'};
 
   try {
-    await fetchJson(`${BACKEND_URL}api/rest/products`, {
+    await this.fetchJson(`${BACKEND_URL}api/rest/products`, {
       method,
       headers,
       body: this.getFormData(),

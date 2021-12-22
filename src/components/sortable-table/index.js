@@ -1,4 +1,3 @@
-import fetchJson from '../../utils/fetch-json';
 import throttle from '../../utils/throttle';
 import Component from '../../utils/component';
 
@@ -194,7 +193,7 @@ export default class SortableTable extends Component {
       this.refToElement.classList.add('sortable-table_loading');
     }
 
-    const data = await fetchJson(this.url)
+    const data = await this.fetchJson(this.url)
       .finally(() => this.refToElement.classList.remove('sortable-table_loading'));
 
 

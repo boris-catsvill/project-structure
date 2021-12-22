@@ -1,3 +1,5 @@
+import fetchJson from "./fetch-json";
+
 const createElement = (template) => {
   const div = document.createElement('div');
   div.innerHTML = template;
@@ -9,9 +11,12 @@ export default class Component {
   subElements = {};
   _element = null;
 
+  fetchJson = fetchJson;
+
+
   constructor() {
     if (new.target === Component) {
-      throw Error('you cannot create an abstract class');
+      throw Error('you cannot create an abstract class: COMPONENT');
     }
   }
 

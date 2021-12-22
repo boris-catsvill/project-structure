@@ -3,8 +3,6 @@ import RangePicker from '../../components/range-picker/index.js';
 import SortableTable from '../../components/sortable-table';
 
 import PageComponent from '../../utils/page.js';
-
-import fetchJson from '../../utils/fetch-json.js';
 import header from './bestsellers-header.js';
 
 export default class Page extends PageComponent {
@@ -87,15 +85,13 @@ export default class Page extends PageComponent {
     });
 
     
-    this.instanceComponent = {
+    this.instanceComponents = {
       ordersChart,
       customersChart,
       salesChart,
       rangePicker,
       sortableTable
     };
-
-    this.instanceConponents = this.instanceComponent;
   }
 
   updateComponents = async ({ detail }) => {
@@ -103,14 +99,14 @@ export default class Page extends PageComponent {
     const data = await this.loadData(detail);
     
     
-    this.instanceComponent.sortableTable.update(data);
-    this.instanceComponent.salesChart.update(from, to);
-    this.instanceComponent.customersChart.update(from, to);
-    this.instanceComponent.ordersChart.update(from, to);
+    this.instanceComponents.sortableTable.update(data);
+    this.instanceComponents.salesChart.update(from, to);
+    this.instanceComponents.customersChart.update(from, to);
+    this.instanceComponents.ordersChart.update(from, to);
   } 
 
   initEventListeners() {
-    const rangePicker = this.instanceComponent['rangePicker'];
+    const rangePicker = this.instanceComponents['rangePicker'];
     rangePicker.element.addEventListener('date-select', this.updateComponents);
     this.element.addEventListener('clear-filter', this.handleClearFilter);
   }
@@ -123,6 +119,6 @@ export default class Page extends PageComponent {
     this.url.searchParams.set('from', from.toISOString());
     this.url.searchParams.set('to', to.toISOString());
 
-    return fetchJson(this.url);
+    return this.fetchJson(this.url);
   }
 }

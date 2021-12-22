@@ -1,7 +1,7 @@
 import RangePicker from "../../components/range-picker";
 import SortableTable from "../../components/sortable-table";
-import fetchJson from "../../utils/fetch-json";
 import PageComponent from "../../utils/page";
+
 import header from "./sales-header";
 
 export default class SalesPage extends PageComponent {
@@ -53,22 +53,27 @@ export default class SalesPage extends PageComponent {
       hasInfinityScroll: true
     });
 
-    this.instanceComponent = {
+    this.instanceComponents = {
       rangePicker,
       sortableTable
     };
-
-    this.instanceConponents = this.instanceComponent;
   }
 
   updateComponents = async ({ detail }) => {
     const data = await this.loadData(detail);
-    this.instanceComponent.sortableTable.update(data);
+    this.instanceComponents.sortableTable.update(data);
   }
 
   initEventListeners() {
-    const rangePicker = this.instanceComponent['rangePicker'];
-    rangePicker.element.addEventListener('date-select', this.updateComponents);
+    const { rangePicker: { element }} = this.instanceComponents;
+    element.addEventListener('date-select', this.updateComponents);
+    this.element.addEventListener('clear-filter', this.handleClearFilter);
+  }
+
+  removeEventListeners() {
+    const { rangePicker: { element }} = this.instanceComponents;
+
+    element.addEventListener('date-select', this.updateComponents);
     this.element.addEventListener('clear-filter', this.handleClearFilter);
   }
 
@@ -79,6 +84,6 @@ export default class SalesPage extends PageComponent {
     this.url.searchParams.set('createdAt_gte', from.toISOString());
     this.url.searchParams.set('createdAt_lte', to.toISOString());
 
-    return fetchJson(this.url);
+    return this.fetchJson(this.url);
   }
 }
