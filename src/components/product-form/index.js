@@ -58,7 +58,6 @@ export default class ProductForm {
       }
     };
 
-    // must be in body for IE
     fileInput.hidden = true;
     document.body.appendChild(fileInput);
     fileInput.click();
@@ -170,7 +169,6 @@ export default class ProductForm {
 
     const [categoriesData, productResponse] = await Promise.all([categoriesPromise, productPromise]);
     const [productData] = productResponse;
-
     this.formData = productData;
     this.categories = categoriesData;
 
@@ -190,7 +188,7 @@ export default class ProductForm {
       : this.getEmptyTemplate();
 
     this.element = element.firstElementChild;
-    this.subElements = this.getSubElements(element);
+    this.subElements = this.getSubElements(element)
   }
 
   getEmptyTemplate() {
@@ -253,7 +251,6 @@ export default class ProductForm {
     const {productForm} = this.subElements;
     const excludedFields = ['images'];
     const fields = Object.keys(this.defaultFormData).filter(item => !excludedFields.includes(item));
-
     fields.forEach(item => {
       const element = productForm.querySelector(`#${item}`);
 
@@ -315,13 +312,13 @@ export default class ProductForm {
     wrapper.innerHTML = `
       <li class="products-edit__imagelist-item sortable-list__item">
         <span>
-          <img src="icon-grab.svg" data-grab-handle alt="grab">
+          <img src="/icon-grab.svg" data-grab-handle alt="grab">
           <img class="sortable-table__cell-img" alt="${escapeHtml(name)}" src="${escapeHtml(url)}">
           <span>${escapeHtml(name)}</span>
         </span>
 
         <button type="button">
-          <img src="icon-trash.svg" alt="delete" data-delete-handle>
+          <img src="/icon-trash.svg" alt="delete" data-delete-handle>
         </button>
       </li>`;
 
@@ -335,13 +332,13 @@ export default class ProductForm {
     uploadImage.addEventListener('click', this.uploadImage);
   }
 
+  remove() {
+    this.element.remove();
+  }
+
   destroy() {
     this.remove();
     this.element = null;
     this.subElements = null;
-  }
-
-  remove() {
-    this.element.remove();
   }
 }

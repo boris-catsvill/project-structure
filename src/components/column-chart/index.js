@@ -4,86 +4,113 @@ export default class ColumnChart {
   chartHeight = 50;
 
   constructor({
-    data = [],
-    label = '',
-    link = '',
-    value = 0
-  } = {}) {
+                data = [],
+                url = '/',
+                label = '',
+                value = 0,
+                formatHeading = (value) => value,
+                link = '',
+                range = {}
+              } = {}) {
+
     this.data = data;
     this.label = label;
-    this.link = link;
     this.value = value;
+    this.link = link;
+    this.formatHeading = formatHeading;
+    this.url = url;
+    this.range = range;
 
     this.render();
   }
 
-  getColumnBody(data) {
-    const maxValue = Math.max(...data);
+  async getData() {
+    const url = new URL(this.url, `${process.env.BACKEND_URL}`);
+    if (this.range.from) {
+      url.searchParams.append('from', this.range.from);
+    }
+    if (this.range.to) {
+      url.searchParams.append('to', this.range.to);
+    }
+    const result = await fetch(url.toString());
+    return result.json();
+  }
 
-    return data
-    .map(item => {
-      const scale = this.chartHeight / maxValue;
+  getColumn(data) {
+    const chooseData = Object.values(data);
+    const maxValue = Math.max(...chooseData);
+    return chooseData.map(item => {
+      const size = this.chartHeight / maxValue;
       const percent = (item / maxValue * 100).toFixed(0);
-
-      return `<div style="--value: ${Math.floor(item * scale)}" data-tooltip="${percent}%"></div>`;
+      return `<div style='--value: ${Math.floor(item * size)}' data-tooltip='${percent}%'></div>`;
     })
-    .join('');
+      .join('');
   }
 
   getLink() {
-    return this.link ? `<a class="column-chart__link" href="${this.link}">View all</a>` : '';
+    return this.link ? `<a class='column-chart__link' href='${this.link}'>View all</a>` : '';
   }
 
-  get template () {
-    return `
-      <div class="column-chart column-chart_loading" style="--chart-height: ${this.chartHeight}">
-        <div class="column-chart__title">
-          Total ${this.label}
-          ${this.getLink()}
-        </div>
-        <div class="column-chart__container">
-          <div data-element="header" class="column-chart__header">
-            ${this.value}
-          </div>
-          <div data-element="body" class="column-chart__chart">
-            ${this.getColumnBody(this.data)}
-          </div>
-        </div>
-      </div>
-    `;
+  getTemplate() {
+    return (
+      `<div class='column-chart column-chart_loading'>
+         <div class='column-chart__title'>
+             Total ${this.label}
+             ${this.getLink()}
+         </div>
+         <div class='column-chart__container'>
+           <div data-element='header' class = 'column-chart__header'>
+           </div>
+           <div data-element='body' class='column-chart__chart' style='--value: ${this.chartHeight}'>
+             ${this.getColumn(this.data)}
+           </div>
+         </div>
+    </div>`);
+  }
+
+  async load() {
+    this.data = await this.getData();
+    this.total = Object.values(this.data).reduce((sum, current) => sum + current, 0);
+    this.subElements.body.innerHTML = this.getColumn(this.data);
+    this.subElements.header.innerHTML = this.formatHeading(this.total);
+    if (Object.values(this.data).length) {
+      this.element.classList.remove('column-chart_loading');
+    }
+    return this.data;
   }
 
   async render() {
     const element = document.createElement('div');
-
-    element.innerHTML = this.template;
+    element.innerHTML = this.getTemplate();
     this.element = element.firstElementChild;
-
-    if (this.data.length) {
-      this.element.classList.remove(`column-chart_loading`);
-    }
-
-    this.subElements = this.getSubElements(this.element);
-
-    return this.element;
+    this.subElements = this.getDataElements(this.element);
+    await this.load();
   }
 
-  getSubElements (element) {
+  getDataElements(element) {
     const elements = element.querySelectorAll('[data-element]');
-
-    return [...elements].reduce((accum, subElement) => {
-      accum[subElement.dataset.element] = subElement;
-
-      return accum;
-    }, {});
+    return [...elements]
+      .reduce(
+        (acc, elem) => ({
+          ...acc,
+          [elem.dataset.element]: elem
+        }),
+        {}
+      );
   }
 
-  update ({headerData, bodyData}) {
-    this.subElements.header.textContent = headerData;
-    this.subElements.body.innerHTML = this.getColumnBody(bodyData);
+  async update(range) {
+    this.range = range;
+    await this.load();
+    return this.data;
+  }
+
+  remove() {
+    this.element.remove();
   }
 
   destroy() {
-    this.element.remove();
+    this.remove();
+    this.subElements = {};
   }
 }

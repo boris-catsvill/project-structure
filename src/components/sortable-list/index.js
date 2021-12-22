@@ -16,19 +16,15 @@ export default class SortableList {
       for (let i = 0; i < children.length; i++) {
         const li = children[i];
 
-        // ignore to prevent bugs when dragging between elements
         if (li !== this.draggingElem) {
           const {top, bottom} = li.getBoundingClientRect();
           const {offsetHeight: height} = li;
 
           if (clientY > top && clientY < bottom) {
-            // inside the element (y-axis)
             if (clientY < top + height / 2) {
-              // upper half of the element
               this.movePlaceholderAt(i);
               break;
             } else {
-              // lower half of the element
               this.movePlaceholderAt(i + 1);
               break;
             }
@@ -63,7 +59,6 @@ export default class SortableList {
   }
 
   addItems() {
-    // item is a DOM element
     for (let item of this.items) {
       item.classList.add('sortable-list__item');
     }
@@ -72,7 +67,7 @@ export default class SortableList {
   }
 
   onPointerDown(event) {
-    if (event.which !== 1) { // must be left-button
+    if (event.which !== 1) {
       return false;
     }
 
@@ -106,8 +101,6 @@ export default class SortableList {
     this.placeholderElem = document.createElement('li');
     this.placeholderElem.className = 'sortable-list__placeholder';
 
-    // itemElem will get position:fixed
-    // so its width will be auto-set to fit the parent container
     itemElem.style.width = `${itemElem.offsetWidth}px`;
     itemElem.style.height = `${itemElem.offsetHeight}px`;
 
@@ -118,7 +111,6 @@ export default class SortableList {
 
     itemElem.after(this.placeholderElem);
 
-    // move to the end, to be over other list elements
     this.element.append(itemElem);
 
     this.moveDraggingAt(clientX, clientY);
@@ -154,7 +146,6 @@ export default class SortableList {
   dragStop() {
     const placeholderIndex = [...this.element.children].indexOf(this.placeholderElem);
 
-    // drop element back
     this.placeholderElem.replaceWith(this.draggingElem);
     this.draggingElem.classList.remove('sortable-list__item_dragging');
 
@@ -171,7 +162,7 @@ export default class SortableList {
     if (placeholderIndex !== this.elementInitialIndex) {
       this.element.dispatchEvent(new CustomEvent('sortable-list-reorder', {
         bubbles: true,
-        details: {
+        detail: {
           from: this.elementInitialIndex,
           to: placeholderIndex
         }

@@ -24,7 +24,7 @@ export default class RangePicker {
     this.showDateFrom = new Date(from);
     this.selected = {from, to};
 
-    this.render();
+    void this.render();
   }
 
   get template () {
@@ -249,7 +249,6 @@ export default class RangePicker {
 
   remove () {
     this.element.remove();
-    // TODO: Warning! To remove listener  MUST be passes the same event phase
     document.removeEventListener('click', this.onDocumentClick, true);
   }
 
