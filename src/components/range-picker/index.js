@@ -144,7 +144,12 @@ export default class RangePicker extends Component {
     const to = new Date(this.selected.to).getDate();
 
     if(from > to) {
-      detail.to = detail.from;
+      const detail = {
+        to: this.selected.from,
+        from: this.selected.to
+      };
+
+      return this.emitEvent('date-select', detail, true);
     };
 
     this.emitEvent('date-select', detail, true);

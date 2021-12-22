@@ -57,7 +57,6 @@ export default class PageComponent extends Component {
   beforeMountedPage() {}
 
   async render() {
-    // тут колбеки 'жизненного цикла экрана'
     await this.beforePageRender();
     this.element = this.createElement(this.template);
 
