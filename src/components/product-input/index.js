@@ -59,8 +59,8 @@ export default class ProductInput {
   }
 
   onPointerDownThumbLeft = () => {
-    const onPointerMove = (e) => {
-      let finishPosition = Math.round((e.clientX - this.subElements.inner.getBoundingClientRect().left) / this.subElements.inner.offsetWidth * 100);
+    const onPointerMove = (event) => {
+      let finishPosition = Math.round((event.clientX - this.subElements.inner.getBoundingClientRect().left) / this.subElements.inner.offsetWidth * 100);
       if (finishPosition < 0) finishPosition = 0;
       if (finishPosition > (100 - this.thumbRightPosition)) finishPosition = 100 - this.thumbRightPosition;
       this.subElements.thumbLeft.style.left = finishPosition + '%';
@@ -79,8 +79,8 @@ export default class ProductInput {
   }
 
   onPointerDownThumbRight = () => {
-    const onPointerMove = (e) => {
-      let finishPosition = Math.round((this.subElements.inner.getBoundingClientRect().right - e.clientX) / this.subElements.inner.offsetWidth * 100);
+    const onPointerMove = (event) => {
+      let finishPosition = Math.round((this.subElements.inner.getBoundingClientRect().right - event.clientX) / this.subElements.inner.offsetWidth * 100);
       if (finishPosition < 0) finishPosition = 0;
       if (finishPosition > (100 - this.thumbLeftPosition)) finishPosition = 100 - this.thumbLeftPosition;
       this.subElements.thumbRight.style.right = finishPosition + '%';
@@ -98,8 +98,8 @@ export default class ProductInput {
     document.addEventListener('pointerup', onPointerUp);
   }
 
-  onStatusChange = (e) => {
-    this.status = e.target.value || 3;
+  onStatusChange = (event) => {
+    this.status = event.target.value || 3;
     this.dispatchEvent();
   }
 
@@ -120,8 +120,8 @@ export default class ProductInput {
     this.subElements.thumbRight.addEventListener('pointerdown', this.onPointerDownThumbRight);
     this.subElements.filterStatus.addEventListener('change', this.onStatusChange);
     this.subElements.filterName.addEventListener('input', this.onInputChange)
-    this.subElements.productInputs.addEventListener('submit', (e) => {
-      e.preventDefault();
+    this.subElements.productInputs.addEventListener('submit', (event) => {
+      event.preventDefault();
       this.dispatchEvent();
     });
   }

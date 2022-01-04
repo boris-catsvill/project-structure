@@ -38,7 +38,7 @@ export default class Page {
   initComponents() {
     this.components.sortableTable = new SortableTable(header, {
       url: 'api/rest/products',
-      page: 'products',
+      isLinkToProductExist: true,
     });
 
     this.components.productInput = new ProductInput();

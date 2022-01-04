@@ -177,17 +177,17 @@ export default class ProductForm {
     `;
   }
 
-  uploadImage = async (e) => {
-    e.preventDefault();
-    const [file] = e.target.files;
+  uploadImage = async (event) => {
+    event.preventDefault();
+    const [file] = event.target.files;
 
     if (file) {
       const formData = new FormData();
       formData.append('image', file);
       const url = 'https://api.imgur.com/3/image';
 
-      e.target.classList.add('is-loading');
-      e.target.disabled = true;
+      event.target.classList.add('is-loading');
+      event.target.disabled = true;
       const result = await fetchJson(url, {
         method: 'POST',
         headers: {
@@ -205,10 +205,10 @@ export default class ProductForm {
       this.imagesArray.push(newImage);
       this.updateImageList(this.imagesArray);
 
-      e.target.classList.remove('is-loading');
-      e.target.disabled = false;
+      event.target.classList.remove('is-loading');
+      event.target.disabled = false;
 
-      e.target.remove();
+      event.target.remove();
     }
   }
 
@@ -283,8 +283,8 @@ export default class ProductForm {
     this.element.dispatchEvent(event);
   }
 
-  sendProductInfo = async (e) => {
-    e.preventDefault();
+  sendProductInfo = async (event) => {
+    event.preventDefault();
     const url = `${process.env.BACKEND_URL}api/rest/products`;
     const data = this.getFormData();
     try {
@@ -298,7 +298,7 @@ export default class ProductForm {
 
       this.dispatchEvent(result.id);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
 
   }

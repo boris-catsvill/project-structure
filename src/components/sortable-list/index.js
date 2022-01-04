@@ -6,16 +6,16 @@ export default class SortableList {
     this.render();
   }
 
-  onPointerDown = (e) => {
-    if (!e.target.closest('.sortable-list__item')) return;
+  onPointerDown = (event) => {
+    if (!event.target.closest('.sortable-list__item')) return;
 
-    if (e.target.dataset.deleteHandle !== undefined) {
-      e.target.closest('.sortable-list__item').remove();
+    if (event.target.dataset.deleteHandle !== undefined) {
+      event.target.closest('.sortable-list__item').remove();
     }
 
-    if ((e.target.dataset.grabHandle !== undefined
-      || e.target.closest('.sortable-list__item').dataset.grabHandle !== undefined)) {
-      const target = e.target.closest('.sortable-list__item');
+    if ((event.target.dataset.grabHandle !== undefined
+      || event.target.closest('.sortable-list__item').dataset.grabHandle !== undefined)) {
+      const target = event.target.closest('.sortable-list__item');
       const elementWidth = target.offsetWidth;
       const elementHeight = target.offsetHeight;
       this.draggingElement = target;
@@ -25,20 +25,20 @@ export default class SortableList {
       const placeholder = this.getPlaceholder(this.draggingElement.offsetHeight);
       this.draggingElement.after(placeholder);
 
-      const shiftY = e.clientY - this.draggingElement.getBoundingClientRect().top;
-      const shiftX = e.clientX - this.draggingElement.getBoundingClientRect().left;
+      const shiftY = event.clientY - this.draggingElement.getBoundingClientRect().top;
+      const shiftX = event.clientX - this.draggingElement.getBoundingClientRect().left;
 
       this.draggingElement.classList.add('sortable-list__item_dragging');
       this.draggingElement.style.width = elementWidth + 'px';
       this.draggingElement.style.height = elementHeight + 'px';
-      this.draggingElement.style.top = e.clientY - shiftY + 'px';
-      this.draggingElement.style.left = e.clientX - shiftX + 'px';
+      this.draggingElement.style.top = event.clientY - shiftY + 'px';
+      this.draggingElement.style.left = event.clientX - shiftX + 'px';
 
       this.element.append(this.draggingElement);
 
-      const onPointerMove = (e) => {
-        const clientX = e.clientX - shiftX;
-        const clientY = e.clientY - shiftY;
+      const onPointerMove = (event) => {
+        const clientX = event.clientX - shiftX;
+        const clientY = event.clientY - shiftY;
         this.draggingElement.style.top = clientY + 'px';
         this.draggingElement.style.left = clientX + 'px';
 

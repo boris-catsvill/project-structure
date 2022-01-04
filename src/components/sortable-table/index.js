@@ -13,13 +13,14 @@ export default class SortableTable {
   costFrom;
   searchString;
   status;
+  anyStatus = 3;
 
   constructor(
     headerConfig = [],
     {
       url = '',
       isSortLocally = false,
-      page = 'sales',
+      isLinkToProductExist = false,
     },
     sorted = {}) {
     this.headerConfig = headerConfig;
@@ -28,7 +29,7 @@ export default class SortableTable {
     this.latestOrder = order;
     this.latestId = id;
     this.isSortLocally = isSortLocally;
-    this.page = page;
+    this.isLinkToProductExist = isLinkToProductExist;
 
     this.render();
   }
@@ -75,7 +76,7 @@ export default class SortableTable {
 
   getBodyRows(data) {
     return data.map((item) => {
-      if (this.page !== 'sales') {
+      if (this.isLinkToProductExist) {
         return `
         <a href="/products/${item.id}" class="sortable-table__row">
           ${this.getBodyRow(item)}
@@ -132,14 +133,16 @@ export default class SortableTable {
   }
 
   changeOrder(order) {
-    let newOrder;
-    if (order === 'asc') newOrder = 'desc';
-    if (order === 'desc') newOrder = 'asc';
-    return newOrder;
+    const orders = {
+      asc: 'desc',
+      desc: 'asc'
+    };
+
+    return orders[order];
   }
 
-  sortListener = (e) => {
-    const column = e.target.closest('[data-sortable="true"]');
+  sortListener = (event) => {
+    const column = event.target.closest('[data-sortable="true"]');
     const allColumns = this.element.querySelectorAll('.sortable-table__cell[data-id]');
 
     if (column) {
@@ -181,8 +184,8 @@ export default class SortableTable {
     }
   }
 
-  searchListener = async (e) => {
-    const { detail: { price_gte, price_lte, title_like, status } } = e;
+  searchListener = async (event) => {
+    const { detail: { price_gte, price_lte, title_like, status } } = event;
     this.costFrom = price_gte;
     this.costTo = price_lte;
     this.searchString = title_like;
@@ -200,8 +203,8 @@ export default class SortableTable {
     if (priceFrom !== undefined && !Number.isNaN(priceFrom)) this.url.searchParams.set('price_gte', priceFrom);
     if (priceTo !== undefined && !Number.isNaN(priceTo)) this.url.searchParams.set('price_lte', priceTo);
     if (searchString) this.url.searchParams.set('title_like', searchString);
-    if (status === 3) this.url.searchParams.delete('status');
-    if (status && status !== 3) this.url.searchParams.set('status', status);
+    if (status === this.anyStatus) this.url.searchParams.delete('status');
+    if (status && status !== this.anyStatus) this.url.searchParams.set('status', status);
 
     if (this.element) {
       this.element.classList.add('sortable-table_loading');

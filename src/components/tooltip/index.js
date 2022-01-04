@@ -1,6 +1,7 @@
 class Tooltip {
   static _instance;
   element;
+  shift = 10;
 
   constructor() {
     if (Tooltip._instance) {
@@ -19,13 +20,13 @@ class Tooltip {
     document.body.append(this.element);
   }
 
-  onPointerMove = (e) => {
-    this.element.style.top = `${(e.clientY + 10).toString()}px`;
-    this.element.style.left = `${(e.clientX + 10).toString()}px`;
+  onPointerMove = (event) => {
+    this.element.style.top = `${(event.clientY + this.shift).toString()}px`;
+    this.element.style.left = `${(event.clientX + this.shift).toString()}px`;
   }
 
-  onPointerOver = (e) => {
-    const element = e.target.closest('[data-tooltip]');
+  onPointerOver = (event) => {
+    const element = event.target.closest('[data-tooltip]');
     if (element) {
       this.render(element.dataset.tooltip);
       document.addEventListener('pointermove', this.onPointerMove);

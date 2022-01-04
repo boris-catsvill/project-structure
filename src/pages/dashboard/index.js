@@ -3,6 +3,7 @@ import SortableTable from '../../components/sortable-table/index.js';
 import ColumnChart from '../../components/column-chart/index.js';
 import header from '../bestsellers-header';
 import getSubElements from '../../utils/getSubElements';
+import NotificationMessage from '../../components/notification';
 
 import fetchJson from '../../utils/fetch-json.js';
 
@@ -69,7 +70,7 @@ export default class Page {
     const sortableTable = new SortableTable(header, {
       url: `api/dashboard/bestsellers?_start=1&_end=20&from=${from.toISOString()}&to=${to.toISOString()}`,
       isSortLocally: true,
-      page: 'dashboard',
+      isLinkToProductExist: true,
     });
 
     const ordersChart = new ColumnChart({
@@ -111,6 +112,8 @@ export default class Page {
       customersChart,
       rangePicker
     };
+
+    this.message = new NotificationMessage('Что-то пошло не так, попробуйте перезагрузить страницу', { duration: 1500, type: 'error show'});
   }
 
   initEventListeners () {
@@ -118,7 +121,10 @@ export default class Page {
       const { from, to } = event.detail;
 
       this.updateComponents(from, to)
-        .catch((error) => console.error(error));
+        .catch((error) => {
+          this.message.show();
+          console.error(error);
+        });
     });
   }
 

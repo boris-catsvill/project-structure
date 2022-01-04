@@ -71,11 +71,7 @@ export default class ColumnChart {
   }
 
   getTotalSum(data) {
-    let sum = 0;
-    Object.values(data).map((value) => {
-      sum += value;
-    });
-    return sum;
+    return Object.values(data).reduce(((previousValue, currentValue) => previousValue + currentValue));
   }
 
   async update(from, to) {
@@ -96,14 +92,14 @@ export default class ColumnChart {
   }
 
   initEventListeners() {
-    this.subElements.body.addEventListener('mouseover', (e) => {
+    this.subElements.body.addEventListener('mouseover', (event) => {
       this.subElements.body.classList.add('has-hovered');
-      e.target.classList.add('is-hovered');
+      event.target.classList.add('is-hovered');
     });
 
-    this.subElements.body.addEventListener('mouseout', (e) => {
+    this.subElements.body.addEventListener('mouseout', (event) => {
       this.subElements.body.classList.remove('has-hovered');
-      e.target.classList.remove('is-hovered');
+      event.target.classList.remove('is-hovered');
     });
   }
 

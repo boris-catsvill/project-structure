@@ -44,7 +44,6 @@ export default class Page {
     this.components.sortableTable = new SortableTable(header, {
       url: `api/rest/orders?_start=1&_end=30&createdAt_gte=${from.toISOString()}&createdAt_lte=${to.toISOString()}`,
       isSortLocally: false,
-      page: 'sales',
     });
   }
 
