@@ -190,8 +190,13 @@ export default class ProductForm {
     const productData = this.productId ? data : this.defaultFormData;
 
     for (const key of fields) {
-      const value = productData[key];
-      this.subElements.productForm.querySelector(`#${key}`).value = typeof value === 'string' ? unescapeHtml(value) : value;
+      let value = productData[key];
+
+      if (typeof value === 'string') {
+        value = unescapeHtml(value);
+      }
+
+      this.subElements.productForm.querySelector(`#${key}`).value = value;
     }
 
     if (productData.images) {
@@ -275,7 +280,7 @@ export default class ProductForm {
   }
 
   onFileChange = async (event) => {
-    const file = event.target.files[0];
+    const [file] = event.target.files;
     const button = this.element.querySelector('[name="uploadImage"]');
 
     button.classList.add('is-loading');
@@ -318,13 +323,11 @@ export default class ProductForm {
 
     result.images = [];
     const images = this.subElements.imageListContainer.querySelectorAll('li');
-    if (images.length) {
-      for (const image of images) {
-        result.images.push({
-          source: image.querySelector('[name="source"]').value,
-          url: image.querySelector('[name="url"]').value
-        });
-      }
+    for (const image of images) {
+      result.images.push({
+        source: image.querySelector('[name="source"]').value,
+        url: image.querySelector('[name="url"]').value
+      });
     }
 
     return result;

@@ -36,8 +36,8 @@ export default class Categories {
   async loadCategoriesData() {
     const url = new URL(this.apiCategoriesUrl, BACKEND_URL);
 
-    for (const key in this.apiCategoriesParams) {
-      url.searchParams.set(key, this.apiCategoriesParams[key]);
+    for (const [key, value] of Object.entries(this.apiCategoriesParams)) {
+      url.searchParams.set(key, value);
     }
 
     const data = await fetchJson(url);

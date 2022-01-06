@@ -106,7 +106,7 @@ export default class SortableTable {
     const sortType = sortFieldConfig ? sortFieldConfig.sortType : 'number';
     const direction = this.directions[order];
 
-    const sortedData = [...this.data].sort(function (a, b) {
+    const sortedData = [...this.data].sort((a, b) => {
       switch (sortType) {
         case 'number':
           return direction * (a[field] - b[field]);
@@ -282,6 +282,7 @@ export default class SortableTable {
     if (this.element) {
       this.element.remove();
     }
+    window.removeEventListener('scroll', this.onWindowScroll);
     this.element = null;
   }
 }

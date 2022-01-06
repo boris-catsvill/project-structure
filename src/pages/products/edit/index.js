@@ -4,12 +4,12 @@ export default class Page {
   element;
   subElements = {};
   components = {};
-  productId;
+
+  constructor(match) {
+    this.productId = match[1] || null;
+  }
 
   async render() {
-    const pathArr = decodeURI(window.location.pathname).split('/');
-    this.productId = pathArr[2];
-
     const element = document.createElement('div');
 
     element.innerHTML = this.template;
@@ -39,8 +39,8 @@ export default class Page {
     </div>`;
   }
 
-  async initComponents() {
-    this.components.productFrom = new ProductForm(this.productId !== 'add' ? this.productId : null);
+  initComponents() {
+    this.components.productFrom = new ProductForm(this.productId);
   }
 
   renderComponents() {

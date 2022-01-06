@@ -10,13 +10,18 @@ export default class Page {
   components = {};
 
   async updateTableComponent (from, to) {
-    const data = await fetchJson(`${process.env.BACKEND_URL}api/rest/orders?createdAt_gte=${from.toISOString()}&createdAt_lte=${to.toISOString()}`);
+    const url = new URL('api/rest/orders', process.env.BACKEND_URL);
+    url.searchParams.set('createdAt_gte', from.toISOString());
+    url.searchParams.set('createdAt_lte', to.toISOString());
+
+    const data = await fetchJson(url);
     this.components.sortableTable.update(data, false);
   }
 
-  async initComponents () {
+  initComponents () {
     const to = new Date();
-    const from = new Date(to.getTime() - (30 * 24 * 60 * 60 * 1000));
+    const from = new Date();
+    from.setMonth(to.getMonth() - 1);
 
     const rangePicker = new RangePicker({
       from,

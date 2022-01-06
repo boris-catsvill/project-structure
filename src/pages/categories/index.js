@@ -5,7 +5,7 @@ export default class Page {
   subElements = {};
   components = {};
 
-  async initComponents () {
+  initComponents () {
     const categories = new Categories();
 
     this.components.Categories = categories;

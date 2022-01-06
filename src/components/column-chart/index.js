@@ -1,5 +1,3 @@
-import fetchJson from '../../utils/fetch-json.js';
-
 export default class ColumnChart {
   chartHeight = 50;
   subElements = {};
@@ -7,7 +5,6 @@ export default class ColumnChart {
 
   constructor({
                 data = [],
-                //url = '',
                 label = '',
                 link = '',
                 value = 0,
@@ -17,7 +14,6 @@ export default class ColumnChart {
                 },
                 formatHeading = (value) => value
               } = {}) {
-    //this.url = new URL(url, process.env.BACKEND_URL);
     this.label = label;
     this.link = link;
     this.value = value;
@@ -49,7 +45,7 @@ export default class ColumnChart {
 
   renderHeader(data = this.data) {
     const values = Object.values(data);
-    const total = values.length ? values.reduce((a, b) => a + b) : 0;
+    const total = values.reduce((a, b) => a + b, 0);
 
     return this.formatHeading(total);
   }
@@ -100,7 +96,7 @@ export default class ColumnChart {
     const {headerData, bodyData} = data;
 
     if (bodyData && Object.values(bodyData).length) {
-      this.subElements.header.innerHTML = headerData ? headerData : this.renderHeader(bodyData);
+      this.subElements.header.innerHTML = headerData || this.renderHeader(bodyData);
       this.subElements.body.innerHTML = this.renderCol(bodyData);
 
       this.element.classList.remove(this.loadingCssClass);
