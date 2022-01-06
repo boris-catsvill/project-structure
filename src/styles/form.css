@@ -81,6 +81,10 @@ form.form-grid .form-control {
   width: 100%;
 }
 
+form .form-control::placeholder {
+  color: var(--grey-light);
+}
+
 form textarea {
   resize: none;
   min-height: 186px;

@@ -25,7 +25,7 @@ export default class Page {
 
   async updateTableComponent (from, to) {
     const data = await fetchJson(`${process.env.BACKEND_URL}api/dashboard/bestsellers?_start=1&_end=20&from=${from.toISOString()}&to=${to.toISOString()}`);
-    this.components.sortableTable.addRows(data);
+    this.components.sortableTable.update(data, false);
   }
 
   async updateChartsComponents (from, to) {
@@ -41,7 +41,9 @@ export default class Page {
 
   async initComponents () {
     const to = new Date();
-    const from = new Date(to.getTime() - (30 * 24 * 60 * 60 * 1000));
+    const from = new Date();
+    from.setMonth(to.getMonth() - 1);
+
     const [ordersData, salesData, customersData] = await this.getDataForColumnCharts(from, to);
 
     const rangePicker = new RangePicker({
@@ -65,6 +67,7 @@ export default class Page {
       data: salesData,
       label: 'sales',
       value: '$' + salesData.reduce((accum, item) => accum + item),
+      formatHeading: data => `$${data.toLocaleString('en-US')}`
     });
 
     const customersChart = new ColumnChart({
