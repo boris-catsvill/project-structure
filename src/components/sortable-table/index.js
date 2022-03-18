@@ -68,6 +68,7 @@ export default class SortableTable {
     isSortLocally = false,
     step = 20,
     start = 1,
+    rowWrapper = null,
     end = start + step
   } = {}) {
 
@@ -78,6 +79,7 @@ export default class SortableTable {
     this.step = step;
     this.start = start;
     this.end = end;
+    this.rowWrapper = rowWrapper;
 
     this.render();
   }
@@ -164,6 +166,10 @@ export default class SortableTable {
   }
 
   getTableRows(data) {
+    if (this.rowWrapper) {
+      return data.map(item => this.rowWrapper(item, this.getTableRow(item, data))).join('');
+    }
+
     return data.map(item => `
       <div class="sortable-table__row">
         ${this.getTableRow(item, data)}
