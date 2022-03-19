@@ -43,7 +43,8 @@ export default class ProductForm {
         const result = await fetchJson('https://api.imgur.com/3/image', {
           method: 'POST',
           headers: {
-            Authorization: `Client-ID ${process.env.IMGUR_CLIENT_ID}`
+            Authorization: `Client-ID ${process.env.IMGUR_CLIENT_ID}`,
+            referer: 'https://course-js.javascript.ru/'
           },
           body: formData,
         });
