@@ -1,4 +1,5 @@
 import SortableList from '../../components/sortable-list/index.js';
+import NotificationMessage from '../../components/notification/index.js';
 
 import fetchJson from '../../utils/fetch-json.js';
 
@@ -100,11 +101,19 @@ export default class Page {
         return category;
       });
 
-      // TODO: add success popper
-      console.log('SUCCESS');
+      const notification = new NotificationMessage('Categories updated!', {
+        duration: 2000,
+        type: 'success'
+      });
+  
+      notification.show();
     } catch (error) {
-      // TODO: add error popper
-      console.error(error);
+      const notification = new NotificationMessage(error.message, {
+        duration: 2000,
+        type: 'error'
+      });
+  
+      notification.show();
     }
   }
 

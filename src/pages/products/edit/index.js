@@ -1,4 +1,5 @@
 import ProductForm from "../../../components/product-form";
+import NotificationMessage from "../../../components/notification";
 
 export default class Page {
   element;
@@ -54,8 +55,12 @@ export default class Page {
 
   initEventListeners () {
     this.components.productFrom.element.addEventListener('product-updated', () => {
-      // ToDo: show success modal
-      console.log('success');
+      const notification = new NotificationMessage('Product updated!', {
+        duration: 2000,
+        type: 'success'
+      });
+  
+      notification.show();
     });
   }
 

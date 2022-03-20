@@ -1,4 +1,5 @@
 import ProductForm from "../../../components/product-form";
+import Notification from "../../../components/notification";
 import Router from "../../../router";
 
 export default class Page {
@@ -53,9 +54,15 @@ export default class Page {
     this.components.productFrom.element.addEventListener('product-saved', event => {
       const id = event.detail;
 
-      const router = new Router();
+      const notification = new Notification('Product created!', {
+        duration: 2000,
+        type: 'success'
+      });
+  
+      notification.show();
 
-      // ToDo: fix page not loading
+      const router = Router.instance();
+
       router.navigate(`/products/${id}`);
     });
   }

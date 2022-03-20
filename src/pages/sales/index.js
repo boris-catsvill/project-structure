@@ -2,16 +2,14 @@ import RangePicker from '../../components/range-picker/index.js';
 import SortableTable from '../../components/sortable-table/index.js';
 import header from './sales-header.js';
 
-import fetchJson from '../../utils/fetch-json.js';
-
 export default class Page {
   element;
   subElements = {};
   components = {};
 
   async updateTableComponent (from, to) {
-    const data = await fetchJson(`${process.env.BACKEND_URL}api/rest/orders?_start=1&_end=30&createdAt_gte=${from.toISOString()}&createdAt_lte=${to.toISOString()}`);
-    this.components.sortableTable.addRows(data);
+    this.components.sortableTable.url = `api/rest/orders?createdAt_gte=${from.toISOString()}&createdAt_lte=${to.toISOString()}`;
+    this.components.sortableTable.update();
   }
 
   async initComponents () {
@@ -24,7 +22,7 @@ export default class Page {
     });
 
     const sortableTable = new SortableTable(header, {
-      url: `api/rest/orders?_start=1&_end=30&createdAt_gte=${from.toISOString()}&createdAt_lte=${to.toISOString()}`,
+      url: `api/rest/orders?createdAt_gte=${from.toISOString()}&createdAt_lte=${to.toISOString()}`,
       isSortLocally: false,
       step: 30
     });

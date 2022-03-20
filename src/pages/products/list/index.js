@@ -15,11 +15,12 @@ export default class Page {
 
   async initComponents () {
     const sortableTable = new SortableTable(header, {
-      url: 'api/rest/products?_embed=subcategory.category&_sort=title&_order=asc',
+      url: 'api/rest/products?_embed=subcategory.category',
       isSortLocally: false,
-      step: 30,
-      start: 0,
-      end: 30,
+      sorted: {
+        id: header.find(item => item.sortable).id,
+        order: 'asc'
+      },
       rowWrapper: (item, callback) => {
         return `
           <a href="/products/${item.id}" class="sortable-table__row">

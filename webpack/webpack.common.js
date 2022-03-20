@@ -68,7 +68,7 @@ module.exports = {
         },
         {
           from: path.join(__dirname, '../src/components/product-form/*.svg').replace(/\\/g, "/"),
-          to: "assets/[path][name][ext]",
+          to: "[name][ext]",
         }
       ]
     })
