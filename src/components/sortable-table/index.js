@@ -74,18 +74,18 @@ export default class SortableTable {
     return await this.loadData(false, id, order, 1);
   }
   
-  _getTemplate = () => {
+  get template() {
     return `
         <div class="sortable-table">
           <div data-element="header" class="sortable-table__header sortable-table__row">
-            ${this._renderRowHeading()}
+            ${this.renderRowHeading()}
           </div>
           <div data-element="body" class="sortable-table__body">
           </div>
         </div>
     `;
   }
-  _renderRowHeading = () => {
+  renderRowHeading = () => {
     return this.headerConfig.map(item => {
       return ` 
         <div class="sortable-table__cell" data-id="${item.id}" data-sortable="${item.sortable}" data-active="heading">
@@ -97,16 +97,16 @@ export default class SortableTable {
     `;
     }).join('');
   }
-  _renderRowBody = (data) => {
+  renderRowBody = (data) => {
     return data.map(product => {
       return `
       <a href="/products/${product.id}" class="sortable-table__row">
-        ${this._renderSortableCell(product)}
+        ${this.renderSortableCell(product)}
       </a>
       `;
     }).join('');
   }
-  _renderSortableCell = (product) => {
+  renderSortableCell = (product) => {
     return this.headerConfig.map(({template, id}) => {
       if (template) {
         return template(product[id]);
@@ -117,7 +117,7 @@ export default class SortableTable {
       return `<div class="sortable-table__cell">${product[id]}</div>`;
     }).join('');
   }
-  _clickTableHandler = (e) => {
+  clickTableHandler = (e) => {
     const headingCell = e.target.closest('[data-active="heading"]');
     
     if (headingCell.dataset.sortable === 'true') {
@@ -128,7 +128,7 @@ export default class SortableTable {
       headingCell.dataset.order = this.order;
     }
   }
-  _scrollTableHandler = async () => {
+  scrollTableHandler = async () => {
     const scrollHeight = Math.max(
       document.body.scrollHeight, document.documentElement.scrollHeight,
       document.body.offsetHeight, document.documentElement.offsetHeight,
@@ -144,29 +144,29 @@ export default class SortableTable {
 
       this.data = await this.loadData(true, this.id, this.order, this.start);
 
-      this._update(this.data);
+      this.update(this.data);
 
       this.isLoading = false;
     }
   }
   render = async () => {
     const $wrapper = document.createElement('div');
-    $wrapper.insertAdjacentHTML('beforeend', this._getTemplate());
+    $wrapper.insertAdjacentHTML('beforeend', this.template);
     this.element = $wrapper.firstElementChild;
-    this.subElements = this._getSubElements(this.element);
+    this.subElements = this.getSubElements(this.element);
     
     this.data = await this.loadData();
     
-    this.subElements.body.innerHTML = this._renderRowBody(this.data);
+    this.subElements.body.innerHTML = this.renderRowBody(this.data);
     this.element.querySelector(`.sortable-table__cell[data-id=title]`).dataset.order = 'asc';
 
     const { id, order } = this.sorted;
 
     if (id && order) {
       this.element.querySelector(`.sortable-table__cell[data-id=${id}]`).dataset.order = order;
-      this.subElements.body.innerHTML = this._renderRowBody(this.sortOnClient(id, order));
+      this.subElements.body.innerHTML = this.renderRowBody(this.sortOnClient(id, order));
     }
-    this._ihitEventListeners();
+    this.ihitEventListeners();
   }
   sort = async (id, order) => {
     const $allColumns = this.element.querySelectorAll('.sortable-table__cell[data-id]');
@@ -174,14 +174,14 @@ export default class SortableTable {
 
     if (this.isSortLocally) {
       this.data = this.sortOnClient(id, order);
-      this.subElements.body.innerHTML = this._renderRowBody(this.data);
+      this.subElements.body.innerHTML = this.renderRowBody(this.data);
       return;
     }
     this.data = await this.sortOnServer(id, order);
-    this.subElements.body.innerHTML = this._renderRowBody(this.data);
+    this.subElements.body.innerHTML = this.renderRowBody(this.data);
   }
 
-  _getSubElements = ($el) => {
+  getSubElements = ($el) => {
     const result = {};
     const $els = $el.querySelectorAll('[data-element]');
     $els.forEach(item => {
@@ -191,12 +191,12 @@ export default class SortableTable {
     
     return result;
   }
-  _update = (data) => {
-    this.subElements.body.innerHTML = this._renderRowBody(data);
+  update = (data) => {
+    this.subElements.body.innerHTML = this.renderRowBody(data);
   }
-  _ihitEventListeners = () => {
-    this.element.addEventListener('pointerdown', this._clickTableHandler);
-    window.addEventListener('scroll', this._scrollTableHandler);
+  ihitEventListeners = () => {
+    this.element.addEventListener('pointerdown', this.clickTableHandler);
+    window.addEventListener('scroll', this.scrollTableHandler);
   }
   destroy = () => {
     this.element.remove();

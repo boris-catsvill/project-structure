@@ -103,7 +103,7 @@ export default class Page {
     
     const { sortableTable, ordersChart, salesChart, customersChart } = this.components;
     
-    sortableTable._update(data);
+    sortableTable.update(data);
     await Promise.all([
       ordersChart.update(from, to),
       salesChart.update(from, to),
