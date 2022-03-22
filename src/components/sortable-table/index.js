@@ -47,7 +47,8 @@ export default class SortableTable {
     this.element.classList.remove('sortable-table_loading');
 
     return data;
-  }
+  };
+
   sortOnClient = (id, order) => {
     const newArr = [...this.data];
     const { sortType } = this.headerConfig.find(item => item.id === id);
@@ -68,11 +69,11 @@ export default class SortableTable {
         return direction * (a[id] - b[id]);
       }
     });
-  }
+  };
 
   sortOnServer = async (id, order) => {
     return await this.loadData(false, id, order, 1);
-  }
+  };
   
   get template() {
     return `
@@ -85,6 +86,7 @@ export default class SortableTable {
         </div>
     `;
   }
+
   renderRowHeading = () => {
     return this.headerConfig.map(item => {
       return ` 
@@ -96,7 +98,8 @@ export default class SortableTable {
         </div>
     `;
     }).join('');
-  }
+  };
+
   renderRowBody = (data) => {
     return data.map(product => {
       return `
@@ -105,18 +108,20 @@ export default class SortableTable {
       </a>
       `;
     }).join('');
-  }
+  };
+
   renderSortableCell = (product) => {
     return this.headerConfig.map(({template, id}) => {
       if (template) {
         return template(product[id]);
       }
-      if (id === 'category'){
-        return `<div class="sortable-table__cell">${product['subcategory'].title}</div>`
+      if (id === 'category') {
+        return `<div class="sortable-table__cell">${product['subcategory'].title}</div>`;
       }
       return `<div class="sortable-table__cell">${product[id]}</div>`;
     }).join('');
-  }
+  };
+
   clickTableHandler = (e) => {
     const headingCell = e.target.closest('[data-active="heading"]');
     
@@ -127,7 +132,8 @@ export default class SortableTable {
       this.sort(this.id, this.order);
       headingCell.dataset.order = this.order;
     }
-  }
+  };
+
   scrollTableHandler = async () => {
     const scrollHeight = Math.max(
       document.body.scrollHeight, document.documentElement.scrollHeight,
@@ -148,7 +154,8 @@ export default class SortableTable {
 
       this.isLoading = false;
     }
-  }
+  };
+
   render = async () => {
     const $wrapper = document.createElement('div');
     $wrapper.insertAdjacentHTML('beforeend', this.template);
@@ -167,7 +174,8 @@ export default class SortableTable {
       this.subElements.body.innerHTML = this.renderRowBody(this.sortOnClient(id, order));
     }
     this.ihitEventListeners();
-  }
+  };
+
   sort = async (id, order) => {
     const $allColumns = this.element.querySelectorAll('.sortable-table__cell[data-id]');
     $allColumns.forEach(item => item.dataset.order = '');
@@ -179,7 +187,7 @@ export default class SortableTable {
     }
     this.data = await this.sortOnServer(id, order);
     this.subElements.body.innerHTML = this.renderRowBody(this.data);
-  }
+  };
 
   getSubElements = ($el) => {
     const result = {};
@@ -190,21 +198,25 @@ export default class SortableTable {
     });
     
     return result;
-  }
+  };
+
   update = (data) => {
     this.subElements.body.innerHTML = this.renderRowBody(data);
-  }
+  };
+
   ihitEventListeners = () => {
     this.element.addEventListener('pointerdown', this.clickTableHandler);
     window.addEventListener('scroll', this.scrollTableHandler);
-  }
+  };
+
   destroy = () => {
     this.element.remove();
-  }
+  };
+
   remove = () => {
     this.destroy();
     this.element = null;
     this.subElements = null;
     window.removeEventListener('scroll', this._scrollTableHandler);
-  }
+  };
 }

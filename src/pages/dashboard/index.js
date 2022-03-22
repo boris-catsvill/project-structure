@@ -9,6 +9,7 @@ export default class Page {
   element = null;
   subElements = {};
   components = {};
+  
   get template() {
     return `
       <div class="dashboard">
@@ -26,6 +27,7 @@ export default class Page {
       </div>
     `;
   }
+
   initComponents = () => {
     const to = new Date();
     const from = new Date();
@@ -76,13 +78,13 @@ export default class Page {
       customersChart,
       sortableTable
     };
-  }
+  };
 
   addedComponents = () => {
     Object.keys(this.components).forEach(item => {
       this.subElements[item].append(this.components[item].element);
     });
-  }
+  };
 
   render = async () => {
     const wrapper = document.createElement('div');
@@ -96,7 +98,7 @@ export default class Page {
     this.initEventListeners();
 
     return this.element;
-  }
+  };
 
   updateComponents = async (from, to) => {
     const data = await this.loadData(from, to);
@@ -109,7 +111,7 @@ export default class Page {
       salesChart.update(from, to),
       customersChart.update(from, to),
     ]);
-  }
+  };
 
   loadData = async (from, to) => {
     const url = new URL('api/dashboard/bestsellers', process.env.BACKEND_URL);
@@ -122,7 +124,7 @@ export default class Page {
     url.searchParams.set('_order', 'asc');
 
     return await fetchJson(url);
-  }
+  };
 
   initEventListeners = () => {
     this.components.rangePicker.element.addEventListener('date-select', event => {
@@ -130,17 +132,20 @@ export default class Page {
 
       this.updateComponents(from, to);
     });
-  }
+  };
+
   getSubElements = () => {
     this.subElements = [...this.element.querySelectorAll('[data-element]')]
     .reduce((acc, item) => {
       acc[item.dataset.element] = item;
       return acc;
     }, {});
-  }
+  };
+
   remove = () => {
     this.element.remove();
-  }
+  };
+
   destroy = () => {
     this.remove();
     this.subElements = {};
@@ -149,5 +154,5 @@ export default class Page {
     Object.values(this.components).forEach(item => {
       item.destroy();
     });
-  }
+  };
 }
