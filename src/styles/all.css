@@ -2,15 +2,17 @@
 
 /* Styles for components  */
 /* components */
-@import url("../components/sortable-table/style.css");
+/* 
 @import url("../components/sortable-list/style.css");
 @import url("../components/double-slider/style.css");
 @import url("../components/notification/style.css");
-@import url("../components/range-picker/style.css");
+
 @import url("../components/tooltip/style.css");
-@import url("../components/column-chart/style.css");
 @import url("../components/product-form/style.css");
-@import url("../components/categories/style.css");
+@import url("../components/categories/style.css"); */
+@import url("../components/sortable-table/style.css");
+@import url("../components/range-picker/style.css");
+@import url("../components/column-chart/style.css");
 
 /* Styles for pages  */
 /* pages */
