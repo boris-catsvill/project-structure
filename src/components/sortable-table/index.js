@@ -115,9 +115,6 @@ export default class SortableTable {
       if (template) {
         return template(product[id]);
       }
-      if (id === 'category') {
-        return `<div class="sortable-table__cell">${product['subcategory'].title}</div>`;
-      }
       return `<div class="sortable-table__cell">${product[id]}</div>`;
     }).join('');
   };
