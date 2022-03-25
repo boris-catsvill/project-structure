@@ -5,7 +5,7 @@ export default class SortableTable {
   subElements = {};
   data = [];
   order = 'asc';
-  id = '';
+  id = 'title';
   isLoading = false;
   constructor(headerConfig, {
     url = '',
@@ -17,7 +17,7 @@ export default class SortableTable {
   } = {}) {
     this.headerConfig = headerConfig;
     this.sorted = sorted;
-    this.url = new URL(url, process.env.BACKEND_URL);
+    this.url = url;
     this.isSortLocally = isSortLocally;
     this.start = start;
     this.step = step;
@@ -198,6 +198,7 @@ export default class SortableTable {
   };
 
   update = (data) => {
+    this.data = data;
     this.subElements.body.innerHTML = this.renderRowBody(data);
   };
 

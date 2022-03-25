@@ -101,7 +101,7 @@ export default class ColumnChart {
   };
 
   update = async (from, to) => {
-    const data = await this._getData(from, to);
+    const data = await this.getData(from, to);
     this.subElements.body.innerHTML = this.createChartItem(Object.values(data), this.chartHeight);
     this.value = new Intl.NumberFormat('en-US').format(Object.values(data).reduce((acc, item) => acc += item, 0));
     this.subElements.header.innerHTML = this.formatHeading(this.value);

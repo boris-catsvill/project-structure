@@ -9,7 +9,7 @@ export default class Page {
   element = null;
   subElements = {};
   components = {};
-  
+  url = new URL('api/dashboard/bestsellers', process.env.BACKEND_URL);
   get template() {
     return `
       <div class="dashboard">
@@ -29,9 +29,18 @@ export default class Page {
   }
 
   initComponents = () => {
+    
     const to = new Date();
     const from = new Date();
     from.setMonth(to.getMonth() - 1);
+
+    this.url.searchParams.set('from', from.toISOString());
+    this.url.searchParams.set('to', to.toISOString());
+    this.url.searchParams.set('_start', '1');
+    this.url.searchParams.set('_end', '21');
+    this.url.searchParams.set('_sort', 'title');
+    this.url.searchParams.set('_order', 'asc');
+
     const rangePicker = new RangePicker({
       from,
       to
@@ -68,7 +77,7 @@ export default class Page {
 
     const sortableTable = new SortableTable(header, {
       isSortLocally: true,
-      url: `api/dashboard/bestsellers?_start=1&_end=20&from=${from.toISOString()}&to=${to.toISOString()}`,
+      url: this.url,
     });
 
     this.components = {
@@ -114,16 +123,14 @@ export default class Page {
   };
 
   loadData = async (from, to) => {
-    const url = new URL('api/dashboard/bestsellers', process.env.BACKEND_URL);
+    this.url.searchParams.set('from', from.toISOString());
+    this.url.searchParams.set('to', to.toISOString());
+    this.url.searchParams.set('_start', '1');
+    this.url.searchParams.set('_end', '21');
+    this.url.searchParams.set('_sort', 'title');
+    this.url.searchParams.set('_order', 'asc');
 
-    url.searchParams.set('from', from.toISOString());
-    url.searchParams.set('to', to.toISOString());
-    url.searchParams.set('_start', '1');
-    url.searchParams.set('_end', '21');
-    url.searchParams.set('_sort', 'title');
-    url.searchParams.set('_order', 'asc');
-
-    return await fetchJson(url);
+    return await fetchJson(this.url);
   };
 
   initEventListeners = () => {
