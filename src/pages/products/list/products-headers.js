@@ -1,4 +1,4 @@
-const header = [
+export const headers = [
   {
     id: 'images',
     title: 'Фото',
@@ -9,7 +9,7 @@ const header = [
             <img class="sortable-table-image" alt="Image" src="${data[0].url}">
           </div>
         `;
-    }
+    },
   },
   {
     id: 'title',
@@ -39,14 +39,25 @@ const header = [
     id: 'price',
     title: 'Цена',
     sortable: true,
-    sortType: 'number'
+    sortType: 'number',
+    template: data => {
+      return `
+        <div class="sortable-table__cell">
+          $${data}
+        </div>
+      `;
+    }
   },
   {
-    id: 'sales',
-    title: 'Продажи',
-    sortable: true,
-    sortType: 'number'
+    id: 'status',
+    title: 'Статус',
+    sortable: false,
+    template: data => {
+      return `
+        <div class="sortable-table__cell">
+          ${data ? 'Активен' : 'Неактивен'}
+        </div>
+      `;
+    }
   },
 ];
-
-export default header;

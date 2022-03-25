@@ -9,6 +9,7 @@ export default class Page {
   element = null;
   subElements = {};
   components = {};
+  url = new URL('api/dashboard/bestsellers', process.env.BACKEND_URL);
   get template() {
     return `
       <div class="dashboard">
@@ -26,10 +27,20 @@ export default class Page {
       </div>
     `;
   }
+
   initComponents = () => {
+    
     const to = new Date();
     const from = new Date();
     from.setMonth(to.getMonth() - 1);
+
+    this.url.searchParams.set('from', from.toISOString());
+    this.url.searchParams.set('to', to.toISOString());
+    this.url.searchParams.set('_start', '1');
+    this.url.searchParams.set('_end', '21');
+    this.url.searchParams.set('_sort', 'title');
+    this.url.searchParams.set('_order', 'asc');
+
     const rangePicker = new RangePicker({
       from,
       to
@@ -66,7 +77,7 @@ export default class Page {
 
     const sortableTable = new SortableTable(header, {
       isSortLocally: true,
-      url: `api/dashboard/bestsellers?_start=1&_end=20&from=${from.toISOString()}&to=${to.toISOString()}`,
+      url: this.url,
     });
 
     this.components = {
@@ -76,13 +87,13 @@ export default class Page {
       customersChart,
       sortableTable
     };
-  }
+  };
 
   addedComponents = () => {
     Object.keys(this.components).forEach(item => {
       this.subElements[item].append(this.components[item].element);
     });
-  }
+  };
 
   render = async () => {
     const wrapper = document.createElement('div');
@@ -96,33 +107,31 @@ export default class Page {
     this.initEventListeners();
 
     return this.element;
-  }
+  };
 
   updateComponents = async (from, to) => {
     const data = await this.loadData(from, to);
     
     const { sortableTable, ordersChart, salesChart, customersChart } = this.components;
     
-    sortableTable._update(data);
+    sortableTable.update(data);
     await Promise.all([
       ordersChart.update(from, to),
       salesChart.update(from, to),
       customersChart.update(from, to),
     ]);
-  }
+  };
 
   loadData = async (from, to) => {
-    const url = new URL('api/dashboard/bestsellers', process.env.BACKEND_URL);
+    this.url.searchParams.set('from', from.toISOString());
+    this.url.searchParams.set('to', to.toISOString());
+    this.url.searchParams.set('_start', '1');
+    this.url.searchParams.set('_end', '21');
+    this.url.searchParams.set('_sort', 'title');
+    this.url.searchParams.set('_order', 'asc');
 
-    url.searchParams.set('from', from.toISOString());
-    url.searchParams.set('to', to.toISOString());
-    url.searchParams.set('_start', '1');
-    url.searchParams.set('_end', '21');
-    url.searchParams.set('_sort', 'title');
-    url.searchParams.set('_order', 'asc');
-
-    return await fetchJson(url);
-  }
+    return await fetchJson(this.url);
+  };
 
   initEventListeners = () => {
     this.components.rangePicker.element.addEventListener('date-select', event => {
@@ -130,17 +139,20 @@ export default class Page {
 
       this.updateComponents(from, to);
     });
-  }
+  };
+
   getSubElements = () => {
     this.subElements = [...this.element.querySelectorAll('[data-element]')]
     .reduce((acc, item) => {
       acc[item.dataset.element] = item;
       return acc;
     }, {});
-  }
+  };
+
   remove = () => {
     this.element.remove();
-  }
+  };
+
   destroy = () => {
     this.remove();
     this.subElements = {};
@@ -149,5 +161,5 @@ export default class Page {
     Object.values(this.components).forEach(item => {
       item.destroy();
     });
-  }
+  };
 }

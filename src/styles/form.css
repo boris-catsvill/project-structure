@@ -107,7 +107,9 @@ form.form-inline {
 form.form-inline .form-group {
   margin-bottom: 0;
 }
-
+form select.form-control {
+  height: 38px;
+}
 @keyframes spin {
   from {
     transform: rotate(0deg);

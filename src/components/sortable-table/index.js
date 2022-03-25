@@ -5,7 +5,7 @@ export default class SortableTable {
   subElements = {};
   data = [];
   order = 'asc';
-  id = '';
+  id = 'title';
   isLoading = false;
   constructor(headerConfig, {
     url = '',
@@ -17,7 +17,7 @@ export default class SortableTable {
   } = {}) {
     this.headerConfig = headerConfig;
     this.sorted = sorted;
-    this.url = new URL(url, process.env.BACKEND_URL);
+    this.url = url;
     this.isSortLocally = isSortLocally;
     this.start = start;
     this.step = step;
@@ -47,7 +47,8 @@ export default class SortableTable {
     this.element.classList.remove('sortable-table_loading');
 
     return data;
-  }
+  };
+
   sortOnClient = (id, order) => {
     const newArr = [...this.data];
     const { sortType } = this.headerConfig.find(item => item.id === id);
@@ -68,24 +69,25 @@ export default class SortableTable {
         return direction * (a[id] - b[id]);
       }
     });
-  }
+  };
 
   sortOnServer = async (id, order) => {
     return await this.loadData(false, id, order, 1);
-  }
+  };
   
-  _getTemplate = () => {
+  get template() {
     return `
         <div class="sortable-table">
           <div data-element="header" class="sortable-table__header sortable-table__row">
-            ${this._renderRowHeading()}
+            ${this.renderRowHeading()}
           </div>
           <div data-element="body" class="sortable-table__body">
           </div>
         </div>
     `;
   }
-  _renderRowHeading = () => {
+
+  renderRowHeading = () => {
     return this.headerConfig.map(item => {
       return ` 
         <div class="sortable-table__cell" data-id="${item.id}" data-sortable="${item.sortable}" data-active="heading">
@@ -96,28 +98,28 @@ export default class SortableTable {
         </div>
     `;
     }).join('');
-  }
-  _renderRowBody = (data) => {
+  };
+
+  renderRowBody = (data) => {
     return data.map(product => {
       return `
       <a href="/products/${product.id}" class="sortable-table__row">
-        ${this._renderSortableCell(product)}
+        ${this.renderSortableCell(product)}
       </a>
       `;
     }).join('');
-  }
-  _renderSortableCell = (product) => {
+  };
+
+  renderSortableCell = (product) => {
     return this.headerConfig.map(({template, id}) => {
       if (template) {
         return template(product[id]);
       }
-      if (id === 'category'){
-        return `<div class="sortable-table__cell">${product['subcategory'].title}</div>`
-      }
       return `<div class="sortable-table__cell">${product[id]}</div>`;
     }).join('');
-  }
-  _clickTableHandler = (e) => {
+  };
+
+  clickTableHandler = (e) => {
     const headingCell = e.target.closest('[data-active="heading"]');
     
     if (headingCell.dataset.sortable === 'true') {
@@ -127,8 +129,9 @@ export default class SortableTable {
       this.sort(this.id, this.order);
       headingCell.dataset.order = this.order;
     }
-  }
-  _scrollTableHandler = async () => {
+  };
+
+  scrollTableHandler = async () => {
     const scrollHeight = Math.max(
       document.body.scrollHeight, document.documentElement.scrollHeight,
       document.body.offsetHeight, document.documentElement.offsetHeight,
@@ -144,44 +147,46 @@ export default class SortableTable {
 
       this.data = await this.loadData(true, this.id, this.order, this.start);
 
-      this._update(this.data);
+      this.update(this.data);
 
       this.isLoading = false;
     }
-  }
+  };
+
   render = async () => {
     const $wrapper = document.createElement('div');
-    $wrapper.insertAdjacentHTML('beforeend', this._getTemplate());
+    $wrapper.insertAdjacentHTML('beforeend', this.template);
     this.element = $wrapper.firstElementChild;
-    this.subElements = this._getSubElements(this.element);
+    this.subElements = this.getSubElements(this.element);
     
     this.data = await this.loadData();
     
-    this.subElements.body.innerHTML = this._renderRowBody(this.data);
+    this.subElements.body.innerHTML = this.renderRowBody(this.data);
     this.element.querySelector(`.sortable-table__cell[data-id=title]`).dataset.order = 'asc';
 
     const { id, order } = this.sorted;
 
     if (id && order) {
       this.element.querySelector(`.sortable-table__cell[data-id=${id}]`).dataset.order = order;
-      this.subElements.body.innerHTML = this._renderRowBody(this.sortOnClient(id, order));
+      this.subElements.body.innerHTML = this.renderRowBody(this.sortOnClient(id, order));
     }
-    this._ihitEventListeners();
-  }
+    this.ihitEventListeners();
+  };
+
   sort = async (id, order) => {
     const $allColumns = this.element.querySelectorAll('.sortable-table__cell[data-id]');
     $allColumns.forEach(item => item.dataset.order = '');
 
     if (this.isSortLocally) {
       this.data = this.sortOnClient(id, order);
-      this.subElements.body.innerHTML = this._renderRowBody(this.data);
+      this.subElements.body.innerHTML = this.renderRowBody(this.data);
       return;
     }
     this.data = await this.sortOnServer(id, order);
-    this.subElements.body.innerHTML = this._renderRowBody(this.data);
-  }
+    this.subElements.body.innerHTML = this.renderRowBody(this.data);
+  };
 
-  _getSubElements = ($el) => {
+  getSubElements = ($el) => {
     const result = {};
     const $els = $el.querySelectorAll('[data-element]');
     $els.forEach(item => {
@@ -190,21 +195,26 @@ export default class SortableTable {
     });
     
     return result;
-  }
-  _update = (data) => {
-    this.subElements.body.innerHTML = this._renderRowBody(data);
-  }
-  _ihitEventListeners = () => {
-    this.element.addEventListener('pointerdown', this._clickTableHandler);
-    window.addEventListener('scroll', this._scrollTableHandler);
-  }
+  };
+
+  update = (data) => {
+    this.data = data;
+    this.subElements.body.innerHTML = this.renderRowBody(data);
+  };
+
+  ihitEventListeners = () => {
+    this.element.addEventListener('pointerdown', this.clickTableHandler);
+    window.addEventListener('scroll', this.scrollTableHandler);
+  };
+
   destroy = () => {
     this.element.remove();
-  }
+  };
+
   remove = () => {
     this.destroy();
     this.element = null;
     this.subElements = null;
     window.removeEventListener('scroll', this._scrollTableHandler);
-  }
+  };
 }
