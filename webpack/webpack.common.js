@@ -66,10 +66,6 @@ module.exports = {
           from: path.join(__dirname, '../src/assets'),
           to: "assets/[path][name][ext]",
         },
-        // {
-        //   from: path.resolve(__dirname, '../src/components/**/*.svg'),
-        //   to: "[name][ext]",
-        // }
       ]
     })
   ]

@@ -203,7 +203,7 @@ export default class SortableTable {
   };
 
   ihitEventListeners = () => {
-    this.element.addEventListener('pointerdown', this.clickTableHandler);
+    this.subElements.header.addEventListener('pointerdown', this.clickTableHandler);
     window.addEventListener('scroll', this.scrollTableHandler);
   };
 
