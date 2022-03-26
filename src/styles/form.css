@@ -59,10 +59,11 @@ form.form-grid .form-group__two-col {
 
 form .form-label {
   font-weight: normal;
-  font-size: 16px;
+  font-size: 18px;
   line-height: 20px;
   color: var(--table-grey);
-  margin-bottom: 8px;
+  margin-bottom: 0px;
+  margin-right: 16px;
 }
 
 form .form-control {
@@ -102,6 +103,7 @@ form.form-inline {
   display: grid;
   grid: auto-flow / repeat(auto-fit, minmax(50px, 1fr));
   grid-gap: 16px;
+  align-items: center;
 }
 
 form.form-inline .form-group {
