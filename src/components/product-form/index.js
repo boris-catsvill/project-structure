@@ -11,7 +11,7 @@ export default class ProductForm {
   product = null;
   images = [];
   url = '/api/rest/';
-  defaultProduct = {
+  defaultProduct = [{
     title: '',
     description: '',
     subcategory: '',
@@ -20,7 +20,7 @@ export default class ProductForm {
     price: 100,
     quantity: 1,
     status: 1,
-  };
+  }];
 
   constructor (productId) {
     this.productId = productId;
@@ -225,7 +225,8 @@ export default class ProductForm {
 
   setTextFields = (product) => {
     const form = this.subElements.productForm;
-    const fieldsForm = Object.keys(this.defaultProduct).filter(item => !item.includes('images'));
+    let [fieldsForm] = this.defaultProduct;
+    fieldsForm = Object.keys(fieldsForm).filter(item => !item.includes('images'));
 
     fieldsForm.forEach(field => {
       form.querySelector(`#${field}`).value = product[field];

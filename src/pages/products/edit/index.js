@@ -11,7 +11,7 @@ export default class Page {
         <div class="content__top-panel">
           <h1 class="page-title">
             <a href="/products" class="link">Товары</a>
-            / Редактировать
+            / ${/\/products\/add$/.test(location) ? 'Добавить' : 'Редактировать'}
           </h1>
         </div>
         <div class="content-box" data-element="productForm">
@@ -41,7 +41,16 @@ export default class Page {
 
   getComponents = async () => {
     const reg = /\/products\//;
-    const productForm = new ProductForm(window.location.pathname.replace(reg, ''));
+    const location = window.location.pathname;
+  
+    let productForm = {};
+    if (/\/products\/([\w()-]+)$/.test(location)) {
+      productForm = new ProductForm(window.location.pathname.replace(reg, ''));
+    }
+    if (/\/products\/add$/.test(location)) {
+      productForm = new ProductForm();
+    }
+
     await productForm.render();
 
     this.components = {
