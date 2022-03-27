@@ -1,0 +1,28 @@
+<!doctype html>
+<meta charset="utf-8">
+<link rel="stylesheet" href="style.css">
+<body>
+
+<div id="holder"></div>
+
+<script type="module">
+  import SortableList from './index.js';
+
+  const data = [1, 2, 3, 4, 5];
+
+  const sortableList = new SortableList({
+    items: data.map(item => {
+      const element = document.createElement('li');
+
+      element.innerHTML = `
+        <span data-grab-handle>drag me!</span>
+        <span data-delete-handle>${item} delete me!</spa>
+      `
+
+      return element;
+    })
+  });
+
+  holder.append(sortableList.element);
+</script>
+</body>
