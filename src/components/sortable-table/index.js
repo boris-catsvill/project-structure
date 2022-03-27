@@ -14,6 +14,7 @@ export default class SortableTable {
     start = 1,
     step = 20,
     end = start + step,
+    isNotLinkRow = false,
   } = {}) {
     this.headerConfig = headerConfig;
     this.sorted = sorted;
@@ -22,6 +23,7 @@ export default class SortableTable {
     this.start = start;
     this.step = step;
     this.end = end;
+    this.isNotLinkRow = isNotLinkRow;
 
     this.render();
   }
@@ -102,11 +104,19 @@ export default class SortableTable {
 
   renderRowBody = (data) => {
     return data.map(product => {
-      return `
-      <a href="/products/${product.id}" class="sortable-table__row">
-        ${this.renderSortableCell(product)}
-      </a>
-      `;
+      if (this.isNotLinkRow) {
+        return `
+            <div class="sortable-table__row">
+              ${this.renderSortableCell(product)}
+            </div>`;
+      }
+      if (!this.isNotLinkRow) {
+        return `
+            <a href="/products/${product.id}" class="sortable-table__row">
+              ${this.renderSortableCell(product)}
+            </a>
+        `;
+      }
     }).join('');
   };
 
@@ -119,19 +129,20 @@ export default class SortableTable {
     }).join('');
   };
 
-  clickTableHandler = (e) => {
+  clickTableHandler = async (e) => {
     const headingCell = e.target.closest('[data-active="heading"]');
     
     if (headingCell.dataset.sortable === 'true') {
       this.order = headingCell.dataset.order === 'desc' ? 'asc' : 'desc';
       this.id = headingCell.dataset.id;
-
-      this.sort(this.id, this.order);
+      
+      await this.sort(this.id, this.order);
       headingCell.dataset.order = this.order;
     }
   };
 
   scrollTableHandler = async () => {
+    
     const scrollHeight = Math.max(
       document.body.scrollHeight, document.documentElement.scrollHeight,
       document.body.offsetHeight, document.documentElement.offsetHeight,
@@ -140,6 +151,7 @@ export default class SortableTable {
     const {scrollTop, clientHeight} = document.documentElement;
     
     if (scrollTop + clientHeight >= scrollHeight && !this.isLoading && !this.isSortLocally) {
+      
       this.start += this.step;
       this.end += this.step;
 
@@ -162,7 +174,6 @@ export default class SortableTable {
     this.data = await this.loadData();
     
     this.subElements.body.innerHTML = this.renderRowBody(this.data);
-    this.element.querySelector(`.sortable-table__cell[data-id=title]`).dataset.order = 'asc';
 
     const { id, order } = this.sorted;
 
