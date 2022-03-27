@@ -3,12 +3,7 @@ export default class ColumnChart {
   subElements = {};
   chartHeight = 50;
 
-  constructor({
-    data = [],
-    label = '',
-    link = '',
-    value = 0
-  } = {}) {
+  constructor({ data = [], label = '', link = '', value = 0 } = {}) {
     this.data = data;
     this.label = label;
     this.link = link;
@@ -21,20 +16,22 @@ export default class ColumnChart {
     const maxValue = Math.max(...data);
 
     return data
-    .map(item => {
-      const scale = this.chartHeight / maxValue;
-      const percent = (item / maxValue * 100).toFixed(0);
+      .map(item => {
+        const scale = this.chartHeight / maxValue;
+        const percent = ((item / maxValue) * 100).toFixed(0);
 
-      return `<div style="--value: ${Math.floor(item * scale)}" data-tooltip="${percent}%"></div>`;
-    })
-    .join('');
+        return `<div style="--value: ${Math.floor(
+          item * scale
+        )}" data-tooltip="${percent}%"></div>`;
+      })
+      .join('');
   }
 
   getLink() {
     return this.link ? `<a class="column-chart__link" href="${this.link}">View all</a>` : '';
   }
 
-  get template () {
+  get template() {
     return `
       <div class="column-chart column-chart_loading" style="--chart-height: ${this.chartHeight}">
         <div class="column-chart__title">
@@ -68,7 +65,7 @@ export default class ColumnChart {
     return this.element;
   }
 
-  getSubElements (element) {
+  getSubElements(element) {
     const elements = element.querySelectorAll('[data-element]');
 
     return [...elements].reduce((accum, subElement) => {
@@ -78,12 +75,19 @@ export default class ColumnChart {
     }, {});
   }
 
-  update ({headerData, bodyData}) {
+  update({ headerData, bodyData }) {
     this.subElements.header.textContent = headerData;
     this.subElements.body.innerHTML = this.getColumnBody(bodyData);
   }
 
+  remove() {
+    if (this.element) {
+      this.element.remove();
+    }
+  }
+
   destroy() {
-    this.element.remove();
+    this.remove();
+    this.element = null;
   }
 }
