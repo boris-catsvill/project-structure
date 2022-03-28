@@ -20,8 +20,8 @@ class Tooltip {
   pointerOverHandler = event => {
     if (event.target.dataset.tooltip) {
       this.render(event.target.dataset.tooltip);
-      this.element.style.top = (event.clientY + 15) + 'px';
-      this.element.style.left = (event.clientX + 15) + 'px';
+      this.element.style.top = (event.pageY + 15) + 'px';
+      this.element.style.left = (event.PageX + 15) + 'px';
       document.removeEventListener('pointerout', this.pointerOutHandler);
     }
   };
@@ -29,8 +29,8 @@ class Tooltip {
   pointerMoveHandler = event => {
     const target = event.target.dataset.tooltip;
     if (target) {
-      this.element.style.top = (event.clientY + 15) + 'px';
-      this.element.style.left = (event.clientX + 15) + 'px';
+      this.element.style.top = (event.pageY + 15) + 'px';
+      this.element.style.left = (event.pageX + 15) + 'px';
       this.dispatchEvent('tooltip-move', event.target);
     }
   };
