@@ -121,7 +121,6 @@ export default class SortableTable {
   };
 
   renderSortableCell = (product) => {
-    console.log(product.subcategory.category)
     return this.headerConfig.map(({template, id}) => {
       if (template) {
         return template(product[id]);
