@@ -61,8 +61,15 @@ export default class ColumnChart {
   };
 
   createChartItem = (data, height) => {
-    return this.calcValuesArray(data, height).map(({value, percents}) => {
-      return `<div style="--value: ${value}" data-tooltip="${percents}%"></div>`;
+    const dataNubmer = Object.values(data);
+    const date = Object.keys(data)
+    .map(item => new Date(item)
+    .toLocaleString('ru-RU', {dateStyle: 'medium'}));
+
+    return this.calcValuesArray(dataNubmer, height).map(({value}, index) => {
+      return `<div style="--value: ${value}"
+        data-tooltip="<div><small>${date[index]}</small></div><strong>${value}</strong>">
+      </div>`;
     }).join('');
   };
 
@@ -79,15 +86,17 @@ export default class ColumnChart {
 
     const {from, to} = this.range;
 
-    const data = Object.values(await this.getData(from, to));
+    const data = await this.getData(from, to);
 
-    if (data.length) {
+    if (Object.values(data).length) {
       this.element.classList.remove('column-chart_loading');
     } 
     
     this.subElements.body.insertAdjacentHTML('beforeend', this.createChartItem(data, this.chartHeight));
-    this.value = new Intl.NumberFormat('en-US').format(data.reduce((acc, item) => acc += item, 0));
+    this.value = new Intl.NumberFormat('en-US').format(Object.values(data).reduce((acc, item) => acc += item, 0));
     this.subElements.header.innerHTML = this.formatHeading(this.value);
+
+    this.initEventListeners();
   };
 
   getSubElements = () => {
@@ -100,9 +109,29 @@ export default class ColumnChart {
     return result;
   };
 
+  initEventListeners = () => {
+    document.addEventListener('tooltip-move', this.tooltipMoveHandler);
+    document.addEventListener('tooltip-out', this.tooltipOutHandler);
+  };
+
+  tooltipMoveHandler = event => {
+    event.detail.parentElement.classList.add('has-hovered');
+    event.detail.classList.add('is-hovered');
+  };
+
+  tooltipOutHandler = event => {
+    event.detail.parentElement.classList.remove('has-hovered');
+    event.detail.classList.remove('is-hovered');
+  };
+
+  removeEventListeners = () => {
+    document.removeEventListener('tooltip-move', this.tooltipMoveHandler);
+    document.removeEventListener('tooltip-out', this.tooltipOutHandler);
+  };
+
   update = async (from, to) => {
     const data = await this.getData(from, to);
-    this.subElements.body.innerHTML = this.createChartItem(Object.values(data), this.chartHeight);
+    this.subElements.body.innerHTML = this.createChartItem(data, this.chartHeight);
     this.value = new Intl.NumberFormat('en-US').format(Object.values(data).reduce((acc, item) => acc += item, 0));
     this.subElements.header.innerHTML = this.formatHeading(this.value);
 
@@ -113,6 +142,7 @@ export default class ColumnChart {
     this.remove();
     this.element = null;
     this.subElements = {};
+    this.removeEventListeners();
   };
 
   remove = () => {
