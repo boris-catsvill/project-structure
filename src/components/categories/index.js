@@ -1,5 +1,6 @@
 import SortableList from '../sortable-list/index';
 import fetchJson from '../../utils/fetch-json';
+import NotificationMessage from '../notification';
 
 export default class Categories {
   element = {};
@@ -26,7 +27,7 @@ export default class Categories {
   }
 
   patchCategories = async (data) => {
-    await fetchJson(new URL('api/rest/subcategories', process.env.BACKEND_URL), {
+    return await fetchJson(new URL('api/rest/subcategories', process.env.BACKEND_URL), {
       method: 'PATCH',
       headers: {
         'Content-type': 'application/json',
@@ -63,12 +64,18 @@ export default class Categories {
       }
     });
     
-    this.element.querySelector('.sortable-list').addEventListener('sortable-list-reorder', event => {
+    this.element.querySelector('.sortable-list').addEventListener('sortable-list-reorder', async event => {
       const { from, to } = event.detail;
       this.subcategories.splice(to, 0, this.subcategories.splice(from, 1)[0]);
       this.subcategories.map((item, index) => item.weight = index + 1);
       
-      this.patchCategories(this.subcategories);
+      await this.patchCategories(this.subcategories)
+      .catch(() => {
+        new NotificationMessage('Network error has occured.', {duration: 3000, type: 'error'}).show();
+      })
+      .then(() => {
+        new NotificationMessage('Category order saved.', {duration: 3000, type: 'success'}).show();
+      });
     });
   };
 
