@@ -2,9 +2,7 @@
 
 /* Styles for components  */
 /* components */
-/* 
 @import url("../components/notification/style.css");
- */
 @import url("../components/double-slider/style.css");
 @import url("../components/sortable-table/style.css");
 @import url("../components/range-picker/style.css");

@@ -84,7 +84,8 @@ export default class ProductForm {
   }
   async save() {
     const data = this.getFormData();
-    const result = await fetchJson(`${process.env.BACKEND_URL}/api/rest/products`, {
+
+    const result = await fetchJson(`${process.env.BACKEND_URL}api/rest/products`, {
       method: this.productId ? 'PATCH' : 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -93,6 +94,7 @@ export default class ProductForm {
     });
     this.dispatchEvent(result.id);
   }
+
   dispatchEvent = (id) => {
     const event = this.productId
       ? new CustomEvent('product-updated', { detail: id })
@@ -237,7 +239,8 @@ export default class ProductForm {
     const data = {};
     const { productForm, imageListContainer } = this.subElements;
     const formatToNumber = ['price', 'quantity', 'discount', 'status'];
-    const fields = Object.keys(this.defaultProduct).filter(field => field !== 'images');
+    const fields = Object.keys(this.defaultProduct[0]).filter(field => field !== 'images');
+    
     const getValue = field => productForm.querySelector(`[name=${field}]`).value;
 
     fields.forEach(field => {

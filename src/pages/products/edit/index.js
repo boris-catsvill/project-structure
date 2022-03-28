@@ -1,4 +1,5 @@
 import ProductForm from '../../../components/product-form/index';
+import NotificationMessage from '../../../components/notification/index';
 
 export default class Page {
   element = {};
@@ -28,6 +29,8 @@ export default class Page {
     this.getSubElements();
     await this.getComponents();
     this.renderComponents();
+
+    this.initEventListeners();
 
     return this.element;
   };
@@ -66,6 +69,16 @@ export default class Page {
 
   remove = () => {
     this.element.remove();
+  };
+
+  initEventListeners = () => {
+    const form = this.element.querySelector('.product-form')
+    form.addEventListener('product-updated', () => {
+      new NotificationMessage('Товар обновлен', {duration: 3000, type: 'success'}).show();
+    });
+    form.addEventListener('product-saved', () => {
+      new NotificationMessage('Товар создан', {duration: 3000, type: 'success'}).show();
+    });
   };
 
   destroy = () => {
