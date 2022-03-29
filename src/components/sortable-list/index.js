@@ -5,6 +5,7 @@ export default class SortableList {
   pointerShift = {};
   placeholder = {};
   offsetPointer = {};
+  
   constructor({
     items,
   }) {
@@ -49,7 +50,7 @@ export default class SortableList {
     if (clientY > elementBottom) {
       return lastElementChild.before(this.placeholder);
     }
-    if (prevEl) {
+    if (prevEl && !prevEl.classList.contains('sortable-list__item_dragging')) {
       const { top, height } = prevEl.getBoundingClientRect();
       const middlePrev = top + height / 2;
 
@@ -57,12 +58,12 @@ export default class SortableList {
         return prevEl.before(this.placeholder);
       }
     }
-    if (nextEl) {
+    if (nextEl && !nextEl.classList.contains('sortable-list__item_dragging')) {
       const { top, height } = nextEl.getBoundingClientRect();
       const middleNext = top + height / 2;
 
       if (clientY > middleNext) {
-        return nextEl.before(this.placeholder);
+        return nextEl.after(this.placeholder);
       }
     }
     this.scrollTo(clientY);
