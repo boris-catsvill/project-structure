@@ -48,7 +48,7 @@ export default class Page {
 
     const ordersChart = new ColumnChart({
       label: 'Заказы',
-      link: '#',
+      link: '/sales',
       range: {
         from,
         to
