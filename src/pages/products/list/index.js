@@ -138,7 +138,7 @@ export default class Page {
       ...this.filter,
       title,
     };
-    console.log(this.filter)
+
     this.url.searchParams.set('_start', 1);
     const data = await this.loadData(this.filter);
 
