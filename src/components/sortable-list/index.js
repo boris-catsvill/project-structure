@@ -1,191 +1,170 @@
 export default class SortableList {
-  element;
-
-  onDocumentPointerMove = ({clientX, clientY}) => {
-    this.moveDraggingAt(clientX, clientY);
-
-    const {firstElementChild, children} = this.element;
-    const {top: firstElementTop} = firstElementChild.getBoundingClientRect();
-    const {bottom} = this.element.getBoundingClientRect();
-
-    if (clientY < firstElementTop) {
-      this.movePlaceholderAt(0);
-    } else if (clientY > bottom) {
-      this.movePlaceholderAt(children.length);
-    } else {
-      for (let i = 0; i < children.length; i++) {
-        const li = children[i];
-
-        // ignore to prevent bugs when dragging between elements
-        if (li !== this.draggingElem) {
-          const {top, bottom} = li.getBoundingClientRect();
-          const {offsetHeight: height} = li;
-
-          if (clientY > top && clientY < bottom) {
-            // inside the element (y-axis)
-            if (clientY < top + height / 2) {
-              // upper half of the element
-              this.movePlaceholderAt(i);
-              break;
-            } else {
-              // lower half of the element
-              this.movePlaceholderAt(i + 1);
-              break;
-            }
-          }
-        }
-      }
-    }
-
-    this.scrollIfCloseToWindowEdge(clientY);
-  };
-
-  onDocumentPointerUp = () => {
-    this.dragStop();
-  };
-
-  constructor({items = []} = {}) {
+  element = {};
+  draggingElement = {};
+  elementInitialIndex = {};
+  pointerShift = {};
+  placeholder = {};
+  offsetPointer = {};
+  
+  constructor({
+    items,
+  }) {
     this.items = items;
 
     this.render();
   }
 
-  render() {
+  render = () => {
     this.element = document.createElement('ul');
-    this.element.className = 'sortable-list';
+    this.element.classList.add('sortable-list');
 
-    this.addItems();
-    this.initEventListeners();
-  }
+    this.addItem();
+    this.element.addEventListener('pointerdown', this.pointerDownHandler);
+  };
 
-  initEventListeners() {
-    this.element.addEventListener('pointerdown', event => this.onPointerDown(event));
-  }
-
-  addItems() {
-    // item is a DOM element
-    for (let item of this.items) {
-      item.classList.add('sortable-list__item');
+  pointerDownHandler = (event) => {
+    const dragElement = event.target.closest('[data-grab-handle]');
+    const removeElement = event.target.closest('[data-delete-handle]');
+    if (dragElement) {
+      event.preventDefault();
+      this.dragStart(dragElement.closest('.sortable-list__item'), event);
     }
-
-    this.element.append(...this.items);
-  }
-
-  onPointerDown(event) {
-    if (event.which !== 1) { // must be left-button
-      return false;
+    if (removeElement) {
+      event.preventDefault();
+      removeElement.closest('.sortable-list__item').remove();
     }
+  };
 
-    const itemElem = event.target.closest('.sortable-list__item');
+  pointerMoveHandler = ({clientX, clientY}) => {
+    this.moveDragging(clientX, clientY);
 
-    if (itemElem) {
-      if (event.target.closest('[data-grab-handle]')) {
-        event.preventDefault();
+    const prevEl = this.placeholder.previousElementSibling;
+    const nextEl = this.placeholder.nextElementSibling;
+    const { firstElementChild, lastElementChild } = this.element;
+    const { top: elementTop } = firstElementChild.getBoundingClientRect();
+    const { bottom: elementBottom } = this.element.getBoundingClientRect();
 
-        this.dragStart(itemElem, event);
+    if (clientY < elementTop) {
+      return firstElementChild.before(this.placeholder);
+    }
+    if (clientY > elementBottom) {
+      return lastElementChild.before(this.placeholder);
+    }
+    if (prevEl && !prevEl.classList.contains('sortable-list__item_dragging')) {
+      const { top, height } = prevEl.getBoundingClientRect();
+      const middlePrev = top + height / 2;
+
+      if (clientY < middlePrev) {
+        return prevEl.before(this.placeholder);
       }
+    }
+    if (nextEl && !nextEl.classList.contains('sortable-list__item_dragging')) {
+      const { top, height } = nextEl.getBoundingClientRect();
+      const middleNext = top + height / 2;
 
-      if (event.target.closest('[data-delete-handle]')) {
-        event.preventDefault();
-
-        itemElem.remove();
+      if (clientY > middleNext) {
+        return nextEl.after(this.placeholder);
       }
     }
-  }
+    this.scrollTo(clientY);
+  };
 
-  dragStart(itemElem, {clientX, clientY}) {
-    this.elementInitialIndex = [...this.element.children].indexOf(itemElem);
+  pointerUpHandler = () => this.dragStop();
 
-    this.pointerInitialShift = {
-      x: clientX - itemElem.getBoundingClientRect().x,
-      y: clientY - itemElem.getBoundingClientRect().y
+  dragStart = (element, {clientX, clientY}) => {
+    this.draggingElement = element;
+    this.elementInitialIndex = [...this.element.children].indexOf(this.draggingElement);
+    
+    const { x: left, y: top, width, height } = element.getBoundingClientRect();
+    
+    this.offsetPointer = {
+      x: clientX - left,
+      y: clientY - top,
     };
+    this.draggingElement.classList.add('sortable-list__item_dragging');
+    this.draggingElement.style.width = `${width}px`;
+    this.draggingElement.style.height = `${height}px`;
 
-    this.draggingElem = itemElem;
+    this.placeholder = this.createPlaceholder(width, height);
+    this.draggingElement.before(this.placeholder);
+    this.element.append(this.draggingElement);
+    this.moveDragging(clientX, clientY);
 
-    this.placeholderElem = document.createElement('li');
-    this.placeholderElem.className = 'sortable-list__placeholder';
+    this.initEventListeners();
+  };
 
-    // itemElem will get position:fixed
-    // so its width will be auto-set to fit the parent container
-    itemElem.style.width = `${itemElem.offsetWidth}px`;
-    itemElem.style.height = `${itemElem.offsetHeight}px`;
+  dragStop = () => {
+    const indexPlaceholder = [...this.element.children].indexOf(this.placeholder);
 
-    this.placeholderElem.style.width = itemElem.style.width;
-    this.placeholderElem.style.height = itemElem.style.height;
+    this.draggingElement.style.cssText = '';
+    this.draggingElement.classList.remove('sortable-list__item_dragging');
+    this.placeholder.replaceWith(this.draggingElement);
+    this.removeEventListeners();
+    
+    if (indexPlaceholder !== this.elementInitialIndex) {
+      this.dispatchEvent('sortable-list-reorder', {
+        from: this.elementInitialIndex,
+        to: indexPlaceholder
+      });
+    }
+    this.draggingElement = null;
+  };
 
-    itemElem.classList.add('sortable-list__item_dragging');
-
-    itemElem.after(this.placeholderElem);
-
-    // move to the end, to be over other list elements
-    this.element.append(itemElem);
-
-    this.moveDraggingAt(clientX, clientY);
-
-    document.addEventListener('pointermove', this.onDocumentPointerMove);
-    document.addEventListener('pointerup', this.onDocumentPointerUp);
-  }
-
-  moveDraggingAt(clientX, clientY) {
-    this.draggingElem.style.left = clientX - this.pointerInitialShift.x + 'px';
-    this.draggingElem.style.top = clientY - this.pointerInitialShift.y + 'px';
-  }
-
-  scrollIfCloseToWindowEdge(clientY) {
-    const scrollingValue = 10;
+  scrollTo = (clientY) => {
+    const scrollingVal = 10;
     const threshold = 20;
 
     if (clientY < threshold) {
-      window.scrollBy(0, -scrollingValue);
+      window.scrollBy(0, -scrollingVal);
     } else if (clientY > document.documentElement.clientHeight - threshold) {
-      window.scrollBy(0, scrollingValue);
+      window.scrollBy(0, scrollingVal);
     }
-  }
+  };
 
-  movePlaceholderAt(index) {
-    const currentElement = this.element.children[index];
+  createPlaceholder = (width, height) => {
+    const placeholder = document.createElement('li');
+    placeholder.classList.add('sortable-list__placeholder');
+    placeholder.style.width = `${width}px`;
+    placeholder.style.height = `${height}px`;
+    return placeholder;
+  };
 
-    if (currentElement !== this.placeholderElem) {
-      this.element.insertBefore(this.placeholderElem, currentElement);
-    }
-  }
+  moveDragging = (clientX, clientY) => {
+    this.draggingElement.style.left = `${clientX - this.offsetPointer.x}px`;
+    this.draggingElement.style.top = `${clientY - this.offsetPointer.y}px`;
+  };
 
-  dragStop() {
-    const placeholderIndex = [...this.element.children].indexOf(this.placeholderElem);
+  initEventListeners = () => {
+    document.addEventListener('pointermove', this.pointerMoveHandler);
+    document.addEventListener('pointerup', this.pointerUpHandler);
+  };
 
-    // drop element back
-    this.placeholderElem.replaceWith(this.draggingElem);
-    this.draggingElem.classList.remove('sortable-list__item_dragging');
+  removeEventListeners = () => {
+    document.removeEventListener('pointermove', this.pointerMoveHandler);
+    document.removeEventListener('pointerup', this.pointerUpHandler);
+  };
 
-    this.draggingElem.style.left = '';
-    this.draggingElem.style.top = '';
-    this.draggingElem.style.width = '';
-    this.draggingElem.style.height = '';
+  addItem = () => {
+    this.items.forEach(item => {
+      item.classList.add('sortable-list__item');
+    });
+    this.element.append(...this.items);
+  };
 
-    document.removeEventListener('pointermove', this.onDocumentPointerMove);
-    document.removeEventListener('pointerup', this.onDocumentPointerUp);
+  dispatchEvent = (type, detail) => {
+    this.element.dispatchEvent(new CustomEvent(type, {
+      bubbles: true,
+      detail,
+    }));
+  };
 
-    this.draggingElem = null;
-
-    if (placeholderIndex !== this.elementInitialIndex) {
-      this.element.dispatchEvent(new CustomEvent('sortable-list-reorder', {
-        bubbles: true,
-        details: {
-          from: this.elementInitialIndex,
-          to: placeholderIndex
-        }
-      }));
-    }
-  }
-
-  remove() {
+  remove = () => {
     this.element.remove();
-    document.removeEventListener('pointermove', this.onDocumentPointerMove);
-    document.removeEventListener('pointerup', this.onDocumentPointerUp);
-  }
+  };
 
-  destroy() {
+  destroy = () => {
     this.remove();
-  }
+    this.removeEventListeners();
+    this.element = null;
+  };
 }
