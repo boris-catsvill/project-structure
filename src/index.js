@@ -5,6 +5,10 @@ tooltip.initialize();
 
 const router = Router.instance();
 
+document.querySelector('.sidebar__toggler').addEventListener('pointerdown', () => {
+  document.body.classList.toggle('is-collapsed-sidebar');
+});
+
 router
   .addRoute(/^$/, 'dashboard')
   .addRoute(/^products$/, 'products/list')
