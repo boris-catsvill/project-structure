@@ -219,13 +219,13 @@ export default class SortableTable {
   };
 
   destroy = () => {
-    this.element.remove();
+    this.remove();
+    this.element = null;
+    this.subElements = null;
+    window.removeEventListener('scroll', this.scrollTableHandler);
   };
 
   remove = () => {
-    this.destroy();
-    this.element = null;
-    this.subElements = null;
-    window.removeEventListener('scroll', this._scrollTableHandler);
+    this.element.remove();
   };
 }

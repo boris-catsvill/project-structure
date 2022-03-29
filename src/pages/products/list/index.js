@@ -50,9 +50,7 @@ export default class Page {
 
   loadData = async ({title, status, from, to} = this.filter) => {
     this.url.searchParams.set('_embed', 'subcategory.category');
-    if (title) {
-      this.url.searchParams.set('title_like', title);
-    }
+    this.url.searchParams.set('title_like', title);
     if (status) {
       this.url.searchParams.set('status', status);
     } else {
@@ -112,6 +110,7 @@ export default class Page {
         ...this.filter,
         ...event.detail,
       };
+      this.url.searchParams.set('_start', 1);
       const data = await this.loadData(this.filter);
 
       sortableTable.update(data);
@@ -125,18 +124,22 @@ export default class Page {
         ...this.filter,
         status
       };
+      this.url.searchParams.set('_start', 1);
       const data = await this.loadData(this.filter);
 
       sortableTable.update(data);
     });
   };
 
-  inputHandler = async (event) => {
+  inputHandler = async event => {
+    
     const title = event.target.value;
     this.filter = {
       ...this.filter,
       title,
     };
+    console.log(this.filter)
+    this.url.searchParams.set('_start', 1);
     const data = await this.loadData(this.filter);
 
     this.components.sortableTable.update(data);
@@ -162,8 +165,7 @@ export default class Page {
 
   destroy = () => {
     this.remove();
-    Object.values(this.getSubElements).forEach(item => item.destroy());
-
+    Object.values(this.components).forEach(item => item.destroy());
     this.element = null;
     this.subElements = null;
     this.controls = null;
