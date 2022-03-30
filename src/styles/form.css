@@ -108,6 +108,27 @@ form.form-inline .form-group {
   margin-bottom: 0;
 }
 
+.products-list form.form-inline .form-group {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+}
+
+.products-list form.form-inline .form-label {
+  margin-bottom: 0;
+  margin-right: 16px;
+}
+
+.products-list .products-list__container {
+  height: 100%;
+}
+
+.products-list {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
 @keyframes spin {
   from {
     transform: rotate(0deg);

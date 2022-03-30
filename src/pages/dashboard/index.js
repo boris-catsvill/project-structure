@@ -54,6 +54,7 @@ export default class Page {
       isSortLocally: true
     });
 
+
     const ordersChart = new ColumnChart({
       data: ordersData,
       label: 'orders',
@@ -73,11 +74,15 @@ export default class Page {
       value: customersData.reduce((accum, item) => accum + item),
     });
 
-    this.components.sortableTable = sortableTable;
-    this.components.ordersChart = ordersChart;
-    this.components.salesChart = salesChart;
-    this.components.customersChart = customersChart;
-    this.components.rangePicker = rangePicker;
+
+    this.components = {
+      sortableTable,
+      ordersChart,
+      salesChart,
+      customersChart,
+      rangePicker
+    };
+
   }
 
   get template () {
@@ -122,6 +127,7 @@ export default class Page {
     Object.keys(this.components).forEach(component => {
       const root = this.subElements[component];
       const { element } = this.components[component];
+
 
       root.append(element);
     });
