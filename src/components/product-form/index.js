@@ -3,8 +3,8 @@ import escapeHtml from '../../utils/escape-html.js';
 import fetchJson from '../../utils/fetch-json.js';
 import { log } from 'webpack-dev-server/client/utils/log';
 
-const IMGUR_CLIENT_ID = '28aaa2e823b03b1';
-const BACKEND_URL = 'https://course-js.javascript.ru';
+const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID;
+const BACKEND_URL = process.env.BACKEND_URL;
 
 export default class ProductForm {
   subElements = {};
@@ -131,10 +131,12 @@ export default class ProductForm {
     this.subElements.imageListContainer.append(this.imageList.element);
     const productCategory = this.formData.subcategory;
     const selectArr = this.subElements.productForm.subcategory.options;
-    const optionProduct = Array.from(selectArr).find(elem => {
+    const optionProduct = [...selectArr].find(elem => {
       return elem.value === productCategory;
     });
-    optionProduct ? optionProduct.selected = true: '';
+    if ( optionProduct ) {
+      optionProduct.selected = true;
+    }
   }
   qetEmptyTemplate() {
     return `<div class="error-404">
@@ -235,7 +237,7 @@ export default class ProductForm {
       const [file] = fileInput.files;
       if (!file)
         return;
-      let result; let formData = new FormData();
+      let result; const formData = new FormData();
       formData.append("image", file);
       this.subElements.productForm.uploadImage.classList.add("is-loading");
       this.subElements.productForm.uploadImage.disabled = true;

@@ -8,6 +8,8 @@ export default class Page {
   element;
   subElements = {};
   components = {};
+  start = 0;
+  end = 30;
   url = new URL('api/rest/products?_embed=subcategory.category', BACKEND_URL);
 
   async updateComponents(from, to) {
@@ -17,7 +19,7 @@ export default class Page {
 
   }
 
-  loadData(from = 0, to = 30) {
+  loadData(from = this.start, to = this.end) {
     this.url.searchParams.set('_start', '0');
     this.url.searchParams.set('_end', '30');
     this.url.searchParams.set('_sort', 'title');
@@ -32,8 +34,8 @@ export default class Page {
 
   initComponents() {
     const sliderContainer = new DoubleSlider({min:1, max: 4000});
-    this.url.searchParams.set('_start', '0');
-    this.url.searchParams.set('_end', '30');
+    this.url.searchParams.set('_start', this.start);
+    this.url.searchParams.set('_end', this.end);
     const sortableTable = new SortableTable(header,{
       url: this.url,
     });

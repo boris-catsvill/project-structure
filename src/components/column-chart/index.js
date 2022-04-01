@@ -1,6 +1,6 @@
 import fetchJson from '../../utils/fetch-json.js';
 
-const BACKEND_URL = 'https://course-js.javascript.ru';
+const BACKEND_URL = process.env.BACKEND_URL;
 
 export default class ColumnChart {
   chartHeight = 50;
@@ -25,7 +25,7 @@ export default class ColumnChart {
   }
 
   getTemplate () {
-    return `<div class="column-chart column-chart_loading" style="--chart-height: 50">
+    return `<div class="column-chart column-chart_loading" style="--chart-height: ${this.chartHeight}">
       <div class="column-chart__title">
         ${this.label}
         ${this.linkTemplate}

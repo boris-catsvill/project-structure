@@ -57,8 +57,8 @@ export default class SortableList {
     element.after(this.placeholderElem);
     this.element.append(element);
     this.moveDraggingAt(clientX, clientY);
-    document.addEventListener("pointermove", this.onDocumentPointerMove);
-    document.addEventListener("pointerup", this.onDocumentPointerUp);
+    this.element.addEventListener("pointermove", this.onDocumentPointerMove);
+    this.element.addEventListener("pointerup", this.onDocumentPointerUp);
   }
   moveDraggingAt(x, y) {
     this.elMove.style.left = x - this.elShift.x + "px";
@@ -94,8 +94,8 @@ export default class SortableList {
     this.elMove.style.left = '';
     this.elMove.style.top = '';
     this.placeholderElem.remove();
-    document.removeEventListener("pointermove", this.onDocumentPointerMove);
-    document.removeEventListener("pointerup", this.onDocumentPointerUp);
+    this.element.removeEventListener("pointermove", this.onDocumentPointerMove);
+    this.element.removeEventListener("pointerup", this.onDocumentPointerUp);
     this.elMove = null;
     if (placeholderIndex !== this.elementInitialIndex) {
       this.element.dispatchEvent(new CustomEvent('sortable-list-reorder', {
@@ -113,8 +113,8 @@ export default class SortableList {
 
   destroy() {
     this.element.removeEventListener('pointerdown', this.onPointerDown);
-    document.removeEventListener("pointermove", this.onDocumentPointerMove);
-    document.removeEventListener("pointerup", this.onDocumentPointerUp);
+    this.element.removeEventListener("pointermove", this.onDocumentPointerMove);
+    this.element.removeEventListener("pointerup", this.onDocumentPointerUp);
     this.element.remove();
   }
 }

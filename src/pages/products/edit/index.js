@@ -7,11 +7,13 @@ export default class Page {
   subElements = {};
   components = {};
   url = new URL('api/dashboard/bestsellers', BACKEND_URL);
-  productId = decodeURI(window.location.pathname)
-    .replace(/\/products\/(.+)/, (...match) => {
+  constructor(
+    match = ''
+  ){
+    this.productId = match.replace(/products\/(.+)/, (...match) => {
       return match[1] !== 'add' ? match[1] : ''
     });
-
+  }
   initComponents() {
     const productForm = new ProductForm(this.productId);
 
@@ -21,7 +23,7 @@ export default class Page {
   }
 
   async render() {
-    await this.initComponents();
+    this.initComponents();
     await this.components.productForm.render();
     this.initEventListeners();
     return this.components.productForm.element;

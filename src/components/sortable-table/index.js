@@ -1,6 +1,7 @@
 import fetchJson from "../../utils/fetch-json.js";
+import NotificationMessage from '../notification';
 
-const BACKEND_URL = 'https://course-js.javascript.ru';
+const BACKEND_URL = process.env.BACKEND_URL;
 
 export default class SortableTable {
   subElements = {};
@@ -17,7 +18,10 @@ export default class SortableTable {
           this.element.classList.remove("sortable-table_loading");
         })
         .catch(error => {
-          console.error('ошибка получения данных', error);
+          const notification = new NotificationMessage('Ошибка получения данных', {
+            duration: 2000,
+            type: 'error'
+          });
         });
 
     }
@@ -62,7 +66,7 @@ export default class SortableTable {
   <\div><\div>`;
   }
   renderHeaders (sortColumn, order) {
-    let headerArr = [];
+    const headerArr = [];
     for (const obj of this.headerConfig) {
       let arrowTemplate = '';
       let orderType = '';
@@ -80,7 +84,7 @@ export default class SortableTable {
   }
 
   renderBody (data) {
-    let bodyArr = [];
+    const bodyArr = [];
     for (const obj of data) {
       bodyArr.push(`<a href="/products/${obj.id}" class="sortable-table__row">
         ${this.headerConfig

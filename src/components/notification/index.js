@@ -1,5 +1,5 @@
 export default class NotificationMessage {
-  element = document.body;
+  element;
   constructor(message = '', {
     duration = 1000,
     type = 'success',
