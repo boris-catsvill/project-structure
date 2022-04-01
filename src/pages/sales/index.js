@@ -36,13 +36,15 @@ export default class Page {
       to: new Date()
     };
     const rangePicker = new RangePicker(range);
-
+    this.url.searchParams.set('createdAt_gte', range.from.toISOString());
+    this.url.searchParams.set('createdAt_lte', range.to.toISOString());
     const sortableTable = new SortableTable(header,{
-      url: `${BACKEND_URL}api/rest/orders?_start=0&_end=30&createdAt_gte=${range.from.toISOString()}&createdAt_lte=${range.to.toISOString()}`,
+      url: this.url,
       sorted: {
         id: 'createdAt',
-        order: 'desc'
-      }
+        order: 'desc',
+      },
+      clickableString: false
     });
     this.components = {
       rangePicker,

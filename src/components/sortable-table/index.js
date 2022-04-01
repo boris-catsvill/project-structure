@@ -50,12 +50,14 @@ export default class SortableTable {
     },
     isSortLocally = false,
     url = '',
+    clickableString = true
   } = {}) {
     this.headerConfig = headerConfig;
     this.url = typeof url === 'string'? new URL(url, BACKEND_URL): url;
     this.data = data;
     this.sorted = sorted;
     this.isSortLocally = isSortLocally;
+    this.clickableString = clickableString;
     this.render().then(() => this.initEventListeners());
   }
   getTemplate () {
@@ -86,12 +88,12 @@ export default class SortableTable {
   renderBody (data) {
     const bodyArr = [];
     for (const obj of data) {
-      bodyArr.push(`<a href="/products/${obj.id}" class="sortable-table__row">
+      bodyArr.push(`${this.clickableString ? `<a href="/products/${obj.id}" `:'<div '} class="sortable-table__row">
         ${this.headerConfig
         .filter(item => obj[item.id])
         .map(el => el.template ? el.template(obj[el.id]) : `<div class="sortable-table__cell">${obj[el.id]}</div>`)
         .join('')}
-        </a>`);
+        ${this.clickableString ? '</a>':'</div>'}`);
     }
     return bodyArr.join('');
   }
