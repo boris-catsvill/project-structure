@@ -23,7 +23,7 @@ const header = [
     sortable: true,
     sortType: 'string',
     template: data => {
-      return `<div class="sortable-table__cell">
+      return `<div class="sortable-table__cell" data-tooltip=${data.category.title}>
         ${data.title}
       </div>`;
     }

@@ -1,8 +1,8 @@
 import SortableList from '../../components/sortable-list/index.js';
 
 export default class CategoriesList {
-  element;
-  subElements = {};
+  element
+  subElements = {}
 
   constructor(category) {
 			this.category = category;

@@ -292,7 +292,7 @@ export default class ProductForm {
     const json = JSON.stringify(formData);
 
     const resolve = await fetch(`${process.env.BACKEND_URL}api/rest/products`, {
-      method: this.productId ? "PATCH" : "POST",
+      method: this.productId ? "PATCH" : "PUT",
       headers: {"Content-Type": "application/json"},
       body: json,
       referrer: ''

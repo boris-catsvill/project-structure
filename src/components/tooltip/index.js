@@ -2,6 +2,7 @@ class Tooltip {
   static instance;
 
   element;
+  distanceFromCursor = 20;
 
   onMouseOver = event => {
     const element = event.target.closest('[data-tooltip]');
@@ -57,10 +58,8 @@ class Tooltip {
   }
 
   moveTooltip(event) {
-    const left = event.clientX + 10;
-    const top = event.clientY + 10;
-
-    // TODO: Add logic for window borders
+    const left = event.clientX + this.distanceFromCursor;
+    const top = event.clientY + this.distanceFromCursor;
 
     this.element.style.left = left + 'px';
     this.element.style.top = top + 'px';
@@ -76,3 +75,5 @@ class Tooltip {
 const tooltip = new Tooltip();
 
 export default tooltip;
+
+

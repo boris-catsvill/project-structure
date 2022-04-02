@@ -84,8 +84,6 @@ export default class Page {
   updateTable = async (event) => {
     const { productsContainer } = this.components;
 
-    productsContainer.destroy();
-
     switch (event.type) {
       case "input":
         productsContainer.title_like = event.target.value;
@@ -104,16 +102,11 @@ export default class Page {
         productsContainer.status = '';
         this.updateHeader();
     }
-    productsContainer.start = 1;
+    productsContainer.start = 0;
     productsContainer.end = 21;
     productsContainer.dataHave = true;
 
-    await productsContainer.render()
-
-    const root = this.subElements["productsContainer"];
-    const {element} = this.components["productsContainer"];
-
-    root.append(element)
+    await productsContainer.updateTable();
   }
 
   initEventListener () {
@@ -122,6 +115,7 @@ export default class Page {
     filterName.addEventListener("input", this.updateTable)
     sliderContainer.addEventListener("range-select", this.updateTable)
     filterStatus.addEventListener("change", this.updateTable)
+
     this.subElements.productsContainer.addEventListener("reset-filters", this.updateTable)
   }
 
