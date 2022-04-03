@@ -11,7 +11,7 @@ export default class {
       </div>
     `;
 
-    this.element = element.firstElementChild
+    this.element = element.firstElementChild;
 
     return this.element;
   }
