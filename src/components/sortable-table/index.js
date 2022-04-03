@@ -273,11 +273,7 @@ export default class SortableTable {
     this.element = element;
     this.subElements = this.getSubElements(element);
 
-    const headers = element.querySelectorAll('[data-sortable="true"]');
-
-    for (const header of headers) {
-      header.addEventListener('pointerdown', this.handleHeaderClick, true);
-    }
+    this.subElements.header.addEventListener('pointerdown', this.handleHeaderClick, true);
 
     if (!this.isSortLocally) {
       window.addEventListener('scroll', this.handleScroll, { passive: true });

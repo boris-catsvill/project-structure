@@ -1,6 +1,6 @@
-import ProductForm from "../../../components/product-form";
-import Notification from "../../../components/notification";
-import Router from "../../../router";
+import ProductForm from "../../../components/product-form/index.js";
+import Notification from "../../../components/notification/index.js";
+import Router from "../../../router/index.js";
 
 export default class Page {
   element;

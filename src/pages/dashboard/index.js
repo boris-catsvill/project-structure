@@ -4,8 +4,6 @@ import ColumnChart from '../../components/column-chart/index.js';
 import NotificationMessage from '../../components/notification/index.js';
 import header from './bestsellers-header.js';
 
-import fetchJson from '../../utils/fetch-json.js';
-
 export default class Page {
   element
   components = {}
@@ -14,7 +12,7 @@ export default class Page {
 
   constructor () {
     const prevDate = new Date();
-    prevDate.setDate(prevDate.getDate() - 30);
+    prevDate.setMonth(prevDate.getMonth() - 1);
 
     this.initialDate = {
       from: prevDate,

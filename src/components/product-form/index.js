@@ -151,7 +151,7 @@ export default class ProductForm {
         body: formData,
         headers: {
           "authorization": `Client-ID ${process.env.IMGUR_CLIENT_ID}`,
-          "referer": 'https://course-js.javascript.ru/'
+          "referer": ''
         }
       });
 
@@ -194,7 +194,7 @@ export default class ProductForm {
     const urls = this.subElements.imageListContainer.firstElementChild.querySelectorAll('[name=url]');
     const sources = this.subElements.imageListContainer.firstElementChild.querySelectorAll('[name=source]');
 
-    res.images = Array.from(urls).map((url, index) => {
+    res.images = Array.from(urls, (url, index) => {
       return { url: url.value, source: sources[index].value };
     });
 

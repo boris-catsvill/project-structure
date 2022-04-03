@@ -1,5 +1,5 @@
-import ProductForm from "../../../components/product-form";
-import NotificationMessage from "../../../components/notification";
+import ProductForm from "../../../components/product-form/index.js";
+import NotificationMessage from "../../../components/notification/index.js";
 
 export default class Page {
   element;

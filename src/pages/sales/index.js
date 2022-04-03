@@ -14,7 +14,8 @@ export default class Page {
 
   async initComponents () {
     const to = new Date();
-    const from = new Date(to.getTime() - (30 * 24 * 60 * 60 * 1000));
+    const from = new Date();
+    from.setMonth(from.getMonth() - 1);
 
     const rangePicker = new RangePicker({
       from,

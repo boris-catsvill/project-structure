@@ -10,7 +10,8 @@ export default class Page {
   data;
 
   async initComponents () {
-    this.data = await fetchJson(`${process.env.BACKEND_URL}api/rest/categories?_sort=weight&_refs=subcategory`);
+    const url = new URL(`${process.env.BACKEND_URL}api/rest/categories?_sort=weight&_refs=subcategory`);
+    this.data = await fetchJson(url.toString());
 
     this.data.forEach(category => {
       const sortableList = new SortableList({

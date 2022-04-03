@@ -13,7 +13,7 @@ export default class Page {
     status: null
   }
 
-  async initComponents () {
+  initComponents () {
     const sortableTable = new SortableTable(header, {
       url: 'api/rest/products?_embed=subcategory.category',
       isSortLocally: false,
@@ -106,16 +106,16 @@ export default class Page {
   }
 
   getFilterData () {
-    let baseURL = 'api/rest/products?_embed=subcategory.category&_sort=title&_order=asc';
+    let baseURL = new URL('api/rest/products?_embed=subcategory.category&_sort=title&_order=asc');
 
     Object.entries(this.currentFilter).forEach(([key, value]) => {
       if (value !== null) {
-        baseURL += `&${key}=${value}`;
+        baseURL.searchParams.set(key, value);
       }
     });
 
     const sortableTable = new SortableTable(header, {
-      url: baseURL,
+      url: baseURL.toString(),
       isSortLocally: false,
       step: 30,
       start: 0,

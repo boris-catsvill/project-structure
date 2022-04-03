@@ -1,4 +1,4 @@
-import NotificationMessage from '../notification';
+import NotificationMessage from '../notification/index.js';
 
 import fetchJson from '../../utils/fetch-json';
 
@@ -33,7 +33,7 @@ export default class ColumnChart {
     });
   }
 
-  renderCard = (data) => {
+  renderCard = data => {
     return `
       <div class="column-chart__title">
           ${this.label}
@@ -64,22 +64,29 @@ export default class ColumnChart {
     this.data = [];
     this.render();
 
-    return fetchJson(`${process.env.BACKEND_URL}${this.url}?from=${from}&to=${to}`).then(data => {
-      this.data = Object.values(data);
-
-      const newValue = this.data.reduce((prev, curr) => prev + curr);
+    return this.getNewData(from, to).then(data => {
+      this.data = data;
+      const newValue = data.reduce((prev, curr) => prev + curr);
       this.value = this.formatHeading ? this.formatHeading(newValue) : newValue;
 
       this.render();
       return data;
-    }).catch((error) => {
-      const notification = new NotificationMessage(error.message, {
-        duration: 2000,
-        type: 'error'
-      });
-  
-      notification.show();
     });
+  }
+
+  getNewData = async (from, to) => {
+      try {
+        const data = await fetchJson(`${process.env.BACKEND_URL}${this.url}?from=${from}&to=${to}`);
+
+        return Object.values(data);
+      } catch (error) {
+        const notification = new NotificationMessage(error.message, {
+          duration: 2000,
+          type: 'error'
+        });
+          
+        notification.show();
+      }
   }
 
   getSubElements = (element) => {
@@ -107,33 +114,29 @@ export default class ColumnChart {
     this.subElements = {};
   }
 
+  renderElement = (element) => {
+    if (this.data.length) {
+      element.className = 'column-chart';
+
+      element.innerHTML = this.renderData();
+    } else {
+      element.className = 'column-chart column-chart_loading';
+
+      element.innerHTML = this.renderPreloader();
+    }
+
+    return element;
+  }
+
   render = () => {
     if (this.element) {
-      if (this.data.length) {
-        this.element.className = 'column-chart';
-
-        this.element.innerHTML = this.renderData();
-      } else {
-        this.element.className = 'column-chart column-chart_loading';
-
-        this.element.innerHTML = this.renderPreloader();
-      }
+      this.element = this.renderElement(this.element);
     } else {
       const wrapper = document.createElement('div');
 
       wrapper.style = `--chart-height: ${this.chartHeight}`;
 
-      if (this.data.length) {
-        wrapper.className = 'column-chart';
-
-        wrapper.innerHTML = this.renderData();
-      } else {
-        wrapper.className = 'column-chart column-chart_loading';
-
-        wrapper.innerHTML = this.renderPreloader();
-      }
-
-      this.element = wrapper;
+      this.element = this.renderElement(wrapper);
     }
 
     this.subElements = this.getSubElements(this.element);
