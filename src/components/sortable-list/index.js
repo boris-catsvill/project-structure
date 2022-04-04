@@ -57,8 +57,8 @@ export default class SortableList {
     element.after(this.placeholderElem);
     this.element.append(element);
     this.moveDraggingAt(clientX, clientY);
-    this.element.addEventListener("pointermove", this.onDocumentPointerMove);
-    this.element.addEventListener("pointerup", this.onDocumentPointerUp);
+    document.addEventListener("pointermove", this.onDocumentPointerMove);
+    document.addEventListener("pointerup", this.onDocumentPointerUp);
   }
   moveDraggingAt(x, y) {
     this.elMove.style.left = x - this.elShift.x + "px";
@@ -72,6 +72,8 @@ export default class SortableList {
     if (!elemBelow) return;
     const elFromList = elemBelow.closest('.sortable-list__item');
     if (!elemBelow.closest('.sortable-list__placeholder') && elFromList) {
+      const placeHoldIndex = [...this.element.children].indexOf(elFromList);
+      if (placeHoldIndex > this.element.children.length || placeHoldIndex < 0) return;
       const direction = elFromList.getBoundingClientRect().top > this.placeholderElem.getBoundingClientRect().top
         ? 1 : 0;
       this.movePlaceholderAt(elFromList, direction);
@@ -81,9 +83,9 @@ export default class SortableList {
     direction ? elFromList.after(this.placeholderElem) : elFromList.before(this.placeholderElem);
 
   }
-  onDocumentPointerUp = (event) => {
+  onDocumentPointerUp = () => {
     this.dragStop();
-  }
+  };
 
   dragStop () {
     const placeholderIndex = [...this.element.children].indexOf(this.placeholderElem);
@@ -94,8 +96,8 @@ export default class SortableList {
     this.elMove.style.left = '';
     this.elMove.style.top = '';
     this.placeholderElem.remove();
-    this.element.removeEventListener("pointermove", this.onDocumentPointerMove);
-    this.element.removeEventListener("pointerup", this.onDocumentPointerUp);
+    document.removeEventListener("pointermove", this.onDocumentPointerMove);
+    document.removeEventListener("pointerup", this.onDocumentPointerUp);
     this.elMove = null;
     if (placeholderIndex !== this.elementInitialIndex) {
       this.element.dispatchEvent(new CustomEvent('sortable-list-reorder', {
@@ -113,8 +115,8 @@ export default class SortableList {
 
   destroy() {
     this.element.removeEventListener('pointerdown', this.onPointerDown);
-    this.element.removeEventListener("pointermove", this.onDocumentPointerMove);
-    this.element.removeEventListener("pointerup", this.onDocumentPointerUp);
+    document.removeEventListener("pointermove", this.onDocumentPointerMove);
+    document.removeEventListener("pointerup", this.onDocumentPointerUp);
     this.element.remove();
   }
 }

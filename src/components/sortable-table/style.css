@@ -127,3 +127,6 @@
 .sortable-table .sortable-table__loading-line {
   display: none;
 }
+.sales .sortable-table__row {
+  grid: auto-flow / 10% 33% 33% 12% 12%;
+}
