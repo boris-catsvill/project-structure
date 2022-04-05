@@ -6,14 +6,14 @@
   "scripts": {
     "start": "npm run build && npm run static-server",
     "develop": "cross-env NODE_ENV=development webpack serve --config ./webpack/webpack.dev.js",
-    "build": "npm run clean && cross-env NODE_ENV=production webpack --config ./webpack/webpack.prod.js",
+    "deploy": "gh-pages -d build",
+    "build": "npm run clean && cross-env NODE_ENV=production URL_PATH='course-js.javascript.ru/' webpack --config ./webpack/webpack.prod.js",
     "eslint": "eslint \"src/**/*.js\"",
     "eslint:fix": "eslint --fix \"**/*.js\"",
     "prettier": "prettier --check \"**/*.{js,css,html,md,json}\" --write",
     "test:jest": "cross-env NODE_ICU_DATA=node_modules/full-icu jest",
     "static-server": "static-server ./build",
-    "clean": "rimraf build",
-    "deploy": "gh-pages -d build"
+    "clean": "rimraf build"
   },
   "author": "",
   "license": "ISC",
