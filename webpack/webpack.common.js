@@ -63,12 +63,12 @@ module.exports = {
     new CopyWebpackPlugin({
       patterns: [
         {
-          from: path.join(__dirname, '../src/assets'),
+          from: path.join(__dirname, '../src/assets').replace(/\\/g, "/"),
           to: "assets/[path][name][ext]",
         },
         {
-          from: path.join(__dirname, '../src/components/product-form/*.svg'),
-          to: "[name][ext]",
+          from: path.join(__dirname, '../src/components/product-form/*.svg').replace(/\\/g, "/"),
+          to: "assets/[path][name][ext]",
         }
       ]
     })

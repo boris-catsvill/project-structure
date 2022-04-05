@@ -3,7 +3,7 @@ const header = [
     id: 'images',
     title: 'Фото',
     sortable: false,
-    template: data => {
+    template: (data = []) => {
       return `
           <div class="sortable-table__cell">
             <img class="sortable-table-image" alt="Image" src="${data[0].url}">
@@ -27,7 +27,6 @@ const header = [
            </div>`;
     }
   },
-
   {
     id: 'quantity',
     title: 'Количество',
