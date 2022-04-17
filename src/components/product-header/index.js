@@ -5,7 +5,7 @@ export default class ProductHeader {
   subElements = {};
   components = {};
 
-  constructor ({
+  constructor({
     min = 100,
     max = 200,
     formatValue = value => '$' + value,
@@ -14,14 +14,14 @@ export default class ProductHeader {
       to: max
     },
     setFindString = () => {}
-    } = {}) {
+  } = {}) {
     this.min = min;
     this.max = max;
     this.formatValue = formatValue;
     this.selected = selected;
     this.setFindString = setFindString;
 
-    this.render()
+    this.render();
   }
 
   async render() {
@@ -30,7 +30,7 @@ export default class ProductHeader {
     this.element = element.firstElementChild;
     this.subElements = this.getSubElements(this.element);
 
-    this.initComponents()
+    this.initComponents();
     await this.renderComponents();
 
     return this.element;
@@ -49,16 +49,16 @@ export default class ProductHeader {
     };
   }
 
-  async renderComponents () {
+  renderComponents() {
     Object.keys(this.components).forEach(component => {
       const root = this.subElements[component];
-      const {element} = this.components[component];
+      const { element } = this.components[component];
 
       root.append(element);
     });
   }
 
-  get template () {
+  get template() {
     return `
         <form class="form-inline">
           <div class="form-group">
@@ -83,7 +83,7 @@ export default class ProductHeader {
 		`;
   }
 
-  getSubElements ($element) {
+  getSubElements($element) {
     const elements = $element.querySelectorAll('[data-element]');
 
     return [...elements].reduce((accum, subElement) => {
@@ -95,7 +95,7 @@ export default class ProductHeader {
 
   destroy() {
     this.element = null;
-    this.subElements = {}
+    this.subElements = {};
     for (const component of Object.values(this.components)) {
       component.destroy();
     }

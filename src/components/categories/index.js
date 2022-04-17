@@ -1,13 +1,13 @@
 import SortableList from '../../components/sortable-list/index.js';
 
 export default class CategoriesList {
-  element
-  subElements = {}
+  element;
+  subElements = {};
 
   constructor(category) {
-			this.category = category;
-      this.render()
-	}
+    this.category = category;
+    this.render();
+  }
 
   get template() {
     return `
@@ -19,11 +19,11 @@ export default class CategoriesList {
           <div class="subcategory-list">
           </div>
         </div>
-      </div>`
+      </div>`;
   }
 
-	getSubCategory({subcategories}) {
-    const subcategoryList = this.element.querySelector(".subcategory-list")
+  getSubCategory({ subcategories }) {
+    const subcategoryList = this.element.querySelector('.subcategory-list');
 
     const sortableList = new SortableList({
       items: subcategories.map(subcategory => {
@@ -37,14 +37,14 @@ export default class CategoriesList {
         element.innerHTML = `
         <strong>${subcategory.title}</strong>
 				<span><b>${subcategory.count}</b> products</span>
-      `
+      `;
 
         return element;
       })
-    })
+    });
 
     subcategoryList.append(sortableList.element);
-    return subcategoryList
+    return subcategoryList;
   }
 
   render() {
@@ -52,18 +52,18 @@ export default class CategoriesList {
     wrapper.innerHTML = this.template;
     this.element = wrapper.firstElementChild;
 
-    this.getSubCategory(this.category)
+    this.getSubCategory(this.category);
 
     this.intEventListener();
-		return this.element;
+    return this.element;
   }
 
   intEventListener() {
-    const tmp = this.element.querySelector(".category__header")
-    tmp.addEventListener("pointerdown", (e) => {
-      const tmp = e.target.closest(".category");
-      tmp.classList.toggle("category_open");
-    })
+    const tmp = this.element.querySelector('.category__header');
+    tmp.addEventListener('pointerdown', event => {
+      const tmp = event.target.closest('.category');
+      tmp.classList.toggle('category_open');
+    });
   }
 
   remove() {

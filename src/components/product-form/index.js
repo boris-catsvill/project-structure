@@ -1,11 +1,9 @@
-
 import escapeHtml from '../../utils/escape-html.js';
 import fetchJson from '../../utils/fetch-json';
 import SortableList from '../sortable-list';
 import NotificationMessage from '../notification';
 
 export default class ProductForm {
-
   element;
   subElements = {};
   components = {};
@@ -16,8 +14,8 @@ export default class ProductForm {
     subcategory: '',
     status: 1,
     price: 100,
-    discount:0,
-    images:[]
+    discount: 0,
+    images: []
   };
 
   constructor(productId) {
@@ -111,33 +109,34 @@ export default class ProductForm {
 
         <div class="form-buttons">
           <button type="submit" name="save" class="button-primary-outline">
-            ${this.productId ? "Сохранить" : "Добавить"} товар
+            ${this.productId ? 'Сохранить' : 'Добавить'} товар
           </button>
         </div>
       </form>
   </div>
 
-    `
+    `;
   }
 
   getSelectCategories(categories) {
     return `
     <select class="form-control" id="subcategory">
-      ${categories.map((item) => {
-      return item.subcategories.map((j) => {
-        return `
-          <option
-            value=${j.id}>${item.title} &gt; ${j.title}
-          </option>`
-      }).join("")
-    }).join("")}
-    </select>`
+      ${categories
+        .map(item => {
+          return item.subcategories
+            .map(j => {
+              return `
+                <option
+                  value=${j.id}>${item.title} &gt; ${j.title}
+                </option>`;
+            }).join('');
+        }).join('')}
+    </select>`;
   }
 
   getImagesList(data) {
-
     if (!this.productId && data.images !== undefined) {
-      return ''
+      return '';
     }
 
     const sortableList = new SortableList({
@@ -157,20 +156,20 @@ export default class ProductForm {
             <button type="button">
               <img src="/assets/icons/icon-trash.svg" data-delete-handle="" alt="delete">
             </button>
-          `
+          `;
         return element;
       })
-    })
+    });
 
     this.components = {
       sortableList
-    }
+    };
 
     this.subElements.imageListContainer.append(sortableList.element);
   }
 
   getImage(url, source) {
-    const element = document.createElement("li");
+    const element = document.createElement('li');
     element.classList = 'products-edit__imagelist-item sortable-list__item';
 
     element.innerHTML = `
@@ -184,7 +183,7 @@ export default class ProductForm {
             <button type="button">
               <img src="/assets/icons/icon-trash.svg" data-delete-handle="" alt="delete">
             </button>
-          `
+          `;
     return element;
   }
 
@@ -195,15 +194,18 @@ export default class ProductForm {
       ? this.loadDataProducts(this.productId)
       : Promise.resolve([this.defaultFormData]);
 
-    const [categoriesData, productResponse] = await Promise.all([categoriesPromise, productPromise])
-    const [productData] = productResponse
+    const [categoriesData, productResponse] = await Promise.all([
+      categoriesPromise,
+      productPromise
+    ]);
+    const [productData] = productResponse;
 
-    this.formData = productData
-    this.categories = categoriesData
+    this.formData = productData;
+    this.categories = categoriesData;
 
-    this.renderForm()
+    this.renderForm();
 
-    return this.element
+    return this.element;
   }
 
   renderForm() {
@@ -212,53 +214,63 @@ export default class ProductForm {
     this.element = wrapper.firstElementChild;
     this.subElements = this.getSubElements(this.element);
 
-    this.getImagesList(this.formData)
+    this.getImagesList(this.formData);
     this.initEventListeners();
   }
 
   initEventListeners() {
-    const {productForm, imageListContainer} = this.subElements;
+    const { productForm, imageListContainer } = this.subElements;
     productForm.addEventListener('submit', this.onSubmit);
     productForm.addEventListener('pointerdown', this.uploadImage);
     imageListContainer.addEventListener('pointerdown', this.deleteImage);
   }
 
-  deleteImage(e) {
-    const deleteBtn = e.target.closest("button")
+  deleteImage(event) {
+    const deleteBtn = event.target.closest('button[data-delete-handle]');
     if (!deleteBtn) return;
-    e.target.closest("li").remove()
+    event.target.closest('li').remove();
   }
 
-  uploadImage = async (e) => {
-    const uploadImage = e.target.closest("button[name = uploadImage]");
+  uploadImage = async event => {
+    const uploadImage = event.target.closest('button[name = uploadImage]');
     if (!uploadImage) return;
 
-    const fileInput = document.createElement("input")
-    fileInput.type = "file"
-    fileInput.accept = "image/*"
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'image/*';
     fileInput.onchange = async () => {
-      uploadImage.classList.add("is-loading");
+      uploadImage.classList.add('is-loading');
       try {
         const [file] = fileInput.files;
         const result = await this.upload(file);
 
-        const currentImage = this.getImage(result.data.link, file.name)
+        const currentImage = this.getImage(result.data.link, file.name);
 
         this.subElements.imageListContainer.children[0].append(currentImage);
-
       } catch (error) {
         console.error(error);
-        alert("Изображение не загружено");
-      }
-      uploadImage.classList.remove("is-loading")
-    }
-    fileInput.click()
+        const notification = new NotificationMessage('Изобрадение не загружено', {
+          duration: 1000,
+          type: 'error'
+        });
 
-  }
+        notification.show();
+      }
+
+      uploadImage.classList.remove('is-loading');
+      const notification = new NotificationMessage('Изобрадение загружено', {
+        duration: 1000,
+        type: 'success'
+      });
+
+      notification.show();
+    };
+    fileInput.click();
+  };
 
   async upload(file) {
     const formData = new FormData();
-    formData.append("image", file);
+    formData.append('image', file);
     try {
       const response = await fetch('https://api.imgur.com/3/image', {
         method: 'POST',
@@ -279,39 +291,38 @@ export default class ProductForm {
     const notification = new NotificationMessage('Товар сохранен', {
       duration: 1000,
       type: 'success'
-    })
+    });
 
     notification.show();
 
     this.save();
-  }
+  };
 
   async save() {
-    const formData = this.getFormData()
-    formData.images = this.prepareImagesData()
+    const formData = this.getFormData();
+    formData.images = this.prepareImagesData();
     const json = JSON.stringify(formData);
 
     const resolve = await fetch(`${process.env.BACKEND_URL}api/rest/products`, {
-      method: this.productId ? "PATCH" : "PUT",
-      headers: {"Content-Type": "application/json"},
+      method: this.productId ? 'PATCH' : 'PUT',
+      headers: { 'Content-Type': 'application/json' },
       body: json,
       referrer: ''
     });
 
-    this.dispatchEvent()
+    this.dispatchEvent();
   }
 
   dispatchEvent() {
     const event = this.productId
-      ? new CustomEvent("product-updated")
-      : new CustomEvent("product-saved");
+      ? new CustomEvent('product-updated')
+      : new CustomEvent('product-saved');
     this.element.dispatchEvent(event);
   }
 
   getFormData = () => {
-
-    const {productForm} = this.subElements
-    const temp = productForm.elements
+    const { productForm } = this.subElements;
+    const temp = productForm.elements;
 
     return {
       id: this.productId,
@@ -323,32 +334,30 @@ export default class ProductForm {
       discount: parseInt(temp.discount.value, 10),
       status: parseInt(temp.status.value, 10),
       images: []
-    }
-  }
+    };
+  };
 
   prepareImagesData() {
     const arrayOfURL = [];
-    const currentArray = []
+    const currentArray = [];
 
-    const formData = new FormData(this.subElements.productForm)
+    const formData = new FormData(this.subElements.productForm);
 
     for (const [name, value] of formData) {
-      if (name === "url" || name === "source") {
-        arrayOfURL.push({name, value})
+      if (name === 'url' || name === 'source') {
+        arrayOfURL.push({ name, value });
       }
     }
 
-    for (let i = 0; i < arrayOfURL.length; i++) {
+    for (let i = 0; i < arrayOfURL.length; i += 2) {
       const w = {
         url: arrayOfURL[i].value,
         source: arrayOfURL[i + 1].value
-      }
-      currentArray.push(w)
-      i++;
-
+      };
+      currentArray.push(w);
     }
 
-    return currentArray
+    return currentArray;
   }
 
   async loadDataCategories() {
@@ -366,13 +375,13 @@ export default class ProductForm {
 
   getSubElements(element) {
     const result = [];
-    const elements = element.querySelectorAll("[data-element]");
+    const elements = element.querySelectorAll('[data-element]');
 
     for (const subElement of elements) {
       const name = subElement.dataset.element;
       result[name] = subElement;
     }
-    return result
+    return result;
   }
 
   remove() {
@@ -385,8 +394,6 @@ export default class ProductForm {
     this.subElements.productForm.removeEventListener('submit', this.onSubmit);
     this.remove();
     this.element = null;
-    this.subElements = {}
-
+    this.subElements = {};
   }
-
 }

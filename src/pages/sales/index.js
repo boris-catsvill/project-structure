@@ -1,21 +1,28 @@
 import fetchJson from '../../utils/fetch-json.js';
-import RangePicker from "../../components/range-picker";
-import SortableTable from "../../components/sortable-table";
-import header from "./sales-header.js";
+import RangePicker from '../../components/range-picker';
+import SortableTable from '../../components/sortable-table';
+import header from './sales-header.js';
 
 export default class Page {
   element;
   subElements = {};
   components = {};
 
-  async updateTableComponent (from, to) {
-    const data = await fetchJson(`${process.env.BACKEND_URL}api/rest/orders?_start=1&_end=20&createdAt_gte=${from.toISOString()}&createdAt_lte=${to.toISOString()}`);
+  async updateTableComponent(from, to) {
+    const url = new URL(`${process.env.BACKEND_URL}api/rest/orders`);
+    url.searchParams.set('_start', 1);
+    url.searchParams.set('_end', 20);
+    url.searchParams.set('createdAt_gte', from.toISOString());
+    url.searchParams.set('createdAt_lte', to.toISOString());
+
+    const data = await fetchJson(url);
     this.components.sortableTable.addRows(data);
   }
 
-  initComponents () {
+  initComponents() {
     const to = new Date();
-    const from = new Date(to.getTime() - (30 * 24 * 60 * 60 * 1000));
+    const from = new Date();
+    from.setMonth(from.getMonth() - 1);
 
     const rangePicker = new RangePicker({
       from,
@@ -31,10 +38,9 @@ export default class Page {
       sortableTable,
       rangePicker
     };
-
   }
 
-  get template () {
+  get template() {
     return `
     <div class="sales full-height flex-column">
       <div class="content__top-panel">
@@ -53,7 +59,7 @@ export default class Page {
     </div>
 		`;
   }
-  async render () {
+  async render() {
     const element = document.createElement('div');
 
     element.innerHTML = this.template;
@@ -68,7 +74,7 @@ export default class Page {
     return this.element;
   }
 
-  renderComponents () {
+  renderComponents() {
     Object.keys(this.components).forEach(component => {
       const root = this.subElements[component];
       const { element } = this.components[component];
@@ -77,7 +83,7 @@ export default class Page {
     });
   }
 
-  getSubElements ($element) {
+  getSubElements($element) {
     const elements = $element.querySelectorAll('[data-element]');
 
     return [...elements].reduce((accum, subElement) => {
@@ -87,7 +93,7 @@ export default class Page {
     }, {});
   }
 
-  initEventListeners () {
+  initEventListeners() {
     this.components.rangePicker.element.addEventListener('date-select', event => {
       const { from, to } = event.detail;
 
@@ -95,7 +101,7 @@ export default class Page {
     });
   }
 
-  destroy () {
+  destroy() {
     for (const component of Object.values(this.components)) {
       component.destroy();
     }
