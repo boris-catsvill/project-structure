@@ -1,0 +1,22 @@
+.products-list {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.products-list .sortable-table {
+  --cols: 6;
+  margin-bottom: 0;
+}
+
+.products-list .products-empty {
+  background: var(--grey-extra-light);
+  border: 1px solid var(--grey-light);
+  border-radius: 4px;
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--grey);
+}
