@@ -43,10 +43,28 @@ export default class SortableTable {
 
   constructor(
     headerConfig,
-    { url = '', isSortLocally = false, sorted = {}, start = 0, step = 20, end = start + step } = {}
+    {
+      url = '',
+      getRowLink = id => '',
+      renderEmpty = () => {
+        return `
+        <div>
+          <p>Не найдено товаров удовлетворяющих выбранному критерию</p>
+          <button type="button" class="button-primary-outline" data-element="reset">Сбросить фильтры</button>
+        </div>
+        `;
+      },
+      isSortLocally = false,
+      sorted = {},
+      start = 0,
+      step = 20,
+      end = start + step
+    } = {}
   ) {
     this.headerConfig = headerConfig;
     this.url = new URL(url, process.env.BACKEND_URL);
+    this.getRowLink = getRowLink;
+    this.renderEmpty = renderEmpty;
     this.isSortLocally = isSortLocally;
     this.sorted = sorted;
     this.start = start;
@@ -66,9 +84,9 @@ export default class SortableTable {
   getHeaderRow() {
     return this.headerConfig
       .map(column => {
-        return `<div class="sortable-table__cell" data-id="${column.id}" ${
-          column.sortable ? 'data-sortable' : ''
-        }>
+        return `<div class="sortable-table__cell" data-id="${column.id}"
+        ${column.sortable ? 'data-sortable' : ''}
+        ${column.id === this.sorted.id ? `data-order='${this.sorted.order}'` : ''}>
         <span>${column.title}</span>
         ${
           column.sortable
@@ -91,10 +109,14 @@ export default class SortableTable {
 
   getBodyRows(data = this.data) {
     return data
-      .map(
-        row =>
-          `<a href='/products/${row.id}' class='sortable-table__row'>${this.getBodyRow(row)}</a>`
-      )
+      .map(row => {
+        const rowLink = this.getRowLink(row.id);
+        const element = rowLink
+          ? `<a href='${rowLink}' class='sortable-table__row'>${this.getBodyRow(row)}</a>`
+          : `<div class='sortable-table__row'>${this.getBodyRow(row)}</div>`;
+
+        return element;
+      })
       .join('');
   }
 
@@ -117,10 +139,7 @@ export default class SortableTable {
       <div data-element="loading" class="loading-line sortable-table__loading-line"></div>
 
       <div data-element="emptyPlaceholder" class="sortable-table__empty-placeholder">
-        <div>
-          <p>No products satisfies your filter criteria</p>
-          <button type="button" class="button-primary-outline">Reset all filters</button>
-        </div>
+        ${this.renderEmpty()}
       </div>
     </div>`;
   }
@@ -166,6 +185,11 @@ export default class SortableTable {
 
   initEventListeners() {
     this.subElements.header.addEventListener('pointerdown', this.handleSort);
+    if (this.subElements.reset) {
+      this.subElements.reset.addEventListener('pointerdown', () => {
+        this.element.dispatchEvent(new CustomEvent('filters-reset'));
+      });
+    }
 
     document.addEventListener('scroll', this.handleScroll);
   }
@@ -223,7 +247,6 @@ export default class SortableTable {
 
   remove() {
     if (this.element) {
-      this.element.removeEventListener('pointerdown', this.handleSort);
       this.element.remove();
     }
   }
@@ -232,7 +255,7 @@ export default class SortableTable {
     this.remove();
     this.element = null;
     this.data = [];
-    this.headerConfig = [];
+    this.subElements = {};
     document.removeEventListener('scroll', this.handleScroll);
   }
 

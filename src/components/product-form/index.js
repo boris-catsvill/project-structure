@@ -2,6 +2,8 @@
 import escapeHtml from '../../utils/escape-html.js';
 import fetchJson from '../../utils/fetch-json.js';
 import FileUploader from './FileUploader/FileUploader.js';
+import iconGrab from '../../assets/icons/icon-grab.svg';
+import iconTrash from '../../assets/icons/icon-trash.svg';
 
 export default class ProductForm {
   subElements = [];
@@ -106,12 +108,12 @@ export default class ProductForm {
       <input type="hidden" name="url" value="${image.url}">
       <input type="hidden" name="source" value="${image.source}">
       <span>
-        <img src="icon-grab.svg" data-grab-handle="" alt="grab">
+        <img src="${iconGrab}" data-grab-handle="" alt="grab">
         <img class="sortable-table__cell-img" alt="Image" src="${image.url}">
         <span>${image.source}</span>
       </span>
       <button type="button">
-        <img src="icon-trash.svg" data-delete-handle="" alt="delete">
+        <img src="${iconTrash}" data-delete-handle="" alt="delete">
       </button>
     </li>`;
   }

@@ -1,10 +1,11 @@
-import DoubleSlider from '../../../components/double-slider/index';
+import ProductListFilters from '../../../components/product-list-filters';
 import SortableTable from '../../../components/sortable-table/index';
 import productsHeader from './products-header';
 
 export default class Page {
   subElements = {};
   components = {};
+  url = 'api/rest/products?_embed=subcategory.category';
 
   render() {
     const wrapper = document.createElement('div');
@@ -26,39 +27,19 @@ export default class Page {
         <h1 class="page-title">Товары</h1>
         <a href="/products/add" class="button-primary">Добавить товар</a>
       </div>
-      <div class="content-box content-box_small">
-        <form class="form-inline">
-          <div class="form-group">
-            <label class="form-label">Поиск по:</label>
-            <input type="text" data-element="filterName" class="form-control" placeholder="Название товара">
-          </div>
-          <div class="form-group" data-element="doubleSlider">
-            <label class="form-label">Цена:</label>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Статус:</label>
-            <select class="form-control" data-element="filterStatus">
-              <option value="" selected="">Любой</option>
-              <option value="1">Активный</option>
-              <option value="0">Неактивный</option>
-            </select>
-          </div>
-        </form>
-      </div>
+      <div data-element="productListFilters" class="content-box content-box_small"></div>
       <div data-element="sortableTable" class="products-list__container"></div>
     </div>
     `;
   }
 
   initComponents() {
-    const doubleSlider = new DoubleSlider({
-      min: 0,
-      max: 4000,
-      formatValue: value => `$${value}`
-    });
+    const productListFilters = new ProductListFilters();
+    productListFilters.render();
 
     const sortableTable = new SortableTable(productsHeader, {
-      url: 'api/rest/products?_embed=subcategory.category',
+      url: `${this.url}`,
+      getRowLink: id => `/products/${id}`,
       sorted: {
         id: 'title',
         order: 'asc'
@@ -66,12 +47,43 @@ export default class Page {
     });
 
     return {
-      doubleSlider,
+      productListFilters,
       sortableTable
     };
   }
 
-  initEventListeners() {}
+  async loadData(filterValues = {}) {
+    const table = this.components.sortableTable;
+    const { filterName = '', doubleSlider = '', filterStatus = '' } = filterValues;
+
+    table.start = 0;
+    table.end = table.step;
+
+    if (filterName !== '') {
+      table.url.searchParams.set('title_like', filterName);
+    } else {
+      table.url.searchParams.delete('title_like');
+    }
+
+    if (doubleSlider !== '') {
+      table.url.searchParams.set('price_gte', doubleSlider.from);
+      table.url.searchParams.set('price_lte', doubleSlider.to);
+    } else {
+      table.url.searchParams.delete('price_gte');
+      table.url.searchParams.delete('price_lte');
+    }
+
+    if (filterStatus !== '') {
+      table.url.searchParams.set('status', filterStatus);
+    } else {
+      table.url.searchParams.delete('status');
+    }
+
+    table.subElements.body.innerHTML = '';
+    const data = await table.loadData(table.sorted.id, table.sorted.order, table.start, table.end);
+
+    table.setRows(data);
+  }
 
   renderComponents() {
     for (const componentName of Object.keys(this.components)) {
@@ -80,6 +92,17 @@ export default class Page {
 
       root.append(element);
     }
+  }
+
+  initEventListeners() {
+    this.components.productListFilters.element.addEventListener('product-list-change', event => {
+      const filterValues = event.detail;
+      this.loadData(filterValues);
+    });
+    this.components.sortableTable.element.addEventListener('filters-reset', () => {
+      const filterValues = this.components.productListFilters.resetValues();
+      this.loadData(filterValues);
+    });
   }
 
   getSubElements(element) {
@@ -95,12 +118,12 @@ export default class Page {
   remove() {
     if (this.element) {
       this.element.remove();
-      this.element = null;
     }
   }
 
   destroy() {
     this.remove();
+    this.element = null;
     this.subElements = {};
 
     for (const component in this.components) {

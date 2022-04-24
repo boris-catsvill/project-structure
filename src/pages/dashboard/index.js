@@ -2,10 +2,15 @@ import header from './bestsellers-header.js';
 import ColumnChart from '../../components/column-chart/index.js';
 import RangePicker from '../../components/range-picker/index.js';
 import SortableTable from '../../components/sortable-table/index.js';
+import currencyFormatter from '../../utils/currency-formatter';
 
 export default class Page {
   subElements = {};
   components = {};
+  defaultRange = {
+    from: new Date(new Date().setMonth(new Date().getMonth() - 1)),
+    to: new Date()
+  };
 
   get template() {
     return `
@@ -25,7 +30,7 @@ export default class Page {
     `;
   }
 
-  render() {
+  async render() {
     const wrapper = document.createElement('div');
     wrapper.innerHTML = this.template;
     this.element = wrapper.firstElementChild;
@@ -40,9 +45,7 @@ export default class Page {
   }
 
   initComponents() {
-    const from = new Date(new Date().setMonth(new Date().getMonth() - 1));
-    const to = new Date();
-
+    const { from, to } = this.defaultRange;
     const rangePicker = new RangePicker({ from, to });
 
     const ordersChart = new ColumnChart({
@@ -52,15 +55,9 @@ export default class Page {
       range: { from, to }
     });
 
-    const formatter = new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      maximumFractionDigits: 0
-    });
-
     const salesChart = new ColumnChart({
       label: 'Продажи',
-      formatHeading: data => formatter.format(data),
+      formatHeading: data => currencyFormatter.format(data),
       url: 'api/dashboard/sales',
       range: { from, to }
     });
@@ -71,9 +68,18 @@ export default class Page {
       range: { from, to }
     });
 
+    const bestsellersURL = new URL('api/dashboard/bestsellers', process.env.BACKEND_URL);
+    bestsellersURL.searchParams.set('from', from.toISOString());
+    bestsellersURL.searchParams.set('to', to.toISOString());
+
     const sortableTable = new SortableTable(header, {
-      url: 'api/dashboard/bestsellers',
-      isSortLocally: true
+      url: bestsellersURL,
+      getRowLink: id => `/products/${id}`,
+      isSortLocally: true,
+      sorted: {
+        id: 'title',
+        order: 'asc'
+      }
     });
 
     return {
@@ -107,14 +113,18 @@ export default class Page {
 
   // Собственный метод для обновления таблицы
   async updateTable(from, to) {
-    this.components.sortableTable.url.searchParams.set('from', from.toISOString());
-    this.components.sortableTable.url.searchParams.set('to', to.toISOString());
+    const table = this.components.sortableTable;
 
-    const data = await this.components.sortableTable.loadData(
-      this.components.sortableTable.sorted.id,
-      this.components.sortableTable.sorted.order
-    );
-    this.components.sortableTable.setRows(data);
+    table.start = 0;
+    table.end = table.step;
+
+    table.url.searchParams.set('from', from.toISOString());
+    table.url.searchParams.set('to', to.toISOString());
+
+    table.subElements.body.innerHTML = '';
+    const data = await table.loadData(table.sorted.id, table.sorted.order, table.start, table.end);
+
+    table.setRows(data);
   }
 
   getSubElements(element) {

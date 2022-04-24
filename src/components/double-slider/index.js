@@ -1,8 +1,8 @@
 export default class DoubleSlider {
   subElements = {};
 
-  handlePointerDown = (event) => {
-    document.removeEventListener("pointermove", this.handlePointerMove);
+  handlePointerDown = event => {
+    document.removeEventListener('pointermove', this.handlePointerMove);
 
     const element = event.target;
     const isLeft = element === this.subElements.left;
@@ -11,31 +11,31 @@ export default class DoubleSlider {
     if (isLeft || isRight) {
       const { left, width } = this.subElements.range.getBoundingClientRect();
 
-      this.handlePointerMove = (event) =>
-        this.handleMove(isLeft, left, width, event);
+      this.handlePointerMove = event => this.handleMove(isLeft, left, width, event);
 
-      document.addEventListener("pointermove", this.handlePointerMove);
+      document.addEventListener('pointermove', this.handlePointerMove);
+
+      document.addEventListener('pointerup', this.handlePointerUp);
     }
   };
 
   handlePointerUp = () => {
-    document.removeEventListener("pointermove", this.handlePointerMove);
+    document.removeEventListener('pointermove', this.handlePointerMove);
+    document.removeEventListener('pointerup', this.handlePointerUp);
 
     if (this.element) {
-      this.element.dispatchEvent(
-        new CustomEvent("range-select", { detail: this.selected })
-      );
+      this.element.dispatchEvent(new CustomEvent('range-select', { detail: this.selected }));
     }
   };
 
   constructor({
     min = 0,
     max = 0,
-    formatValue = (value) => value,
+    formatValue = value => value,
     selected = {
       from: min,
-      to: max,
-    },
+      to: max
+    }
   } = {}) {
     this.min = min;
     this.max = max;
@@ -49,7 +49,7 @@ export default class DoubleSlider {
   get progress() {
     return {
       left: ((this.selected.from - this.min) / this.delta) * 100,
-      right: (1 - (this.selected.to - this.min) / this.delta) * 100,
+      right: (1 - (this.selected.to - this.min) / this.delta) * 100
     };
   }
 
@@ -57,22 +57,18 @@ export default class DoubleSlider {
     return `<div class="range-slider">
     <span data-element="from">${this.formatValue(this.selected.from)}</span>
     <div class="range-slider__inner">
-      <span class="range-slider__progress" style="left: ${
-        this.progress.left
-      }%; right: ${this.progress.right}%"></span>
-      <span class="range-slider__thumb-left" style="left: ${
-        this.progress.left
-      }%"></span>
-      <span class="range-slider__thumb-right" style="right: ${
-        this.progress.right
-      }%"></span>
+      <span class="range-slider__progress" style="left: ${this.progress.left}%; right: ${
+      this.progress.right
+    }%"></span>
+      <span class="range-slider__thumb-left" style="left: ${this.progress.left}%"></span>
+      <span class="range-slider__thumb-right" style="right: ${this.progress.right}%"></span>
     </div>
     <span data-element="to">${this.formatValue(this.selected.to)}</span>
   </div>`;
   }
 
   render() {
-    const wrapper = document.createElement("div");
+    const wrapper = document.createElement('div');
 
     wrapper.innerHTML = this.template;
     this.element = wrapper.firstElementChild;
@@ -83,13 +79,12 @@ export default class DoubleSlider {
   }
 
   initEventListeners() {
-    this.element.addEventListener("pointerdown", this.handlePointerDown);
-    document.addEventListener("pointerup", this.handlePointerUp);
+    this.element.addEventListener('pointerdown', this.handlePointerDown);
   }
 
   handleMove(isLeft, startX, width, event) {
-    const key = isLeft ? "from" : "to";
-    const direction = isLeft ? "left" : "right";
+    const key = isLeft ? 'from' : 'to';
+    const direction = isLeft ? 'left' : 'right';
     const delta = event.clientX - startX;
     const newPercentage = delta / width;
 
@@ -101,28 +96,27 @@ export default class DoubleSlider {
     if (newValue > this.max) {
       newValue = this.max;
     }
-    if (direction === "left" && newValue > this.selected.to) {
+    if (direction === 'left' && newValue > this.selected.to) {
       newValue = this.selected.to;
     }
-    if (direction === "right" && newValue < this.selected.from) {
+    if (direction === 'right' && newValue < this.selected.from) {
       newValue = this.selected.from;
     }
 
     this.selected[key] = newValue;
 
-    this.subElements.progress.style[direction] = this.progress[direction] + "%";
-    this.subElements[direction].style[direction] =
-      this.progress[direction] + "%";
+    this.subElements.progress.style[direction] = this.progress[direction] + '%';
+    this.subElements[direction].style[direction] = this.progress[direction] + '%';
     this.subElements[key].innerHTML = this.formatValue(this.selected[key]);
   }
 
   getSubElements() {
     const result = {};
 
-    result.range = this.element.querySelector(".range-slider__inner");
-    result.progress = this.element.querySelector(".range-slider__progress");
-    result.left = this.element.querySelector(".range-slider__thumb-left");
-    result.right = this.element.querySelector(".range-slider__thumb-right");
+    result.range = this.element.querySelector('.range-slider__inner');
+    result.progress = this.element.querySelector('.range-slider__progress');
+    result.left = this.element.querySelector('.range-slider__thumb-left');
+    result.right = this.element.querySelector('.range-slider__thumb-right');
     result.from = this.element.querySelector("[data-element='from']");
     result.to = this.element.querySelector("[data-element='to']");
 
@@ -131,14 +125,13 @@ export default class DoubleSlider {
 
   remove() {
     if (this.element) {
-      this.element.removeEventListener("pointerdown", this.handlePointerDown);
       this.element.remove();
     }
   }
 
   destroy() {
-    document.removeEventListener("pointermove", this.handlePointerMove);
-    document.removeEventListener("pointerup", this.handlePointerUp);
+    document.removeEventListener('pointermove', this.handlePointerMove);
+    document.removeEventListener('pointerup', this.handlePointerUp);
     this.remove();
     this.element = null;
   }
