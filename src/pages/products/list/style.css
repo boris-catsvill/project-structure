@@ -1,0 +1,12 @@
+.products-list {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.products-list form.form-inline .form-group {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-gap: 1em;
+    align-items: center;
+}

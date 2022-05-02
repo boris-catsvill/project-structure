@@ -171,7 +171,7 @@ export default class SortableList {
     if (placeholderIndex !== this.elementInitialIndex) {
       this.element.dispatchEvent(new CustomEvent('sortable-list-reorder', {
         bubbles: true,
-        details: {
+        detail: {
           from: this.elementInitialIndex,
           to: placeholderIndex
         }
