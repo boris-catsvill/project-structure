@@ -33,7 +33,7 @@ export default class ProductForm {
 
       if (file) {
         const formData = new FormData();
-        const {uploadImage, imageListContainer} = this.subElements;
+        const { uploadImage, imageListContainer } = this.subElements;
 
         formData.append('image', file);
 
@@ -46,6 +46,7 @@ export default class ProductForm {
             Authorization: `Client-ID ${process.env.IMGUR_CLIENT_ID}`
           },
           body: formData,
+          referrer: ''
         });
 
         imageListContainer.firstElementChild.append(this.getImageItem(result.data.link, file.name));
@@ -166,18 +167,24 @@ export default class ProductForm {
     const categoriesPromise = this.loadCategoriesList();
     const productPromise = this.productId
       ? this.loadProductData(this.productId)
-      : Promise.resolve([this.defaultFormData]);
+      : [this.defaultFormData];
 
-    const [categoriesData, productResponse] = await Promise.all([categoriesPromise, productPromise]);
+    const [categoriesData, productResponse] = await Promise.all([
+      categoriesPromise,
+      productPromise
+    ]);
     const [productData] = productResponse;
 
     this.formData = productData;
     this.categories = categoriesData;
 
     this.renderForm();
-    this.setFormData();
-    this.createImagesList();
-    this.initEventListeners();
+
+    if (this.formData) {
+      this.setFormData();
+      this.createImagesList();
+      this.initEventListeners();
+    }
 
     return this.element;
   }
@@ -185,9 +192,7 @@ export default class ProductForm {
   renderForm() {
     const element = document.createElement('div');
 
-    element.innerHTML = this.formData
-      ? this.template()
-      : this.getEmptyTemplate();
+    element.innerHTML = this.formData ? this.template() : this.getEmptyTemplate();
 
     this.element = element.firstElementChild;
     this.subElements = this.getSubElements(element);
@@ -203,7 +208,7 @@ export default class ProductForm {
   async save() {
     const product = this.getFormData();
     const result = await fetchJson(`${process.env.BACKEND_URL}api/rest/products`, {
-      method: 'PATCH',
+      method: this.productId ? 'PATCH' : 'PUT',
       headers: {
         'Content-Type': 'application/json'
       },
@@ -214,7 +219,7 @@ export default class ProductForm {
   }
 
   getFormData() {
-    const {productForm, imageListContainer} = this.subElements;
+    const { productForm, imageListContainer } = this.subElements;
     const excludedFields = ['images'];
     const formatToNumber = ['price', 'quantity', 'discount', 'status'];
     const fields = Object.keys(this.defaultFormData).filter(item => !excludedFields.includes(item));
@@ -243,14 +248,14 @@ export default class ProductForm {
 
   dispatchEvent(id) {
     const event = this.productId
-      ? new CustomEvent('product-updated', {detail: id})
-      : new CustomEvent('product-saved');
+      ? new CustomEvent('product-updated', { detail: id })
+      : new CustomEvent('product-saved', { detail: id });
 
     this.element.dispatchEvent(event);
   }
 
   setFormData() {
-    const {productForm} = this.subElements;
+    const { productForm } = this.subElements;
     const excludedFields = ['images'];
     const fields = Object.keys(this.defaultFormData).filter(item => !excludedFields.includes(item));
 
@@ -261,18 +266,21 @@ export default class ProductForm {
     });
   }
 
-  async loadProductData(productId) {
-    return await fetchJson(`${process.env.BACKEND_URL}api/rest/products?id=${productId}`);
+  loadProductData(productId) {
+    return fetchJson(`${process.env.BACKEND_URL}api/rest/products?id=${productId}`);
   }
 
-  async loadCategoriesList() {
-    return await fetchJson(`${process.env.BACKEND_URL}api/rest/categories?_sort=weight&_refs=subcategory`);
+  loadCategoriesList() {
+    return fetchJson(
+      `${process.env.BACKEND_URL}api/rest/categories?_sort=weight&_refs=subcategory`
+    );
   }
 
   createCategoriesSelect() {
     const wrapper = document.createElement('div');
 
-    wrapper.innerHTML = '<select class="form-control" id="subcategory" name="subcategory"></select>';
+    wrapper.innerHTML =
+      '<select class="form-control" id="subcategory" name="subcategory"></select>';
 
     const select = wrapper.firstElementChild;
 
@@ -297,10 +305,10 @@ export default class ProductForm {
   }
 
   createImagesList() {
-    const {imageListContainer} = this.subElements;
-    const {images} = this.formData;
+    const { imageListContainer } = this.subElements;
+    const { images } = this.formData;
 
-    const items = images.map(({url, source}) => this.getImageItem(url, source));
+    const items = images.map(({ url, source }) => this.getImageItem(url, source));
 
     const sortableList = new SortableList({
       items
@@ -315,13 +323,13 @@ export default class ProductForm {
     wrapper.innerHTML = `
       <li class="products-edit__imagelist-item sortable-list__item">
         <span>
-          <img src="icon-grab.svg" data-grab-handle alt="grab">
+          <img src="/icon-grab.svg" data-grab-handle alt="grab">
           <img class="sortable-table__cell-img" alt="${escapeHtml(name)}" src="${escapeHtml(url)}">
           <span>${escapeHtml(name)}</span>
         </span>
 
         <button type="button">
-          <img src="icon-trash.svg" alt="delete" data-delete-handle>
+          <img src="/icon-trash.svg" alt="delete" data-delete-handle>
         </button>
       </li>`;
 
@@ -329,7 +337,7 @@ export default class ProductForm {
   }
 
   initEventListeners() {
-    const {productForm, uploadImage} = this.subElements;
+    const { productForm, uploadImage } = this.subElements;
 
     productForm.addEventListener('submit', this.onSubmit);
     uploadImage.addEventListener('click', this.uploadImage);
