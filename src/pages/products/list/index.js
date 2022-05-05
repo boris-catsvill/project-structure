@@ -8,6 +8,8 @@ export default class Page {
   element;
   subElements = {};
   components = {};
+  doubleSliderMinRange = 0;
+  doubleSliderMaxRange = 4000;
 
   getTemplate() {
     return `<div class="products-list">
@@ -50,7 +52,11 @@ export default class Page {
   }
 
   initComponents() {
-    this.components.sliderContainer = new DoubleSlider({min: 0, max: 4000});
+    this.components.sliderContainer = new DoubleSlider({
+      min: this.doubleSliderMinRange,
+      max: this.doubleSliderMaxRange,
+    });
+
     this.components.productsContainer = new SortableTable(header, {
         url: 'api/rest/products?_embed=subcategory.category',
         isSortLocally: false,
@@ -105,16 +111,33 @@ export default class Page {
     await this.components.productsContainer.update(settings);
   }
 
+  resetFilters = async (event) => {
+    this.subElements.filterName.value = '';
+    this.subElements.filterStatus.value = '';
+    this.components.sliderContainer.reset();
+
+    const settings = {
+      "price_gte" : this.doubleSliderMinRange,
+      "price_lte" : this.doubleSliderMaxRange,
+      "title_like" : '',
+      "status" : '',
+    };
+
+    await this.components.productsContainer.update(settings);
+  }
+
   addEventListeners() {
     this.subElements.sliderContainer.addEventListener('range-select', this.updatePriceRange);
     this.subElements.filterName.addEventListener('input', this.updateName);
     this.subElements.filterStatus.addEventListener('change', this.updateStatus);
+    this.subElements.productsContainer.addEventListener('reset-filters', this.resetFilters);
   }
 
   removeEventListeners() {
     this.subElements.sliderContainer.removeEventListener('range-select', this.updateFilterName);
     this.subElements.filterName.removeEventListener('input', this.updateName);
     this.subElements.filterStatus.removeEventListener('change', this.updateStatus);
+    this.subElements.productsContainer.removeEventListener('reset-filters', this.resetFilters);
   }
 
   remove() {

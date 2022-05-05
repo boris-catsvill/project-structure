@@ -173,4 +173,15 @@ export default class DoubleSlider {
 
     return { from, to };
   }
+
+  reset() {
+    this.selected = {
+      from: this.min,
+      to: this.max,
+    }
+
+    this.update();
+    this.subElements.from.innerHTML = this.formatValue(this.getValue().from);
+    this.subElements.to.innerHTML = this.formatValue(this.getValue().to);
+  }
 }
