@@ -9,7 +9,7 @@ const header = [
             <img class="sortable-table-image" alt="Image" src="${data[0]?.url}">
           </div>
         `;
-    },
+    }
   },
   {
     id: 'title',
@@ -29,7 +29,7 @@ const header = [
             <b class='sortable-table-tooltip__subcategory'>${data.title}</b>
           </div>">${data.title}</span>
       </div>`;
-    },
+    }
   },
   {
     id: 'quantity',
@@ -43,14 +43,15 @@ const header = [
     sortable: true,
     sortType: 'number',
     template: data => `<div class="sortable-table__cell">
-        ${data.toLocaleString(['en'], { style: 'currency', currency: 'USD', minimumFractionDigits: 0 })}
+      ${data.toLocaleString(['en'], { style: 'currency', currency: 'USD', minimumFractionDigits: 0 })}
       </div>`,
   },
   {
-    id: 'sales',
-    title: 'Sales',
+    id: 'status',
+    title: 'Status',
     sortable: true,
-    sortType: 'number'
+    sortType: 'number',
+    template: data => `<div class="sortable-table__cell">${data === 1 ? "Активен" : "Неактивен"}</div>`,
   },
 ];
 
