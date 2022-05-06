@@ -3,7 +3,6 @@ import RangePicker from '../../components/range-picker/index.js';
 import SortableTable from '../../components/sortable-table/index.js';
 import ColumnChart from '../../components/column-chart/index.js';
 import header from './bestsellers-header.js';
-import process from 'process';
 
 export default class Page extends PageBase {
   onDateSelected = (event) => {
@@ -124,17 +123,5 @@ export default class Page extends PageBase {
         <div data-element="sortableTable"></div>
       </div>
     `;
-  }
-  remove() {
-    if (this.element) {
-      this.element.remove();
-    }
-    this.element = null;
-  }
-  destroy() {
-    for (const component of Object.values(this.components)) {
-      component.destroy();
-    }
-    this.remove();
   }
 }

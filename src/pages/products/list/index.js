@@ -113,10 +113,4 @@ export default class Page extends PageBase {
       detailLink: '/products',
     });
   }
-
-  destroy() {
-    for (const component of Object.values(this.components)) {
-      component.destroy();
-    }
-  }
 }

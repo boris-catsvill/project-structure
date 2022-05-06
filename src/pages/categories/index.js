@@ -1,7 +1,7 @@
 import PageBase from "../page-base";
 import Category from "../../components/categories";
 import fetchJson from "../../utils/fetch-json";
-import process from 'process';
+//import process from 'process';
 
 export default class Page extends PageBase {
   subElements;
@@ -37,19 +37,5 @@ export default class Page extends PageBase {
         <div data-element="categoriesContainer"></div>
       </div>
     `;
-  }
-
-  remove() {
-    if (this.element) {
-      this.element.remove();
-    }
-    this.element = null;
-  }
-
-  destroy() {
-    for (const component of this.components) {
-      component.destroy();
-    }
-    this.remove();
   }
 }

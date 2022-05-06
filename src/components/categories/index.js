@@ -1,8 +1,6 @@
 import SortableList from '../../components/sortable-list';
 import fetchJson from "../../utils/fetch-json";
 
-import process from 'process';
-
 export default class Category {
   constructor(data) {
     this.data = data;

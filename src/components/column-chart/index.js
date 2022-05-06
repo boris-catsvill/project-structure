@@ -1,5 +1,4 @@
 import fetchJson from '../../utils/fetch-json.js';
-import process from 'process';
 
 export default class ColumnChart {
   element;

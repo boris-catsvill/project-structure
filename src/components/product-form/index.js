@@ -1,7 +1,6 @@
 import SortableList from '../sortable-list/index.js';
 import escapeHtml from '../../utils/escape-html.js';
 import fetchJson from '../../utils/fetch-json.js';
-import process from 'process';
 
 export default class ProductForm {
   onSubmit = (event) => {
@@ -24,16 +23,14 @@ export default class ProductForm {
   getImageList() {
     const urls = this.subElements.productForm.elements.url;
     const sources = this.subElements.productForm.elements.source;
-    const result = [];
     if (urls && sources) {
-      for (let i = 0; i < urls.length; i++) {
-        result.push({
-          source: sources[i].value,
-          url: urls[i].value
-        });
-      }
+      return [...urls].map((url, index) => ({
+        source: sources[index].value,
+        url: url.value
+      }));
+    } else {
+      return [];
     }
-    return result;
   }
   async save() {
     const url = new URL('api/rest/products', process.env.BACKEND_URL);
@@ -84,7 +81,7 @@ export default class ProductForm {
     for (const elem of elements) {
       this.subElements[elem.dataset.element] = elem;
     }
-    this.initForm(product);
+    this.initForm(product, categories);
     this.renderImageList(product.images);
     this.element.addEventListener("click", this.onClick);
     this.subElements.productForm.addEventListener('submit', this.onSubmit);
@@ -99,7 +96,7 @@ export default class ProductForm {
     input.type = 'file';
     input.accept = "image/*";
     input.onchange = async () => {
-      const file = input.files[0];
+      const [file] = input.files;
       const formData = new FormData();
       formData.append("image", file);
       this.subElements.productForm.uploadImage.classList.toggle('is-loading');
@@ -128,14 +125,14 @@ export default class ProductForm {
     document.body.append(input);
     input.click();
   }
-  initForm(product) {
+  initForm(product, categories) {
     const form = this.subElements.productForm;
-    form.elements.title.value = product.title;
-    form.elements.description.value = product.description;
-    form.elements.price.value = product.price;
-    form.elements.discount.value = product.discount;
-    form.elements.quantity.value = product.quantity;
-    form.elements.status.value = product.status;
+    this.getSubcategoryOptions(categories).forEach(option => {
+      form.elements.subcategory.options.add(option);
+    });
+    for (const element of form.elements) {
+      element.value = product[element.name];  
+    }
   }
   getFormData() {
     const form = this.subElements.productForm;
@@ -180,7 +177,6 @@ export default class ProductForm {
           <div class="form-group form-group__half_left">
             <label class="form-label">Категория</label>
             <select id="subcategory" class="form-control" name="subcategory">
-              ${this.getSubcategoryOptions(categories)}
             </select>
           </div>
           <div class="form-group form-group__half_left form-group__two-col">
@@ -214,12 +210,14 @@ export default class ProductForm {
     `;
   }
   getSubcategoryOptions(categories) {
-    return categories.map(category => {
-      return category.subcategories.map(subcategory => {
-        const text = escapeHtml(`${category.title} > ${subcategory.title}`);
-        return `<option value="kormlenie-i-gigiena">${text}</option>`; 
-      });
-    });
+    return categories.reduce((result, category) => {
+      category.subcategories.reduce((options, subcategory) => {
+        const option = new Option(`${category.title} > ${subcategory.title}`, subcategory.id);
+        options.push(option);
+        return options;
+      }, result);
+      return result;
+    }, []);
   }
   getImageListTemplate(items) {
     return `
