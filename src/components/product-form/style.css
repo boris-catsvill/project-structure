@@ -340,7 +340,7 @@ form .form-label {
     font-size: 16px;
     line-height: 20px;
     color: var(--table-grey);
-    margin-bottom: 8px;
+    /* margin-bottom: 8px; */
 }
 
 form .form-control {
@@ -383,7 +383,7 @@ form .form-buttons {
 form.form-inline {
     display: grid;
     grid: auto-flow / repeat(auto-fit, minmax(50px, 1fr));
-    grid-gap: 16px;
+    grid-gap: 2em;
 }
 
 form.form-inline .form-group {
