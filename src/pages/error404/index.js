@@ -1,18 +1,30 @@
-export default class {
-  element;
+
+
+export default class ErrorPage {
 
   async render () {
-    const element = document.createElement('div');
+    this.getTemplate();
+    const div = document.createElement('div');
+    div.innerHTML = this.getTemplate();
+    this.element = div.firstElementChild;
+    return this.element;
+  }
 
-    element.innerHTML = `
-      <div class="error-404">
+  getTemplate () {
+    return `
+    <div class="error-404">
         <h1 class="page-title">Страница не найдена</h1>
         <p>Извините, страница не существует</p>
-      </div>
+    </div>
     `;
+  }
 
-    this.element = element.firstElementChild
+  remove () {
+    this.element.remove();
+  }
 
-    return this.element;
+  destroy () {
+    this.remove();
+    this.element = null;
   }
 }

@@ -80,6 +80,16 @@ export default class Router {
 
   listen () {
     window.addEventListener('popstate', () => this.route());
+    document.addEventListener('pointerdown', this.slideBarToggle);
     this.route();
+  }
+
+  slideBarToggle = (event) => {
+    const sideBar = event.target.closest('.sidebar__toggler');
+
+    if (!sideBar) return;
+
+    document.body.classList.toggle('is-collapsed-sidebar');
+
   }
 }
