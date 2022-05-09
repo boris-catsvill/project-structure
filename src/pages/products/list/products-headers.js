@@ -18,6 +18,12 @@ const header = [
     sortType: 'string'
   },
   {
+    id: 'subcategory',
+    title: 'Qategoty',
+    sortable: true,
+    sortType: 'string'
+  },
+  {
     id: 'quantity',
     title: 'Quantity',
     sortable: true,
@@ -40,6 +46,7 @@ const header = [
         </div>`;
     }
   },
+
 ];
 
 export default header;

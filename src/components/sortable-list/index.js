@@ -44,10 +44,17 @@ export default class SortableList {
     this.dragStop();
   };
 
-  constructor({items = []} = {}) {
-    this.items = items;
+  constructor({items, element} = {}) {
+    if (items) {
+      this.items = items;
+      this.render();
+      return;
+    }
 
-    this.render();
+    if (element) {
+      this.element = element;
+      this.initEventListeners();
+    }
   }
 
   render() {
@@ -95,6 +102,7 @@ export default class SortableList {
 
   dragStart(itemElem, {clientX, clientY}) {
     this.elementInitialIndex = [...this.element.children].indexOf(itemElem);
+
 
     this.pointerInitialShift = {
       x: clientX - itemElem.getBoundingClientRect().x,
@@ -171,7 +179,7 @@ export default class SortableList {
     if (placeholderIndex !== this.elementInitialIndex) {
       this.element.dispatchEvent(new CustomEvent('sortable-list-reorder', {
         bubbles: true,
-        details: {
+        detail: {
           from: this.elementInitialIndex,
           to: placeholderIndex
         }

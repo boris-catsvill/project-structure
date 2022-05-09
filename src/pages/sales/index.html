@@ -6,6 +6,7 @@
   <link rel="apple-touch-icon-precomposed" href="../../assets/favicon/apple-touch-icon-precomposed.png">
   <link rel="icon" href="../../assets/favicon/favicon.png">
   <link rel="stylesheet" href="../../styles/all.css">
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -49,21 +50,23 @@
     </ul>
   </aside>
   <section class="content" id="content">
-    <div class="dashboard">
-      <div class="content__top-panel">
-        <h2 class="page-title">Dashboard</h2>
 
-        <!-- range-picker component -->
-
-      </div>
-      <div class="dashboard__charts">
-        <!-- column-chart component -->
-      </div>
-
-      <h3 class="block-title">Best sellers</h3>
-
-      <!-- sortable-table component -->
-    </div>
   </section>
 </main>
+
+<script type="module">
+  import Page from './index.js';
+
+  const contentNode = document.querySelector('#content');
+
+    function initialize () {
+    const page = new Page();
+    const element =  page.render();
+
+    contentNode.innerHTML = '';
+    contentNode.append(element);
+  }
+
+  initialize();
+</script>
 </body>
