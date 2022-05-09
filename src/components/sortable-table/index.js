@@ -8,7 +8,7 @@ export default class SortableTable {
   data = [];
   loading = false;
   step = 20;
-  start = 1;
+  start = 0;
   end = this.start + this.step;
 
   onWindowScroll = async() => {
@@ -67,7 +67,7 @@ export default class SortableTable {
     },
     isSortLocally = false,
     step = 20,
-    start = 1,
+    start = 0,
     end = start + step
   } = {}) {
 
@@ -212,7 +212,7 @@ export default class SortableTable {
   }
 
   async sortOnServer(id, order) {
-    const start = 1;
+    const start = 0;
     const end = start + this.step;
     const data = await this.loadData(id, order, start, end);
 
