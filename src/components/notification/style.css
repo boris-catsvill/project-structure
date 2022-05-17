@@ -4,30 +4,52 @@
   font-size: 14px;
   box-shadow: 0 2px 4px 1px rgba(0, 0, 0, .5);
   border-radius: 2px;
-  animation: calc(var(--value) * 0.1) ease-out calc(var(--value) * 0.9) fadeOut;
+  animation: calc(10 * 0.1) ease-out calc(10* 0.9) fadeOut;
   z-index: 1000;
+  position: fixed;
+  right: 75px;
+  bottom: 75px;
+}
+
+.notification__content {
+  padding: 16px 24px 16px 64px;
+  font-size: 16px;
+  line-height: 20px;
+  color: #ffffff;
+  position: relative;
+  display: inline-flex;
+}
+
+.notification__icon {
+  display: inline;
+  width: 24px;
+  height: 24px;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  left: 16px;
 }
 
 /* Success */
-.notification.success {
-  background: #cdfccd;
+.notification_success {
+  background: #7a725bb5;
 }
 
-.notification.success .timer {
+/* .notification.success .timer {
   background: #86aa86;
-}
+} */
 
 /* Error */
-.notification.error {
+.notification_error {
   background: #ffe3e3;
 }
 
-.notification.error .timer {
+/* .notification.error .timer {
   background: #c28585;
-}
+} */
 
 /* Warning */
-.notification.warning {
+/* .notification.warning {
   background: #fff9c2;
 }
 
@@ -68,12 +90,13 @@
 
 .notification-body {
   font-weight: bold;
-}
+} */
 
 @keyframes fadeOut {
   from {
     opacity: 0.8;
   }
+
   to {
     opacity: 0;
   }
@@ -83,6 +106,7 @@
   from {
     width: 100%;
   }
+
   to {
     width: 0;
   }
