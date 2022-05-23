@@ -34,10 +34,8 @@ export default class SortableTable {
 
   onReset = event => {
     event.preventDefault();
-    const { sortableTable } = this.subElements;
-    // sortable - undefined
     this.dispatchEvent('reset-filter');
-    sortableTable.classList.remove('sortable-table_empty');
+    this.element.classList.remove('sortable-table_empty');
   }
 
   onSortClick = event => {
@@ -73,6 +71,7 @@ export default class SortableTable {
 
 
   onProductForm = event => {
+    if (event.currentTarget.closest("[data-sales]")) return null;
     const item = event.target.closest("[data-id]");
     history.pushState({ id: item.dataset.id }, '', `products/${item.dataset.id}`);
     history.go();
@@ -115,8 +114,7 @@ export default class SortableTable {
     const element = document.createElement('div');
   
     element.innerHTML = this.getTable();
-    this.element = element.firstElementChild;
-    // первый ребенок после div   <div class="sortable-table" data-element="sortableTable"> 
+    this.element = element.firstElementChild; 
 
     this.subElements = this.getSubElements();
     console.log(this.subElements)
@@ -152,8 +150,7 @@ export default class SortableTable {
   addRows(data) {
 
     if (!data.length) {
-      const { sortableTable } = this.subElements;
-      sortableTable.classList.add('sortable-table_empty');
+      this.element.classList.add('sortable-table_empty');
     }
 
 
@@ -240,8 +237,9 @@ export default class SortableTable {
         ${this.getTableHeader()}
         ${this.getTableBody(this.data)}
         <div data-element="emptyPlaceholder" class="sortable-table__empty-placeholder">
-      Не найдено товаров удовлетворяющих выбранному критерию
-      <button type="button" data-element="resetButton" class="button-primary-outline">Очистить фильтры</button>
+        <div>
+        Не найдено товаров удовлетворяющих выбранному критерию
+        <button type="button" data-element="resetButton" class="button-primary-outline">Очистить фильтры</button></div>
     </div>
         <div data-element="loading" class="loading-line sortable-table__loading-line"></div>
       </div>`;
@@ -250,12 +248,11 @@ export default class SortableTable {
   initEventListeners() {
     const { resetButton, header, body } = this.subElements;
 
-
     header.addEventListener('pointerdown', this.onSortClick);
     document.addEventListener('scroll', this.onWindowScroll);
     body.addEventListener('pointerdown', this.onProductForm);
 
-    resetButton.addEventListener('submit', this.onReset);
+    resetButton.addEventListener('click', this.onReset);
   }
 
   sortOnClient(id, order) {

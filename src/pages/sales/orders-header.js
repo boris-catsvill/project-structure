@@ -43,11 +43,6 @@ const header = [
     title: 'Status',
     sortable: true,
     sortType: 'string',
-    // template: data => {
-    //   return `<div class="sortable-table__cell">
-    //         ${data > 0 ? 'Active' : 'Inactive'}
-    //       </div>`;
-    // }
   },
 ];
 

@@ -99,14 +99,6 @@ export default class Page {
 
     initEventListeners() {
 
-
-      // this.components.rangePicker.element.addEventListener('data-select', event => {
-      //   const {from, to} = e.detail;
-
-      //   this.updateComponents(from, to)
-
-      // })
-
       document.addEventListener('date-select', async event => {
         this.toggleProgressbar();
         const { from, to } = event.detail;

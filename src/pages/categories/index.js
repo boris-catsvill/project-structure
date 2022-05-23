@@ -78,9 +78,10 @@ export default class Page {
     const { categoriesContainer } = this.subElements;
 
     document.addEventListener('sortable-list-reorder', async event => {
-      console.log(event);
+      console.log(event.details);
       // const { from, to } = event.details;
-      await this.save(event.detail);
+      console.log(event.details);
+      await this.save(event.details);
     }, true )
 
     categoriesContainer.addEventListener('click', this.toggleOpen);
@@ -154,7 +155,9 @@ export default class Page {
     this.element = null;
     this.subElements = null;
 
-    for (const component of Object.value(this.component)) {
+
+
+    for (const component of Object.values(this.components)) {
       component.destroy();
     }
   }

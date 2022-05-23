@@ -164,8 +164,10 @@ export default class SortableList {
     this.placeholderElement.replaceWith(this.draggingElem);
     this.draggingElem = null;
 
-    this.removeDocumentEventListeners();
+    console.log(this.placeholderElement);
 
+    this.removeDocumentEventListeners();
+    console.log(placeholderIndex);
     if (placeholderIndex !== this.elementInitialIndex) {
       this.dispatchEvent('sortable-list-reorder', {
         from: this.elementInitialIndex,

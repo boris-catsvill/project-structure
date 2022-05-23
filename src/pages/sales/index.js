@@ -120,7 +120,7 @@ export default class Page {
                 <!-- range picker -->
             </div>
           </div>
-          <div data-element="sortableTable">
+          <div data-element="sortableTable" data-sales="sales">
           
           </div>
         </div>`

@@ -49,9 +49,11 @@ export default class NotificationMessage {
 
   getIcon() {
     return this.status === "success" ? 
-    `<img src="./notification-success.svg"alt="notification-success">` :
-    `<img src="./notification-error.svg"  alt="notification-error">`;
+    `<img src="./notification-success.svg" alt="notification-success">` :
+    `<img src="/assets/icons/icon-trash.svg"  alt="notification-error">`;
   }
+  
+
 
   remove() {
     clearTimeout(this.timerId);

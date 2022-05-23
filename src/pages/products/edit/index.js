@@ -6,7 +6,7 @@ export default class Page {
   components = {};
 
   constructor() {
-    this.id = history.state?.id ?? null;
+    this.id = history.state ? history.state.id : null; 
   }
 
   async render() {
@@ -34,28 +34,5 @@ export default class Page {
     this.remove()
     this.element = null;
   }
-
-  // async render() {
-  //   const element = document.createElement('div');
-  //   this.element = element;
-
-
-  //   this.initComponents();
-  //   await this.renderComponents();
-
-  //   return this.element;
-  // }
-
-  // initComponents() {
-  //   this.components.productForm = new ProductForm(this.id);
-  //   console.log(this.components);
-  // }
-
-  // async renderComponents() {
-  //   const element = await this.components.productForm.render();
-  //   console.log(element); // undefined
-  //   this.element.append(element);
-  // }
-
 
 }

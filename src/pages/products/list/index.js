@@ -3,7 +3,7 @@ import fetchJson from "../../../utils/fetch-json";
 import DoubleSlider from "../../../components/double-slider";
 
 import header from "../../dashboard/bestsellers-header";
-import escapeHtml from "../../../utils/escape-html";
+
 
 
 const BACKEND_URL = 'https://course-js.javascript.ru/';
@@ -13,8 +13,8 @@ export default class Page {
 
 
   filterName = async event => {
-    this.input = escapeHtml(event.target.value);
-    this.components.sortableTable.input = escapeHtml(event.target.value);
+    this.input = event.target.value;
+    this.components.sortableTable.input = event.target.value;
 
     this.urlProducts.searchParams.set('title_like', this.input);
     const data = await this.loadData();

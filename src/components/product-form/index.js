@@ -60,6 +60,7 @@ export default class ProductForm {
         
       
         this.sortableList.addItem(this.getImage(responce.data.link, file.name));
+        console.log(this.subElements)
 
         // раскоментить при работе без SortableList
         // const newImage = this.getImage(responce.data.link, file.name);
