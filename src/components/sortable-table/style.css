@@ -7,8 +7,6 @@
 }
 
 .sortable-table__row {
-  display: grid;
-  grid: auto-flow / 80px calc(50% - 80px) 20% 15% 15%;
   text-decoration: none;
 }
 .sortable-table__row.bold {
@@ -16,17 +14,18 @@
 }
 
 .sortable-table__cell {
-  padding: 16px;
+  /*padding: 16px;*/
   font-size: 16px;
   line-height: 20px;
   color: var(--table-black);
   display: flex;
   align-items: center;
-  border-top: 1px solid var(--grey-light);
+  /*border-top: 1px solid var(--grey-light);*/
+  text-decoration: none;
 }
 
 .sortable-table__cell:first-child {
-  padding-left: 32px;
+  /*padding-left: 32px;*/
 }
 
 .sortable-table__cell:last-child {

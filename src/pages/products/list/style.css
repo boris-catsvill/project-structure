@@ -1,0 +1,16 @@
+.products-list {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.form-inline{
+  grid-template-columns: 3fr 3fr 2fr;
+  grid-gap: 46px;
+}
+
+.form-group {
+  display: grid;
+  /*grid-template-columns: auto 1fr;*/
+  align-items: center;
+}
