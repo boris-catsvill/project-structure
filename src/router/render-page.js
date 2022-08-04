@@ -4,6 +4,7 @@ export default async function(path, match) {
   main.classList.add('is-loading');
 
   const { default: Page } = await import(/* webpackChunkName: "[request]" */`../pages/${path}/index.js`);
+
   const page = new Page();
   const element = await page.render();
 
