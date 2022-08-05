@@ -1,7 +1,7 @@
 
 [[redirects]]
   from = "/*"
-  to = "/blog/:splat"
+  to = "/:splat"
 
 # A redirect rule with many of the supported properties
 [[redirects]]
