@@ -7,161 +7,180 @@ import fetchJson from '../../utils/fetch-json';
 
 const BACKEND_URL = 'https://course-js.javascript.ru/';
 
+
+
 export default class Page {
-    subElements = {};
-    components = {};
-    urlBestaSellers = new URL('api/dashboard/bestsellers', BACKEND_URL);
+  subElements = {};
+  components = {};
+  urlBestaSellers = new URL('api/dashboard/bestsellers', BACKEND_URL);
 
 
-    render () {
-
-      const element = document.createElement('div');
-      element.innerHTML = this.getTemplate();
-
-      this.element = element.firstElementChild;
-
-      this.subElements = this.getSubElements();
-
-      this.initComponents();
-      this.renderComponents();
-      this.initEventListeners();
-    
-      return this.element;
+  hideNote = event => {
+    if (event.target.closest('.note__img')) {
+      const { note } = this.subElements;
+      note.classList.add('note__img_hide');
     }
+  }
 
-    initComponents() {
+  render() {
 
-      const now = new Date();
-      const to = new Date();
-      const from = new Date(now.setMonth(now.getMonth(), now.getDay()));
+    const element = document.createElement('div');
+    element.innerHTML = this.getTemplate();
 
-      const rangePicker = new RangePicker();
+    this.element = element.firstElementChild;
 
-      const sortableTable = new SortableTable(header, {
-        isSortLocally: false,
-        url: `api/dashboard/bestsellers?from=${from}&to=${to}&_sort=title&_order=asc&_start=0&_end=30`
-      });
+    this.subElements = this.getSubElements();
 
+    this.initComponents();
+    this.renderComponents();
+    this.initEventListeners();
 
-      const ordersChart = new ColumnChart({
-        url: 'api/dashboard/orders',
-        range: {
-          from,
-          to
-        },
-        label: 'orders',
-        link: '#',
-      });
+    return this.element;
+  }
 
-      const salesChart = new ColumnChart({
-        url: 'api/dashboard/sales',
-        range: {
-          from,
-          to
-        },
-        label: 'sales',
-        formatHeading: data => `$${data}`
-      });
+  initComponents() {
 
-      const customersChart = new ColumnChart({
-        url: 'api/dashboard/customers',
-        range: {
-          from,
-          to
-        },
-        label: 'customers',
-      });
+    const now = new Date();
+    const to = new Date();
+    const from = new Date(now.setMonth(now.getMonth(), now.getDay()));
+
+    const rangePicker = new RangePicker();
+
+    const sortableTable = new SortableTable(header, {
+      isSortLocally: false,
+      url: `api/dashboard/bestsellers?from=${from}&to=${to}&_sort=title&_order=asc&_start=0&_end=30`
+    });
 
 
-      this.components = {
-        rangePicker,
-        ordersChart,
-        salesChart,
-        customersChart,
-        sortableTable,
-      };
-    }
+    const ordersChart = new ColumnChart({
+      url: 'api/dashboard/orders',
+      range: {
+        from,
+        to
+      },
+      label: 'orders',
+      link: '#',
+    });
 
-    renderComponents() {
-      Object.keys(this.components).forEach(component => {
-        const root = this.subElements[component];
-        const { element } = this.components[component];
-        root.append(element);
-      });
+    const salesChart = new ColumnChart({
+      url: 'api/dashboard/sales',
+      range: {
+        from,
+        to
+      },
+      label: 'sales',
+      formatHeading: data => `$${data}`
+    });
 
+    const customersChart = new ColumnChart({
+      url: 'api/dashboard/customers',
+      range: {
+        from,
+        to
+      },
+      label: 'customers',
+    });
+
+
+    this.components = {
+      rangePicker,
+      ordersChart,
+      salesChart,
+      customersChart,
+      sortableTable,
+    };
+  }
+
+  renderComponents() {
+    Object.keys(this.components).forEach(component => {
+      const root = this.subElements[component];
+      const { element } = this.components[component];
+      root.append(element);
+    });
+
+    this.toggleProgressbar();
+  }
+
+  toggleProgressbar() {
+    const element = document.querySelector('.progress-bar');
+    return element.style.display === '' ? element.style.display = 'none' : element.style.display = 'none';
+  }
+
+  initEventListeners() {
+
+    const { note } = this.subElements;
+
+    note.addEventListener('click', this.hideNote);
+
+    document.addEventListener('date-select', async event => {
       this.toggleProgressbar();
-    }
+      const { from, to } = event.detail;
 
-    toggleProgressbar() {
-      const element = document.querySelector('.progress-bar');
-      return element.style.display === '' ? element.style.display = 'none' : element.style.display = 'none';
-    }
+      const columnChartComponents = [
+        this.components.ordersChart,
+        this.components.salesChart,
+        this.components.customersChart,
+      ];
 
-    initEventListeners() {
-
-      document.addEventListener('date-select', async event => {
-        this.toggleProgressbar();
-        const { from, to } = event.detail;
-
-        const columnChartComponents = [
-          this.components.ordersChart,
-          this.components.salesChart,
-          this.components.customersChart,
-        ];
-
-        for (const component of columnChartComponents) {
-          component.loadData(from, to);
-        }
-
-        const data = await this.loadData(from, to);
-        this.components.sortableTable.update(data);
-        this.toggleProgressbar();
-      });
-    }
-
-    async loadData(from, to) {
-      this.urlBestaSellers.searchParams.set('_start', '1');
-      this.urlBestaSellers.searchParams.set('_end', '21');
-      this.urlBestaSellers.searchParams.set('_sort', 'title');
-      this.urlBestaSellers.searchParams.set('_order', 'asc');
-      this.urlBestaSellers.searchParams.set('from', from.toISOString());
-      this.urlBestaSellers.searchParams.set('to', to.toISOString());
-
-      const data = await fetchJson(this.urlBestaSellers);
-      return data;
-    }
-
-    getSubElements() {
-      const elements = this.element.querySelectorAll('[data-element]');
-
-      for (const item of elements) {
-        this.subElements[item.dataset.element] = item;
+      for (const component of columnChartComponents) {
+        component.loadData(from, to);
       }
-      
-      return this.subElements;
+
+      const data = await this.loadData(from, to);
+      this.components.sortableTable.update(data);
+      this.toggleProgressbar();
+    });
+
+
+  }
+
+  async loadData(from, to) {
+    this.urlBestaSellers.searchParams.set('_start', '1');
+    this.urlBestaSellers.searchParams.set('_end', '21');
+    this.urlBestaSellers.searchParams.set('_sort', 'title');
+    this.urlBestaSellers.searchParams.set('_order', 'asc');
+    this.urlBestaSellers.searchParams.set('from', from.toISOString());
+    this.urlBestaSellers.searchParams.set('to', to.toISOString());
+
+    const data = await fetchJson(this.urlBestaSellers);
+    return data;
+  }
+
+  getSubElements() {
+    const elements = this.element.querySelectorAll('[data-element]');
+
+    for (const item of elements) {
+      this.subElements[item.dataset.element] = item;
     }
 
+    return this.subElements;
+  }
 
-    remove() {
-      if (this.element) {
-        this.element.remove();
-      }
+
+  remove() {
+    if (this.element) {
+      this.element.remove();
     }
+  }
 
-    destroy() {
-      this.remove();
-      this.element = null;
-      this.subElements = null;
+  destroy() {
+    this.remove();
+    this.element = null;
+    this.subElements = null;
 
-      for (const component of Object.values(this.components)) {
-        component.destroy();
-      }
+    for (const component of Object.values(this.components)) {
+      component.destroy();
     }
+  }
 
 
-    getTemplate() {
-      return `
+  getTemplate() {
+    return `
         <div class="dashboard">
+        <div class="note" data-element="note">
+        Для начала работы необходимо выбрать определенный промежуток даты. Например с мая по июнь 2022  
+        <img class="note__img"  src="/assets/icons/item-delete-cross.svg" alt="notification-delete-cross" >
+        </div>
         <div class="content__top-panel">
           <h2 class="page-title">Dashboard</h2>
           <div data-element="rangePicker">
@@ -182,6 +201,6 @@ export default class Page {
         </div>
       </div>
             `;
-    }
+  }
 
 }

@@ -117,7 +117,7 @@ export default class SortableTable {
     this.element = element.firstElementChild; 
 
     this.subElements = this.getSubElements();
-    console.log(this.subElements)
+   
     const data = await this.loadData(id, order, this.start, this.end);
 
     this.renderRows(data);
@@ -223,8 +223,15 @@ export default class SortableTable {
         template
       };
     });
-
+    // console.log(cells);
     return cells.map(({ id, template }) => {
+      // console.log(item, id);
+
+
+      // item.id - это в хидере header data.id то есть всегда обращение к id-ку в data
+      // а вот item[id] это не обращение по айдишнику а по ЗНАЧЕНИЯ айдишника. в id: title следовательно обращение
+      // data.title ВАЖНО!!!
+
       return template
         ? template(item[id])
         : `<div class="sortable-table__cell" data-id="${item.id}">${item[id]}</div>`;

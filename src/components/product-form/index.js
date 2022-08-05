@@ -95,10 +95,13 @@ export default class ProductForm {
   async render () {
 
     const categoriesPromise = this.loadCategoriesList(); 
+    // присвоили промис в переменную 
+    console.log(categoriesPromise);
     const productsPromise = this.productId ? 
       this.loadProducts(this.productId) : Promise.resolve([this.defaultForm]);
     const promiseProductsCategories = await Promise.all([categoriesPromise, productsPromise]);
-
+    // ждем результаты промиса, await ждет результат промиса, он ничего не вызывает.
+    console.log(promiseProductsCategories);
     const [categories, productsResponse] = promiseProductsCategories;
 
     const [products] = productsResponse;
