@@ -13,7 +13,7 @@ export default class Page {
   duration = 2000;
 
   constructor() {
-    this.openSubcategory = this.open.bind(this);
+    this.handleClick = this.handleClick.bind(this);
   }
 
   get template() {
@@ -29,7 +29,7 @@ export default class Page {
             `;
   }
 
-  open() {
+  handleClick() {
     if (event.target.nodeName === 'HEADER') {
       event.target.closest('.category').classList.toggle('category_open');
     }
@@ -97,16 +97,16 @@ export default class Page {
   }
 
   addListeners() {
-    this.element.addEventListener('click', this.openSubcategory);
-    document.addEventListener('sortable-list-reorder', async event => {
+    this.element.addEventListener('click', this.handleClick);
+    this.element.addEventListener('sortable-list-reorder', async event => {
       await this.saveOrder(event.detail);
     });
   }
 
   async saveOrder(data) {
-    let url = new URL(BACKEND_URL + '/api/rest/subcategories');
-    let newOrderArr = [];
-    let newOrder = data.order.querySelectorAll("[data-id]");
+    const url = new URL(BACKEND_URL + '/api/rest/subcategories');
+    const newOrderArr = [];
+    const newOrder = data.order.querySelectorAll("[data-id]");
 
     for (let i = 0; i < newOrder.length; i++) {
       newOrderArr[i] = {

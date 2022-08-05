@@ -4,12 +4,6 @@ export default class NotificationMessage {
   static notificationDiv = document.getElementsByClassName('notification');
   static canShow = true;
 
-  static checkDiv() {
-    return this.notificationDiv.length === 0 ?
-      this.canShow = true :
-      this.canShow = false;
-  }
-
   constructor(text,
               {
                 duration = 2000,
@@ -42,8 +36,6 @@ export default class NotificationMessage {
   }
 
   show(targetElem = document.body) {
-    NotificationMessage.checkDiv();
-
     let message = this._render();
 
 
