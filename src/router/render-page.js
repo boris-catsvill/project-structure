@@ -23,11 +23,11 @@ export default async function (path, match) {
     const { message, status } = event.detail;
     console.log(`message: ${message}, status: ${status}`);
     const notification = new NotificationMessage(message, {
-      duration: 500000,
+      duration: 50000,
       type: status,
     });
 
-    notification.show();
+    // notification.show();
   });
 
 
