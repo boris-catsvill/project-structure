@@ -8,6 +8,7 @@ export default class Categories {
         this.element = this.getTemplate()
         this.subElements = this.getSubElements(this.element)
         this.initEventListeners()
+        this.addSortableList()
         return this.element
     }
 
@@ -27,7 +28,8 @@ export default class Categories {
                   <div class="subcategory-list">
                   <ul class="sortable-list">
                   ${this.addSubcategories(obj.subcategories)}
-                  </ul></div>
+                  </ul>
+                  </div>
                 </div>
                </div>`
             })
@@ -50,40 +52,45 @@ export default class Categories {
 
     initEventListeners() {
         this.element.addEventListener('click', this.onClick)
-        this.element.addEventListener('pointerdown', this.addSortableList)
     }
 
     onClick = (e) => {
         if (!e.target.classList.contains('category__header')) return
         const categoryParent = e.target.parentNode
         categoryParent.classList.toggle('category_open')
-
-
     }
 
-    addSortableList = (e) => {
-        if (!e.target.closest('.sortable-list__item')) return
-
-        let targetList = e.target.closest('.sortable-list')
-        const sortable = new SortableList({}, targetList)
-        /* возникает ошибка при инициализации класса  */
-        /* Failed to execute 'insertBefore' on 'Node': The node before which the new node is to be inserted is not a child of this node.
-    at HTMLDocument.addEventPointerDown 
-    на 107 строчке в компонетн sortable list
-    
-    */
-
-        targetList.addEventListener('clickOnList', this.sendNewCategories)
-
+    addSortableList() {
+        const CollectionOfList = this.element.querySelectorAll('.sortable-list')
+        for (const list of CollectionOfList) {
+            const sortable = new SortableList({}, list)
+            list.addEventListener('clickOnList', this.sendNewOrderOfCategories)
+        }
     }
 
-    sendNewCategories = (event) => {
-        const collectionOfLi = event.detail.list
-        console.log(collectionOfLi) /* при нажатии на один и тот же li  в консоль выводится множество ul */
-        /* далее думала проитерироваьт коллекцию li, и уже по их id сформировать запрос на сервер */
+    sendNewOrderOfCategories = (event) => {
+        const newCategories = this.getNewOrderOfCategories(event.detail.list)
+        fetchJson(`${process.env.BACKEND_URL}api/rest/subcategories`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(newCategories)
+        });
     }
 
+    getNewOrderOfCategories(liCollection) {
+        const newCategories = [];
+        let count = 0
 
+        for (const li of liCollection) {
+            count++
+            const obj = { id: li.dataset.id, weight: count }
+            newCategories.push(obj)
+        }
+
+        return newCategories
+    }
 
     getTemplate() {
         return this.createElement(`<div class="categories">
@@ -115,8 +122,6 @@ export default class Categories {
         }
         return result;
     }
-
-
 
     remove() {
         this.element.remove();

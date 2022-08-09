@@ -69,20 +69,22 @@ export default class SortableTable {
       .join('')
   }
 
-  async update(from, to) {
+  async update(fromParam, toParam) {
     const { start, end } = this.getPagination()
-    this.data = await this.loadData(start, end, from, to)
+    this.data = await this.loadData(start, end, fromParam, toParam)
     this.subElements.body.innerHTML = ""
     this.fillBodyTemplate()
     this.addArrow()
   }
 
-  async loadData(start, end, from, to) {
+  async loadData(start, end, fromParam, toParam) {
     const path = new URL(this.url, BACKEND_URL)
 
-    if (from && to) {
-      const startInput = from.toISOString();
-      const endInput = to.toISOString();
+    if (fromParam && toParam) {
+      this.from = fromParam
+      this.to = toParam
+      const startInput = this.from.toISOString();
+      const endInput = this.to.toISOString();
       path.searchParams.set(this.paramFrom, startInput)
       path.searchParams.set(this.paramTo, endInput)
       start = 0

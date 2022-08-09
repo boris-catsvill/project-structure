@@ -2,14 +2,12 @@ export default class SortableList {
     constructor(obj = { items: '' }, elem = '') {
         this.items = obj.items
         this.elem = elem
-        this.id = Math.random()
         this.element
         this.render()
         this.initEventListeners()
     }
 
     render() {
-        console.log(this)
         if (this.elem === '') {
             this.element = this.createElement(`<ul class = "sortable-list" data-element="imageListContainer"></ul>`)
             for (const li of this.items) {
@@ -26,31 +24,33 @@ export default class SortableList {
     }
 
     initEventListeners() {
-        document.addEventListener('pointerdown', this.addEventPointerDown)
-        document.ondragstart = function () {
+        this.element.addEventListener('pointerdown', this.addEventPointerDown)
+        this.element.ondragstart = function () {
             return false;
         };
-        document.addEventListener('pointerup', this.addEventPointerUp)
+        this.element.addEventListener('pointerup', this.addEventPointerUp)
     }
 
-    addEventPointerDown = event => {
+    addEventPointerDown = (event) => {
         if (event.target.dataset.deleteHandle != undefined) this.deleteElem(event)
         if (!event.target.closest('[data-grab-handle]')) return
 
-        this.parentNode = event.target.closest('.sortable-list__item')
-        this.parentList = this.parentNode.closest('.sortable-list')   
+        this.listItem = event.target.closest('.sortable-list__item')
+        this.parentList = this.listItem.closest('.sortable-list')
 
-        this.placeHolder = this.parentNode.cloneNode(false) // создаем клон 
+        this.placeHolder = document.createElement('div') // создаем клон 
+        this.placeHolder.style.height = this.listItem.offsetHeight + 'px'
         this.placeHolder.classList.add('sortable-list__placeholder')
-        this.element.insertBefore(this.placeHolder, this.parentNode) // вставляем клон
+        this.element.insertBefore(this.placeHolder, this.listItem) // вставляем клон
 
-        this.parentNode.classList.add('sortable-list__item_dragging')
-        this.parentNode.style.width = this.placeHolder.offsetWidth + 'px'
+
+        this.listItem.classList.add('sortable-list__item_dragging')
+        this.listItem.style.width = this.placeHolder.offsetWidth + 'px'
 
         this.shiftX = event.clientX - this.placeHolder.getBoundingClientRect().left;
         this.shiftY = event.clientY - this.placeHolder.getBoundingClientRect().top;
 
-        this.move(event.clientX, event.clientY, this.parentNode)
+        this.move(event.clientX, event.clientY, this.listItem)
 
         document.addEventListener('pointermove', this.onPointerMove)
     }
@@ -61,12 +61,12 @@ export default class SortableList {
     }
 
     onPointerMove = event => {
-        this.move(event.clientX, event.clientY, this.parentNode);
+        this.move(event.clientX, event.clientY, this.listItem);
 
 
-        this.parentNode.style.display = 'none';
+        this.listItem.style.display = 'none';
         const elemBelow = document.elementFromPoint(event.clientX, event.clientY)
-        this.parentNode.style.display = '';
+        this.listItem.style.display = '';
 
         if (elemBelow && elemBelow.closest('.sortable-list__item') && elemBelow.parentNode === this.parentList) {
 
@@ -101,7 +101,6 @@ export default class SortableList {
         li.style.left = 0
         li.style.top = 0
 
-
         if (elemBelow.closest('.sortable-list__item') && elemBelow.closest('.sortable-list') === this.parentList) {
             this.addСustomEvent()
             this.element.insertBefore(li, elemBelow.closest('.sortable-list__item'))
@@ -111,12 +110,12 @@ export default class SortableList {
     }
 
     addСustomEvent() {
-        this.element.dispatchEvent(new CustomEvent("clickOnList", {
-            detail: { list: this.parentList}
-        }));
+        setTimeout(() => {
+            this.element.dispatchEvent(new CustomEvent("clickOnList", {
+                detail: { list: this.element.children }
+            }))
+        }, 100)
     }
-
-
 
     deleteElem = event => {
         const parentNode = event.target.closest('.sortable-list__item')
