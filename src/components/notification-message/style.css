@@ -12,7 +12,7 @@
   left: 300px;
 }
 
-h1 {
+#notification__message h1 {
   font-size: 0.9em;
   font-weight: 100;
   letter-spacing: 3px;
@@ -35,7 +35,7 @@ h1 {
   letter-spacing: 5px;
 }
 
-p {
+#notification__message p {
   margin-top: -5px;
   font-size: 0.5em;
   font-weight: 100;
