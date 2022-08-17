@@ -1,5 +1,4 @@
 import SortableList from '../sortable-list/index.js';
-import escapeHtml from '../../utils/escape-html.js';
 import fetchJson from '../../utils/fetch-json.js';
 
 export default class ProductForm {
@@ -18,6 +17,7 @@ export default class ProductForm {
 
   constructor(productId) {
       this.productId = productId;
+      this.subElements = {};
   }
 
   addSortableList() {
@@ -72,7 +72,7 @@ export default class ProductForm {
   }
 
   fillForm(form, obj) {
-      for (let key of Object.keys(obj)) {
+      for (const key of Object.keys(obj)) {
 
           if (form.elements[key]) {
               form.elements[key].value = obj[key] // заполняем формы значениями ключей объекта
@@ -147,7 +147,7 @@ export default class ProductForm {
       const product = this.data
       const formatToNumber = ['price', 'quantity', 'discount', 'status']
 
-      for (let key of Object.keys(product)) {
+      for (const key of Object.keys(product)) {
           if (this.form.elements[key]) {
               product[key] = formatToNumber.includes(key) ? +this.form.elements[key].value : this.form.elements[key].value
           }
@@ -156,7 +156,6 @@ export default class ProductForm {
   }
 
   getSubElements(element) {
-      this.subElements = {};
       const elements = element.querySelectorAll('[data-element]');
       for (let element of elements) {
           this.subElements[element.dataset.element] = element;

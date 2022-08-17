@@ -3,8 +3,6 @@ import SortableTable from '../../components/sortable-table/index.js';
 import header from './sales-header';
 
 export default class SalesPage {
-    constructor() {
-    }
 
     async render() {
         this.element = this.getTemplate()
@@ -52,7 +50,7 @@ export default class SalesPage {
         const {from, to} = this.range
   
         Object.keys(this.components).forEach(component => {
-            component != 'rangePicker' ? this.components[component].update(from, to) : ''
+            component !== 'rangePicker' ? this.components[component].update(from, to) : ''
         })
     }
 

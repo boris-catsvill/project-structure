@@ -1,8 +1,5 @@
 import fetchJson from "../../utils/fetch-json.js";
 
-const BACKEND_URL = 'https://course-js.javascript.ru';
-
-
 export default class SortableTable {
   itemsPerPage = 30
   constructor(headersConfig, {
@@ -78,7 +75,7 @@ export default class SortableTable {
   }
 
   async loadData(start, end, fromParam, toParam) {
-    const path = new URL(this.url, BACKEND_URL)
+    const path = new URL(this.url, process.env.BACKEND_URL)
 
     if (fromParam && toParam) {
       this.from = fromParam
@@ -108,7 +105,7 @@ export default class SortableTable {
     priceFrom ? this.priceFrom = priceFrom : ''
     priceTo ? this.priceTo = priceTo : ''
     searchValue ? this.productSearchValue = searchValue : ''
-    status != '' ? this.status = status : this.status = '' // если status = '', значит, выбран option 'любой'
+    status !== '' ? this.status = status : this.status = '' // если status = '', значит, выбран option 'любой'
   }
 
 
@@ -159,7 +156,7 @@ export default class SortableTable {
 
     this.sorted = {
       id: eventTarget.dataset.id,
-      order: eventTarget.dataset.order == 'desc' ? 'asc' : 'desc'
+      order: eventTarget.dataset.order === 'desc' ? 'asc' : 'desc'
     }
     this.sort()
   }

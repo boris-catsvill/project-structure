@@ -41,8 +41,9 @@ class Tooltip {
   }
 
   changeCoordinates(event) {
-    this.element.style.left = event.pageX + 5 + 'px';
-    this.element.style.top = event.pageY + 5 + 'px';
+    const shift = 5
+    this.element.style.left = event.pageX + shift + 'px';
+    this.element.style.top = event.pageY + shift + 'px';
   }
 
   removeEventListeners() {

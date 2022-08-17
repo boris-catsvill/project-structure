@@ -113,7 +113,7 @@ export default class Page {
       const {from, to} = this.range
 
       Object.keys(this.components).forEach(component => {
-          component != 'rangePicker' ? this.components[component].update(from, to) : ''
+          component !== 'rangePicker' ? this.components[component].update(from, to) : ''
       })
   }
 

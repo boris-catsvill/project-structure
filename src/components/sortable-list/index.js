@@ -1,14 +1,13 @@
 export default class SortableList {
-    constructor(obj = { items: '' }, elem = '') {
+    constructor(obj = { items: [] }, readyElem = '') {
         this.items = obj.items
-        this.elem = elem
-        this.element
+        this.readyElem = readyElem
         this.render()
         this.initEventListeners()
     }
 
     render() {
-        if (this.elem === '') {
+        if (this.readyElem === '') {
             this.element = this.createElement(`<ul class = "sortable-list" data-element="imageListContainer"></ul>`)
             for (const li of this.items) {
                 li.classList.add('sortable-list__item')
@@ -19,15 +18,13 @@ export default class SortableList {
             }
         }
         else {
-            this.element = this.elem
+            this.element = this.readyElem
         }
     }
 
     initEventListeners() {
         this.element.addEventListener('pointerdown', this.addEventPointerDown)
-        this.element.ondragstart = function () {
-            return false;
-        };
+        this.element.ondragstart = () => false;
         this.element.addEventListener('pointerup', this.addEventPointerUp)
     }
 
@@ -47,8 +44,9 @@ export default class SortableList {
         this.listItem.classList.add('sortable-list__item_dragging')
         this.listItem.style.width = this.placeHolder.offsetWidth + 'px'
 
-        this.shiftX = event.clientX - this.placeHolder.getBoundingClientRect().left;
-        this.shiftY = event.clientY - this.placeHolder.getBoundingClientRect().top;
+        const { left, top } = this.placeHolder.getBoundingClientRect();
+        this.shiftX = event.clientX - left;;
+        this.shiftY = event.clientY - top;
 
         this.move(event.clientX, event.clientY, this.listItem)
 
@@ -111,7 +109,7 @@ export default class SortableList {
 
     addСustomEvent() {
         setTimeout(() => {
-            this.element.dispatchEvent(new CustomEvent("clickOnList", {
+            this.element.dispatchEvent(new CustomEvent("", {
                 detail: { list: this.element.children }
             }))
         }, 100)

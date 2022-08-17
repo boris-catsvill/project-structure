@@ -1,8 +1,7 @@
 import fetchJson from '/project-structure/src/utils/fetch-json';
 
-const BACKEND_URL = 'https://course-js.javascript.ru';
-
 export default class ColumnChart {
+    chartHeight = 50
     constructor({
         range = {},
         label = '',
@@ -10,9 +9,8 @@ export default class ColumnChart {
         url = '',
         formatHeading = data => data
     } = {}) {
-        this.path = new URL(url, BACKEND_URL)
+        this.path = new URL(url, process.env.BACKEND_URL)
         this.formatHeading = formatHeading
-        this.chartHeight = 50
         this.range = range
         this.from = this.range.from
         this.to = this.range.to
@@ -36,7 +34,7 @@ export default class ColumnChart {
 
 
 
-        if (this.link != "") {
+        if (this.link !== "") {
             this.element.querySelector(".column-chart__title").insertAdjacentHTML("beforeend", `<a href="/sales" class="column-chart__link">View all</a>`)
         }
         this.subElements = this.getSubElements(this.element)

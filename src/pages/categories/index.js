@@ -64,7 +64,7 @@ export default class Categories {
         const CollectionOfList = this.element.querySelectorAll('.sortable-list')
         for (const list of CollectionOfList) {
             const sortable = new SortableList({}, list)
-            list.addEventListener('clickOnList', this.sendNewOrderOfCategories)
+            list.addEventListener('click-on-list', this.sendNewOrderOfCategories)
         }
     }
 
