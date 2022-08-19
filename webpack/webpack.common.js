@@ -18,7 +18,7 @@ module.exports = {
     styles: path.join(__dirname, '../src/styles/all.css')
   },
   output: {
-    publicPath: '',
+    publicPath: '/',
     filename: '[name].bundle.js',
     path: path.join(__dirname, '../dist'),
     chunkFilename: '[name]-[id].js'
