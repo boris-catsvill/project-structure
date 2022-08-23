@@ -35,6 +35,7 @@ export default class Router {
 
     let match;
 
+
     for (let route of this.routes) {
       match = strippedPath.match(route.pattern);
 

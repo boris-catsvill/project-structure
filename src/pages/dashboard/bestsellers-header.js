@@ -23,6 +23,7 @@ const header = [
     sortable: true,
     sortType: 'number'
   },
+
   {
     id: 'price',
     title: 'Price',
