@@ -52,4 +52,14 @@
 
   </section>
 </main>
+<script type="module">
+  import Page from './index.js';
+
+  const contentNode = document.querySelector('#content');
+  const page = new Page();
+  const element = page.render();
+
+  contentNode.innerHTML = '';
+  contentNode.append(element);
+</script>
 </body>
