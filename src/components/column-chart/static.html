@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ColumnChart</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<h2>ColumnCharts with data</h2>
+<div class="dashboard__charts">
+  <div class="dashboard__chart_orders">
+    <div class="column-chart" style="--chart-height: 50">
+      <div class="column-chart__title">
+        Total orders
+        <a href="/sales" class="column-chart__link">View all</a>
+      </div>
+      <div class="column-chart__container">
+        <div data-element="header" class="column-chart__header">344</div>
+        <div data-element="body" class="column-chart__chart">
+          <div style="--value: 2" data-tooltip="6%"></div>
+          <div style="--value: 22" data-tooltip="44%"></div>
+          <div style="--value: 5" data-tooltip="11%"></div>
+          <div style="--value: 50" data-tooltip="100%"></div>
+          <div style="--value: 12" data-tooltip="25%"></div>
+          <div style="--value: 4" data-tooltip="8%"></div>
+          <div style="--value: 13" data-tooltip="28%"></div>
+          <div style="--value: 5" data-tooltip="11%"></div>
+          <div style="--value: 23" data-tooltip="47%"></div>
+          <div style="--value: 12" data-tooltip="25%"></div>
+          <div style="--value: 34" data-tooltip="69%"></div>
+          <div style="--value: 1" data-tooltip="3%"></div>
+          <div style="--value: 23" data-tooltip="47%"></div>
+          <div style="--value: 27" data-tooltip="56%"></div>
+          <div style="--value: 2" data-tooltip="6%"></div>
+          <div style="--value: 1" data-tooltip="3%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="dashboard__chart_sales">
+    <div class="column-chart" style="--chart-height: 50">
+      <div class="column-chart__title">
+        Total sales
+      </div>
+      <div class="column-chart__container">
+        <div data-element="header" class="column-chart__header">$243,437</div>
+        <div data-element="body" class="column-chart__chart">
+          <div style="--value: 12" data-tooltip="25%"></div>
+          <div style="--value: 16" data-tooltip="33%"></div>
+          <div style="--value: 8" data-tooltip="17%"></div>
+          <div style="--value: 33" data-tooltip="67%"></div>
+          <div style="--value: 14" data-tooltip="29%"></div>
+          <div style="--value: 6" data-tooltip="13%"></div>
+          <div style="--value: 25" data-tooltip="50%"></div>
+          <div style="--value: 8" data-tooltip="17%"></div>
+          <div style="--value: 6" data-tooltip="13%"></div>
+          <div style="--value: 18" data-tooltip="38%"></div>
+          <div style="--value: 50" data-tooltip="100%"></div>
+          <div style="--value: 41" data-tooltip="83%"></div>
+          <div style="--value: 35" data-tooltip="71%"></div>
+          <div style="--value: 41" data-tooltip="83%"></div>
+          <div style="--value: 4" data-tooltip="8%"></div>
+          <div style="--value: 2" data-tooltip="4%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="dashboard__chart_customers">
+    <div class="column-chart" style="--chart-height: 50">
+      <div class="column-chart__title">
+        Total customers
+
+      </div>
+      <div class="column-chart__container">
+        <div data-element="header" class="column-chart__header">321</div>
+        <div data-element="body" class="column-chart__chart">
+          <div style="--value: 50" data-tooltip="100%"></div>
+          <div style="--value: 45" data-tooltip="90%"></div>
+          <div style="--value: 40" data-tooltip="80%"></div>
+          <div style="--value: 17" data-tooltip="35%"></div>
+          <div style="--value: 45" data-tooltip="90%"></div>
+          <div style="--value: 12" data-tooltip="25%"></div>
+          <div style="--value: 22" data-tooltip="45%"></div>
+          <div style="--value: 32" data-tooltip="65%"></div>
+          <div style="--value: 35" data-tooltip="70%"></div>
+          <div style="--value: 12" data-tooltip="25%"></div>
+          <div style="--value: 7" data-tooltip="15%"></div>
+          <div style="--value: 2" data-tooltip="5%"></div>
+          <div style="--value: 5" data-tooltip="10%"></div>
+          <div style="--value: 12" data-tooltip="25%"></div>
+          <div style="--value: 25" data-tooltip="50%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2>ColumnChart without data</h2>
+<div class="dashboard__charts">
+  <div id="orders" class="dashboard__chart_orders">
+    <div class="column-chart column-chart_loading" style="--chart-height: 50">
+      <div class="column-chart__title">
+        Total orders
+        <a class="column-chart__link" href="#">View all</a>
+      </div>
+      <div class="column-chart__container">
+        <div data-element="header" class="column-chart__header">
+          344
+        </div>
+        <div data-element="body" class="column-chart__chart">
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
