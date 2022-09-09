@@ -220,6 +220,7 @@ export default class ProductForm {
       return {url: url, source: sources[index]};
     });
     if (this.productId) {
+      formData.id = this.productId;
       await this.updateProduct(formData);
     } else {
       await this.createProduct(formData);
