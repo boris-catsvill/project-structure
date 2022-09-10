@@ -6,7 +6,7 @@
   },
   "extends": "eslint:recommended",
   "parserOptions": {
-    "ecmaVersion": 2020,
+    "ecmaVersion": 2022,
     "sourceType": "module"
   },
   "rules": {
@@ -47,7 +47,6 @@
       "let": "never",
       "const": "never"
     }],
-    "semi": "warn",
     "space-in-parens": ["warn", "never"],
     "space-before-blocks": "warn",
     "unicode-bom": "warn",

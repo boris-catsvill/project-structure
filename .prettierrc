@@ -1,5 +1,5 @@
 {
-  "semi": true,
+  "semi": false,
   "printWidth": 100,
   "trailingComma": "none",
   "singleQuote": true,
