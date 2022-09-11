@@ -3,9 +3,12 @@ import {
   ordersChartState,
   customersChartState 
 } from '../../state/ChartEventState.js'
+import { bestsellersTableState } from '../../state/TableEventState.js'
+import { productHeader } from '../../components/sortable-table/configs/productHeader'
 import BaseComponent from '../../components/BaseComponent.js'
 import RangePicker from '../../components/range-picker'
 import ColumnChart from '../../components/column-chart'
+import SortableTable from '../../components/sortable-table'
 
 const rangePicker = new RangePicker({
   from: new Date('08.01.2022'),
@@ -27,6 +30,16 @@ const customersChart = new ColumnChart({
   link: 'customers',
 }, customersChartState)
 
+const sortableTable = new SortableTable({
+    headerConfig: productHeader,
+    sorted: {
+      fieldValue: productHeader.find(item => item.sortable).id,
+      orderValue: 'asc'
+    },
+    isSortLocally: true,
+    isLazyLoad: false
+}, bestsellersTableState)
+
 export default class extends BaseComponent {
   #elementDOM = null
 
@@ -35,7 +48,9 @@ export default class extends BaseComponent {
     await Promise.all([
       ordersChartState.updateChartRange(from, to), 
       salesChartState.updateChartRange(from, to),
-      customersChartState.updateChartRange(from, to)
+      customersChartState.updateChartRange(from, to),
+
+      sortableTable.updateTableRange(from, to)
     ])
   }
 
@@ -46,6 +61,7 @@ export default class extends BaseComponent {
     this.addChildrenComponent('ordersChart', ordersChart)
     this.addChildrenComponent('salesChart', salesChart)
     this.addChildrenComponent('customersChart', customersChart)
+    this.addChildrenComponent('sortableTable', sortableTable)
   }
 
   get element() {
@@ -82,6 +98,7 @@ export default class extends BaseComponent {
         </div>
 
         <h3 class="block-title">Лидеры продаж</h3>
+        <span data-mount="sortableTable"></span>
       </div>
     `
   }

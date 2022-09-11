@@ -27,7 +27,7 @@ export default class ColumnChart extends BaseComponent {
     super()
 
     if (!(stateManager instanceof ChartEventState)) 
-      throw new Error('state manager not passed to chart need in ChartEventState')
+      throw new Error('state manager not passed to ColumnChart, need in ChartEventState')
 
     this.label = label || this.label
     this.link = link || this.link

@@ -1,7 +1,7 @@
 import BaseEventState from "./BaseEventState";
 import fetchJson from '../utils/fetch-json'
 
-const BACKEND_URL = 'https://course-js.javascript.ru'
+const BACKEND_URL = process.env.BACKEND_URL
 
 export default class ChartEventState extends BaseEventState {
   apiUrl = new URL(`${BACKEND_URL}/api/dashboard/`)

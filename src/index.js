@@ -7,7 +7,7 @@ const router = Router.instance();
 
 router
   .addRoute(/^$/, 'dashboard')
-  // .addRoute(/^products$/, 'products/list')
+  .addRoute(/^products$/, 'products/list')
   // .addRoute(/^products\/add$/, 'products/edit')
   // .addRoute(/^products\/([\w()-]+)$/, 'products/edit')
   // .addRoute(/^sales$/, 'sales')
