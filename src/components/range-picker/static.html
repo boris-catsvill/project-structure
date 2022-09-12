@@ -1,24 +1,6 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <style>
-  :root {
-    --blue: #109cf1;
-    --dark-blue: #334d6e;
-    --light-blue: #cfebfc;
-    --middle-blue: #9fd7f9;
-    --yellow: #ffb946;
-    --red: #f7685b;
-    --green: #2ed47a;
-    --purple: #885af8;
-    --black: #192a3e;
-    --table-black: #323c47;
-    --table-grey: #707683;
-    --grey: #90a0b7;
-    --grey-light: #c2cfe0;
-    --grey-extra-light: #eff1f4;
-    --grey-skeleton: #f5f6f8;
-    --white: #ffffff;
-  }
   body {
     background-color: var(--grey-light);
     margin: 0;
@@ -32,16 +14,16 @@
     margin: 0 auto;
   }
 </style>
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="07-forms-fetch-api-part-2/2-range-picker/src/style.css">
 
 <body>
   <div class="container">
   <div class="rangepicker rangepicker_open">
-    <div class="rangepicker__input" data-elem="input">
-      <span data-elem="from">11/26/19</span> -
-      <span data-elem="to">12/26/19</span>
+    <div class="rangepicker__input" data-element="input">
+      <span data-element="from">11/26/19</span> -
+      <span data-element="to">12/26/19</span>
     </div>
-    <div class="rangepicker__selector" data-elem="selector">
+    <div class="rangepicker__selector" data-element="selector">
       <div class="rangepicker__selector-arrow"></div>
       <div class="rangepicker__selector-control-left"></div>
       <div class="rangepicker__selector-control-right"></div>

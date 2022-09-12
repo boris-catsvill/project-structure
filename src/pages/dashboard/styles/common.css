@@ -1,0 +1,117 @@
+@import url("https://fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap");
+@import url("../assets/fonts/css/fontello.css");
+@import url("variables.css");
+@import url("form.css");
+
+body {
+  font-family: "Source Sans Pro", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+.button-primary,
+.button-primary-outline {
+  outline: none;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 24px;
+  padding: 6px 34px;
+  border: 1px solid var(--blue);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: 0.2s all;
+  text-decoration: none;
+}
+
+.button-primary {
+  color: var(--white);
+  background-color: var(--blue);
+  box-shadow: 0 4px 10px rgba(16, 156, 241, 0.24);
+}
+
+.button-primary:hover,
+.button-primary:focus,
+.button-primary:active,
+.button-primary.active {
+  opacity: 0.8;
+}
+
+.button-primary-outline {
+  color: var(--blue);
+  background-color: var(--white);
+}
+
+button.is-loading::before {
+  content: "";
+  display: grid;
+  width: 24px;
+  height: 24px;
+  animation: spin 1000ms linear infinite;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -12px;
+  margin-left: -12px;
+  z-index: 1;
+}
+
+.button-primary.is-loading::before {
+  background: url("/components/product-form/icon-loading-circle-white.svg") center
+    no-repeat;
+  background-size: cover;
+}
+
+.button-primary-outline.is-loading::before {
+  background: url("/components/product-form/icon-loading-circle-blue.svg") center
+    no-repeat;
+  background-size: cover;
+}
+
+button.is-loading {
+  pointer-events: none;
+  cursor: default;
+  opacity: 0.5;
+  overflow: hidden;
+  text-indent: -9999px;
+  position: relative;
+}
+
+button.is-loading > span {
+  display: none;
+}
+
+/* skeleton */
+
+.loading-line {
+  animation-duration: 1.5s;
+  animation-fill-mode: forwards;
+  animation-iteration-count: infinite;
+  animation-name: backgroundMovement;
+  animation-timing-function: linear;
+  background: var(--grey-skeleton);
+  background: linear-gradient(
+    267.58deg,
+    var(--grey-skeleton) 0%,
+    var(--grey-light) 80%,
+    var(--grey-skeleton) 100%
+  );
+  background-size: 200%;
+  border-radius: 2px;
+  display: block;
+  height: var(--loading-line-height);
+}
+
+@keyframes backgroundMovement {
+  0% {
+    background-position: 100%;
+  }
+  100% {
+    background-position: -100%;
+  }
+}

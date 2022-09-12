@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>ColumnChart</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+  </head>
+
+  <body>
+    <div class="dashboard__charts">
+      <div>
+        <div id="orders" class="dashboard__chart_orders"></div>
+        <input id="start" type="text" placeholder="yy-mm-dd" />
+        <input id="end" type="text" placeholder="yy-mm-dd" />
+        <button id="loadOrders">Load data</button>
+      </div>
+      <div id="sales" class="dashboard__chart_sales"></div>
+      <div id="customers" class="dashboard__chart_customers"></div>
+    </div>
+
+    <script type="module">
+      import ColumnChart from "./index.js";
+
+      const getRange = () => {
+        const now = new Date();
+        const to = new Date();
+        const from = new Date(now.setMonth(now.getMonth() - 1));
+
+        return { from, to };
+      };
+
+      const { from, to } = getRange();
+
+      const startInput = document.getElementById("start");
+      const endInput = document.getElementById("end");
+
+      startInput.value = from.toISOString().split("T")[0];
+      endInput.value = to.toISOString().split("T")[0];
+
+      const ordersChart = new ColumnChart({
+        url: "api/dashboard/orders",
+        range: {
+          from,
+          to,
+        },
+        label: "orders",
+        link: "#",
+      });
+
+      loadOrders.addEventListener("click", () => {
+        ordersChart.update(new Date(start.value), new Date(end.value));
+      });
+
+      const salesChart = new ColumnChart({
+        url: "api/dashboard/sales",
+        range: {
+          from,
+          to,
+        },
+        label: "sales",
+        formatHeading: (data) => `$${data}`,
+      });
+
+      const customersChart = new ColumnChart({
+        url: "api/dashboard/customers",
+        range: {
+          from,
+          to,
+        },
+        label: "customers",
+      });
+
+      orders.append(ordersChart.element);
+      sales.append(salesChart.element);
+      customers.append(customersChart.element);
+    </script>
+  </body>
+</html>
