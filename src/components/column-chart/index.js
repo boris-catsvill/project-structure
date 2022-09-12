@@ -1,40 +1,36 @@
-export default class ColumnChart {
-  element;
-  subElements = {};
-  chartHeight = 50;
+import fetchJson from '../../utils/fetch-json.js';
 
-  constructor({
-    data = [],
-    label = '',
-    link = '',
-    value = 0
-  } = {}) {
-    this.data = data;
+export default class ColumnChart {
+  chartHeight = 50;
+  subElements = {};
+  hoveredBar = null;
+
+  onPointerOver = (event) => {
+    const bar = event.target.closest('[data-tooltip]');
+    if(!bar) return;
+
+    bar.classList.add('is-hovered');
+    this.hoveredBar = bar;
+    this.subElements.body.classList.add('has-hovered');
+  }
+
+  onPointerOut = (event) => {
+    if(this.hoveredBar) this.hoveredBar.classList.remove('is-hovered');
+    this.subElements.body.classList.remove('has-hovered');
+  }
+
+  constructor({url = '', range = {from : new Date(), to : new Date()},
+               label = '', link = '', formatHeading = (data) => data} = {}) {
+    this.url = new URL(url, process.env.BACKEND_URL);
+    this.range = range;
     this.label = label;
     this.link = link;
-    this.value = value;
-
+    this.formatHeading = formatHeading;
+      
     this.render();
   }
-
-  getColumnBody(data) {
-    const maxValue = Math.max(...data);
-
-    return data
-    .map(item => {
-      const scale = this.chartHeight / maxValue;
-      const percent = (item / maxValue * 100).toFixed(0);
-
-      return `<div style="--value: ${Math.floor(item * scale)}" data-tooltip="${percent}%"></div>`;
-    })
-    .join('');
-  }
-
-  getLink() {
-    return this.link ? `<a class="column-chart__link" href="${this.link}">View all</a>` : '';
-  }
-
-  get template () {
+      
+  getTemplate() {
     return `
       <div class="column-chart column-chart_loading" style="--chart-height: ${this.chartHeight}">
         <div class="column-chart__title">
@@ -43,47 +39,109 @@ export default class ColumnChart {
         </div>
         <div class="column-chart__container">
           <div data-element="header" class="column-chart__header">
-            ${this.value}
           </div>
           <div data-element="body" class="column-chart__chart">
-            ${this.getColumnBody(this.data)}
           </div>
         </div>
       </div>
     `;
   }
+      
+  getBarElementsAsString(data) {
+    const values = this.getNormalizeBarArray(data);
 
-  async render() {
-    const element = document.createElement('div');
+    return values.map(item => `<div style="--value:${item.normalizedValue}" data-tooltip="${this.getTooltipInfo(item)}"></div>`).join('');
+  }
 
-    element.innerHTML = this.template;
-    this.element = element.firstElementChild;
+  getTooltipInfo(item) {
+    const date = new Date(item.date);
+    const options = { year: 'numeric', month: 'short', day: 'numeric' };
 
-    if (this.data.length) {
-      this.element.classList.remove(`column-chart_loading`);
+    return `<div><small>${date.toLocaleDateString('ru-RU', options)}</small></div><strong>${item.originalValue}</strong>`;
+  }
+  
+  getLink() {
+    return this.link
+      ? `<a class="column-chart__link" href="${this.link}">View all</a>`
+      : "";
+  }
+
+  getSubElements() {
+    const result = {};
+    const elements = this.element.querySelectorAll("[data-element]");
+
+    for (const subElement of elements) {
+      const name = subElement.dataset.element;
+
+      result[name] = subElement;
     }
 
-    this.subElements = this.getSubElements(this.element);
-
-    return this.element;
+    return result;
   }
 
-  getSubElements (element) {
-    const elements = element.querySelectorAll('[data-element]');
+  getNormalizeBarArray(barArray) {
+    const maxValue = Math.max(...Object.values(barArray));
+    const scale = this.chartHeight / maxValue;
+        
+    return Object.entries(barArray).map(([date, value]) => {
+      return {
+        date: date,
+        originalValue: value,
+        percent: (value / maxValue * 100).toFixed(0) + '%',
+        normalizedValue: String(Math.floor(value * scale))
+      };
+    });
+  }
+          
+  render() {
+    const element = document.createElement("div");
+    element.innerHTML = this.getTemplate();
+    this.element = element.firstElementChild;
+    this.subElements = this.getSubElements();
 
-    return [...elements].reduce((accum, subElement) => {
-      accum[subElement.dataset.element] = subElement;
-
-      return accum;
-    }, {});
+    this.update({from: this.range.from, to: this.range.to});
   }
 
-  update ({headerData, bodyData}) {
-    this.subElements.header.textContent = headerData;
-    this.subElements.body.innerHTML = this.getColumnBody(bodyData);
+  async update({from, to} = {}) {
+    const query = new URL(this.url);
+    query.searchParams.set('from', from);
+    query.searchParams.set('to', to);
+
+    try {
+      this.element.classList.add("column-chart_loading");
+      const response = await fetchJson(query.href);
+      this.updateReceivedData(response);
+      this.element.classList.remove("column-chart_loading");
+
+      this.initEventListeners();
+      return response;
+    } catch (error) {
+      throw new Error(`Unable to fetch data from ${query}`);
+    }
   }
 
+  updateReceivedData(data) {
+    const value = Object.values(data).reduce((acc,val) => acc += val, 0);
+    this.subElements.header.innerHTML = this.formatHeading(Number(value).toLocaleString('en-US'));
+    this.subElements.body.innerHTML = this.getBarElementsAsString(data);
+  }
+
+  initEventListeners(){
+    this.subElements.body.addEventListener('pointerover', this.onPointerOver);
+    this.subElements.body.addEventListener('pointerout', this.onPointerOut);
+  }
+      
+  remove() {
+    if(this.element) {
+      this.element.remove();  
+    }
+  }
+      
   destroy() {
-    this.element.remove();
+    this.subElements.body.removeEventListener('pointerover', this.onPointerOver);
+    this.subElements.body.removeEventListener('pointerout', this.onPointerOut);
+    this.remove();
+    this.subElements = {};
+    this.element = null;
   }
 }
