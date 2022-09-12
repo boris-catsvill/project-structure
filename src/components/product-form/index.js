@@ -3,11 +3,11 @@ import escapeHtml from '../../utils/escape-html.js';
 import fetchJson from '../../utils/fetch-json.js';
 
 const IMGUR_CLIENT_ID = '28aaa2e823b03b1';
-const IMGUR_URL = "https://api.imgur.com/3/image";
+const IMGUR_URL = 'https://api.imgur.com/3/image';
 const BACKEND_URL = 'https://course-js.javascript.ru';
-const CATEGORIES_PATH = "api/rest/categories";
-const PRODUCT_PATH = "api/rest/products";
-
+const CATEGORIES_PATH = 'api/rest/categories';
+const PRODUCT_PATH = 'api/rest/products';
+const NUM_PROPS = ['quantity', 'price', 'status', 'discount'];
 
 export default class ProductForm {
   element = {};
@@ -32,54 +32,54 @@ export default class ProductForm {
 
   formTemplate() {
     return `
-    <div class="product-form">
-      <form data-element="productForm" class="form-grid">
-        <div class="form-group form-group__half_left">
+    <div class='product-form'>
+      <form data-element='productForm' class='form-grid'>
+        <div class='form-group form-group__half_left'>
           <fieldset>
-            <label class="form-label">Название товара</label>
-            <input required="" type="text" name="title" class="form-control" placeholder="Название товара" value="${this.formData.title ? this.formData.title : ''}">
+            <label class='form-label'>Название товара</label>
+            <input required='' type='text' name='title' class='form-control' placeholder='Название товара' value='${this.formData.title ? this.formData.title : ''}'>
           </fieldset>
         </div>
-        <div class="form-group form-group__wide">
-          <label class="form-label">Описание</label>
-          <textarea required="" class="form-control" name="description" data-element="productDescription" placeholder="Описание товара">${this.formData.description ? this.formData.description : ''}</textarea>
+        <div class='form-group form-group__wide'>
+          <label class='form-label'>Описание</label>
+          <textarea required='' class='form-control' name='description' data-element='productDescription' placeholder='Описание товара'>${this.formData.description ? this.formData.description : ''}</textarea>
         </div>
-        <div class="form-group form-group__wide" data-element="sortable-list-container">
-          <label class="form-label">Фото</label>
-          <div data-element="imageListContainer">
+        <div class='form-group form-group__wide' data-element='sortable-list-container'>
+          <label class='form-label'>Фото</label>
+          <div data-element='imageListContainer'>
 <!--            A place for a sortable list-->
           </div>
-          <button type="button" name="uploadImage" class="button-primary-outline"><span>Загрузить</span></button>
+          <button type='button' name='uploadImage' class='button-primary-outline'><span>Загрузить</span></button>
         </div>
-        <div class="form-group form-group__half_left">
-          <label class="form-label">Категория</label>
-          <select class="form-control" name="subcategory">
+        <div class='form-group form-group__half_left'>
+          <label class='form-label'>Категория</label>
+          <select class='form-control' name='subcategory'>
           ${this.subcategoriesTemplate()}
           </select>
         </div>
-        <div class="form-group form-group__half_left form-group__two-col">
+        <div class='form-group form-group__half_left form-group__two-col'>
           <fieldset>
-            <label class="form-label">Цена ($)</label>
-            <input required="" type="number" name="price" class="form-control" placeholder="100" value="${this.formData.price ? this.formData.price : ''}">
+            <label class='form-label'>Цена ($)</label>
+            <input required='' type='number' name='price' class='form-control' placeholder='100' value='${this.formData.price ? this.formData.price : ''}'>
           </fieldset>
           <fieldset>
-            <label class="form-label">Скидка ($)</label>
-            <input required="" type="number" name="discount" class="form-control" placeholder="0" value="${this.formData.discount ? this.formData.discount : ''}">
+            <label class='form-label'>Скидка ($)</label>
+            <input required='' type='number' name='discount' class='form-control' placeholder='0' value='${this.formData.discount ? this.formData.discount : ''}'>
           </fieldset>
         </div>
-        <div class="form-group form-group__part-half">
-          <label class="form-label">Количество</label>
-          <input required="" type="number" class="form-control" name="quantity" placeholder="1" value="${this.formData.quantity ? this.formData.quantity : ''}">
+        <div class='form-group form-group__part-half'>
+          <label class='form-label'>Количество</label>
+          <input required='' type='number' class='form-control' name='quantity' placeholder='1' value='${this.formData.quantity ? this.formData.quantity : ''}'>
         </div>
-        <div class="form-group form-group__part-half">
-          <label class="form-label">Статус</label>
-          <select class="form-control" name="status">
-            <option value="1" ${this.formData.status === 1 ? "selected" : ""}>Активен</option>
-            <option value="0" ${this.formData.status === 0 ? "selected" : ""}>Неактивен</option>
+        <div class='form-group form-group__part-half'>
+          <label class='form-label'>Статус</label>
+          <select class='form-control' name='status'>
+            <option value='1' ${this.formData.status === 1 ? 'selected' : ''}>Активен</option>
+            <option value='0' ${this.formData.status === 0 ? 'selected' : ''}>Неактивен</option>
           </select>
         </div>
-        <div class="form-buttons">
-          <button type="submit" name="save" class="button-primary-outline">
+        <div class='form-buttons'>
+          <button type='submit' name='save' class='button-primary-outline'>
             Сохранить товар
           </button>
         </div>
@@ -99,7 +99,7 @@ export default class ProductForm {
       }).join('\n')).join('\n')}
       `;
     }
-    return "";
+    return '';
   }
 
   sortableListItems() {
@@ -109,28 +109,28 @@ export default class ProductForm {
     return [];
   }
 
-  productImagesContainerItemTemplate({url, source}) {
+  productImagesContainerItemTemplate({ url, source }) {
     return `
-      <li class="products-edit__imagelist-item sortable-list__item" style="">
-        <input type="hidden" name="url" value="${url}">
-        <input type="hidden" name="source" value="${source}">
+      <li class='products-edit__imagelist-item sortable-list__item' style=''>
+        <input type='hidden' name='url' value='${url}'>
+        <input type='hidden' name='source' value='${source}'>
         <span>
-          <img draggable="false" src="../../assets/icons/icon-grab.svg" data-grab-handle="" alt="grab">
-          <img class="sortable-table__cell-img" alt="Image" src="${url}">
+          <img draggable='false' src='../../assets/icons/icon-grab.svg' data-grab-handle='' alt='grab'>
+          <img class='sortable-table__cell-img' alt='Image' src='${url}'>
           <span>${source}</span>
         </span>
-        <button type="button">
-          <img src="../../assets/icons/icon-trash.svg" data-delete-handle="" alt="delete">
+        <button type='button'>
+          <img src='../../assets/icons/icon-trash.svg' data-delete-handle='' alt='delete'>
         </button>
       </li>
     `;
   }
 
-  appendImagesContainerItem({url, source}) {
+  appendImagesContainerItem({ url, source }) {
     const itemWrapper = document.createElement('div');
-    itemWrapper.innerHTML = this.productImagesContainerItemTemplate({url, source});
+    itemWrapper.innerHTML = this.productImagesContainerItemTemplate({ url, source });
     const newItem = itemWrapper.firstElementChild;
-    this.subElements.imageListContainer.querySelector(".sortable-list").appendChild(newItem);
+    this.subElements.imageListContainer.querySelector('.sortable-list').appendChild(newItem);
     this.sortableList.registerItem(newItem);
   }
 
@@ -140,11 +140,11 @@ export default class ProductForm {
       this.productId ? this.fetchProduct() : this.formData]
     );
 
-    const elementWrapper = document.createElement("div");
+    const elementWrapper = document.createElement('div');
     elementWrapper.innerHTML = this.formTemplate();
     this.element = elementWrapper.firstElementChild;
     this.subElements = this.getSubElements();
-    this.sortableList = new SortableList({items: this.sortableListItems()});
+    this.sortableList = new SortableList({ items: this.sortableListItems() });
     this.subElements.imageListContainer.append(this.sortableList.element);
     this.initHandlers();
 
@@ -153,7 +153,7 @@ export default class ProductForm {
 
   getSubElements() {
     const result = {};
-    const elements = this.element.querySelectorAll("[data-element]");
+    const elements = this.element.querySelectorAll('[data-element]');
 
     for (const subElement of elements) {
       const name = subElement.dataset.element;
@@ -165,21 +165,21 @@ export default class ProductForm {
   }
 
   initHandlers() {
-    this.subElements.productForm.querySelector('[name="save"]').addEventListener("click", this.clickSave);
-    this.subElements.productForm.querySelector('[name="uploadImage"]').addEventListener("click", this.clickUploadImage);
+    this.subElements.productForm.querySelector('[name="save"]').addEventListener('click', this.clickSave);
+    this.subElements.productForm.querySelector('[name="uploadImage"]').addEventListener('click', this.clickUploadImage);
   }
 
   async fetchCategories() {
     const url = new URL(CATEGORIES_PATH, BACKEND_URL);
-    url.searchParams.set("_sort", "weight");
-    url.searchParams.set("_refs", "subcategory");
+    url.searchParams.set('_sort', 'weight');
+    url.searchParams.set('_refs', 'subcategory');
     return await fetchJson(url)
       .catch(reason => console.error(`Failed to fetch form categories: ${reason}`));
   }
 
   async fetchProduct() {
     const url = new URL(PRODUCT_PATH, BACKEND_URL);
-    url.searchParams.set("id", this.productId);
+    url.searchParams.set('id', this.productId);
     return fetchJson(url)
       .then(arr => (this.formParams(arr[0])))
       .then(unsafeObj => this.escapeHtmlValues(unsafeObj))
@@ -191,15 +191,15 @@ export default class ProductForm {
 
   escapeHtmlValues(obj) {
     Object.keys(obj).forEach(key => {
-      if (typeof obj[key] === "string") {
+      if (typeof obj[key] === 'string') {
         obj[key] = escapeHtml(obj[key]);
       }
     });
     return obj;
   }
 
-  formParams = ({title, description, quantity, subcategory, status, price, discount, images}) =>
-    ({title, description, quantity, subcategory, status, price, discount, images});
+  formParams = ({ title, description, quantity, subcategory, status, price, discount, images }) =>
+    ({ title, description, quantity, subcategory, status, price, discount, images });
 
   clickSave = async (event) => {
     event.preventDefault();
@@ -211,13 +211,14 @@ export default class ProductForm {
 
     for (const prop in this.formData) {
       const dataInput = this.subElements.productForm.querySelector(`[name=${prop}]`);
-      formData[prop] = dataInput?.value;
+      formData[prop] = this.parseNumber(prop, dataInput?.value);
+      console.log(`${prop}: ${formData[prop]}`)
     }
 
-    const urls = [...this.subElements.productForm.querySelectorAll("[name='url']")].map(element => element.value);
-    const sources = [...this.subElements.productForm.querySelectorAll("[name='source']")].map(element => element.value);
+    const urls = [...this.subElements.productForm.querySelectorAll('[name=\'url\']')].map(element => element.value);
+    const sources = [...this.subElements.productForm.querySelectorAll('[name=\'source\']')].map(element => element.value);
     formData.images = urls.map((url, index) => {
-      return {url: url, source: sources[index]};
+      return { url: url, source: sources[index] };
     });
     if (this.productId) {
       formData.id = this.productId;
@@ -227,19 +228,39 @@ export default class ProductForm {
     }
   }
 
+  parseNumber(prop, string) {
+    if (!NUM_PROPS.includes(prop)) {
+      return string;
+    }
+    if (!string) {
+      return 0;
+    }
+    if (!isNaN(parseInt(string))) {
+      return parseInt(string);
+    } else if (!isNaN(parseFloat(string))) {
+      return parseFloat(string);
+    } else {
+      return string;
+    }
+  }
+
   async createProduct(jsonFormData) {
-    return this.productApiCall(jsonFormData, "POST", "product-created");
+    return this.productApiCall(jsonFormData, 'POST', 'product-created');
   }
 
   async updateProduct(formData) {
-    return this.productApiCall(JSON.stringify(formData), "PATCH", "product-updated");
+    return this.productApiCall(JSON.stringify(formData), 'PATCH', 'product-updated');
   }
 
   async productApiCall(jsonFormData, method, event) {
     const url = new URL(PRODUCT_PATH, BACKEND_URL);
     await fetchJson(url, {
       method: method,
-      body: jsonFormData
+      body: jsonFormData,
+      headers: {
+        'Content-Type': 'application/json',
+        'Charset': 'UTF-8'
+      }
     })
       .then(_ => this.element.dispatchEvent(new Event(event)))
       .catch(reason => console.error(`Failed to create product: ${reason}`));
@@ -251,17 +272,16 @@ export default class ProductForm {
   };
 
   uploadImage() {
-    const imageInput = document.createElement("input");
-    imageInput.type = "file";
-    imageInput.accept = "image/*";
+    const imageInput = document.createElement('input');
+    imageInput.type = 'file';
+    imageInput.accept = 'image/*';
     imageInput.onchange = async (event) => {
       const image = event.target.files[0];
       const imageFormData = new FormData();
-      imageFormData.append("image", image);
+      imageFormData.append('image', image);
 
       const imgurResource = await this.createImgurResource(image, imageFormData);
-      // this.formData.images.push(imgurResource);
-      this.appendImagesContainerItem({url: imgurResource.url, source: imgurResource.source});
+      this.appendImagesContainerItem({ url: imgurResource.url, source: imgurResource.source });
     };
     imageInput.click();
     imageInput.remove();
@@ -294,8 +314,8 @@ export default class ProductForm {
     }
 
     if (this.subElements) {
-      this.subElements.productForm?.querySelector('[name="save"]')?.removeEventListener("click", this.clickSave);
-      this.subElements.productForm?.querySelector('[name="uploadImage"]').removeEventListener("click", this.clickSave);
+      this.subElements.productForm?.querySelector('[name="save"]')?.removeEventListener('click', this.clickSave);
+      this.subElements.productForm?.querySelector('[name="uploadImage"]').removeEventListener('click', this.clickSave);
     }
 
     this.element = null;
