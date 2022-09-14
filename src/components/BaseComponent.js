@@ -17,10 +17,10 @@ export default class BaseComponent {
   renderDOMChildren(elementDOM) {
     const renderPlace = elementDOM.querySelectorAll('[data-mount]')
 
-    renderPlace.forEach(elem => {
+    renderPlace.forEach(async elem => {
       const component = elem.dataset.mount
       const componentInstance = this.#DOMChildren[component]
-      componentInstance.render()
+      await componentInstance.render()
       elem.replaceWith(componentInstance.element)
     })
   }

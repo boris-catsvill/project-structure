@@ -1,24 +1,21 @@
 import BaseComponent from "../BaseComponent";
 
 export default class Input extends BaseComponent {
-  name = ''
-  label = ''
-  placeholder = ''
-  type = 'text'
-
   #elementDOM = null
 
   constructor({ 
+    name = '',
     label = '', 
     placeholder = '', 
     type = 'text',
-    name = '' 
+    required = false
   }) {
     super()
+    this.name = name
     this.label = label
     this.placeholder = placeholder
     this.type = type
-    this.name = name
+    this.required = required
   }
 
   get element() {
@@ -37,9 +34,9 @@ export default class Input extends BaseComponent {
 
   template() {
     return /*html*/`
-      <div class="form-group">
+      <fieldset>
         <label class="form-label">${this.label}</label>
-        <br/>
+       
         <input 
           data-memo="input"
           type=${this.type} 
@@ -47,7 +44,7 @@ export default class Input extends BaseComponent {
           placeholder=${this.placeholder} 
           name=${this.name}
         />
-      </div>
+      </fieldset>
     `
   }
 }

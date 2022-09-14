@@ -8,16 +8,25 @@ export default class TableEventState extends BaseEventState {
   
   isLoading = false
   data = []
+  #additionalFilters = {}
 
   constructor(request = '') {
     super()
     this.apiUrl = new URL(`/api${request}`, this.apiUrl)
   }
 
+  set additionalFilters(filters) {
+    this.#additionalFilters = filters
+  }
+
+  get additionalFilters() {
+    return this.#additionalFilters
+  }
+
   async updateData(options, clearBefore = false) {
     this.startLoading()
 
-    const request = this.makeRequest(options)
+    const request = this.makeRequest({ ...options, ...this.#additionalFilters })
 
     const data = await fetchJson(request)
 

@@ -7,6 +7,7 @@ export default class SortableTable extends BaseComponent {
   headerConfig = []
   sorted = {}
   lazyLoadItems = 30
+  isLazyLoad = true
 
   stateManager = null
 
@@ -18,11 +19,20 @@ export default class SortableTable extends BaseComponent {
     const { bottom } = this.#elementDOM.getBoundingClientRect()
     const { clientHeight } = document.documentElement
 
-    if (this.isLoading) return
+    if (this.stateManager.isLoading) return
     if (bottom >= clientHeight) return
     if (this.isSortLocally) return
 
-    this.loadMoreData()
+    const { fieldValue: _sort, orderValue: _order } = this.sorted
+    const _start = this.stateManager.data.length
+    const _end = _start + this.lazyLoadItems
+
+    this.stateManager.updateData({ 
+      _order,
+      _sort,
+      _start,
+      _end
+    })
   }
 
   onSortClick = (event) => {
@@ -44,9 +54,10 @@ export default class SortableTable extends BaseComponent {
     }
 
     this.stateManager.updateData({ 
-      ...this.sorted,
+      _order: orderValue,
+      _sort: fieldValue,
       _start: 0,
-      end: this.lazyLoadItems
+      _end: this.lazyLoadItems
     }, true)
   }
 
@@ -99,7 +110,7 @@ export default class SortableTable extends BaseComponent {
       _sort,
       _order,
       _start: 0,
-      end: this.lazyLoadItems,
+      _end: this.lazyLoadItems,
       from,
       to
     }, true)

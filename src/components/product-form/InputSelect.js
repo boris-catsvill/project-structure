@@ -25,6 +25,12 @@ export default class InputSelect extends BaseComponent {
     return this.memoDOM.cache.input
   }
 
+  // updateOptions(options) {
+  //   this.options = options
+
+  //   this.memoDOM.input.innerHTML = this.templateOptions()
+  // }
+
   render() {
     this.#elementDOM = this.createDOMElement(this.template())
 
@@ -33,9 +39,9 @@ export default class InputSelect extends BaseComponent {
 
   template() {
     return /*html*/`
-      <div class="form-group">
+      <fieldset>
         <label class="form-label">${this.label}</label>
-        <br/>
+        
         <select 
           data-memo="input"
           name=${this.name}
@@ -43,11 +49,15 @@ export default class InputSelect extends BaseComponent {
           class="form-control" 
           placeholder=${this.placeholder}
         >
-          ${this.options.map(({ label, value}) => /*html*/`
-            <option value="${value}">${label}</option>
-          `)}
+          ${this.templateOptions()}
         </select>
-      </div>
+      </fieldset>
     `
+  }
+
+  templateOptions() {
+    return this.options.map(({ label, value }) => /*html*/`
+      <option value="${value}">${label}</option>
+    `).join('')
   }
 }

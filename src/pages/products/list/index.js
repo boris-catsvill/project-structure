@@ -3,10 +3,10 @@ import { productsTableState } from "../../../state/TableEventState";
 import { productFormFilterState } from "../../../state/FormEventState";
 
 import BaseComponent from "../../../components/BaseComponent";
-import ProductFormFilter from "../../../components/product-form/ProductFormFilter";
+import ProductFilterForm from "../../../components/product-form/ProductFilterForm";
 import SortableTable from "../../../components/sortable-table";
 
-const productFormFilter = new ProductFormFilter(productFormFilterState)
+const productFormFilter = new ProductFilterForm(productFormFilterState)
 
 const sortableTable = new SortableTable({
   headerConfig: productHeader,
@@ -19,21 +19,34 @@ const sortableTable = new SortableTable({
 export default class extends BaseComponent {
   #elementDOM = null
 
-  delayUpdateTable = () => {}
+  timerUpdate = null
+
+  delayUpdateTable = () => {
+    if (this.timerUpdate) {
+      clearInterval(this.timerUpdate)
+    }
+    this.timerUpdate = setTimeout(async () => {
+      await this.updateTable()
+      this.timerUpdate = null
+    }, 500)
+  }
 
   updateTable = async () => {
     const { title, priceFrom, status, priceTo } = productFormFilterState.formState
     const { orderValue: _order, fieldValue: _sort } = sortableTable.sorted
-    const request = {
+    productsTableState.additionalFilters = {
       price_gte: priceFrom,
       price_lte: priceTo,
       title_like: title,
+      status
+    }
+    const request = {
       _start: 0,
       _end: sortableTable.lazyLoadItems,
       _order,
       _sort,
-      status
     }
+
     await productsTableState.updateData(request, true)
   }
 
@@ -59,13 +72,19 @@ export default class extends BaseComponent {
   }
 
   initEvents() {
-    productFormFilterState.on('changeField', this.updateTable)
+    productFormFilterState.on('changeField', this.delayUpdateTable)
   }
 
   template() {
     return /*html*/`
       <div>
-        <h1>Товары</h1>
+        <div class="content__top-panel">
+          <h1 class="page-title">Товары</h1>
+          <a href="/products/add" class="button-primary">
+            Добавить товар
+          </a>
+        </div>
+        
         <div class="content-box content-box_small">
           <span data-mount="productFormFilter"></span>
         </div>

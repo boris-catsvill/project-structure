@@ -30,7 +30,7 @@ const inputStatus = new InputSelect({
   ]
 })
 
-export default class ProductFormFilter extends BaseComponent {
+export default class ProductFilterForm extends BaseComponent {
   #elementDOM = null
 
   #stateManager = null
