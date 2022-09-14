@@ -34,7 +34,10 @@ export default class Page {
   }
 
   async render() {
-    this.rangePicker = new RangePicker();
+    const now = new Date();
+    const to = new Date();
+    const from = new Date(now.setMonth(now.getMonth() - 1));
+    this.rangePicker = new RangePicker({from, to});
     const [
       sortableTable,
       columnChartOrders,

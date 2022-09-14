@@ -93,7 +93,7 @@ export default class ProductForm {
       return `
         ${this.categories.map(category => category.subcategories.map(subcategory => {
         return `
-        <option value=${subcategory.id} ${this.formData.subcategory === subcategory.id ? "selected" : ""}>
+        <option value=${subcategory.id} ${this.formData.subcategory === subcategory.id ? 'selected' : ''}>
           ${category.title} &gt; ${subcategory.title}
         </option>`;
       }).join('\n')).join('\n')}
@@ -212,7 +212,6 @@ export default class ProductForm {
     for (const prop in this.formData) {
       const dataInput = this.subElements.productForm.querySelector(`[name=${prop}]`);
       formData[prop] = this.parseNumber(prop, dataInput?.value);
-      console.log(`${prop}: ${formData[prop]}`)
     }
 
     const urls = [...this.subElements.productForm.querySelectorAll('[name=\'url\']')].map(element => element.value);
@@ -262,7 +261,14 @@ export default class ProductForm {
         'Charset': 'UTF-8'
       }
     })
-      .then(_ => this.element.dispatchEvent(new Event(event)))
+      .then(res => {
+        this.element.dispatchEvent(new CustomEvent(event, {
+          bubbles: true,
+          detail: {
+            id: res.id
+          }
+        }));
+      })
       .catch(reason => console.error(`Failed to create product: ${reason}`));
   }
 

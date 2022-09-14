@@ -15,13 +15,20 @@ export default class SortableTable {
       sorted = {
         id: '',
         order: ''
-      }
+      },
+      urlSettings = {
+        createdAt_gte: '',
+        createdAt_lte: ''
+      },
+      rowTemplate = (item, innerHTML) => `<div class='sortable-table__row'>${innerHTML}</div>`
     } = {}
   ) {
     this.headerConfig = headerConfig;
     this.url = url;
     this.isSortLocally = isSortLocally;
     this.sorted = sorted;
+    this.urlSettings = urlSettings;
+    this.rowTemplate = rowTemplate;
   }
 
   get template() {
@@ -36,22 +43,16 @@ export default class SortableTable {
   get headerTemplate() {
     return `
     <div data-element='header' class='sortable-table__header sortable-table__row'>
-      ${this.headerConfig.map(({ id, title, sortable, template }) => {
-      if (template) {
-        return template(this.data);
-      } else {
-        return this.headerCellTemplate(id, sortable, title);
-      }
-    }).join('\n')}
+      ${this.headerConfig.map((configItem) => this.headerCellTemplate(configItem)).join('\n')}
     </div>
     `;
   }
 
-  headerCellTemplate(id, sortable, title) {
+  headerCellTemplate(configItem) {
     return `
-    <div class='sortable-table__cell' data-id='${id}' data-sortable='${sortable}'
-    ${this.sorted?.id === id ? `data-order=${this.sorted.order}` : ''}>
-      <span>${title}</span>
+    <div class='sortable-table__cell' data-id='${configItem.id}' data-sortable='${configItem.sortable}'
+    ${this.sorted?.id === configItem.id ? `data-order=${this.sorted.order}` : ''}>
+      <span>${configItem.title}</span>
       <span data-element='arrow' class='sortable-table__sort-arrow'>
         <span class='sort-arrow'></span>
       </span>
@@ -60,14 +61,15 @@ export default class SortableTable {
   }
 
   get bodyTemplate() {
-    return this.data.map(item => `
-        <a href='/products/${item.id}' class='sortable-table__row'>
-        ${this.headerConfig.map(configItem => {
+    return this.data.map(item =>
+      this.rowTemplate(
+        item,
+        this.headerConfig.map(configItem => {
           const itemProperty = item[configItem.id];
           const itemTemplate = configItem.template ? configItem.template : this.defaultItemTemplate;
           return itemTemplate(itemProperty);
-        }).join('\n')}
-        </a>`
+        }).join('\n')
+      )
     ).join('\n');
   }
 
@@ -189,7 +191,7 @@ export default class SortableTable {
       });
   }
 
-  async loadData(id, order) {
+  async loadData(id = this.sorted?.id, order = this.sorted?.order) {
     this.loading = true;
     if (!this.range) {
       this.range = { start: 0, end: DATA_INC };
@@ -204,6 +206,13 @@ export default class SortableTable {
         this.reRenderTableBody();
         this.loading = false;
       });
+  }
+
+  async update({ createdAt_gte, createdAt_lte }) {
+    this.urlSettings = { createdAt_gte, createdAt_lte };
+    this.data = [];
+    this.subElements.body.innerHTML = '';
+    await this.loadData();
   }
 
   loadDataOnScroll = async () => {
@@ -226,6 +235,12 @@ export default class SortableTable {
     }
     dataRequestUrl.searchParams.set('_start', start);
     dataRequestUrl.searchParams.set('_end', end);
+    if (this.urlSettings?.createdAt_gte) {
+      dataRequestUrl.searchParams.set('createdAt_gte', this.urlSettings.createdAt_gte);
+    }
+    if (this.urlSettings?.createdAt_lte) {
+      dataRequestUrl.searchParams.set('createdAt_lte', this.urlSettings.createdAt_lte);
+    }
     return dataRequestUrl;
   }
 

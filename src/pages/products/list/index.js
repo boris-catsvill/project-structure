@@ -23,7 +23,8 @@ export default class Page {
 
   initComponents() {
     this.components.sortableTable = new SortableTable(header, {
-      url: 'api/rest/products'
+      url: 'api/rest/products',
+      rowTemplate: (item, innerHTML) => `<a href='/products/${item.id}' class='sortable-table__row'>${innerHTML}</a>`
     });
 
   }

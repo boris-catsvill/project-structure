@@ -34,6 +34,9 @@ body {
   border-radius: 2px;
   animation: calc(var(--value) * 0.1) ease-out calc(var(--value) * 0.9) fadeOut;
   z-index: 1000;
+  position: fixed;
+  bottom: 40px;
+  right: 40px;
 }
 
 /* Success */
