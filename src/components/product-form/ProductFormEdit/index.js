@@ -2,22 +2,14 @@ import { Fields } from "./Fields";
 
 import BaseComponent from "../../BaseComponent"
 import ProductFormEditState from "../../../state/ProductFormEditState";
-import fetchJson from "../../../utils/fetch-json"
-
-const BACKEND_URL = process.env.BACKEND_URL
-
 export default class ProductFormEdit extends BaseComponent {
   #elementDOM = null
-  #baseUrl = new URL(`${BACKEND_URL}`)
-
   #stateManager = null
 
   onSubmitForm = (event) => {
     event.preventDefault()
-
     console.log('this.#stateManager.formState :>> ', this.#stateManager.formState);
-
-    this.save()
+    this.#stateManager.saveProduct()
   }
 
   constructor (stateManager) {
@@ -37,36 +29,6 @@ export default class ProductFormEdit extends BaseComponent {
     return this.#elementDOM
   }
 
-  async save() {
-    const product = this.getFormData()
-  
-    try {
-      await fetchJson(`${this.#baseUrl}products`, {
-        method: this.productId ? 'PATCH' : 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(product)
-      })
-    } catch (error) {
-      console.error('что-то пошло не так', error);
-    }
-  }
-
-  loadCategories() {
-    const categoriesUrl = new URL('categories', this.#baseUrl)
-
-    categoriesUrl.searchParams.set('_sort', 'weight')
-    categoriesUrl.searchParams.set('_refs', 'subcategory')
-
-    return fetchJson(categoriesUrl)
-  }
-
-  loadProductData () {
-    if (!this.productId) return null
-    return fetchJson(`${this.#baseUrl}products?id=${this.productId}`);
-  }
-
   async render() {
     const { categories } = await this.#stateManager.loadFormGoods()
 
@@ -77,12 +39,8 @@ export default class ProductFormEdit extends BaseComponent {
 
     this.#elementDOM = this.createDOMElement(this.template())
 
-    // this.memoDOM.memoizeDocument(this.#elementDOM)
-    // this.initEventListeners()
-
+    this.registerFields()
     this.renderDOMChildren(this.#elementDOM)
-
-
     this.initEvents()
   }
 
@@ -96,7 +54,7 @@ export default class ProductFormEdit extends BaseComponent {
     this.memoDOM.clear()
   }
 
-  initFormValues() {
+  registerFields() {
     Object.values(Fields).forEach((field) => {
       this.#stateManager.registerField(field.name, field.input.value)
     }) 

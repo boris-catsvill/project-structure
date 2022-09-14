@@ -49,7 +49,6 @@ export default class ProductFormEditState extends FormEventState {
     return { categories }
   }
 
-
   getFormData() {
     const formPayload = {}
     
