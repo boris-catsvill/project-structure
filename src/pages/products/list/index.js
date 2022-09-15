@@ -1,8 +1,8 @@
-import ProductForm from "../../../components/product-form";
+import SortableTable from "../../../components/sortable-table";
+import { header } from './header';
 
 export default class Page {
   element;
-  subElements = {};
   components = {};
 
   async render() {
@@ -22,13 +22,15 @@ export default class Page {
   }
 
   initComponents() {
-    const productId = '101-planset-lenovo-yt3-x90l-64-gb-3g-lte-cernyj';
+    this.components.sortableTable = new SortableTable(header, {
+      url: 'api/rest/products',
+      rowTemplate: (item, innerHTML) => `<a href='/products/${item.id}' class='sortable-table__row'>${innerHTML}</a>`
+    });
 
-    this.components.productFrom = new ProductForm(productId);
   }
 
   async renderComponents() {
-    const element = await this.components.productFrom.render();
+    const element = await this.components.sortableTable.render();
 
     this.element.append(element);
   }

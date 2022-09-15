@@ -1,11 +1,11 @@
-const header = [
+export const header = [
   {
     id: 'images',
     title: 'Image',
     sortable: false,
-    template: data => {
+    template: (data = []) => {
       return `
-          <div class="sortable-table__cell">
+          <div class='sortable-table__cell'>
             ${data[0] ? `<img class='sortable-table-image' alt='Image' src='${data[0].url}'>` : 'Photo'}
           </div>
         `;
@@ -35,11 +35,9 @@ const header = [
     sortable: true,
     sortType: 'number',
     template: data => {
-      return `<div class="sortable-table__cell">
+      return `<div class='sortable-table__cell'>
           ${data > 0 ? 'Active' : 'Inactive'}
         </div>`;
     }
-  },
+  }
 ];
-
-export default header;
