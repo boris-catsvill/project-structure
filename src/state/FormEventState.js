@@ -1,5 +1,4 @@
 import BaseEventState from "./BaseEventState";
-import fetchJson from "../utils/fetch-json";
 
 export default class FormEventState extends BaseEventState {
   formState = {}

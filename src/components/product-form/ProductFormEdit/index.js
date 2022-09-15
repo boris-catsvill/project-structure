@@ -2,13 +2,13 @@ import { Fields } from "./Fields";
 
 import BaseComponent from "../../BaseComponent"
 import ProductFormEditState from "../../../state/ProductFormEditState";
+
 export default class ProductFormEdit extends BaseComponent {
   #elementDOM = null
   #stateManager = null
 
   onSubmitForm = (event) => {
     event.preventDefault()
-    console.log('this.#stateManager.formState :>> ', this.#stateManager.formState);
     this.#stateManager.saveProduct()
   }
 
@@ -39,8 +39,8 @@ export default class ProductFormEdit extends BaseComponent {
 
     this.#elementDOM = this.createDOMElement(this.template())
 
-    this.registerFields()
     this.renderDOMChildren(this.#elementDOM)
+    this.registerFields()
     this.initEvents()
   }
 
@@ -84,9 +84,7 @@ export default class ProductFormEdit extends BaseComponent {
           <span data-mount="inputArea"></span>
         </div>
         <div class="form-group form-group__wide" data-element="sortable-list-container">
-
-          ${/*<span data-mount="ImageInput"></span>*/''}
-
+          <span data-mount="inputImage"></span>
         </div>
 
         <div class="form-group form-group__half_left">

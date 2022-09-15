@@ -2,7 +2,6 @@ import { Fields } from "./Fields";
 import BaseComponent from "../../BaseComponent";
 import FormEventState from "../../../state/FormEventState";
 
-
 export default class ProductFilterForm extends BaseComponent {
   #elementDOM = null
 

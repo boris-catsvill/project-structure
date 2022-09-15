@@ -1,6 +1,9 @@
+import { imageUploaderState } from "../../../state/FileUploaderEventState"
+
 import Input from "../Input"
 import InputSelect from "../InputSelect"
 import InputArea from "../InputArea"
+import InputImage from "../InputImage"
 
 const inputTitle = new Input({ 
   name: 'title',
@@ -14,6 +17,10 @@ const inputPrice = new Input({
   type: 'number',
   placeholder: '00.00'
 })
+
+const inputImage = new InputImage({
+  name: 'images'
+}, imageUploaderState)
 
 const inputDiscount = new Input({
   name: 'discount',
@@ -36,7 +43,7 @@ const inputArea = new InputArea({
 })
 
 const inputCategorySelect = new InputSelect({
-  name: 'category',
+  name: 'subcategory',
   label: 'Категория',
   options: []
 })
@@ -57,5 +64,6 @@ export const Fields = {
   inputQuantity,
   inputArea,
   inputStatusSelect,
-  inputCategorySelect
+  inputCategorySelect,
+  inputImage
 }

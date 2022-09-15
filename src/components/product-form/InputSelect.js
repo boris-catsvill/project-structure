@@ -25,12 +25,6 @@ export default class InputSelect extends BaseComponent {
     return this.memoDOM.cache.input
   }
 
-  // updateOptions(options) {
-  //   this.options = options
-
-  //   this.memoDOM.input.innerHTML = this.templateOptions()
-  // }
-
   render() {
     this.#elementDOM = this.createDOMElement(this.template())
 
