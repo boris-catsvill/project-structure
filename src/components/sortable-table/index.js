@@ -1,10 +1,9 @@
 import fetchJson from '../../utils/fetch-json.js';
 
-const BACKEND_URL = 'https://course-js.javascript.ru';
-const collator = new Intl.Collator(['ru', 'en'], { sensitivity: 'variant', caseFirst: 'upper' });
-const DATA_INC = 30;
 
 export default class SortableTable {
+  step = 30;
+  collator = new Intl.Collator(['ru', 'en'], { sensitivity: 'variant', caseFirst: 'upper' });
   data = [];
 
   constructor(
@@ -61,15 +60,14 @@ export default class SortableTable {
   }
 
   get bodyTemplate() {
-    return this.data.map(item =>
-      this.rowTemplate(
-        item,
-        this.headerConfig.map(configItem => {
+    return this.data.map(item => {
+        const rowInnerHtml = this.headerConfig.map(configItem => {
           const itemProperty = item[configItem.id];
           const itemTemplate = configItem.template ? configItem.template : this.defaultItemTemplate;
           return itemTemplate(itemProperty);
-        }).join('\n')
-      )
+        }).join('\n');
+        return this.rowTemplate(item, rowInnerHtml);
+      }
     ).join('\n');
   }
 
@@ -168,8 +166,8 @@ export default class SortableTable {
           y[this.sorted.id] - x[this.sorted.id];
       case 'string':
         return this.sorted.order === 'asc' ?
-          collator.compare(x[this.sorted.id], y[this.sorted.id]) :
-          collator.compare(y[this.sorted.id], x[this.sorted.id]);
+          this.collator.compare(x[this.sorted.id], y[this.sorted.id]) :
+          this.collator.compare(y[this.sorted.id], x[this.sorted.id]);
       }
     };
     this.data.sort(rule);
@@ -194,18 +192,21 @@ export default class SortableTable {
   async loadData(id = this.sorted?.id, order = this.sorted?.order) {
     this.loading = true;
     if (!this.range) {
-      this.range = { start: 0, end: DATA_INC };
+      this.range = { start: 0, end: this.step };
     } else {
-      this.range.start += DATA_INC;
-      this.range.end += DATA_INC;
+      this.range.start += this.step;
+      this.range.end += this.step;
     }
 
-    await fetchJson(this.dataRequestUrl({ id, order, start: this.range.start, end: this.range.end }))
-      .then(data => {
-        this.data.push(...data);
-        this.reRenderTableBody();
-        this.loading = false;
-      });
+    try {
+      const data = await fetchJson(this.dataRequestUrl({ id, order, start: this.range.start, end: this.range.end }));
+      this.data.push(...data);
+    } catch (err) {
+      console.error(`Failed to fetch new data: ${err}`)
+      return;
+    }
+    this.reRenderTableBody();
+    this.loading = false;
   }
 
   async update({ createdAt_gte, createdAt_lte }) {
@@ -225,7 +226,7 @@ export default class SortableTable {
   };
 
   dataRequestUrl({ id, order, start, end }) {
-    const dataRequestUrl = new URL(this.url, `${BACKEND_URL}`);
+    const dataRequestUrl = new URL(this.url, `${process.env.BACKEND_URL}`);
     dataRequestUrl.searchParams.set('_embed', 'subcategory.category');
     if (id) {
       dataRequestUrl.searchParams.set('_sort', id);

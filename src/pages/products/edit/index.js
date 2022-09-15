@@ -5,6 +5,7 @@ import NotificationMessage from '../../../components/notification/index.js';
 export default class Page {
   element = {};
   components = {};
+  productId = '';
 
   onProductSaved = (event) => {
     document.addEventListener('route',(function cb() {
@@ -22,6 +23,10 @@ export default class Page {
       type: 'success',
     });
     notification.show(this.element);
+  }
+
+  constructor() {
+    this.productId = document.URL.split("/").pop();
   }
 
   async render() {
@@ -42,8 +47,7 @@ export default class Page {
   }
 
   initComponents() {
-    const productId = document.URL.split("/").pop();
-    this.components.productForm = new ProductForm(productId);
+    this.components.productForm = new ProductForm(this.productId);
   }
 
   async renderComponents() {
@@ -58,9 +62,6 @@ export default class Page {
   }
 
   destroy() {
-    this.element.removeEventListener('product-updated', this.onProductUpdated);
-    this.element.removeEventListener('product-saved', this.onProductSaved);
-
     for (const component of Object.values(this.components)) {
       component.destroy();
     }

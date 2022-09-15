@@ -2,12 +2,9 @@ import SortableList from '../sortable-list/index.js';
 import escapeHtml from '../../utils/escape-html.js';
 import fetchJson from '../../utils/fetch-json.js';
 
-const IMGUR_CLIENT_ID = '28aaa2e823b03b1';
 const IMGUR_URL = 'https://api.imgur.com/3/image';
-const BACKEND_URL = 'https://course-js.javascript.ru';
 const CATEGORIES_PATH = 'api/rest/categories';
 const PRODUCT_PATH = 'api/rest/products';
-const NUM_PROPS = ['quantity', 'price', 'status', 'discount'];
 
 export default class ProductForm {
   element = {};
@@ -25,6 +22,8 @@ export default class ProductForm {
     images: []
   };
   sortableList = {};
+  numberProperties = ['quantity', 'price', 'status', 'discount'];
+  productApiUrl = new URL(PRODUCT_PATH, process.env.BACKEND_URL);
 
   constructor(productId) {
     this.productId = productId;
@@ -93,7 +92,7 @@ export default class ProductForm {
       return `
         ${this.categories.map(category => category.subcategories.map(subcategory => {
         return `
-        <option value=${subcategory.id} ${this.formData.subcategory === subcategory.id ? 'selected' : ''}>
+        <option value='${subcategory.id}' ${this.formData.subcategory === subcategory.id ? 'selected' : ''}>
           ${category.title} &gt; ${subcategory.title}
         </option>`;
       }).join('\n')).join('\n')}
@@ -170,7 +169,7 @@ export default class ProductForm {
   }
 
   async fetchCategories() {
-    const url = new URL(CATEGORIES_PATH, BACKEND_URL);
+    const url = new URL(CATEGORIES_PATH, process.env.BACKEND_URL);
     url.searchParams.set('_sort', 'weight');
     url.searchParams.set('_refs', 'subcategory');
     return await fetchJson(url)
@@ -178,15 +177,15 @@ export default class ProductForm {
   }
 
   async fetchProduct() {
-    const url = new URL(PRODUCT_PATH, BACKEND_URL);
+    const url = new URL(PRODUCT_PATH, process.env.BACKEND_URL);
     url.searchParams.set('id', this.productId);
-    return fetchJson(url)
-      .then(arr => (this.formParams(arr[0])))
-      .then(unsafeObj => this.escapeHtmlValues(unsafeObj))
-      .catch(reason => {
-        console.error(`Failed to fetch product ${this.productId} data: ${reason}`);
-        return {};
-      });
+    try {
+      const productsArr = await fetchJson(url);
+      return this.escapeHtmlValues(this.formParams(productsArr[0]));
+    } catch (err) {
+      console.error(`Failed to fetch product ${this.productId} data: ${reason}`);
+      return {};
+    }
   }
 
   escapeHtmlValues(obj) {
@@ -228,48 +227,43 @@ export default class ProductForm {
   }
 
   parseNumber(prop, string) {
-    if (!NUM_PROPS.includes(prop)) {
+    if (!this.numberProperties.includes(prop)) {
       return string;
     }
     if (!string) {
       return 0;
     }
-    if (!isNaN(parseInt(string))) {
-      return parseInt(string);
-    } else if (!isNaN(parseFloat(string))) {
-      return parseFloat(string);
-    } else {
-      return string;
-    }
+    return parseFloat(string);
   }
 
   async createProduct(jsonFormData) {
-    return this.productApiCall(jsonFormData, 'POST', 'product-created');
+    return this.callProductApi(jsonFormData, 'POST', 'product-created');
   }
 
   async updateProduct(formData) {
-    return this.productApiCall(JSON.stringify(formData), 'PATCH', 'product-updated');
+    return this.callProductApi(JSON.stringify(formData), 'PATCH', 'product-updated');
   }
 
-  async productApiCall(jsonFormData, method, event) {
-    const url = new URL(PRODUCT_PATH, BACKEND_URL);
-    await fetchJson(url, {
-      method: method,
-      body: jsonFormData,
-      headers: {
-        'Content-Type': 'application/json',
-        'Charset': 'UTF-8'
-      }
-    })
-      .then(res => {
-        this.element.dispatchEvent(new CustomEvent(event, {
-          bubbles: true,
-          detail: {
-            id: res.id
-          }
-        }));
-      })
-      .catch(reason => console.error(`Failed to create product: ${reason}`));
+  async callProductApi(jsonFormData, method, eventName) {
+    try {
+      const result = await fetchJson(this.productApiUrl, {
+        method: method,
+        body: jsonFormData,
+        headers: {
+          'Content-Type': 'application/json',
+          'Charset': 'UTF-8'
+        }
+      });
+      const productEvent = new CustomEvent(eventName, {
+        bubbles: true,
+        detail: {
+          id: result.id
+        }
+      });
+      this.element.dispatchEvent(productEvent);
+    } catch (err) {
+      console.error(`Failed to create product: ${err}`);
+    }
   }
 
   clickUploadImage = (event) => {
@@ -298,7 +292,7 @@ export default class ProductForm {
       method: 'POST',
       body: imageFormData,
       headers: {
-        authorization: `Client-ID ${IMGUR_CLIENT_ID}`
+        authorization: `Client-ID ${process.env.IMGUR_CLIENT_ID}`
       }
     })
       .then(response => {
@@ -315,13 +309,8 @@ export default class ProductForm {
   }
 
   destroy() {
-    if (this.element != null) {
+    if (this.element !== null) {
       this.remove();
-    }
-
-    if (this.subElements) {
-      this.subElements.productForm?.querySelector('[name="save"]')?.removeEventListener('click', this.clickSave);
-      this.subElements.productForm?.querySelector('[name="uploadImage"]').removeEventListener('click', this.clickSave);
     }
 
     this.element = null;

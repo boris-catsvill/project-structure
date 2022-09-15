@@ -1,7 +1,5 @@
 import fetchJson from '../../utils/fetch-json.js';
 
-const BACKEND_URL = 'https://course-js.javascript.ru';
-
 export default class ColumnChart {
   element;
   subElements = {};
@@ -17,7 +15,7 @@ export default class ColumnChart {
       to: new Date(),
     }
   } = {}) {
-    this.url = new URL(url, BACKEND_URL);
+    this.url = new URL(url, process.env.BACKEND_URL);
     this.range = range;
     this.label = label;
     this.link = link;

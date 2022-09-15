@@ -1,6 +1,6 @@
 class Tooltip {
   static instance;
-  static shift = 10;
+  shift = 10;
 
   constructor() {
     if (!Tooltip.instance) {

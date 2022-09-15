@@ -12,8 +12,6 @@ export default class Page {
       this.updateComponents(from.toISOString(), to.toISOString());
     }
 
-    constructor() {}
-
     get template() {
       return `
       <div class="sales full-height flex-column">
