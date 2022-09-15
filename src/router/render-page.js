@@ -1,4 +1,6 @@
-export default async function(path, match) {
+import NotificationMessage from "../components/notification";
+
+export default async function (path, match) {
   const main = document.querySelector('main');
 
   main.classList.add('is-loading');
@@ -13,6 +15,22 @@ export default async function(path, match) {
 
   contentNode.innerHTML = '';
   contentNode.append(element);
+
+  const toogleSidebar = document.querySelector('.sidebar__toggler');
+  toogleSidebar.addEventListener('click', () => document.body.classList.toggle('is-collapsed-sidebar'));
+
+  document.addEventListener('notification-message', event => {
+    const { message, status } = event.detail;
+    console.log(`message: ${message}, status: ${status}`);
+    const notification = new NotificationMessage(message, {
+      duration: 50000,
+      type: status,
+    });
+
+    // notification.show();
+  });
+
+
 
   return page;
 }

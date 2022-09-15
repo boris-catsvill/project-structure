@@ -1,3 +1,10 @@
+/* Common styles */
+@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap');
+
+body {
+  font-family: 'Source Sans Pro', sans-serif;
+}
+
 :root {
   --blue: #109cf1;
   --dark-blue: #334d6e;
@@ -14,9 +21,11 @@
   --grey-light: #c2cfe0;
   --grey-extra-light: #eff1f4;
   --grey-skeleton: #f5f6f8;
+  --grey-middle: #e0e4eb;
   --white: #ffffff;
 }
 
+/* RangePicker styles */
 .rangepicker {
   position: relative;
 }

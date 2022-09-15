@@ -98,6 +98,12 @@ form .form-buttons {
   margin-top: 24px;
 }
 
+
+.products-list form.form-inline {
+  grid-template-columns: 3fr 3fr 2fr;
+  grid-gap: 46px;
+}
+
 form.form-inline {
   display: grid;
   grid: auto-flow / repeat(auto-fit, minmax(50px, 1fr));

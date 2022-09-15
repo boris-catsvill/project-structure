@@ -20,3 +20,30 @@
 .dashboard .sortable-table {
   --cols: 6;
 }
+
+
+.note {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  box-sizing: border-box;
+  box-shadow: rgb(193 38 38 / 24%) 0px 3px 8px;
+  background-color: aliceblue;
+  padding: 20px;
+}
+
+.note__img {
+  width: 20px;
+  height: 20px;
+  display: inline;
+  position: absolute;
+  top: 5%;
+  left: 95%;
+  cursor: pointer;
+}
+
+.note__img_hide {
+  display: none;
+}

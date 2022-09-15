@@ -69,7 +69,13 @@ module.exports = {
         {
           from: path.join(__dirname, '../src/components/product-form/*.svg'),
           to: "[name][ext]",
-        }
+          noErrorOnMissing: true,
+        },
+        {
+          from: path.join(__dirname, '../src/components/notification/*.svg'),
+          to: "[name][ext]",
+          noErrorOnMissing: true,
+        },
       ]
     })
   ]
