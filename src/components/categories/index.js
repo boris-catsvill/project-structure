@@ -119,8 +119,6 @@ export default class Category {
   }
   
   destroy() {
-    this.subElements.listContainer.removeEventListener('sortable-list-reorder', this.onReorder);
-
     this.sortableList.destroy();
     this.remove();
     this.subElements = {};

@@ -155,7 +155,7 @@ export default class ProductForm {
   }
 
   updateFormElements() {
-    this.subElements.productForm.elements['subcategory'].innerHTML = this.getCategoryElements();
+    this.subElements.productForm.elements.subcategory.innerHTML = this.getCategoryElements();
     this.subElements.imageListContainer.append(this.sortableList.element);
     
     for (const elem of this.subElements.productForm.elements) {
@@ -190,7 +190,7 @@ export default class ProductForm {
     productForm.elements.uploadImage.addEventListener("pointerdown", this.onImageChoose);
   }
 
-  async fetchProduct(productID) {
+  fetchProduct(productID) {
     const urlProduct = new URL(this.url.product);
     urlProduct.searchParams.set('id', productID); 
 
@@ -199,7 +199,7 @@ export default class ProductForm {
       Promise.resolve(this.defaulFormData);
   }
 
-  async fetchCategories() {
+  fetchCategories() {
     const urlCategories = new URL(this.url.categories);
     urlCategories.searchParams.set('_sort', 'weight');
     urlCategories.searchParams.set('_refs', 'subcategory');
@@ -279,9 +279,6 @@ export default class ProductForm {
   }
     
   destroy() {
-    const {productForm} = this.subElements;
-    productForm.removeEventListener('submit', this.onFormSubmit);
-    productForm.elements.uploadImage.removeEventListener("pointerdown", this.onImageChoose);
     this.remove();
     this.subElements = {};
     this.element = null;

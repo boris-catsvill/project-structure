@@ -35,8 +35,8 @@ export default class SortableList {
     this.moveDraggingElement(event.clientX, event.clientY);
 
     this.dragElement.style.visibility = 'hidden';
-    let elemBelow = document.elementFromPoint(event.clientX, event.clientY);
-    let listElement = elemBelow.closest("li:not(.sortable-list__placeholder)");
+    const elemBelow = document.elementFromPoint(event.clientX, event.clientY);
+    const listElement = elemBelow.closest("li:not(.sortable-list__placeholder)");
     this.dragElement.style.visibility = 'visible';
     if(!listElement || !this.element.contains(listElement)) return;
 
@@ -51,7 +51,7 @@ export default class SortableList {
     this.items = items;
 
     this.render();
-    this.InitEventListeners();
+    this.initEventListeners();
   }
 
   moveDraggingElement(shiftX, shiftY) {
@@ -97,7 +97,7 @@ export default class SortableList {
     this.items.map(listElement => this.addItem(listElement));
   }
 
-  InitEventListeners() {
+  initEventListeners() {
     this.element.addEventListener("pointerdown", this.onPointerDown);
   }
 
@@ -119,7 +119,6 @@ export default class SortableList {
   destroy() {
     document.removeEventListener("pointermove", this.onPointerMove);
     document.removeEventListener("pointerup", this.onPointerUp);
-    this.element.removeEventListener("pointerdown", this.onPointerDown);
 
     this.remove();
     this.element = null;

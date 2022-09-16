@@ -12,8 +12,6 @@ export default class Page {
       this.updateComponents(from.toISOString(), to.toISOString());
     }
   
-    constructor() {}
-  
     get template() {
       return `
       <div class="sales full-height flex-column">
@@ -102,8 +100,9 @@ export default class Page {
     }
   
     destroy() {
-      this.components.rangePicker.element.removeEventListener('date-select', this.onRangeSelected);
       Object.values(this.components).map(component => component.destroy());
       this.remove();
+      this.subElements = {};
+      this.element = null;
     }
   }

@@ -3,19 +3,19 @@ import fetchJson from '../../utils/fetch-json.js';
 export default class ColumnChart {
   chartHeight = 50;
   subElements = {};
-  hoveredBar = null;
+  hoveredChartColumn = null;
 
   onPointerOver = (event) => {
-    const bar = event.target.closest('[data-tooltip]');
-    if(!bar) return;
+    const chartColumn = event.target.closest('[data-tooltip]');
+    if(!chartColumn) return;
 
-    bar.classList.add('is-hovered');
-    this.hoveredBar = bar;
+    chartColumn.classList.add('is-hovered');
+    this.hoveredChartColumn = chartColumn;
     this.subElements.body.classList.add('has-hovered');
   }
 
   onPointerOut = (event) => {
-    if(this.hoveredBar) this.hoveredBar.classList.remove('is-hovered');
+    if(this.hoveredChartColumn) this.hoveredChartColumn.classList.remove('is-hovered');
     this.subElements.body.classList.remove('has-hovered');
   }
 
@@ -100,6 +100,10 @@ export default class ColumnChart {
     this.subElements = this.getSubElements();
 
     this.update({from: this.range.from, to: this.range.to});
+
+    this.initEventListeners();
+
+    return this.element;
   }
 
   async update({from, to} = {}) {
@@ -113,7 +117,6 @@ export default class ColumnChart {
       this.updateReceivedData(response);
       this.element.classList.remove("column-chart_loading");
 
-      this.initEventListeners();
       return response;
     } catch (error) {
       throw new Error(`Unable to fetch data from ${query}`);
@@ -138,8 +141,6 @@ export default class ColumnChart {
   }
       
   destroy() {
-    this.subElements.body.removeEventListener('pointerover', this.onPointerOver);
-    this.subElements.body.removeEventListener('pointerout', this.onPointerOut);
     this.remove();
     this.subElements = {};
     this.element = null;

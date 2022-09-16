@@ -45,7 +45,7 @@ export default class SortableTable {
     }
   }
 
-  onHeaderClick = async (event) => {
+  onHeaderClick = (event) => {
     const sortColumn = event.target.closest('[data-sortable="true"]');
     if(!sortColumn) return;
 
@@ -263,8 +263,6 @@ export default class SortableTable {
   }
     
   destroy() {
-    this.subElements.header.removeEventListener('pointerdown', this.onHeaderClick);
-    this.subElements.resetFiltersButton.removeEventListener('pointerdown', this.onResetFiltersButtonClick);
     window.removeEventListener('scroll', this.onScroll);
 
     this.remove();

@@ -95,8 +95,6 @@ export default class Page {
   }
 
   destroy() {
-    this.element.removeEventListener('pointerdown', this.onCategoryHeaderClick);
-
     this.components.map(component => component.destroy());
     this.remove();
     this.subElements = {};

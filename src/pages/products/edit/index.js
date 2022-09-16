@@ -8,12 +8,13 @@ export default class Page {
   components = {};
 
   onProductSaved = (event) => {
-    document.addEventListener('route',(function cb() {
-      new NotificationMessage('Product saved', {
-        type: 'success',
-      }).show();
-      document.removeEventListener('route', cb);
-    }));
+    const notification = new NotificationMessage('Product saved', {
+      type: 'success',
+     });
+    const onRouter = () => {
+      notification.show();
+    };
+    document.addEventListener('route', onRouter, {once : true});
 
     Router.instance().navigate(`/products/${event.detail.id}`);
   }
@@ -89,10 +90,9 @@ export default class Page {
   }
 
   destroy() {
-    this.element.removeEventListener('product-updated', this.onProductUpdated);
-    this.element.removeEventListener('product-saved', this.onProductSaved);
-
     Object.values(this.components).map(component => component.destroy());
     this.remove();
+    this.subElements = {};
+    this.element = null;
   }
 }

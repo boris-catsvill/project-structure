@@ -30,8 +30,6 @@ export default class Page {
     await this.components.sortableTable.update({_embed: 'subcategory.category'});
   }
 
-  constructor() {}
-
   get template() {
     return `
     <div class="products-list">
@@ -119,11 +117,6 @@ export default class Page {
   }
 
   destroy() {
-    this.subElements.sliderContainer.removeEventListener('range-select', this.onRangeSelect);
-    this.subElements.filterName.removeEventListener('input', this.onFilterNameChange);
-    this.subElements.filterStatus.removeEventListener('change', this.onStatusChange);
-    this.subElements.productsContainer.removeEventListener('reset-filters', this.onFiltersReset);
-
     Object.values(this.components).map(component => component.destroy());
     this.remove();
     this.subElements = {};
