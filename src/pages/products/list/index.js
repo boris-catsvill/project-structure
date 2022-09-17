@@ -6,15 +6,20 @@ import BaseComponent from "../../../components/BaseComponent";
 import ProductFilterForm from "../../../components/product-form/ProductFilterForm";
 import SortableTable from "../../../components/sortable-table";
 
-const productFormFilter = new ProductFilterForm(productFormFilterState)
 
-const sortableTable = new SortableTable({
-  headerConfig: productHeader,
-  sorted: {
-    fieldValue: productHeader.find(item => item.sortable).id,
-    orderValue: 'asc'
-  }
-}, productsTableState)
+const getDOMChildren = () => {
+  const productFormFilter = new ProductFilterForm(productFormFilterState)
+
+  const sortableTable = new SortableTable({
+    headerConfig: productHeader,
+    sorted: {
+      fieldValue: productHeader.find(item => item.sortable).id,
+      orderValue: 'asc'
+    }
+  }, productsTableState)
+
+  return { productFormFilter, sortableTable }
+}
 
 export default class extends BaseComponent {
   #elementDOM = null
@@ -32,6 +37,7 @@ export default class extends BaseComponent {
   }
 
   updateTable = async () => {
+    const { sortableTable } = this.DOMChildren
     const { title, priceFrom, status, priceTo } = productFormFilterState.formState
     const { orderValue: _order, fieldValue: _sort } = sortableTable.sorted
     productsTableState.additionalFilters = {
@@ -53,8 +59,9 @@ export default class extends BaseComponent {
   constructor() {
     super()
 
-    this.addChildrenComponent('productFormFilter', productFormFilter)
-    this.addChildrenComponent('sortableTable', sortableTable)
+    Object.entries(getDOMChildren()).forEach(([key, instance]) => {
+      this.addChildrenComponent(key, instance)
+    })
   }
 
   get element() {
@@ -71,8 +78,24 @@ export default class extends BaseComponent {
     this.initEvents()
   }
 
+  remove() {
+    this.#elementDOM.remove()
+  }
+
+  destroy() {
+    this.remove()
+    this.#elementDOM = null
+    this.memoDOM.clear()
+    this.removeEvents()
+    this.clearChildrenComponents()
+  }
+
   initEvents() {
     productFormFilterState.on('changeField', this.delayUpdateTable)
+  }
+
+  removeEvents() {
+    productFormFilterState.removeListener('changeField', this.delayUpdateTable)
   }
 
   template() {

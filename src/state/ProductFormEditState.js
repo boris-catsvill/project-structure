@@ -3,7 +3,6 @@ import fetchJson from "../utils/fetch-json";
 
 const BACKEND_URL = process.env.BACKEND_URL
 
-
 export default class ProductFormEditState extends FormEventState {
   apiUrl = new URL(`${BACKEND_URL}api/rest/`)
 
@@ -39,12 +38,14 @@ export default class ProductFormEditState extends FormEventState {
     }
 
     const productDataPromise = () => {
-      if (!this.productId) return null
-      return fetchJson(`${this.apiUrl}products?id=${this.productId}`);
+      if (!this.productId) return [null]
+      return fetchJson(`${this.apiUrl}products?id=${this.productId}`)
     }
 
     const promises = [categoriesPromise(), productDataPromise()]
-    const [categories, formData] = await Promise.all(promises)
+    const [categories, [formData]] = await Promise.all(promises)
+
+    if (formData) this.formData = formData
 
     return { categories }
   }

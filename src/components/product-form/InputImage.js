@@ -77,7 +77,7 @@ export default class InputImage extends BaseComponent {
 
     const inputInstance = new Input({})
     inputInstance.render()
-    this.inputDOM = inputInstance.memoDOM.cache.input
+    this.inputDOM = inputInstance.input
 
     this.name = name
     this.#stateManager = stateManager

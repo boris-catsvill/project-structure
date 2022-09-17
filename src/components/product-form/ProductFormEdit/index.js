@@ -40,7 +40,8 @@ export default class ProductFormEdit extends BaseComponent {
     this.#elementDOM = this.createDOMElement(this.template())
 
     this.renderDOMChildren(this.#elementDOM)
-    this.registerFields()
+    // this.registerFields()
+
     this.initEvents()
   }
 
@@ -70,9 +71,11 @@ export default class ProductFormEdit extends BaseComponent {
     })
   }
 
-  template(productData) {
-    const { title, description, price, discount, quantity } = productData || {}
+  setDefaultValues() {
+    
+  }
 
+  template(productData) {
     return /*html*/`
       <form class="form-grid">
         <div class="form-group form-group__half_left">

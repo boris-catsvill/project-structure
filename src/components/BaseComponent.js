@@ -38,6 +38,9 @@ export default class BaseComponent {
   }
 
   clearChildrenComponents() {
+    Object.values(this.#DOMChildren).forEach(DOMChild => {
+      DOMChild.destroy()
+    })
     this.#DOMChildren = {}
   }
 }

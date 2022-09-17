@@ -31,6 +31,16 @@ export default class InputSelect extends BaseComponent {
     this.memoDOM.memoizeDocument(this.#elementDOM)
   }
 
+  remove() {
+    this.#elementDOM.remove()
+  }
+
+  destroy() {
+    this.remove()
+    this.#elementDOM = null
+    this.clearChildrenComponents()
+  }
+
   template() {
     return /*html*/`
       <fieldset>

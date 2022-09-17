@@ -19,11 +19,6 @@ export default class extends BaseComponent {
   }
 
   render() {
-    const paths = window.location.pathname.split('/')
-    const id = paths[paths.length - 1]
-
-    productFormEditState.productId = id
-
     this.#elementDOM = this.createDOMElement(this.template())
 
     this.renderDOMChildren(this.#elementDOM)

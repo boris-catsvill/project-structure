@@ -1,4 +1,4 @@
-import { Fields } from "./Fields";
+import { getFields } from "./Fields";
 import BaseComponent from "../../BaseComponent";
 import FormEventState from "../../../state/FormEventState";
 
@@ -6,6 +6,8 @@ export default class ProductFilterForm extends BaseComponent {
   #elementDOM = null
 
   #stateManager = null
+
+  fields = null
 
   constructor(stateManager) {
     super()
@@ -15,7 +17,9 @@ export default class ProductFilterForm extends BaseComponent {
 
     this.#stateManager = stateManager
 
-    Object.entries(Fields).forEach(([key, field]) => {
+    this.fields = getFields()
+
+    Object.entries(this.fields).forEach(([key, field]) => {
       this.addChildrenComponent(key, field) 
     })
   }
@@ -34,8 +38,18 @@ export default class ProductFilterForm extends BaseComponent {
     this.initEvents()
   }
 
+  remove() {
+    this.#elementDOM.remove()
+  }
+
+  destroy() {
+    this.remove()
+    this.#elementDOM = null
+    this.clearChildrenComponents()
+  }
+
   registerFields() {
-    Object.values(Fields).forEach((field) => {
+    Object.values(this.fields).forEach((field) => {
       this.#stateManager.registerField(field.name, field.input.value)
     }) 
   }
