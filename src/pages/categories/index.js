@@ -1,7 +1,7 @@
 import fetchJson from '../../utils/fetch-json.js';
 import SortableList from '../../components/sortable-list/index.js';
 
-const BACKEND_URL = 'https://course-js.javascript.ru';
+const BACKEND_URL = process.env.BACKEND_URL;
 
 export default class Categories {
   subElements = {};
@@ -49,14 +49,15 @@ export default class Categories {
 
       const categories = await fetchJson(urlCategories);
 
-      this.categories = await categories;
+      this.categories = categories;
     } catch (error) {
       console.log(error);
     }
   }
 
   categoryFill(data) {
-    data.map(({ title, id, subcategories }) => {
+    for (const good of data) {
+      const { title, id, subcategories } = good;
       const div = document.createElement('div');
 
       div.innerHTML = `
@@ -76,7 +77,7 @@ export default class Categories {
       category.querySelector('.subcategory-list').append(ul);
 
       this.subElements.categoriesContainer.append(div.firstElementChild);
-    });
+    }
   }
 
   subCategoryFill(subData) {
@@ -99,7 +100,6 @@ export default class Categories {
   }
 
   async render() {
-    // this.element = document.createElement('div');
     this.getTemplate();
 
     await this.loadCategories();
@@ -117,9 +117,8 @@ export default class Categories {
   }
 
   destroy() {
-    this.element.removeEventListener('click', this.onClick);
-    this.subElements.sortableList.destroy();
     this.remove();
+    this.subElements.sortableList.destroy();
     this.element = null;
   }
 }

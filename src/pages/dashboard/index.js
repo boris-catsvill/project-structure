@@ -1,10 +1,10 @@
-import RangePicker from './components/range-picker/src/index.js';
-import SortableTable from './components/sortable-table/src/index.js';
-import ColumnChart from './components/column-chart/src/index.js';
+import RangePicker from '../../components/range-picker/index.js';
+import SortableTable from '../../components/sortable-table/index.js';
+import ColumnChart from '../../components/column-chart/index.js';
 
 import header from './bestsellers-header.js';
 
-const BACKEND_URL = 'https://course-js.javascript.ru/';
+const BACKEND_URL = process.env.BACKEND_URL;
 
 export default class Page {
   element = '';
@@ -17,7 +17,7 @@ export default class Page {
     to: new Date()
   };
 
-  onDateSelectFunction = event => {
+  onDateSelect = event => {
     try {
       const { from, to } = event.detail;
 
@@ -54,7 +54,7 @@ export default class Page {
   }
 
   initEventListeners() {
-    this.element.addEventListener('date-select', this.onDateSelectFunction);
+    this.element.addEventListener('date-select', this.onDateSelect);
   }
 
   makeURL(path, from = this.range.from, to = this.range.to) {
@@ -144,7 +144,14 @@ export default class Page {
 
       const data = await this.components.bestSellersTable.loadData();
 
-      this.components.bestSellersTable.addRows(data);
+      this.components.bestSellersTable.elementWithArrow.removeAttribute('data-order');
+
+      const arrow =
+        this.components.bestSellersTable.elementWithArrow.querySelector("[data-element='arrow']");
+      arrow.remove();
+
+      this.components.bestSellersTable.defaultSorting();
+      this.components.bestSellersTable.bodyReFilling(data);
     } catch (error) {
       console.log(error);
     }
@@ -207,6 +214,6 @@ export default class Page {
     this.chartElements = null;
     this.range = null;
 
-    document.removeEventListener('date-select', this.onDateSelectFunction);
+    document.removeEventListener('date-select', this.onDateSelect);
   }
 }

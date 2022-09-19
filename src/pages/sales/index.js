@@ -2,7 +2,7 @@ import RangePicker from '../../components/range-picker/index.js';
 import SortableTable from '../../components/sortable-table/index.js';
 import header from './sales-header.js';
 
-const BACKEND_URL = 'https://course-js.javascript.ru/';
+const BACKEND_URL = process.env.BACKEND_URL;
 
 export default class Sales {
   subElements = {};
@@ -12,7 +12,7 @@ export default class Sales {
     to: new Date()
   };
 
-  onDateSelectFunction = event => {
+  onDateSelection = event => {
     const { from, to } = event.detail;
 
     this.salesTableReFill(from, to);
@@ -20,7 +20,6 @@ export default class Sales {
 
   constructor() {
     this.getDatesForRange();
-    this.render();
   }
 
   makeURL(from = this.range.from, to = this.range.to) {
@@ -92,14 +91,15 @@ export default class Sales {
     try {
       const { url } = this.components.saleTable;
 
+      const id = url.searchParams.get('_sort');
+      const order = url.searchParams.get('_order');
+
       url.searchParams.set('createdAt_gte', from.toISOString());
       url.searchParams.set('createdAt_lte', to.toISOString());
 
       this.components.saleTable.url = url;
 
-      console.log(this.components.saleTable);
-
-      const data = await this.components.saleTable.loadData();
+      const data = await this.components.saleTable.loadData(id, order);
 
       this.components.saleTable.bodyReFilling(data);
     } catch (error) {
@@ -108,7 +108,7 @@ export default class Sales {
   }
 
   initEventListeners() {
-    this.element.addEventListener('date-select', this.onDateSelectFunction);
+    this.element.addEventListener('date-select', this.onDateSelection);
   }
 
   render() {
@@ -128,12 +128,12 @@ export default class Sales {
   }
 
   destroy() {
-    this.remove();
-    this.element.removeEventListener('date-select', this.onDateSelectFunction);
-
     for (const component in this.components) {
       this.components[component].destroy();
     }
+
+    this.remove();
+    this.element.removeEventListener('date-select', this.onDateSelection);
 
     this.element = null;
     this.subElements = null;

@@ -1,5 +1,5 @@
 import SortableTable from '../../../components/sortable-table/index.js';
-import FilterForm from './filter-form.js';
+import FilterForm from '../../../components/filter-form/filter-form.js';
 
 import header from './products-header.js';
 
@@ -8,20 +8,25 @@ export default class Page {
   subElements = {};
   components = {};
 
-  onInputFunc = async event => {
-    const values = this.getValueFromFilter();
+  onInput = async () => {
+    try {
+      const values = this.getValueFromFilter();
 
-    this.components.sortableTable.url = this.changeTableUrl(values);
+      const id = this.components.sortableTable.url.searchParams.get('_sort');
+      const order = this.components.sortableTable.url.searchParams.get('_order');
 
-    const data = await this.components.sortableTable.loadData();
+      this.components.sortableTable.url = this.changeTableUrl(values);
 
-    this.components.sortableTable.data = data;
-    this.components.sortableTable.bodyReFilling(data);
+      const data = await this.components.sortableTable.loadData(id, order);
+
+      this.components.sortableTable.data = data;
+      this.components.sortableTable.bodyReFilling(data);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  constructor() {
-    this.render();
-  }
+  constructor() {}
 
   getTemplate() {
     const div = document.createElement('div');
@@ -87,8 +92,6 @@ export default class Page {
 
     status ? url.searchParams.set('status', status) : url.searchParams.delete('status');
 
-    this.components.sortableTable.url = url;
-
     return url;
   }
 
@@ -109,14 +112,12 @@ export default class Page {
     this.getProductsTable();
     this.initEventListeners();
 
-    this.getValueFromFilter();
-
     return this.element;
   }
 
   initEventListeners() {
-    this.element.addEventListener('input', this.onInputFunc);
-    this.element.addEventListener('range-select', this.onInputFunc);
+    this.element.addEventListener('input', this.onInput);
+    this.element.addEventListener('range-select', this.onInput);
   }
 
   remove() {
@@ -128,8 +129,8 @@ export default class Page {
   destroy() {
     this.remove();
     this.subElements = null;
-    this.element.removeEventListener('input', this.onInputFunc);
-    this.element.removeEventListener('range-select', this.onInputFunc);
+    this.element.removeEventListener('input', this.onInput);
+    this.element.removeEventListener('range-select', this.onInput);
 
     for (const component in this.components) {
       this.components[component].destroy();

@@ -9,7 +9,7 @@ class Tooltip {
   initialize() {
     this.makeTooltip();
 
-    document.addEventListener('pointerover', this.pointerOverFunc);
+    document.addEventListener('pointerover', this.onPointerOver);
   }
 
   render() {
@@ -24,29 +24,29 @@ class Tooltip {
     this.element = div;
   }
 
-  pointerOverFunc = event => {
+  onPointerOver = event => {
     if (event.target.hasAttribute('data-tooltip')) {
       this.element.innerHTML = event.target.dataset.tooltip;
 
-      document.addEventListener('mousemove', this.mouseMoveFunc);
+      document.addEventListener('mousemove', this.onMouseMove);
 
       this.render();
 
-      document.addEventListener('pointerout', this.pointerOutFunc);
+      document.addEventListener('pointerout', this.onPointerOut);
     }
   };
 
-  pointerOutFunc = event => {
+  onPointerOut = event => {
     if (!event.target.hasAttribute('data-tooltip')) {
       this.element.remove();
 
-      document.removeEventListener('mousemove', this.mouseMoveFunc);
+      document.removeEventListener('mousemove', this.onMouseMove);
 
-      document.removeEventListener('pointerout', this.pointerOutFunc);
+      document.removeEventListener('pointerout', this.onPointerOut);
     }
   };
 
-  mouseMoveFunc = event => {
+  onMouseMove = event => {
     const shift = 10;
 
     this.element.style.left = event.clientX + shift + 'px';
@@ -60,9 +60,9 @@ class Tooltip {
   }
 
   destroy() {
-    document.removeEventListener('pointerover', this.pointerOverFunc);
-    document.removeEventListener('mousemove', this.mouseMoveFunc);
-    document.removeEventListener('pointerout', this.pointerOutFunc);
+    document.removeEventListener('pointerover', this.onPointerOver);
+    document.removeEventListener('mousemove', this.onMouseMove);
+    document.removeEventListener('pointerout', this.onPointerOut);
 
     this.remove();
     this.element = null;

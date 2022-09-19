@@ -1,6 +1,6 @@
 import fetchJson from '../../utils/fetch-json.js';
 
-const BACKEND_URL = 'https://course-js.javascript.ru';
+const BACKEND_URL = process.env.BACKEND_URL;
 
 export default class SortableTable {
   subElements = {};
@@ -41,11 +41,11 @@ export default class SortableTable {
 
         this.sort(id, 'desc');
       } else {
-        const presentOrder = cell.dataset.order;
+        const { order } = cell.dataset;
 
-        cell.setAttribute('data-order', orders[presentOrder]);
+        cell.setAttribute('data-order', orders[order]);
 
-        this.sort(id, orders[presentOrder]);
+        this.sort(id, orders[order]);
       }
     }
   };
@@ -55,18 +55,22 @@ export default class SortableTable {
     const { bottom } = lastChild.getBoundingClientRect();
     const { clientHeight: screenHeight } = document.documentElement;
 
-    if (bottom < screenHeight && !this.loading) {
-      const { order, id } = this.elementWithArrow.dataset;
-      const range = 30;
+    if (bottom < screenHeight && !this.loading && !this.isSortLocally) {
+      try {
+        const { order, id } = this.elementWithArrow.dataset;
+        const range = 30;
 
-      this.start += range;
-      this.end += range;
+        this.start += range;
+        this.end += range;
 
-      this.loading = true;
+        this.loading = true;
 
-      await this.sortOnServer(id, order);
+        await this.sortOnServer(id, order);
 
-      this.loading = false;
+        this.loading = false;
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 
@@ -133,36 +137,44 @@ export default class SortableTable {
   }
 
   async loadData(id = 'title', order = 'asc', start = this.start, end = this.end) {
-    this.url.searchParams.set('_sort', id);
-    this.url.searchParams.set('_order', order);
-    this.url.searchParams.set('_start', start);
-    this.url.searchParams.set('_end', end);
-    this.url.searchParams.set('_embed', 'subcategory.category');
+    try {
+      this.url.searchParams.set('_sort', id);
+      this.url.searchParams.set('_order', order);
+      this.url.searchParams.set('_start', start);
+      this.url.searchParams.set('_end', end);
+      this.url.searchParams.set('_embed', 'subcategory.category');
 
-    this.element.classList.add('sortable-table_loading');
+      this.element.classList.add('sortable-table_loading');
 
-    const response = await fetchJson(this.url);
+      const response = await fetchJson(this.url);
 
-    this.element.classList.remove('sortable-table_loading');
+      this.element.classList.remove('sortable-table_loading');
 
-    return response;
+      return response;
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async defaultSorting() {
-    this.elementWithArrow = this.subElements.header.querySelector(`[data-id="title"]`);
+    try {
+      this.elementWithArrow = this.subElements.header.querySelector(`[data-id="title"]`);
 
-    this.elementWithArrow.setAttribute('data-order', 'asc');
+      this.elementWithArrow.setAttribute('data-order', 'asc');
 
-    this.elementWithArrow.innerHTML += `
+      this.elementWithArrow.innerHTML += `
       <span data-element="arrow" class="sortable-table__sort-arrow">
         <span class="sort-arrow"></span>
       </span>`;
 
-    this.bodyReFilling(this.data);
+      this.bodyReFilling(this.data);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   bodyReFilling(data) {
-    if (data.length === 0) {
+    if (!data.length) {
       this.emptyData();
     } else {
       this.element.classList.remove('sortable-table_empty');
@@ -171,19 +183,23 @@ export default class SortableTable {
   }
 
   async render() {
-    const element = document.createElement('div');
+    try {
+      const element = document.createElement('div');
 
-    element.innerHTML = this.getTemplateOfTable();
+      element.innerHTML = this.getTemplateOfTable();
 
-    this.element = element.firstElementChild;
+      this.element = element.firstElementChild;
 
-    this.data = await this.loadData(this.sorted.id, this.sorted.order, this.start, this.end);
+      this.data = await this.loadData(this.sorted.id, this.sorted.order, this.start, this.end);
 
-    this.makeHeader();
-    this.loadingElement();
-    this.makeBody();
+      this.makeHeader();
+      this.loadingElement();
+      this.makeBody();
 
-    this.initEventListener();
+      this.initEventListener();
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   initEventListener() {
@@ -329,7 +345,6 @@ export default class SortableTable {
       this.data = [...this.data, ...response];
 
       this.bodyReFilling(this.data);
-      this.subElements.loading.style.display = '';
     }
   }
 
@@ -339,7 +354,7 @@ export default class SortableTable {
 
   destroy() {
     document.removeEventListener('scroll', this.onScroll);
-    this.header.removeEventListener('pointerdown', this.onClick);
+    this.subElements.header.removeEventListener('pointerdown', this.onClick);
 
     this.remove();
   }

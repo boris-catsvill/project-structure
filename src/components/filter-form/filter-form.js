@@ -1,4 +1,4 @@
-import DoubleSlider from '../../../components/double-slider/index.js';
+import DoubleSlider from '../double-slider/index.js';
 
 export default class FilterForm {
   valueElements = {};

@@ -123,13 +123,13 @@ body {
 }
 
 .column-chart_loading .column-chart__container:before {
-  content: "";
+  content: '';
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 113px;
-  background: url("charts-skeleton.svg") center no-repeat;
+  background: url('../../assets/icons/charts-skeleton.svg') center no-repeat;
   background-size: cover;
   display: block;
 }

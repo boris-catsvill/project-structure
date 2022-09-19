@@ -3,15 +3,25 @@ import escapeHtml from '../../../utils/escape-html.js';
 import fetchJson from '../../../utils/fetch-json.js';
 import Notification from '../../../components/notification/index.js';
 
-const IMGUR_CLIENT_ID = '28aaa2e823b03b1';
-const BACKEND_URL = 'https://course-js.javascript.ru';
+const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID;
+const BACKEND_URL = process.env.BACKEND_URL;
 
 export default class ProductForm {
-  сategories = [];
+  categories = [];
   productInfo = {};
   productImages = [];
   elementsToEdit = {};
   subElements = {};
+  defaultFormData = {
+    title: '',
+    description: '',
+    quantity: 1,
+    subcategory: '',
+    status: 1,
+    images: [],
+    price: 100,
+    discount: 0
+  };
 
   deleteImageByClick = event => {
     if (event.target.hasAttribute('data-delete-handle')) {
@@ -61,7 +71,7 @@ export default class ProductForm {
       });
 
       const result = await response.json();
-      const { link } = await result.data;
+      const { link } = result.data;
 
       this.makeNewLi(link, file.name);
     } catch (error) {
@@ -73,25 +83,13 @@ export default class ProductForm {
   };
 
   onSave = event => {
-    try {
-      event.preventDefault();
+    event.preventDefault();
 
-      this.save();
-    } catch (error) {
-      console.log(error);
-    }
+    this.save();
   };
 
   constructor(productId) {
-    this.productId = this.getId();
-  }
-
-  getId() {
-    const pathname = window.location.pathname;
-
-    const [id] = pathname.match(/(?<=\/products\/).+/g);
-
-    return id === 'add' ? '' : id;
+    this.productId = productId;
   }
 
   async save() {
@@ -110,7 +108,7 @@ export default class ProductForm {
 
       this.element.dispatchEvent(this.customEvent(promise.id));
       const notification = new Notification('Information was succesfully saved');
-      notification.show(); // finish the notificationx
+      notification.show();
     } catch (error) {
       console.log(error);
     }
@@ -130,13 +128,15 @@ export default class ProductForm {
     }
 
     for (const elem in this.elementsToEdit) {
+      if (elem === 'uploadImage' || elem === 'save') {
+        continue;
+      }
+
       const element = this.elementsToEdit[elem];
 
-      if (element.tagName !== 'BUTTON' && element.hasAttribute('name')) {
-        const value = isFinite(element.value) ? Number(element.value) : escapeHtml(element.value);
+      const value = isFinite(element.value) ? Number(element.value) : escapeHtml(element.value);
 
-        data[element.getAttribute('name')] = value;
-      }
+      data[element.getAttribute('name')] = value;
     }
 
     data.images = this.imagesForData();
@@ -164,7 +164,7 @@ export default class ProductForm {
     <div class="products-edit">
       <div class="content__top-panel">
       <h1 class="page-title">
-            <a href="/products" class="link">Товары</a> / Редактировать
+            <a href="/products" class="link">Products</a> / ${this.productId ? 'Edit' : 'Add'}
       </h1></div>
       <div class="content-box">
       <div class="product-form">
@@ -222,7 +222,7 @@ export default class ProductForm {
           </div>
           <div class="form-buttons">
             <button type="submit" name="save" class="button-primary-outline">
-              Сохранить товар
+              ${this.productId ? 'Сохранить товар' : 'Добавить товар'}
             </button>
           </div>
         </form>
@@ -239,12 +239,16 @@ export default class ProductForm {
     for (const element of Object.keys(this.elementsToEdit)) {
       const attributeName = this.elementsToEdit[element].getAttribute('name');
 
-      if (this.elementsToEdit[element].tagName !== 'BUTTON') {
-        this.elementsToEdit[element].value = this.productInfo[attributeName];
+      if (attributeName === 'uploadImage' || attributeName === 'save') {
+        continue;
       }
+
+      this.elementsToEdit[element].value = this.productInfo[attributeName];
     }
 
-    this.addImage();
+    if (this.productImages) {
+      this.addImage();
+    }
   }
 
   getSubElements() {
@@ -265,7 +269,7 @@ export default class ProductForm {
   }
 
   addImage() {
-    const array = this.productImages.map(image => {
+    const items = this.productImages.map(image => {
       const div = document.createElement('div');
 
       div.innerHTML = `
@@ -285,7 +289,7 @@ export default class ProductForm {
       return div.firstElementChild;
     });
 
-    const images = this.sortableList({ items: array });
+    const images = this.sortableList({ items });
 
     this.subElements.imageListContainer.append(images);
   }
@@ -338,7 +342,7 @@ export default class ProductForm {
 
       const categories = await fetchJson(urlCategories);
 
-      this.categories = categories;
+      return categories;
     } catch (error) {
       console.log(error);
     }
@@ -352,9 +356,7 @@ export default class ProductForm {
 
       const productInfo = await fetchJson(urlInfo);
 
-      [this.productInfo] = productInfo;
-
-      this.productImages = this.productInfo.images;
+      return productInfo;
     } catch (error) {
       console.log(error);
     }
@@ -362,18 +364,18 @@ export default class ProductForm {
 
   async render() {
     try {
-      if (this.productId) {
-        await Promise.all([this.loadCategories(), this.loadProductInfo()]);
-      } else {
-        await this.loadCategories();
-      }
+      const categoriesPromise = this.loadCategories();
+      const productPromise = this.productId ? this.loadProductInfo() : [this.defaultFormData];
+
+      const [categories, product] = await Promise.all([categoriesPromise, productPromise]);
+
+      this.categories = categories;
+      [this.productInfo] = product;
+      this.productImages = this.productInfo.images || null;
 
       this.makeTemplate();
       this.initEventListeners();
-
-      if (this.productId) {
-        this.templateFill();
-      }
+      this.templateFill();
 
       return this.element;
     } catch (error) {
@@ -397,11 +399,12 @@ export default class ProductForm {
     }
 
     this.remove();
-    this.element = null;
-    this.сategories = null;
-    this.productInfo = null;
-    this.productImages = null;
-    this.elementsToEdit = null;
-    this.subElements = null;
+    this.productId = null;
+
+    for (const key in this) {
+      if (typeof this[key] === 'object') {
+        this[key] = null;
+      }
+    }
   }
 }

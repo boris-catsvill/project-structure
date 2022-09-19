@@ -18,6 +18,20 @@ const header = [
     sortType: 'string'
   },
   {
+    id: 'subcategory',
+    title: 'Category',
+    sortType: 'string',
+    template: ({ title, category }) => {
+      return `<div class="sortable-table__cell">
+      <span data-tooltip="
+      <div class='sortable-table-tooltip'>
+        <span class='sortable-table-tooltip__category'>${category.title}</span> /
+        <b class='sortable-table-tooltip__subcategory'>${title}</b>
+      </div>">${title}</span>
+    </div>`;
+    }
+  },
+  {
     id: 'quantity',
     title: 'Quantity',
     sortable: true,
@@ -27,19 +41,21 @@ const header = [
     id: 'price',
     title: 'Price',
     sortable: true,
-    sortType: 'number'
-  },
-  {
-    id: 'status',
-    title: 'Status',
-    sortable: true,
     sortType: 'number',
     template: data => {
-      return `<div class="sortable-table__cell">
-          ${data > 0 ? 'Active' : 'Inactive'}
-        </div>`;
+      return `
+      <div class="sortable-table__cell">
+        $${data}
+      </div>
+        `;
     }
   },
+  {
+    id: 'sales',
+    title: 'Sales',
+    sortable: true,
+    sortType: 'number'
+  }
 ];
 
 export default header;

@@ -1,9 +1,9 @@
 import SortableList from '../sortable-list/index.js';
-import escapeHtml from './utils/escape-html.js';
-import fetchJson from './utils/fetch-json.js';
+import escapeHtml from '../../utils/escape-html.js';
+import fetchJson from '../../utils/fetch-json.js';
 
-const IMGUR_CLIENT_ID = '28aaa2e823b03b1';
-const BACKEND_URL = 'https://course-js.javascript.ru';
+const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID;
+const BACKEND_URL = process.env.BACKEND_URL;
 
 export default class ProductForm {
   сategories = [];
@@ -60,7 +60,7 @@ export default class ProductForm {
       });
 
       const result = await response.json();
-      const { link } = await result.data;
+      const { link } = result.data;
 
       this.makeNewLi(link, file.name);
     } catch (error) {
@@ -72,25 +72,13 @@ export default class ProductForm {
   };
 
   onSave = event => {
-    try {
-      event.preventDefault();
+    event.preventDefault();
 
-      this.save();
-    } catch (error) {
-      console.log(error);
-    }
+    this.save();
   };
 
   constructor(productId) {
     this.productId = productId;
-  }
-
-  getId() {
-    const pathname = window.location.pathname;
-
-    const [id] = pathname.match(/(?<=\/products\/).+/g);
-
-    return id === 'add' ? '' : id;
   }
 
   async save() {
@@ -127,13 +115,15 @@ export default class ProductForm {
     }
 
     for (const elem in this.elementsToEdit) {
+      if (elem === 'uploadImage' || elem === 'save') {
+        continue;
+      }
+
       const element = this.elementsToEdit[elem];
 
-      if (element.tagName !== 'BUTTON' && element.hasAttribute('name')) {
-        const value = isFinite(element.value) ? Number(element.value) : escapeHtml(element.value);
+      const value = isFinite(element.value) ? Number(element.value) : escapeHtml(element.value);
 
-        data[element.getAttribute('name')] = value;
-      }
+      data[element.getAttribute('name')] = value;
     }
 
     data.images = this.imagesForData();
@@ -228,9 +218,11 @@ export default class ProductForm {
     for (const element of Object.keys(this.elementsToEdit)) {
       const attributeName = this.elementsToEdit[element].getAttribute('name');
 
-      if (this.elementsToEdit[element].tagName !== 'BUTTON') {
-        this.elementsToEdit[element].value = this.productInfo[attributeName];
+      if (attributeName === 'uploadImage' || attributeName === 'save') {
+        continue;
       }
+
+      this.elementsToEdit[element].value = this.productInfo[attributeName];
     }
 
     this.addImage();
@@ -377,18 +369,16 @@ export default class ProductForm {
   }
 
   destroy() {
-    this.element.removeEventListener('click', this.deleteImageByClick);
-    this.elementsToEdit.uploadImage.removeEventListener('click', this.onClickToSend);
-    this.elementsToEdit.save.removeEventListener('click', this.onSave);
-
     this.subElements.sortableList.destroy();
 
     this.remove();
-    this.element = null;
-    this.сategories = null;
-    this.productInfo = null;
-    this.productImages = null;
-    this.elementsToEdit = null;
-    this.subElements = null;
+    this.productId = null;
+
+    for (const key in this) {
+      if (typeof this[key] === 'object') {
+        console.log(key);
+        this[key] = null;
+      }
+    }
   }
 }

@@ -1,7 +1,7 @@
 import fetchJson from '../../utils/fetch-json.js';
 import SortableList from '../sortable-list/index.js';
 
-const BACKEND_URL = 'https://course-js.javascript.ru';
+const BACKEND_URL = process.env.BACKEND_URL;
 
 export default class Categories {
   subElements = {};
@@ -49,14 +49,15 @@ export default class Categories {
 
       const categories = await fetchJson(urlCategories);
 
-      this.categories = await categories;
+      this.categories = categories;
     } catch (error) {
       console.log(error);
     }
   }
 
   categoryFill(data) {
-    data.map(({ title, id, subcategories }) => {
+    for (const good of data) {
+      const { title, id, subcategories } = good;
       const div = document.createElement('div');
 
       div.innerHTML = `
@@ -76,11 +77,11 @@ export default class Categories {
       category.querySelector('.subcategory-list').append(ul);
 
       this.subElements.categoriesContainer.append(div.firstElementChild);
-    });
+    }
   }
 
   subCategoryFill(subData) {
-    const array = subData.map(({ id, title, count }) => {
+    const items = subData.map(({ id, title, count }) => {
       const div = document.createElement('div');
 
       div.innerHTML = `
@@ -93,19 +94,22 @@ export default class Categories {
       return div.firstElementChild;
     });
 
-    this.subElements.sortableList = new SortableList({ items: array });
+    this.subElements.sortableList = new SortableList({ items });
 
     return this.subElements.sortableList.element;
   }
 
   async render() {
-    // this.element = document.createElement('div');
-    this.getTemplate();
+    try {
+      this.getTemplate();
 
-    await this.loadCategories();
+      await this.loadCategories();
 
-    this.categoryFill(this.categories);
-    this.initEventListeners();
+      this.categoryFill(this.categories);
+      this.initEventListeners();
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   remove() {
@@ -115,7 +119,6 @@ export default class Categories {
   }
 
   destroy() {
-    this.element.removeEventListener('click', this.onClick);
     this.subElements.sortableList.destroy();
     this.remove();
     this.element = null;
