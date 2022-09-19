@@ -51,7 +51,6 @@ export default class InputSelect extends BaseComponent {
           name=${this.name}
           type=${this.type} 
           class="form-control" 
-          placeholder=${this.placeholder}
         >
           ${this.templateOptions()}
         </select>

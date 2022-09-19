@@ -1,9 +1,11 @@
-import { productFormEditState } from "../../../state/ProductFormEditState";
+import { productFormAddState } from "../../../state/ProductFormState";
 
 import BaseComponent from "../../../components/BaseComponent";
-import ProductFormEdit from "../../../components/product-form/ProductFormEdit";
+import ProductForm from "../../../components/product-form/ProductForm";
 
-const productForm = new ProductFormEdit(productFormEditState)
+const productForm = new ProductForm({
+  clearAfterSend: true
+}, productFormAddState)
 
 export default class extends BaseComponent {
   #elementDOM = null

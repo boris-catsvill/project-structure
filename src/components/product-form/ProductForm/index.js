@@ -1,18 +1,33 @@
-import { Fields } from "./Fields";
+import getFields from "./getFields";
 
 import BaseComponent from "../../BaseComponent"
-import ProductFormEditState from "../../../state/ProductFormEditState";
+import ProductFormEditState, { PRODUCT_FORM_ACTIONS} from "../../../state/ProductFormState";
 
-export default class ProductFormEdit extends BaseComponent {
+export default class ProductForm extends BaseComponent {
   #elementDOM = null
   #stateManager = null
+
+  fields = null
+
+  clearAfterSend = false
 
   onSubmitForm = (event) => {
     event.preventDefault()
     this.#stateManager.saveProduct()
   }
 
-  constructor (stateManager) {
+  onSaveProductSuccess = () => {
+    if (!this.clearAfterSend) return
+    this.#stateManager.clearForm()
+    this.registerFields()
+    
+    const { inputImage } = this.fields
+    inputImage.stateManager.clearFiles()
+  }
+
+  constructor ({
+    clearAfterSend = false
+  }, stateManager) {
     super()
 
     if (!(stateManager instanceof ProductFormEditState)) 
@@ -20,7 +35,10 @@ export default class ProductFormEdit extends BaseComponent {
     
     this.#stateManager = stateManager
 
-    Object.entries(Fields).forEach(([key, field]) => {
+    this.clearAfterSend = clearAfterSend
+    this.fields = getFields()
+
+    Object.entries(this.fields).forEach(([key, field]) => {
       this.addChildrenComponent(key, field) 
     })
   }
@@ -30,9 +48,10 @@ export default class ProductFormEdit extends BaseComponent {
   }
 
   async render() {
+    const { inputCategorySelect } = this.DOMChildren
     const { categories } = await this.#stateManager.loadFormGoods()
 
-    Fields.inputCategorySelect.options = categories.map(category => ({
+    inputCategorySelect.options = categories.map(category => ({
       value: category.id,
       label: category.title
     }))
@@ -40,7 +59,8 @@ export default class ProductFormEdit extends BaseComponent {
     this.#elementDOM = this.createDOMElement(this.template())
 
     this.renderDOMChildren(this.#elementDOM)
-    // this.registerFields()
+    this.memoDOM.memoizeDocument(this.#elementDOM)
+    this.registerFields()
 
     this.initEvents()
   }
@@ -56,23 +76,33 @@ export default class ProductFormEdit extends BaseComponent {
   }
 
   registerFields() {
-    Object.values(Fields).forEach((field) => {
-      this.#stateManager.registerField(field.name, field.input.value)
+    const { formState } = this.#stateManager
+    Object.values(this.fields).forEach((field) => {
+      const defaultValue = formState[field.name]
+      if (defaultValue === undefined) {
+        field.input.value = null
+        return
+      }
+      field.input.value = defaultValue
     }) 
+
+    const { inputImage } = this.fields
+    const files = formState[inputImage.name]
+    inputImage.stateManager.updateDefaultFiles(files)
   }
 
   initEvents() {
     this.#elementDOM.addEventListener('submit', this.onSubmitForm)
+    this.#stateManager.on(
+      PRODUCT_FORM_ACTIONS.saveProductSuccess, 
+      this.onSaveProductSuccess
+    )
 
-    Object.values(Fields).forEach((inputInstance) => {
+    Object.values(this.fields).forEach((inputInstance) => {
       inputInstance.input.oninput = (e) => {
         this.#stateManager.changeField(inputInstance.name, e.target.value)
       }
     })
-  }
-
-  setDefaultValues() {
-    
   }
 
   template(productData) {

@@ -3,6 +3,14 @@ import fetchJson from "../utils/fetch-json"
 
 const IMGUR_CLIENT_ID = '28aaa2e823b03b1';
 
+export const FILE_UPLOADER_ACTIONS = {
+  uploadFileSuccess: 'uploadFileSuccess',
+  uploadFileFail: 'uploadFileFail',
+  clearFiles: 'clearFiles',
+  startLoading: 'startLoading',
+  finishLoading: 'finishLoading',
+  updateDefaultFiles: 'updateDefaultFiles'
+}
 export default class FileUploaderEventState extends BaseEventState {
   apiUrl = null
 
@@ -38,22 +46,40 @@ export default class FileUploaderEventState extends BaseEventState {
 
       this.files.push({ source, url, touchid})
 
-      this.dispatchEvent('uploadFileSuccess')
+      this.dispatchEvent(FILE_UPLOADER_ACTIONS.uploadFileSuccess)
     } catch(e) {
-      this.dispatchEvent('uploadFileFail')
+      this.dispatchEvent(FILE_UPLOADER_ACTIONS.uploadFileFail)
     }    
 
     this.finishLoading()
   }
 
+  updateDefaultFiles(files) {
+    if (!files) {
+      this.files = []
+      return
+    }
+    const filesWithTochid = files.map((file, idx) => ({
+      ...file,
+      touchid: `${new Date().getTime() + idx}`
+    }))
+    this.files = filesWithTochid
+    this.dispatchEvent(FILE_UPLOADER_ACTIONS.updateDefaultFiles)
+  }
+
+  clearFiles() {
+    this.files = []
+    this.dispatchEvent(FILE_UPLOADER_ACTIONS.clearFiles)
+  }
+
   startLoading() {
     this.isLoading = true
-    this.dispatchEvent('startLoading')
+    this.dispatchEvent(FILE_UPLOADER_ACTIONS.startLoading)
   }
 
   finishLoading() {
     this.isLoading = false
-    this.dispatchEvent('finishLoading')
+    this.dispatchEvent(FILE_UPLOADER_ACTIONS.finishLoading)
   }
 
   sortFiles(orderIds) {

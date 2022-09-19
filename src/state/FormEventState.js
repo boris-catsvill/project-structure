@@ -7,6 +7,10 @@ export default class FormEventState extends BaseEventState {
     super()
   }
 
+  clearForm () {
+    this.formState = {}
+  }
+
   registerField(fieldName, defaultValue) {
     this.formState[fieldName] = defaultValue
   }

@@ -53,6 +53,10 @@ export default class TableEventState extends BaseEventState {
     this.dispatchEvent('updateData')
   }
 
+  clearData() {
+    this.data = []
+  }
+
   startLoading() {
     this.isLoading = true
     this.dispatchEvent('startLoading')

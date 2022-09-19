@@ -100,6 +100,7 @@ export default class SortableTable extends BaseComponent {
     this.headerConfig = null
     this.data = null
 
+    this.stateManager.clearData()
     this.memoDOM.clear()
     this.removeEvents()
   }

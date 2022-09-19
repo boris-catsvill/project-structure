@@ -3,7 +3,12 @@ import fetchJson from "../utils/fetch-json";
 
 const BACKEND_URL = process.env.BACKEND_URL
 
-export default class ProductFormEditState extends FormEventState {
+export const PRODUCT_FORM_ACTIONS = {
+  saveProductSuccess: 'saveProductSuccess',
+  saveProductFail: 'saveProductFail'
+}
+
+export default class ProductFormState extends FormEventState {
   apiUrl = new URL(`${BACKEND_URL}api/rest/`)
 
   constructor() {
@@ -22,10 +27,10 @@ export default class ProductFormEditState extends FormEventState {
         body: JSON.stringify(product)
       })
       
-      this.dispatchEvent(new Event('saveProductSuccess'))
+      this.dispatchEvent(PRODUCT_FORM_ACTIONS.saveProductSuccess)
     } catch (error) {
       console.error('что-то пошло не так', error)
-      this.dispatchEvent(new Event('saveProductFail'))
+      this.dispatchEvent(PRODUCT_FORM_ACTIONS.saveProductFail)
     }
   }
 
@@ -45,7 +50,7 @@ export default class ProductFormEditState extends FormEventState {
     const promises = [categoriesPromise(), productDataPromise()]
     const [categories, [formData]] = await Promise.all(promises)
 
-    if (formData) this.formData = formData
+    if (formData) this.formState = formData
 
     return { categories }
   }
@@ -67,4 +72,5 @@ export default class ProductFormEditState extends FormEventState {
   }
 }
 
-export const productFormEditState = new ProductFormEditState()
+export const productFormEditState = new ProductFormState()
+export const productFormAddState = new ProductFormState()

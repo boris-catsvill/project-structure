@@ -1,10 +1,8 @@
 import BaseComponent from "../BaseComponent"
 import Input from "./Input"
-import FileUploaderEventState from "../../state/FileUploaderEventState"
+import FileUploaderEventState, { FILE_UPLOADER_ACTIONS} from "../../state/FileUploaderEventState"
 import SortableList from "../../components/sortable-list"
 import escapeHtml from "../../utils/escape-html"
-
-const imageSortableList = new SortableList({ items: [] })
 
 export default class InputImage extends BaseComponent {
   #elementDOM = null
@@ -13,10 +11,16 @@ export default class InputImage extends BaseComponent {
 
   inputDOM = null
 
+  imageSortableList = null
+
   onChange = () => {
     // для обратной совместимости с дефолтными инпутами
     const target = { value: this.#stateManager.getFilesInfoWith('source', 'url') }
     this.inputDOM.oninput({ target })
+  }
+
+  clearFiles = () => {
+    this.imageSortableList.element.innerHTML = ''
   }
 
   uploadFile = async (event) => {
@@ -48,19 +52,23 @@ export default class InputImage extends BaseComponent {
   uploadFileSuccess = () => {
     const files = this.#stateManager.files
     const uploadedFile = files[files.length - 1]
-    const { url, source, touchid } = uploadedFile
-    const DOMListItem = this.createDOMElement(this.templateImg(url, source, touchid))
-    imageSortableList.add(DOMListItem);
-
+    this.printFile.bind(this, uploadedFile)()
     this.onChange()
   }
 
+  onUpdateDefaultFiles = () => {
+    const files = this.#stateManager.files
+
+    files.forEach(this.printFile.bind(this))
+  }
+
   onSortFiles = () => {
-    const imageListContainer = imageSortableList.element
+    const imageListContainer = this.imageSortableList.element
     const orderIds = [...imageListContainer.childNodes].map((item) => {
       const img = item.querySelector('[data-image]')
       return img.dataset.touchid
     })
+
     this.#stateManager.sortFiles(orderIds)
 
     this.onChange()
@@ -75,6 +83,7 @@ export default class InputImage extends BaseComponent {
     if (!(stateManager instanceof FileUploaderEventState))
       throw new Error('instance of InputImage need in instance of FileUploaderEventState')
 
+    // для обратной совместимости с другими инпутами создается псевдоинпут
     const inputInstance = new Input({})
     inputInstance.render()
     this.inputDOM = inputInstance.input
@@ -82,7 +91,9 @@ export default class InputImage extends BaseComponent {
     this.name = name
     this.#stateManager = stateManager
     
-    this.addChildrenComponent('imageSortableList', imageSortableList)
+    this.imageSortableList = new SortableList({ items: [] })
+    
+    this.addChildrenComponent('imageSortableList', this.imageSortableList)
   }
 
   get element() {
@@ -93,12 +104,12 @@ export default class InputImage extends BaseComponent {
     return this.inputDOM
   }
 
+  get stateManager() {
+    return this.#stateManager
+  }
+
   render() {
     this.#elementDOM = this.createDOMElement(this.template())
-
-    const listArrayDOMItems = this.getArrayDOMItems()
-
-    imageSortableList.items = listArrayDOMItems
 
     this.memoDOM.memoizeDocument(this.#elementDOM)
     this.renderDOMChildren(this.#elementDOM)
@@ -106,23 +117,25 @@ export default class InputImage extends BaseComponent {
     this.initEvents()
   }
 
-  getArrayDOMItems() {
-    return this.#stateManager.files.map(({ url, source, touchid }) => {
-      this.createDOMElement(this.templateImg(url, source, touchid))
-    })
-  }
-
   touchid() {
     return `${new Date().getTime()}`
+  }
+
+  printFile(uploadedFile) {
+    const { url, source, touchid } = uploadedFile
+    const DOMListItem = this.createDOMElement(this.templateImg(url, source, touchid))
+    this.imageSortableList.add(DOMListItem)
   }
 
   initEvents() {
     const { uploadBtn } = this.memoDOM.cache
     uploadBtn.addEventListener('click', this.clickUploadBtn)
-    this.#stateManager.on('startLoading', this.startLoading)
-    this.#stateManager.on('finishLoading', this.finishLoading)
-    this.#stateManager.on('uploadFileSuccess', this.uploadFileSuccess)
-    imageSortableList.element.addEventListener('sortlist', this.onSortFiles)
+    this.#stateManager.on(FILE_UPLOADER_ACTIONS.startLoading, this.startLoading)
+    this.#stateManager.on(FILE_UPLOADER_ACTIONS.finishLoading, this.finishLoading)
+    this.#stateManager.on(FILE_UPLOADER_ACTIONS.uploadFileSuccess, this.uploadFileSuccess)
+    this.#stateManager.on(FILE_UPLOADER_ACTIONS.clearFiles, this.clearFiles)
+    this.#stateManager.on(FILE_UPLOADER_ACTIONS.updateDefaultFiles, this.onUpdateDefaultFiles)
+    this.imageSortableList.element.addEventListener('sortlist', this.onSortFiles)
   }
 
   template() {

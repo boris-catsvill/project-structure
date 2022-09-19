@@ -1,7 +1,7 @@
 import Input from "../Input"
 import InputSelect from "../InputSelect"
 
-export const getFields = () => {
+const getFields = () => {
   const inputTitle = new Input({ 
     name: 'title',
     label: 'Сортировать по:', 
@@ -37,3 +37,4 @@ export const getFields = () => {
   }
 }
 
+export default getFields

@@ -1,4 +1,4 @@
-import { getFields } from "./Fields";
+import getFields from "./getFields";
 import BaseComponent from "../../BaseComponent";
 import FormEventState from "../../../state/FormEventState";
 
