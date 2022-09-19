@@ -1,7 +1,11 @@
 export default class {
   element;
 
-  async render () {
+  constructor() {
+    this.render();
+  }
+
+  render() {
     const element = document.createElement('div');
 
     element.innerHTML = `
@@ -11,8 +15,19 @@ export default class {
       </div>
     `;
 
-    this.element = element.firstElementChild
+    this.element = element.firstElementChild;
 
     return this.element;
+  }
+
+  remove() {
+    if (this.element) {
+      this.element.remove();
+    }
+  }
+
+  destroy() {
+    this.remove();
+    this.element = null;
   }
 }

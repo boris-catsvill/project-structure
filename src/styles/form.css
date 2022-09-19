@@ -108,6 +108,22 @@ form.form-inline .form-group {
   margin-bottom: 0;
 }
 
+.dashboard form.form-inline .form-group {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+}
+
+.dashboard form.form-inline {
+  grid-template-columns: 3fr 3fr 2fr;
+  grid-gap: 46px;
+}
+
+.dashboard form.form-inline .form-label {
+  margin-bottom: 0;
+  margin-right: 16px;
+}
+
 @keyframes spin {
   from {
     transform: rotate(0deg);

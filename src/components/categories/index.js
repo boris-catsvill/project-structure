@@ -1,5 +1,5 @@
 import fetchJson from '../../utils/fetch-json.js';
-import SortableList from '../../components/sortable-list/index.js';
+import SortableList from '../sortable-list/index.js';
 
 const BACKEND_URL = process.env.BACKEND_URL;
 
@@ -81,7 +81,7 @@ export default class Categories {
   }
 
   subCategoryFill(subData) {
-    const array = subData.map(({ id, title, count }) => {
+    const items = subData.map(({ id, title, count }) => {
       const div = document.createElement('div');
 
       div.innerHTML = `
@@ -94,20 +94,22 @@ export default class Categories {
       return div.firstElementChild;
     });
 
-    this.subElements.sortableList = new SortableList({ items: array });
+    this.subElements.sortableList = new SortableList({ items });
 
     return this.subElements.sortableList.element;
   }
 
   async render() {
-    this.getTemplate();
+    try {
+      this.getTemplate();
 
-    await this.loadCategories();
+      await this.loadCategories();
 
-    this.categoryFill(this.categories);
-    this.initEventListeners();
-
-    return this.element;
+      this.categoryFill(this.categories);
+      this.initEventListeners();
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   remove() {
@@ -117,8 +119,8 @@ export default class Categories {
   }
 
   destroy() {
-    this.remove();
     this.subElements.sortableList.destroy();
+    this.remove();
     this.element = null;
   }
 }

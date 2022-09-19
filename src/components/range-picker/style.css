@@ -1,3 +1,10 @@
+/* Common styles */
+@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap');
+
+body {
+  font-family: 'Source Sans Pro', sans-serif;
+}
+
 :root {
   --blue: #109cf1;
   --dark-blue: #334d6e;
@@ -14,9 +21,11 @@
   --grey-light: #c2cfe0;
   --grey-extra-light: #eff1f4;
   --grey-skeleton: #f5f6f8;
+  --grey-middle: #e0e4eb;
   --white: #ffffff;
 }
 
+/* RangePicker styles */
 .rangepicker {
   position: relative;
 }
@@ -32,7 +41,7 @@
   border: 1px solid var(--grey-light);
   border-radius: 4px;
   outline: none;
-  background: var(--white) url("calendar-icon.svg") 16px center no-repeat;
+  background: var(--white) url('../../assets/icons/calendar-icon.svg') 16px center no-repeat;
   background-size: 18px 18px;
 }
 
@@ -76,7 +85,7 @@
 }
 
 .rangepicker__selector-arrow:after {
-  content: "";
+  content: '';
   position: absolute;
   width: 12px;
   height: 12px;
@@ -123,7 +132,7 @@
   justify-content: center;
   cursor: pointer;
   transition: 0.3s all;
-  background: url("angle-arrow-icon.svg") left center no-repeat;
+  background: url('../../assets/icons/angle-arrow-icon.svg') left center no-repeat;
   background-size: 9px 13px;
 }
 
