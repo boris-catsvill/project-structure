@@ -10,7 +10,7 @@ router
   .addRoute(/^products$/, 'products/list')
   .addRoute(/^products\/add$/, 'products/add')
   .addRoute(/^products\/([\w()-]+)$/, 'products/edit')
-  // .addRoute(/^sales$/, 'sales')
+  .addRoute(/^sales$/, 'sales')
   // .addRoute(/^categories$/, 'categories')
   // .addRoute(/^404\/?$/, 'error404')
   .setNotFoundPagePath('error404')

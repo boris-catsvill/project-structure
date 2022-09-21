@@ -79,3 +79,4 @@ export default class TableEventState extends BaseEventState {
 
 export const bestsellersTableState = new TableEventState('/dashboard/bestsellers')
 export const productsTableState = new TableEventState('/rest/products')
+export const salesTableState = new TableEventState('/rest/orders')

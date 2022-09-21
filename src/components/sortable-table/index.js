@@ -53,6 +53,8 @@ export default class SortableTable extends BaseComponent {
       return
     }
 
+    const { orderValue, fieldValue } = this.sorted
+
     this.stateManager.updateData({ 
       _order: orderValue,
       _sort: fieldValue,
