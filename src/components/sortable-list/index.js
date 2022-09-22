@@ -1,3 +1,7 @@
+export const SORT_LIST_ACTIONS = {
+  sortlist: 'sortlist'
+}
+
 export default class SortableList {
   #elemenetDOM = null
   items = []
@@ -29,7 +33,7 @@ export default class SortableList {
     this.placeholderLi?.remove()
     this.placeholderLi = null
 
-    this.#elemenetDOM.dispatchEvent(new Event('sortlist'))
+    this.#elemenetDOM.dispatchEvent(new Event(SORT_LIST_ACTIONS.sortlist))
   }
 
   onMouseDown = (event) => {

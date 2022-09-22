@@ -1,4 +1,4 @@
-import BaseEventState from "./BaseEventState";
+import BaseEventState from "./BaseEventState"
 import fetchJson from '../utils/fetch-json'
 
 const BACKEND_URL = process.env.BACKEND_URL
