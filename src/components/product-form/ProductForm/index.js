@@ -1,5 +1,5 @@
 import getFields from "./getFields";
-
+import NotificationMessage from "../../notification";
 import BaseComponent from "../../BaseComponent"
 import ProductFormEditState, { PRODUCT_FORM_ACTIONS} from "../../../state/ProductFormState";
 
@@ -16,7 +16,34 @@ export default class ProductForm extends BaseComponent {
     this.#stateManager.saveProduct()
   }
 
+  onSaveProductFail = () => {
+    const notification = new NotificationMessage(
+      this.#stateManager.productId 
+        ? 'Не удалось обновить товар'
+        : 'Не удалось добавить товар'
+      , 
+      {
+        duration: 5000,
+        type: 'error'
+      }
+    )
+
+    notification.show()
+  }
+
   onSaveProductSuccess = () => {
+    const notification = new NotificationMessage(
+      this.#stateManager.productId 
+        ? 'Товар обновлен' 
+        : 'Товар добавлен', 
+      {
+        duration: 5000,
+        type: 'success'
+      }
+    )
+
+    notification.show()
+
     if (!this.clearAfterSend) return
     this.#stateManager.clearForm()
     this.registerFields()
@@ -96,6 +123,10 @@ export default class ProductForm extends BaseComponent {
     this.#stateManager.on(
       PRODUCT_FORM_ACTIONS.saveProductSuccess, 
       this.onSaveProductSuccess
+    )
+    this.#stateManager.on(
+      PRODUCT_FORM_ACTIONS.saveProductFail,
+      this.onSaveProductFail
     )
 
     Object.values(this.fields).forEach((inputInstance) => {

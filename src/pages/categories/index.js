@@ -1,9 +1,34 @@
 import { categoriesState, CATEGORY_STATE_ACTIONS } from '../../state/CategoriesEventState'
+import NotificationMessage from '../../components/notification'
 import BaseComponent from '../../components/BaseComponent'
 import CategoryDropdown from '../../components/category-dropdown'
 
 export default class extends BaseComponent {
   #elementDOM = null
+
+  onUpdeteOrderSuccess = () => {
+    const notification = new NotificationMessage(
+      'Новый порядок сохранен', 
+      {
+        duration: 2000,
+        type: 'success'
+      }
+    )
+
+    notification.show()
+  }
+
+  onUpdateOrderFail = () => {
+    const notification = new NotificationMessage(
+      'Не удалось сохранить порядок', 
+      {
+        duration: 2000,
+        type: 'error'
+      }
+    )
+
+    notification.show()
+  }
 
   renderCategories = () => {
     const { categoriesContainer } = this.memoDOM.cache
@@ -60,6 +85,14 @@ export default class extends BaseComponent {
 
   initEvents() {
     categoriesState.on(CATEGORY_STATE_ACTIONS.updateCategories, this.renderCategories)
+    categoriesState.on(
+      CATEGORY_STATE_ACTIONS.updateCategoriesOrderSucess, 
+      this.onUpdeteOrderSuccess
+    )
+    categoriesState.on(
+      CATEGORY_STATE_ACTIONS.updateCategoriesOrderFail, 
+      this.onUpdateOrderFail
+    )
   }
 
   removeEvents() {

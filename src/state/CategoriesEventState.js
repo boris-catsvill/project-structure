@@ -6,7 +6,9 @@ const BACKEND_URL = process.env.BACKEND_URL
 export const CATEGORY_STATE_ACTIONS = {
   startLoading: 'startLoading',
   finishLoading: 'finishLoading',
-  updateCategories: 'updateCategories'
+  updateCategories: 'updateCategories',
+  updateCategoriesOrderSucess: 'updateCategoriesSucess',
+  updateCategoriesOrderFail: 'updateCategoriesOrderFail'
 }
 
 export default class CategoriesEventState extends BaseEventState {
@@ -61,13 +63,18 @@ export default class CategoriesEventState extends BaseEventState {
 
     const subcategoriesUrl = new URL('/api/rest/subcategories', this.apiUrl)
 
-    await fetchJson(subcategoriesUrl, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(subcategoriesPayload)
-    })
+    try {
+      await fetchJson(subcategoriesUrl, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(subcategoriesPayload)
+      })
+      this.dispatchEvent(CATEGORY_STATE_ACTIONS.updateCategoriesOrderSucess)
+    } catch {
+      this.dispatchEvent(CATEGORY_STATE_ACTIONS.updateCategoriesOrderFail)
+    }
   }
 
   startLoading() {
