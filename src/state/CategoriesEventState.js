@@ -68,7 +68,6 @@ export default class CategoriesEventState extends BaseEventState {
       },
       body: JSON.stringify(subcategoriesPayload)
     })
-
   }
 
   startLoading() {
@@ -79,6 +78,11 @@ export default class CategoriesEventState extends BaseEventState {
   finishLoading() {
     this.isLoading = false
     this.dispatchEvent(CATEGORY_STATE_ACTIONS.finishLoading)
+  }
+
+  clearState() {
+    this.categoriesList = []
+    this.subcategoriesMap = {}
   }
 
   makeRequest(query = {}) {

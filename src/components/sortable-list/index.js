@@ -19,6 +19,9 @@ export default class SortableList {
     this.scrollIfCloseToWindowEdge(event)
 
     const droppableLi = this.findDroppableArea(event)
+    const isCursorInList = this.isCursorInListArea(event)
+
+    if (!isCursorInList) return
     if (!droppableLi) return
     this.droppableLi = droppableLi
 
@@ -107,6 +110,15 @@ export default class SortableList {
     this.draggingLi.style.top = clientY - shiftY + 'px'
   }
 
+  isCursorInListArea({ clientX, clientY }) {
+    const { x, y, height, width } = this.#elemenetDOM.getBoundingClientRect()
+    if (clientX < x) return false
+    if (clientX > (x + width)) return false
+    if (clientY < y) return false
+    if (clientY > (y + height)) return false
+    return true
+  }
+
   findDroppableArea({ clientX, clientY }) {
     const defaultDisplay = this.draggingLi.style.display
     this.draggingLi.style.display = 'none'
@@ -118,6 +130,7 @@ export default class SortableList {
 
   swapElements(item1, item2, debug) {
     const swapMarker = document.createElement("div")
+    swapMarker.classList.add('swapMarker')
     this.#elemenetDOM.insertBefore(swapMarker, item1)
     this.#elemenetDOM.insertBefore(item1, item2)
     this.#elemenetDOM.insertBefore(item2, swapMarker)

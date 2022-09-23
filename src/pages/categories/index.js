@@ -45,8 +45,28 @@ export default class extends BaseComponent {
     })
   }
 
+  remove() {
+    this.#elementDOM.remove()
+  }
+
+  destroy() {
+    this.remove()
+    this.#elementDOM = null
+    this.memoDOM.clear()
+    this.removeEvents()
+    categoriesState.clearState()
+    this.clearChildrenComponents()
+  }
+
   initEvents() {
     categoriesState.on(CATEGORY_STATE_ACTIONS.updateCategories, this.renderCategories)
+  }
+
+  removeEvents() {
+    categoriesState.removeListener(
+      CATEGORY_STATE_ACTIONS.updateCategories,
+      this.renderCategories
+    )
   }
 
   template() {

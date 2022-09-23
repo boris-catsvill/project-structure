@@ -31,7 +31,6 @@ export default class CategoryDropdown extends BaseComponent {
     const orderIds = [...sortListContainer.childNodes].map((item) => {
       return item.dataset.id
     })
-
     this.onChangeOrder(this.category.id, orderIds)
   }
 
