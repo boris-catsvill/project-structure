@@ -1,11 +1,11 @@
-import { productFormEditState } from "../../../state/ProductFormState";
+import { productFormAddState } from "../../../state/ProductFormState";
 
 import BaseComponent from "../../../components/BaseComponent";
 import ProductForm from "../../../components/product-form/ProductForm";
 
 const productForm = new ProductForm({
-  clearAfterSend: false
-}, productFormEditState)
+  clearAfterSend: true
+}, productFormAddState)
 
 export default class extends BaseComponent {
   #elementDOM = null
@@ -21,11 +21,6 @@ export default class extends BaseComponent {
   }
 
   render() {
-    const paths = window.location.pathname.split('/')
-    const id = paths[paths.length - 1]
-
-    productFormEditState.productId = id
-
     this.#elementDOM = this.createDOMElement(this.template())
 
     this.renderDOMChildren(this.#elementDOM)

@@ -1,270 +1,207 @@
-import fetchJson from "../../utils/fetch-json.js";
+import BaseComponent from '../BaseComponent'
+import TableEventState from '../../state/TableEventState'
 
-const BACKEND_URL = 'https://course-js.javascript.ru';
+export default class SortableTable extends BaseComponent {
+  #elementDOM = null
 
-export default class SortableTable {
-  element;
-  subElements = {};
-  data = [];
-  loading = false;
-  step = 20;
-  start = 1;
-  end = this.start + this.step;
+  headerConfig = []
+  sorted = {}
+  lazyLoadItems = 30
+  isLazyLoad = true
 
-  onWindowScroll = async() => {
-    const { bottom } = this.element.getBoundingClientRect();
-    const { id, order } = this.sorted;
+  stateManager = null
 
-    if (bottom < document.documentElement.clientHeight && !this.loading && !this.isSortLocally) {
-      this.start = this.end;
-      this.end = this.start + this.step;
+  updateTableBody = () => {
+    this.memoDOM.cache.body.innerHTML = this.templateBody()
+  }
 
-      this.loading = true;
+  onWindowScroll = async () => {
+    const { bottom } = this.#elementDOM.getBoundingClientRect()
+    const { clientHeight } = document.documentElement
 
-      const data = await this.loadData(id, order, this.start, this.end);
-      this.update(data);
+    if (this.stateManager.isLoading) return
+    if (bottom >= clientHeight) return
+    if (this.isSortLocally) return
 
-      this.loading = false;
+    const { fieldValue: _sort, orderValue: _order } = this.sorted
+    const _start = this.stateManager.data.length
+    const _end = _start + this.lazyLoadItems
+
+    this.stateManager.updateData({ 
+      _order,
+      _sort,
+      _start,
+      _end
+    })
+  }
+
+  onSortClick = (event) => {
+    const col = event.target.closest('[data-sortable=true]')
+    if (!col) return 
+
+    const { id, order } = col.dataset
+    const changerOrder = { asc: 'desc', desc: 'asc' }
+    this.sorted = { 
+      fieldValue: id, 
+      orderValue: order ? changerOrder[order] : 'asc'
     }
-  };
 
-  onSortClick = event => {
-    const column = event.target.closest('[data-sortable="true"]');
-    const toggleOrder = order => {
-      const orders = {
-        asc: 'desc',
-        desc: 'asc'
-      };
+    this.showSortArrow()
 
-      return orders[order];
-    };
-
-    if (column) {
-      const { id, order } = column.dataset;
-      const newOrder = toggleOrder(order);
-
-      this.sorted = {
-        id,
-        order: newOrder
-      };
-
-      column.dataset.order = newOrder;
-      column.append(this.subElements.arrow);
-
-      if (this.isSortLocally) {
-        this.sortLocally(id, newOrder);
-      } else {
-        this.sortOnServer(id, newOrder);
-      }
+    if (this.isSortLocally) {
+      this.stateManager.updateDataLocalSort(this.sorted, this.headerConfig)
+      return
     }
-  };
 
-  constructor(headersConfig = [], {
-    url = '',
-    sorted = {
-      id: headersConfig.find(item => item.sortable).id,
-      order: 'asc'
-    },
+    const { orderValue, fieldValue } = this.sorted
+
+    this.stateManager.updateData({ 
+      _order: orderValue,
+      _sort: fieldValue,
+      _start: 0,
+      _end: this.lazyLoadItems
+    }, true)
+  }
+
+  constructor({ 
+    headerConfig = [],
+    sorted = { fieldValue: null, orderValue: null }, 
     isSortLocally = false,
-    step = 20,
-    start = 1,
-    end = start + step
-  } = {}) {
+    isLazyLoad = true
+  }, stateManager) {
+    super()
 
-    this.headersConfig = headersConfig;
-    this.url = new URL(url, BACKEND_URL);
-    this.sorted = sorted;
-    this.isSortLocally = isSortLocally;
-    this.step = step;
-    this.start = start;
-    this.end = end;
+    if (!(stateManager instanceof TableEventState)) 
+      throw new Error('state manager not passed to SortableTable, need in TableEventState')
 
-    this.render();
+    this.headerConfig = headerConfig
+    this.sorted = sorted
+    this.isSortLocally = isSortLocally
+    this.isLazyLoad = isLazyLoad
+
+    this.stateManager = stateManager
   }
 
-  async render() {
-    const {id, order} = this.sorted;
-    const wrapper = document.createElement('div');
-
-    wrapper.innerHTML = this.getTable();
-
-    const element = wrapper.firstElementChild;
-
-    this.element = element;
-    this.subElements = this.getSubElements(element);
-
-    const data = await this.loadData(id, order, this.start, this.end);
-
-    this.renderRows(data);
-    this.initEventListeners();
+  get element() {
+    return this.#elementDOM
   }
 
-  async loadData(id, order, start = this.start, end = this.end) {
-    this.url.searchParams.set('_sort', id);
-    this.url.searchParams.set('_order', order);
-    this.url.searchParams.set('_start', start);
-    this.url.searchParams.set('_end', end);
-
-    this.element.classList.add('sortable-table_loading');
-
-    const data = await fetchJson(this.url);
-
-    this.element.classList.remove('sortable-table_loading');
-
-    return data;
-  }
-
-  addRows(data) {
-    this.data = data;
-
-    this.subElements.body.innerHTML = this.getTableRows(data);
-  }
-
-  update(data) {
-    const rows = document.createElement('div');
-
-    this.data = [...this.data, ...data];
-    rows.innerHTML = this.getTableRows(data);
-
-    this.subElements.body.append(...rows.childNodes);
-  }
-
-  getTableHeader() {
-    return `<div data-element="header" class="sortable-table__header sortable-table__row">
-      ${this.headersConfig.map(item => this.getHeaderRow(item)).join('')}
-    </div>`;
-  }
-
-  getHeaderRow({id, title, sortable}) {
-    const order = this.sorted.id === id ? this.sorted.order : 'asc';
-
-    return `
-      <div class="sortable-table__cell" data-id="${id}" data-sortable="${sortable}" data-order="${order}">
-        <span>${title}</span>
-        ${this.getHeaderSortingArrow(id)}
-      </div>
-    `;
-  }
-
-  getHeaderSortingArrow(id) {
-    const isOrderExist = this.sorted.id === id ? this.sorted.order : '';
-
-    return isOrderExist
-      ? `<span data-element="arrow" class="sortable-table__sort-arrow">
-          <span class="sort-arrow"></span>
-        </span>`
-      : '';
-  }
-
-  getTableBody(data) {
-    return `
-      <div data-element="body" class="sortable-table__body">
-        ${this.getTableRows(data)}
-      </div>`;
-  }
-
-  getTableRows(data) {
-    return data.map(item => `
-      <div class="sortable-table__row">
-        ${this.getTableRow(item, data)}
-      </div>`
-    ).join('');
-  }
-
-  getTableRow(item) {
-    const cells = this.headersConfig.map(({id, template}) => {
-      return {
-        id,
-        template
-      };
-    });
-
-    return cells.map(({id, template}) => {
-      return template
-        ? template(item[id])
-        : `<div class="sortable-table__cell">${item[id]}</div>`;
-    }).join('');
-  }
-
-  getTable() {
-    return `
-      <div class="sortable-table">
-        ${this.getTableHeader()}
-        ${this.getTableBody(this.data)}
-
-        <div data-element="loading" class="loading-line sortable-table__loading-line"></div>
-
-        <div data-element="emptyPlaceholder" class="sortable-table__empty-placeholder">
-          No products
-        </div>
-      </div>`;
-  }
-
-  initEventListeners() {
-    this.subElements.header.addEventListener('pointerdown', this.onSortClick);
-    document.addEventListener('scroll', this.onWindowScroll);
-  }
-
-  sortLocally(id, order) {
-    const sortedData = this.sortData(id, order);
-
-    this.subElements.body.innerHTML = this.getTableRows(sortedData);
-  }
-
-  async sortOnServer(id, order) {
-    const start = 1;
-    const end = start + this.step;
-    const data = await this.loadData(id, order, start, end);
-
-    this.renderRows(data);
-  }
-
-  renderRows(data) {
-    if (data.length) {
-      this.element.classList.remove('sortable-table_empty');
-      this.addRows(data);
-    } else {
-      this.element.classList.add('sortable-table_empty');
-    }
-  }
-
-  sortData(id, order) {
-    const arr = [...this.data];
-    const column = this.headersConfig.find(item => item.id === id);
-    const {sortType, customSorting} = column;
-    const direction = order === 'asc' ? 1 : -1;
-
-    return arr.sort((a, b) => {
-      switch (sortType) {
-        case 'number':
-          return direction * (a[id] - b[id]);
-        case 'string':
-          return direction * a[id].localeCompare(b[id], 'ru');
-        case 'custom':
-          return direction * customSorting(a, b);
-        default:
-          return direction * (a[id] - b[id]);
-      }
-    });
-  }
-
-  getSubElements(element) {
-    const elements = element.querySelectorAll('[data-element]');
-
-    return [...elements].reduce((accum, subElement) => {
-      accum[subElement.dataset.element] = subElement;
-
-      return accum;
-    }, {});
+  render() {
+    this.#elementDOM = this.createDOMElement(this.template())
+    this.memoDOM.memoizeDocument(this.#elementDOM)
+    this.initEvents()
   }
 
   remove() {
-    this.element.remove();
-    document.removeEventListener('scroll', this.onWindowScroll);
+    this.#elementDOM?.remove()
   }
 
   destroy() {
-    this.remove();
-    this.subElements = {};
+    this.remove()
+    this.#elementDOM = null
+    this.headerConfig = null
+    this.data = null
+
+    this.stateManager.clearData()
+    this.memoDOM.clear()
+    this.removeEvents()
+  }
+
+  updateTableRange = async (from, to) => {
+    const { orderValue: _order, fieldValue: _sort } = this.sorted
+    await this.stateManager.updateData({ 
+      _sort,
+      _order,
+      _start: 0,
+      _end: this.lazyLoadItems,
+      from,
+      to
+    }, true)
+  }
+
+  showSortArrow() {
+    const { fieldValue, orderValue } = this.sorted
+    const cacheDOM = this.memoDOM.cache
+
+    Object.entries(cacheDOM).forEach(([elemKey, elemDOM]) => {
+      if (elemKey === `sort-cell-${fieldValue}`) {
+        elemDOM.dataset.order = orderValue
+        return
+      }
+      if (elemKey.startsWith('sort-cell'))
+        elemDOM.dataset.order = ''
+    })
+  }
+
+  template() {
+    return /*html*/`
+      <div class="sortable-table">
+
+        <div data-memo="header" class="sortable-table__header sortable-table__row">
+          ${this.templateHeader()}
+        </div>
+        
+        <div data-memo="body" class="sortable-table__body">
+          ${this.templateBody()}
+        </div>
+      </div>
+    `
+  }
+
+  templateHeader() {
+    return this.headerConfig.map(({ id, title, sortable } = {}) => (
+      /*html*/`
+      <div 
+        class="sortable-table__cell"
+        data-memo="sort-cell-${id}"
+        data-id="${id}" 
+        data-sortable="${sortable}" 
+        data-order="${
+          this.sorted.fieldValue === id 
+            ? this.sorted.orderValue 
+            : ''
+        }"
+      >
+        <span>${title}</span>
+        <span data-element="arrow" class="sortable-table__sort-arrow">
+          <span class="sort-arrow"></span>
+        </span>
+      </div>`
+    )).join('') 
+  }
+
+  templateBody() {
+    const buildData = this.stateManager.data
+    return buildData.map((product) => this.templateRow(product)).join('')
+  }
+
+  templateRow(product) {
+    const row = this.headerConfig.map((col) => {
+      if (!product[col.id]) return
+      if (col.template) return col.template(product[col.id])
+      return /*html*/`
+        <div class="sortable-table__cell">${product[col.id]}</div>
+      `
+    }).join("")
+
+    return /*html*/`
+      <a href="/products/${product.id}" class="sortable-table__row">
+        ${row}
+      </a>
+    `
+  }
+
+  initEvents() {
+    this.memoDOM.cache.header.addEventListener('click', this.onSortClick)
+
+    if (this.isLazyLoad)
+      window.addEventListener('scroll', this.onWindowScroll)
+
+    this.stateManager.on('updateData', this.updateTableBody)
+  }
+
+  removeEvents() {
+    this.stateManager.removeListener('updateData', this.updateTableBody)
+    window.removeEventListener('scroll', this.onWindowScroll)
   }
 }

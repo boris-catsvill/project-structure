@@ -1,89 +1,113 @@
-export default class ColumnChart {
-  element;
-  subElements = {};
-  chartHeight = 50;
+import BaseComponent from '../BaseComponent'
+import ChartEventState from '../../state/ChartEventState'
+export default class ColumnChart extends BaseComponent {
+  #chartHeight = 50
+  #elementDOM = null
 
-  constructor({
-    data = [],
-    label = '',
-    link = '',
-    value = 0
-  } = {}) {
-    this.data = data;
-    this.label = label;
-    this.link = link;
-    this.value = value;
+  label = ''
+  link = ''
+  formatHeading = (v) => v
 
-    this.render();
+  stateManager = null
+
+  changeLoading = () => {
+    const classList = [...this.#elementDOM.classList]
+    classList.includes('column-chart_loading')
+      ? this.#elementDOM.classList.remove('column-chart_loading')
+      : this.#elementDOM.classList.add('column-chart_loading')
   }
 
-  getColumnBody(data) {
-    const maxValue = Math.max(...data);
-
-    return data
-    .map(item => {
-      const scale = this.chartHeight / maxValue;
-      const percent = (item / maxValue * 100).toFixed(0);
-
-      return `<div style="--value: ${Math.floor(item * scale)}" data-tooltip="${percent}%"></div>`;
-    })
-    .join('');
+  updateColumns = () => {
+    const { body, header } = this.memoDOM.cache
+    body.innerHTML = this.templateColumns()
+    header.innerHTML = this.formatHeading(this.stateManager.value)
   }
 
-  getLink() {
-    return this.link ? `<a class="column-chart__link" href="${this.link}">View all</a>` : '';
+  constructor({ label, link, formatHeading }, stateManager) {  
+    super()
+
+    if (!(stateManager instanceof ChartEventState)) 
+      throw new Error('state manager not passed to ColumnChart, need in ChartEventState')
+
+    this.label = label || this.label
+    this.link = link || this.link
+    this.formatHeading = formatHeading || this.formatHeading
+
+    this.stateManager = stateManager
   }
 
-  get template () {
-    return `
-      <div class="column-chart column-chart_loading" style="--chart-height: ${this.chartHeight}">
+  get element() {
+    return this.#elementDOM
+  }
+
+  render() {
+    this.#elementDOM = this.createDOMElement(this.template())
+    this.memoDOM.memoizeDocument(this.#elementDOM)
+    this.initEvents()
+  }
+
+  remove() {
+    this.#elementDOM?.remove();
+  }
+
+  destroy() {
+    this.remove()
+    this.memoDOM.clear()
+    this.#elementDOM = null
+    this.removeEvents()
+  }
+
+  template() {
+    return /*html*/`
+      <div
+        class="column-chart" 
+        style="--chart-height: ${this.#chartHeight}"
+      >
         <div class="column-chart__title">
-          Total ${this.label}
-          ${this.getLink()}
+          ${this.label}
+          ${this.templateLink()}
         </div>
         <div class="column-chart__container">
-          <div data-element="header" class="column-chart__header">
-            ${this.value}
+          <div data-memo="header" class="column-chart__header">
+            ${this.formatHeading(this.stateManager.value)}
           </div>
-          <div data-element="body" class="column-chart__chart">
-            ${this.getColumnBody(this.data)}
+          <div data-memo="body" class="column-chart__chart">
+            ${this.templateColumns()}
           </div>
         </div>
       </div>
     `;
   }
 
-  async render() {
-    const element = document.createElement('div');
-
-    element.innerHTML = this.template;
-    this.element = element.firstElementChild;
-
-    if (this.data.length) {
-      this.element.classList.remove(`column-chart_loading`);
-    }
-
-    this.subElements = this.getSubElements(this.element);
-
-    return this.element;
+  templateLink() {
+    return this.link
+      ? /*html*/`<a class="column-chart__link" href="${this.link}">View all</a>`
+      : ""
   }
 
-  getSubElements (element) {
-    const elements = element.querySelectorAll('[data-element]');
+  templateColumns() {
+    const columnsData = this.stateManager.data
+    const maxValue = Math.max(...columnsData);
+    const scale = this.#chartHeight / maxValue;
 
-    return [...elements].reduce((accum, subElement) => {
-      accum[subElement.dataset.element] = subElement;
-
-      return accum;
-    }, {});
+    return columnsData.map((columnValue) => {
+      const percent = ((columnValue / maxValue) * 100).toFixed(0);
+      const value = String(Math.floor(columnValue * scale))
+      return /*html*/`
+        <div style="--value: ${value}" data-tooltip="${percent}%"></div>
+      `
+    }).join('')
   }
 
-  update ({headerData, bodyData}) {
-    this.subElements.header.textContent = headerData;
-    this.subElements.body.innerHTML = this.getColumnBody(bodyData);
+  initEvents() {
+    this.stateManager.on('updateChartRange', this.updateColumns)
+    this.stateManager.on('startLoading', this.changeLoading)
+    this.stateManager.on('finishLoading', this.changeLoading)
   }
 
-  destroy() {
-    this.element.remove();
+  removeEvents() {
+    this.stateManager.removeListener('updateChartRange', this.updateColumns)
+    this.stateManager.removeListener('startLoading', this.changeLoading)
+    this.stateManager.removeListener('finishLoading', this.changeLoading)
   }
 }
