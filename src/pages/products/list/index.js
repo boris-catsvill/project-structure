@@ -4,7 +4,7 @@ import header from "../list/list-header.js"
 import fetchJson from "../../dashboard/utils/fetch-json.js";
 import select from '../../../utils/select.js';
 
-const BACKEND_URL = 'https://course-js.javascript.ru/';
+const BACKEND_URL = process.env.BACKEND_URL;
 
 export default class Page {
   element;

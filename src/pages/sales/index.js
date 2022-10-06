@@ -5,7 +5,7 @@ import select from '../../utils/select.js';
 
 import header from './header.js';
 
-const BACKEND_URL = 'https://course-js.javascript.ru/';
+const BACKEND_URL = process.env.BACKEND_URL;
 
 export default class Page {
     element;
