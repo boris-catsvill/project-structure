@@ -44,7 +44,6 @@ export default class SortableList {
   
     constructor({ items = [] } = {}) {
       this.items = items;
-  
       this.render();
     }
   

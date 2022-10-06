@@ -1,5 +1,3 @@
-import fetchJson from './utils/fetch-json.js';
-
 const BACKEND_URL = 'https://course-js.javascript.ru';
 
 export default class ColumnChart {
@@ -30,9 +28,7 @@ export default class ColumnChart {
                     ${this.getLink()}
                 </div>
                 <div class="column-chart__container">
-                    <div data-element="header" class="column-chart__header">
-                        
-                    </div>
+                    <div data-element="header" class="column-chart__header"></div>
                     <div data-element="body" class="column-chart__chart">
                         ${this.getColumn()}
                     </div>
@@ -42,22 +38,38 @@ export default class ColumnChart {
     }
 
     getLink() {
-        return this.link ? `<a href="${this.link} class="column-chart__link">View all</a>` : '';
+        return this.link ? `<a href="/sales" class="column-chart__link">View all</a>` : '';
+    }
+    
+    getColumn(data = [], from = this.range.from) {
+        let today = new Date(from);
+
+        const maxValue = Math.max(...data);
+        let arr = [];
+        const scale = this.chartHeight / maxValue;
+        const mounth = ['янв.', 'фев.', 'мар.', 'апр.', 'мая.', 'июн.', 'июл.', 'авг.', 'сен.', 'окт.', 'ноя.', 'дек.'];
+    
+        for (const i of data) {
+            const day = today.getDate();
+            const mounthDate = mounth[today.getMonth()];
+            const year = today.getFullYear();
+
+            arr.push(`<div style="--value: ${Math.floor(i * scale)}" data-tooltip="${this.createTooltipText(day, mounthDate, year, i)}"></div>`);
+            today = new Date(today.getTime() + (24 * 60 * 60 * 1000));
+        }
+
+        return arr.join("");
     }
 
-
-
-    getColumn(data = []) {
-        const maxValue = Math.max(...data);
-        const scale = this.chartHeight / maxValue;
-
-        return data.map(item => {
-            const percent = ((item / maxValue) * 100).toFixed(0);
-
-            return `
-                <div style="--value: ${Math.floor(item * scale)}" data-tooltip="${percent}%"></div>
-            `
-        }).join("");
+    createTooltipText (day, mounthDate, year, i) {
+        return `
+            <div>
+                <small>
+                    ${day} ${mounthDate} ${year} г.
+                </small>
+            </div>
+            <strong>${this.formatHeading(i)}</strong>
+        `
     }
 
     render() {
@@ -68,6 +80,34 @@ export default class ColumnChart {
         this.element = element.firstElementChild;
 
         this.subElements = this.getSubElements();
+        this.init();
+    }
+
+    init () {
+        const elem = this.subElements.body;
+
+        elem.addEventListener('mouseover', this.classHoverAdd);
+
+        elem.addEventListener('mouseout', this.classHoverRemove);
+    }
+
+    classHoverAdd = (event) => {
+        const target = event.target.closest('[data-tooltip]');
+        // const relatedTarget = event.relatedTarget.closest('[data-tooltip]');
+
+        if (!target) return;
+        if (target === null) return;
+        this.subElements.body.classList.add('has-hovered');
+        target.classList.add('is-hovered');
+    }
+
+    classHoverRemove = (event) => {
+        const target = event.target.closest('[data-tooltip]');
+
+        if (!target) return;
+        if (target === null) return;
+        this.subElements.body.classList.remove('has-hovered');
+        target.classList.remove('is-hovered');
     }
 
     loadData(from = this.range.from, to = this.range.to) {
@@ -109,9 +149,9 @@ export default class ColumnChart {
         const data = await this.loadData(from, to);
         const dataArr = Object.values(data);
 
-        if(data && dataArr.length) {
-          this.subElements.header.textContent = this.getHeaderValue(dataArr);
-          this.subElements.body.innerHTML = this.getColumn(dataArr);
+        if(data) {
+          this.subElements.header.textContent = this.formatHeading(this.getHeaderValue(dataArr));
+          this.subElements.body.innerHTML = this.getColumn(dataArr, from);
 
           this.element.classList.remove('column-chart_loading');
         }

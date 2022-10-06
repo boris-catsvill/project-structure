@@ -2,6 +2,7 @@ import RangePicker from './components/range-picker/src/index.js';
 import SortableTable from '../../components/sortable-table/index.js';
 import ColumnChart from '../../components/column-chart/index.js';
 import header from './bestsellers-header.js';
+import select from '../../utils/select.js';
 
 import fetchJson from './utils/fetch-json.js';
 
@@ -100,7 +101,7 @@ export default class Page {
   async updateComponents (from, to) {
     const data = await this.initUrl(from, to);
 
-    this.components.sortableTable.update(data);
+    this.components.sortableTable.updateClear(data);
     this.components.ordersChart.update(from, to);
     this.components.salesChart.update(from, to);
     this.components.customersChart.update(from, to);
@@ -128,6 +129,7 @@ export default class Page {
     this.element = element;
 
     this.subElements = this.getSubElements();
+    select();
 
     this.initCompinents();
     this.renderComponents();

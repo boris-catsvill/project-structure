@@ -1,4 +1,5 @@
 import SortableList from '../sortable-list/index.js';
+import Notification from "../notification/index.js"
 import escapeHtml from './utils/escape-html.js';
 import fetchJson from './utils/fetch-json.js';
 
@@ -37,13 +38,13 @@ export default class ProductForm {
           <div class="form-group form-group__half_left">
             <fielset>
               <label class="form-label">Название товара</label>
-              <input required id="title" value="" type="text" name="title" class="form-control" placeholder="${this.productNameTitle}">
+              <input required id="title" value="" type="text" name="title" class="form-control" placeholder="Название товара">
             </fieldset>
           </div>
 
           <div class="form-group form-group__wide">
             <label class="form-label">Описание</label>
-            <textarea id="description" class="form-control" name="description" data-element="productDescription" placeholder="${this.descriptiontitle}"></textarea>
+            <textarea required id="description" class="form-control" name="description" data-element="productDescription" placeholder="Описание товара"></textarea>
           </div>
 
           <div class="form-group form-group__wide">
@@ -88,11 +89,11 @@ export default class ProductForm {
           </div>
 
           <div class="form-buttons">
-            <button type="submit" name="save" class="button-primary-outline">
+            <button data-id="btn" type="submit" name="save" class="button-primary-outline">
               ${this.productId ? "Сохранить" : "Добавить"} товар
             </button>
           </div>
-        </form>  
+        </form>
       </div>
     `;
   }
@@ -168,8 +169,7 @@ export default class ProductForm {
     const {images} = this.formData;
     
     const items = images.map(item => this.getImageItem(item.url, item.source));
-    
-    const sortableList = new SortableList({items})
+    const sortableList = new SortableList({items});
 
     imageListContainer.append(sortableList.element)
   }
@@ -180,12 +180,12 @@ export default class ProductForm {
     wrapper.innerHTML = `
       <li class="products-edit__imagelist-item sortable-list__item">
         <span>
-          <img src="./icon-grab.svg" data-grab-handle="" alt="grab">
+          <img src="/icon-grab.svg" data-grab-handle="" alt="grab">
           <img class="sortable-table__cell-img" alt="${escapeHtml(name)}" src="${escapeHtml(url)}">
           <span>${escapeHtml(name)}</span>
         </span>
         <button type="button">
-          <img src="./icon-trash.svg" data-delete-handle="" alt="delete">
+          <img src="/icon-trash.svg" data-delete-handle="" alt="delete">
         </button>
       </li>`
 
@@ -218,7 +218,7 @@ export default class ProductForm {
       
       if (file) {
         const formData = new FormData();
-        formData.append('image', file);
+        let q = formData.append('image', file);
 
         const {uploadImage, imageListContainer} = this.subElements;
 
@@ -233,8 +233,9 @@ export default class ProductForm {
           body: formData,
           referrer: ''
         });
+        console.log(result)
 
-        imageListContainer.append(this.getImageItem(result.data.link, file.name));
+        imageListContainer.firstElementChild.append(this.getImageItem(result.data.link, file.name));
 
         uploadImage.classList.remove('is-loading');
         uploadImage.disabled = false;
@@ -244,14 +245,36 @@ export default class ProductForm {
     });
 
     inputFile.hidden = true;
-    document.body.append(inputFile);
+    document.body.appendChild(inputFile);
 
     inputFile.click();
   };
 
+  createNotification(massage, type) {
+    const notification = new Notification(massage, {
+      duration: 2000,
+      type: type
+    });
+
+    notification.show(this.subElements.productForm);
+  }
+
+  createProductId (obj) {
+    document.location.pathname = `/products/${obj.id}`
+  }
+
   onSubmit = (event) => {
     event.preventDefault();
 
+    const type = 'success';
+    let massage = '';
+
+    if (this.productId) {
+      massage = 'Товар сохранен';
+    } else massage = 'Товар добавлен';
+
+    this.createNotification(massage, type);
+    
     this.save();
   }
 
@@ -267,6 +290,10 @@ export default class ProductForm {
         body: JSON.stringify(obj)
       });
 
+      if (!this.productId) {
+        this.createProductId(result);
+      }
+      
       this.dispatchEvent(obj.id)
     } catch (error) {
       console.error('ой-ой', error);
@@ -328,4 +355,3 @@ export default class ProductForm {
     this.subElements = null;
   }
 }
-

@@ -55,8 +55,8 @@ export default class DoubleSlider {
   };
 
   constructor({
-    min = 100,
-    max = 200,
+    min = 0,
+    max = 4000,
     formatValue = value => '$' + value,
     selected = {
       from: min,

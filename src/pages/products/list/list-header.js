@@ -4,18 +4,20 @@ const header = [
     title: 'Image',
     sortable: false,
     template: data => {
-      return `
+      if (data.length) { //сделать возможность пустого фото
+        return `
           <div class="sortable-table__cell">
             <img class="sortable-table-image" alt="Image" src="${data[0].url}">
           </div>
         `;
+      } else return `<div class="sortable-table__cell"></div>`
     }
   },
   {
     id: 'title',
     title: 'Name',
     sortable: true,
-    sortType: 'string'
+    sortType: 'string',
   },
   {
     id: 'subcategory',
@@ -29,7 +31,7 @@ const header = [
         ">
           ${data.title}
         </div>    
-      `;
+      `
     }
   },
   {
@@ -42,13 +44,23 @@ const header = [
     id: 'price',
     title: 'Price',
     sortable: true,
-    sortType: 'number'
+    sortType: 'number',
+    template: data => {
+      return `<div class="sortable-table__cell">
+        $${data}
+      </div>`
+    }
   },
   {
-    id: 'sales',
-    title: 'Sales',
+    id: 'status',
+    title: 'Status',
     sortable: true,
     sortType: 'number',
+    template: data => {
+      return `<div class="sortable-table__cell">
+        ${data > 0 ? 'Active' : 'Inactive'}
+      </div>`
+    }
   },
 ];
 

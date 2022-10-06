@@ -40,7 +40,7 @@ export default class NotificationMessage {
 
         const timerId = setTimeout(() => {
             this.remove();
-        }, this.duration);
+        }, this.duration - 50);
 
         NotificationMessage.isActive = this;
     }
