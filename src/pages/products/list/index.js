@@ -1,7 +1,7 @@
 import SortableTable from "../../../components/sortable-table/index.js";
 import DoubleSlider from "../../../components/double-slider/index.js";
 import header from "../list/list-header.js"
-import fetchJson from "../../dashboard/utils/fetch-json.js";
+import fetchJson from "../../../utils/fetch-json.js";
 import select from '../../../utils/select.js';
 
 const BACKEND_URL = process.env.BACKEND_URL;

@@ -1,6 +1,6 @@
 import RangePicker from '../../components/range-picker/index.js';
 import SortableTable from '../../components/sortable-table/index.js';
-import fetchJson from '../dashboard/utils/fetch-json.js';
+import fetchJson from '../../utils/fetch-json.js';
 import select from '../../utils/select.js';
 
 import header from './header.js';

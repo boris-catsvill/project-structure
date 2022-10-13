@@ -1,4 +1,4 @@
-import fetchJson from '../dashboard/utils/fetch-json.js';
+import fetchJson from '../../utils/fetch-json.js';
 import SortableList from '../../components/sortable-list/index.js';
 import Notification from '../../components/notification/index.js';
 import select from '../../utils/select.js';

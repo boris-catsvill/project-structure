@@ -1,8 +1,6 @@
 import ProductForm from "../../../components/product-form/index.js";
 import select from '../../../utils/select.js';
 
-import fetchJson from "../../dashboard/utils/fetch-json.js";
-
 const BACKEND_URL = process.env.BACKEND_URL;
 
 export default class Page {
