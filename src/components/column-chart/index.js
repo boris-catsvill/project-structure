@@ -40,6 +40,15 @@ export default class ColumnChart {
     getLink() {
         return this.link ? `<a href="/sales" class="column-chart__link">View all</a>` : '';
     }
+
+    createLocalyMounth() {
+        let monthsLocaly = [];
+
+        for (let i = 0; i < 12; i++)
+        monthsLocaly.push(new Date(2000, i, 1).toLocaleDateString(undefined, { "month": "short" }));
+
+        return monthsLocaly;
+    }
     
     getColumn(data = [], from = this.range.from) {
         let today = new Date(from);
@@ -47,28 +56,29 @@ export default class ColumnChart {
         const maxValue = Math.max(...data);
         let arr = [];
         const scale = this.chartHeight / maxValue;
-        const mounth = ['янв.', 'фев.', 'мар.', 'апр.', 'мая.', 'июн.', 'июл.', 'авг.', 'сен.', 'окт.', 'ноя.', 'дек.'];
+        const mounth = this.createLocalyMounth();
     
-        for (const i of data) {
+        for (const columnValue of data) {
             const day = today.getDate();
             const mounthDate = mounth[today.getMonth()];
             const year = today.getFullYear();
+            const multiplication = 24 * 60 * 60 * 1000;
 
-            arr.push(`<div style="--value: ${Math.floor(i * scale)}" data-tooltip="${this.createTooltipText(day, mounthDate, year, i)}"></div>`);
-            today = new Date(today.getTime() + (24 * 60 * 60 * 1000));
+            arr.push(`<div style="--value: ${Math.floor(columnValue * scale)}" data-tooltip="${this.createTooltipText(day, mounthDate, year, columnValue)}"></div>`);
+            today = new Date(today.getTime() + (multiplication));
         }
 
         return arr.join("");
     }
 
-    createTooltipText (day, mounthDate, year, i) {
+    createTooltipText (day, mounthDate, year, columnValue) {
         return `
             <div>
                 <small>
                     ${day} ${mounthDate} ${year} г.
                 </small>
             </div>
-            <strong>${this.formatHeading(i)}</strong>
+            <strong>${this.formatHeading(columnValue)}</strong>
         `
     }
 
@@ -86,28 +96,27 @@ export default class ColumnChart {
     init () {
         const elem = this.subElements.body;
 
-        elem.addEventListener('mouseover', this.classHoverAdd);
+        elem.addEventListener('mouseover', this.classHoverOutAdd);
 
-        elem.addEventListener('mouseout', this.classHoverRemove);
+        elem.addEventListener('mouseout', this.classHoverOutAdd);
     }
 
-    classHoverAdd = (event) => {
+    classHoverOutAdd = (event) => {
         const target = event.target.closest('[data-tooltip]');
-        // const relatedTarget = event.relatedTarget.closest('[data-tooltip]');
+        const eventType = event.type;
 
         if (!target) return;
         if (target === null) return;
-        this.subElements.body.classList.add('has-hovered');
-        target.classList.add('is-hovered');
-    }
 
-    classHoverRemove = (event) => {
-        const target = event.target.closest('[data-tooltip]');
+        if (eventType === 'mouseover') {
+            this.subElements.body.classList.add('has-hovered');
+            target.classList.add('is-hovered');
+        }
 
-        if (!target) return;
-        if (target === null) return;
-        this.subElements.body.classList.remove('has-hovered');
-        target.classList.remove('is-hovered');
+        if (eventType === 'mouseout') {
+            this.subElements.body.classList.remove('has-hovered');
+            target.classList.remove('is-hovered');
+        }
     }
 
     loadData(from = this.range.from, to = this.range.to) {

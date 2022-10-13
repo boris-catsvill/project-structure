@@ -157,7 +157,7 @@ export default class ProductForm {
   }
 
   loadCategoriesList () {
-    return fetchJson(`${BACKEND_URL}/api/rest/categories?_sort=weight&_refs=subcategory`);
+    return fetchJson(new URL('/api/rest/categories?_sort=weight&_refs=subcategory', BACKEND_URL));
   }
 
   loadProductData (productId) {
@@ -269,9 +269,7 @@ export default class ProductForm {
     const type = 'success';
     let massage = '';
 
-    if (this.productId) {
-      massage = 'Товар сохранен';
-    } else massage = 'Товар добавлен';
+    this.productId ? massage = 'Товар сохранен' : massage = 'Товар добавлен';
 
     this.createNotification(massage, type);
     
@@ -290,9 +288,7 @@ export default class ProductForm {
         body: JSON.stringify(obj)
       });
 
-      if (!this.productId) {
-        this.createProductId(result);
-      }
+      this.createProductId(obj)
       
       this.dispatchEvent(obj.id)
     } catch (error) {
@@ -314,6 +310,10 @@ export default class ProductForm {
     const sendObj = {};
     sendObj.images = [];
     sendObj.id = this.productId;
+
+    if (!this.productId) {
+      sendObj.id = String(Date.now());
+    }
 
     const getValue = (field) => productForm.querySelector(`[name=${field}]`);
 

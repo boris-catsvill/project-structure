@@ -10,7 +10,6 @@ export default class Page {
   element;
   subElements = {};
   components = {};
-  // isCooldown = false;
 
   url = new URL('api/rest/products', BACKEND_URL);
 
@@ -89,19 +88,6 @@ export default class Page {
     this.url.searchParams.set('_order', `${this.components.sortableTable.sorted.order}`);
   }
 
-  // debounce (f, ms) {
-  //   return function() {
-  //     if (this.isCooldown) return;
-
-  //     f.apply(this, arguments);
-  //     console.log(this.value)
-
-  //     this.isCooldown = true;
-      
-  //     setTimeout(() => this.isCooldown = false, ms);
-  //   };
-  // };
-
   initEventListeners () {
     const innerSlider = this.components.doubleSlider.element.querySelector('[data-element=inner]');
 
@@ -121,9 +107,6 @@ export default class Page {
 
     this.subElements.filterName.addEventListener('input', (event) => {
       const value = event.target.value;
-
-      // let f1000 = this.debounce(this.updateByName, 1000);
-      // f1000(value)
 
       this.updateByName(value);
     });

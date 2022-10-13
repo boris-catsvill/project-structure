@@ -23,24 +23,24 @@ export default class Categories {
     }
 
     async createElementCategories () {
-        const data = await fetchJson(BACKEND_URL + 'api/rest/categories?_sort=weight&_refs=subcategory');
+        const data = await fetchJson(new URL('api/rest/categories?_sort=weight&_refs=subcategory', BACKEND_URL));
         
-        let itog = [];    
+        let categoryConteiners = [];    
         
         for (const elem of data) {
             const categoryBody = this.createElementBody(elem);
 
             const listCategoryBody = categoryBody.querySelector('[data-elem="list"]');
 
-            const items = Array.from(this.createList(elem));
+            const items = this.createList(elem);
             const sortableList = new SortableList({items});
 
             listCategoryBody.append(sortableList.element)
             
-            itog.push(categoryBody)
+            categoryConteiners.push(categoryBody)
         }  
-        
-        return itog;
+      
+        return categoryConteiners;
     }
 
     createElementBody (data) {
@@ -64,11 +64,10 @@ export default class Categories {
 
     createList (data) {
         const wrapper = document.createElement('div');
-        wrapper.innerHTML = ``;
-        let i = data.subcategories;
+        let str = ``;
         
-        for (let item of i) {
-            const e = `
+        for (let item of data.subcategories) {
+            const liElement = `
             <li class="categories__sortable-list-item sortable-list__item" data-grab-handle data-id="${item.id}">
                 <strong>${item.title}</strong>
                 <span>
@@ -77,8 +76,9 @@ export default class Categories {
                 </span>
             </li>
             `
-            wrapper.innerHTML += e;
+            str += liElement;
         }
+        wrapper.innerHTML = str; 
 
         return wrapper.children;
     }
@@ -153,7 +153,7 @@ export default class Categories {
     createArrList (target) {
         const arr = [];
         
-        const children = target.children;
+        const children = target.querySelectorAll('[data-id]');;
         
         for (let i = 0; i < children.length; i++) {
             const obj = {

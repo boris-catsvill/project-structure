@@ -1,4 +1,13 @@
-const mounthAll = ['янв. ', 'фев. ', 'мар. ', 'апр. ', 'мая. ', 'июн. ', 'июл. ', 'авг. ', 'сен. ', 'окт. ', 'ноя. ', 'дек. ']
+function createLocalyMounth () {
+  let monthsLocaly = [];
+
+  for (let i = 0; i < 12; i++)
+  monthsLocaly.push(new Date(2000, i, 1).toLocaleDateString(undefined, { "month": "short" }));
+
+  return monthsLocaly;
+}
+
+const mounthAll = createLocalyMounth();
 
 const header = [
     {

@@ -32,6 +32,8 @@ export default class NotificationMessage {
     }
 
     show(parent = document.body) {
+        const minusBlinktime = 50;
+
         if(NotificationMessage.isActive) {
             NotificationMessage.isActive.remove()
         }
@@ -40,7 +42,7 @@ export default class NotificationMessage {
 
         const timerId = setTimeout(() => {
             this.remove();
-        }, this.duration - 50);
+        }, this.duration - minusBlinktime);
 
         NotificationMessage.isActive = this;
     }

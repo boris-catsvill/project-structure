@@ -29,8 +29,7 @@ export default class Page {
   createProductId () {
     const href = document.location.href;
     const arr = href.split('/');
-    const itog = arr[arr.length - 1];
-    return itog;
+    return arr.at(-1);
   }
 
   async initComponents () {
