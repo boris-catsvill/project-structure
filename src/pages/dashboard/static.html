@@ -3,9 +3,10 @@
 
 <head>
   <title>Админка для магазина</title>
-  <link rel="apple-touch-icon-precomposed" href="../../assets/favicon/apple-touch-icon-precomposed.png">
-  <link rel="icon" href="../../assets/favicon/favicon.png">
-  <link rel="stylesheet" href="../../styles/all.css">
+  <link rel="apple-touch-icon-precomposed" href="./assets/favicon/apple-touch-icon-precomposed.png">
+  <link rel="icon" href="./assets/favicon/favicon.png">
+  <link rel="stylesheet" href="./styles/all.css">
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -52,17 +53,21 @@
     <div class="dashboard">
       <div class="content__top-panel">
         <h2 class="page-title">Dashboard</h2>
-
-        <!-- range-picker component -->
-
+        <!-- RangePicker component -->
+        <div data-element="rangePicker"></div>
       </div>
-      <div class="dashboard__charts">
-        <!-- column-chart component -->
+      <div data-element="chartsRoot" class="dashboard__charts">
+        <!-- column-chart components -->
+        <div data-element="ordersChart" class="dashboard__chart_orders"></div>
+        <div data-element="salesChart" class="dashboard__chart_sales"></div>
+        <div data-element="customersChart" class="dashboard__chart_customers"></div>
       </div>
 
       <h3 class="block-title">Best sellers</h3>
 
-      <!-- sortable-table component -->
+      <div data-element="sortableTable">
+        <!-- sortable-table component -->
+      </div>
     </div>
   </section>
 </main>
