@@ -107,10 +107,12 @@ export default class SortableTable {
     this.url.searchParams.set('_end', end);
 
     this.element.classList.add('sortable-table_loading');
+    this.element.querySelector('.loading-line').classList.add('sortable-table__loading-line');
 
     const data = await fetchJson(this.url);
 
     this.element.classList.remove('sortable-table_loading');
+    this.element.querySelector('.loading-line').classList.remove('sortable-table__loading-line');
 
     return data;
   }
@@ -197,7 +199,7 @@ export default class SortableTable {
         ${this.getTableHeader()}
         ${this.getTableBody(this.data)}
 
-        <div data-element="loading" class="loading-line sortable-table__loading-line"></div>
+        <div data-element="loading" class="loading-line"></div>
 
         <div data-element="emptyPlaceholder" class="sortable-table__empty-placeholder">No products
         </div>
@@ -268,13 +270,11 @@ export default class SortableTable {
 
   remove() {
     this.element.remove();
+    document.removeEventListener('scroll',  this.onWindowScroll)
   }
 
   destroy() {
     this.remove();
     this.subElements = {};
-    // this.element = null;
-
-    document.removeEventListener('scroll',  this.onWindowScroll)
   }
 }
