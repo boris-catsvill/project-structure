@@ -1,11 +1,27 @@
 .notification {
-  width: 200px;
-  margin: 10px 5px;
-  font-size: 14px;
-  box-shadow: 0 2px 4px 1px rgba(0, 0, 0, .5);
-  border-radius: 2px;
-  animation: calc(var(--value) * 0.1) ease-out calc(var(--value) * 0.9) fadeOut;
-  z-index: 1000;
+  background-color: var(--black);
+  opacity: 0.8;
+  border-radius: 4px;
+  -webkit-animation: fadeOut 0.3s linear;
+  animation: fadeOut 0.3s linear;
+  display: none;
+  position: fixed;
+  right: 75px;
+  bottom: 75px;
+}
+
+.notification.show {
+  display: block;
+  -webkit-animation: fadeIn 0.3s linear;
+  animation: fadeIn 0.3s linear;
+}
+
+.notification__content {
+  padding: 16px 24px 16px 64px;
+  font-size: 16px;
+  line-height: 20px;
+  color: var(--white);
+  position: relative;
 }
 
 /* Success */

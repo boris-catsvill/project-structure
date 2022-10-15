@@ -58,17 +58,18 @@ module.exports = {
       // Options similar to the same options in webpackOptions.output
       // both options are optional
       filename: '[name].css',
-      chunkFilename: '[id].css',
+      chunkFilename: '[id].css'
     }),
     new CopyWebpackPlugin({
       patterns: [
         {
           from: path.join(__dirname, '../src/assets'),
-          to: "assets/[path][name][ext]",
+          to: 'assets/[path][name][ext]'
         },
         {
           from: path.join(__dirname, '../src/components/product-form/*.svg'),
-          to: "[name][ext]",
+          to: '[name][ext]',
+          noErrorOnMissing: true
         }
       ]
     })
