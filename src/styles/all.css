@@ -12,7 +12,8 @@
 @import url("../components/product-form/style.css");
 @import url("../components/categories/style.css");
 
+@import url("form.css");
+
 /* Styles for pages  */
 /* pages */
 @import url("../pages/style.css");
-@import url("../pages/dashboard/style.css");

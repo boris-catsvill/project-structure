@@ -1,73 +1,52 @@
 .notification {
-  width: 200px;
-  margin: 10px 5px;
-  font-size: 14px;
-  box-shadow: 0 2px 4px 1px rgba(0, 0, 0, .5);
-  border-radius: 2px;
-  animation: calc(var(--value) * 0.1) ease-out calc(var(--value) * 0.9) fadeOut;
+  display: none;
+  position: fixed;
+  right: 75px;
+  bottom: 75px;
   z-index: 1000;
+
+  background-color: var(--black);
+  opacity: 0.8;
+  border-radius: 4px;
 }
 
-/* Success */
-.notification.success {
-  background: #cdfccd;
+.notification__content {
+  padding: 16px 24px 16px 64px;
+  font-size: 16px;
+  line-height: 20px;
+  color: var(--white);
+  position: relative;
 }
 
-.notification.success .timer {
-  background: #86aa86;
+.notification__success .notification__content:after, .notification__error .notification__content:after {
+  content: "";
+  position: absolute;
+  left: 24px;
+  top: 50%;
+  width: 24px;
+  height: 24px;
+  transform: translate(0, -50%);
+  background-size: 24px 24px;
 }
 
-/* Error */
-.notification.error {
-  background: #ffe3e3;
+.notification.notification__success .notification__content:after {
+  background: url(icon-circle-check.svg) center no-repeat;
 }
 
-.notification.error .timer {
-  background: #c28585;
+.notification.notification__error .notification__content:after {
+  background: url(icon-circle-error.svg) center no-repeat;
 }
 
-/* Warning */
-.notification.warning {
-  background: #fff9c2;
-}
-
-.notification.warning .timer {
-  background: #c1c377;
-}
-
-.inner-wrapper {
-  padding: 5px;
-}
-
-.timer {
-  width: 100%;
-  height: 2px;
-  animation: progress var(--value) linear;
+.show {
+  display: block;
+  -webkit-animation: fadeIn 0.3s linear;
+  animation: fadeIn 0.3s linear;
 }
 
 .close {
-  width: 12px;
-  height: 12px;
-  display: flex;
-  text-decoration: none;
-  align-items: center;
-  justify-content: center;
-  color: #ffe3e3;
-  font-weight: bold;
-  background: #c28585;
-  cursor: pointer;
-  border-radius: 50%;
-}
-
-.notification-header {
-  display: flex;
-  justify-content: space-between;
-  text-transform: capitalize;
-  font-size: 12px;
-}
-
-.notification-body {
-  font-weight: bold;
+  display: block;
+  -webkit-animation: fadeOut 0.3s linear;
+  animation: fadeOut 0.3s linear;
 }
 
 @keyframes fadeOut {
@@ -79,11 +58,11 @@
   }
 }
 
-@keyframes progress {
+@keyframes fadeIn {
   from {
-    width: 100%;
+    opacity: 0;
   }
   to {
-    width: 0;
+    opacity: 0.8;
   }
 }

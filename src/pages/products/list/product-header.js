@@ -54,14 +54,19 @@ const header = [
             $${new Intl.NumberFormat('ru-RU').format(data)}
           </div>
         `;
-    },
+    }
   },
   {
-    id: 'sales',
-    title: 'Продажи',
+    id: 'status',
+    title: 'Статус',
     sortable: true,
     sortType: 'number',
-  },
+    template: data => {
+      return `<div class="sortable-table__cell">
+          ${data > 0 ? 'Активен' : 'Неактивен'}
+        </div>`;
+    }
+  }
 ];
 
 export default header;

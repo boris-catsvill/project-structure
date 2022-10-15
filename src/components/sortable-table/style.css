@@ -105,11 +105,13 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  text-align: center;
   color: var(--grey);
+  min-height: 300px;
 }
 
 .sortable-table-image {
-  height: 40px;
+  max-height: 80px;
   max-width: 100%;
   padding: 4px;
   border: 1px solid var(--grey-light);
