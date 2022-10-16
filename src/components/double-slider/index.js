@@ -152,17 +152,6 @@ export default class DoubleSlider {
     this.subElements.progress.style.right = right;
   }
 
-  reset() {
-    this.subElements.from.innerHTML = this.formatValue(this.min);
-    this.subElements.to.innerHTML = this.formatValue(this.max);
-
-    this.subElements.sliderLeft.style.left = '0%';
-    this.subElements.sliderRight.style.right = '0%';
-
-    this.subElements.progress.style.left = '0%';
-    this.subElements.progress.style.right = '0%';
-  }
-
   getSubElements() {
     const subElements = {};
     const elementsAll = this.element.querySelectorAll('[data-element]');
