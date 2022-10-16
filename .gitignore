@@ -1,5 +1,5 @@
 .idea
-git rm --cached .DS_Store
+.DS_Store
 node_modules
 cypress/videos
 cypress/screenshots
