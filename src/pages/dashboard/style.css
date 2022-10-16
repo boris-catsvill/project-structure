@@ -20,3 +20,6 @@
 .dashboard .sortable-table {
   --cols: 6;
 }
+.dashboard__sortable {
+  height: 100%;
+}

@@ -2,7 +2,7 @@
   display: grid;
   grid-template-columns: 256px 1fr;
   grid-template-rows: minmax(100vh, auto);
-  grid-template-areas: "sidebar content";
+  grid-template-areas: 'sidebar content';
 }
 
 .content {
@@ -193,16 +193,16 @@
   box-shadow: none;
   animation: progress-bar-stripes 2s linear infinite;
   background: var(--blue)
-  linear-gradient(
-    45deg,
-    rgba(255, 255, 255, 0.15) 25%,
-    transparent 25%,
-    transparent 50%,
-    rgba(255, 255, 255, 0.15) 50%,
-    rgba(255, 255, 255, 0.15) 75%,
-    transparent 75%,
-    transparent
-  );
+    linear-gradient(
+      45deg,
+      rgba(255, 255, 255, 0.15) 25%,
+      transparent 25%,
+      transparent 50%,
+      rgba(255, 255, 255, 0.15) 50%,
+      rgba(255, 255, 255, 0.15) 75%,
+      transparent 75%,
+      transparent
+    );
   background-size: 40px 40px;
 }
 
@@ -217,4 +217,112 @@
 
 .main.is-loading .progress-bar {
   display: block;
+}
+.sales .sortable-table__row {
+  grid-template-rows: none;
+  grid-template-columns: 10% 33% 33% 12% 12%;
+  grid-template-areas: none;
+}
+.notification.show {
+  display: block;
+  -webkit-animation: fadeIn 0.3s linear;
+  animation: fadeIn 0.3s linear;
+}
+.full-height {
+  height: 100%;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.notification {
+  background-color: var(--black);
+  opacity: 0.8;
+  border-radius: 4px;
+  -webkit-animation: fadeOut 0.3s linear;
+  animation: fadeOut 0.3s linear;
+  display: none;
+  position: fixed;
+  right: 75px;
+  bottom: 75px;
+}
+.notification__content {
+  padding: 16px 24px 16px 64px;
+  font-size: 16px;
+  line-height: 20px;
+  color: var(--white);
+  position: relative;
+}
+.notification.notification_success .notification__content:after {
+  background: url(../components/notification/icon-circle-check.e37fc449393b4467471a19dd39ea9472.svg)
+    center no-repeat;
+  content: '';
+  position: absolute;
+  left: 24px;
+  top: 50%;
+  width: 24px;
+  height: 24px;
+  transform: translate(0, -50%);
+  background-size: 24px 24px;
+}
+.notification.notification_error .notification__content:after {
+  background: url(../components/notification/381599_error_icon.svg) center no-repeat;
+  content: '';
+  position: absolute;
+  left: 24px;
+  top: 50%;
+  width: 24px;
+  height: 24px;
+  transform: translate(0, -50%);
+  background-size: 24px 24px;
+}
+.products-list {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.products-list .content__top-panel {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+.products-list form.form-inline {
+  grid-template-columns: 3fr 3fr 2fr;
+  grid-gap: 46px;
+}
+.products-list .content-box.content-box_small {
+  padding: 16px 32px;
+}
+.products-list form.form-inline .form-group {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+}
+.products-list form.form-inline .form-label {
+  margin-bottom: 0;
+  margin-right: 16px;
+}
+form .form-label {
+  font-weight: normal;
+  font-size: 16px;
+  line-height: 20px;
+  color: var(--table-grey);
+  margin-bottom: 8px;
+}
+.range-slider {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0 60px;
+}
+.products-list .products-list__container {
+  height: 100%;
+}
+.sales__sortable {
+  height: 100%;
 }
