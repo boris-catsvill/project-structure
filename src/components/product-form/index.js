@@ -36,10 +36,18 @@ export default class ProductForm {
         body: JSON.stringify(data)
       });
 
-      this.dispatchEvent(result.id);
+      this.dispatchEvent(result.id, 'success');
     } catch (error) {
-      console.error('error', error);
+      this.dispatchEvent('', 'error');
     }
+  }
+
+  dispatchEvent(id, status) {
+    const event = this.productId
+      ? new CustomEvent('product-updated', { detail: { id, status } })
+      : new CustomEvent('product-saved', { detail: { id, status } });
+
+    this.element.dispatchEvent(event);
   }
 
   uploadImage = () => {
@@ -239,14 +247,6 @@ export default class ProductForm {
     }
 
     return values;
-  }
-
-  dispatchEvent(id) {
-    const event = this.productId
-      ? new CustomEvent('product-updated', { detail: id })
-      : new CustomEvent('product-saved');
-
-    this.element.dispatchEvent(event);
   }
 
   setFormData() {

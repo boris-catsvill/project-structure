@@ -55,13 +55,16 @@ export default class Page {
   initEventListeners() {
     this.components.productFrom.element.addEventListener('product-updated', event => {
       this.showNotification({
-        type: 'notification_success show',
-        name: 'Товар обновлен',
-        id: event.detail
+        type: `notification_${event.detail.status} show`,
+        name: event.detail.status === 'success' ? 'Товар обновлен' : 'Ошибка обновления',
+        id: event.detail.id
       });
     });
     this.components.productFrom.element.addEventListener('product-saved', event => {
-      this.showNotification({ type: 'notification_success show', name: 'Товар сохранен' });
+      this.showNotification({
+        type: `notification_${event.detail.status} show`,
+        name: event.detail.status === 'success' ? 'Товар сохранен' : 'Ошибка сохранения'
+      });
     });
   }
   showNotification(message) {
