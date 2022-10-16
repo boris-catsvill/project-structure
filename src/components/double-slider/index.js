@@ -134,7 +134,8 @@ export default class DoubleSlider {
   }
 
   update(reset = false) {
-    let left, right;
+    let left;
+    let right;
     if (reset) {
       this.subElements.from.innerHTML = this.formatValue(this.min);
       this.subElements.to.innerHTML = this.formatValue(this.max);
