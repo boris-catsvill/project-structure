@@ -101,6 +101,7 @@ export default class SortableTable {
   }
 
   async loadData(id, order, start = this.start, end = this.end) {
+    this.url.searchParams.set('_embed', 'subcategory.category');
     this.url.searchParams.set('_sort', id);
     this.url.searchParams.set('_order', order);
     this.url.searchParams.set('_start', start);
