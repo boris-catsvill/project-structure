@@ -1,78 +1,65 @@
 class Tooltip {
-  static instance;
-
+  static activeTooltip;
   element;
 
-  onMouseOver = event => {
-    const element = event.target.closest('[data-tooltip]');
+  showTooltipPointeroverHandle = e => {
+    const target = e.target.closest('[data-tooltip]');
+    if (!target) return;
+    this.render(e.target.dataset?.tooltip);
 
-    if (element) {
-      this.render(element.dataset.tooltip);
-      this.moveTooltip(event);
-
-      document.addEventListener('pointermove', this.onMouseMove);
-    }
+    document.addEventListener('pointermove', this.elementPointermoveHandle);
   };
 
-  onMouseMove = event => {
-    this.moveTooltip(event);
+  elementPointermoveHandle = e => {
+    this.element.style.top = e.clientY + 20 + 'px';
+    this.element.style.left = e.clientX + 'px';
   };
 
-  onMouseOut = () => {
-    this.removeTooltip();
+  hideTooltipPointeroutHandle = e => {
+    this.remove();
+
+    document.removeEventListener('pointermove', this.elementPointermoveHandle);
   };
-
-  removeTooltip() {
-    if (this.element) {
-      this.element.remove();
-      this.element = null;
-
-      document.removeEventListener('pointermove', this.onMouseMove);
-    }
-  }
 
   constructor() {
-    if (Tooltip.instance) {
-      return Tooltip.instance;
+    if (!Tooltip.activeTooltip) {
+      Tooltip.activeTooltip = this;
+    } else {
+      return Tooltip.activeTooltip;
     }
-
-    Tooltip.instance = this;
   }
 
-  initEventListeners() {
-    document.addEventListener('pointerover', this.onMouseOver);
-    document.addEventListener('pointerout', this.onMouseOut);
+  initEventListners() {
+    document.addEventListener('pointerover', this.showTooltipPointeroverHandle);
+    document.addEventListener('pointerout', this.hideTooltipPointeroutHandle);
   }
 
-  initialize () {
-    this.initEventListeners();
+  initialize() {
+    this.initEventListners();
   }
 
-  render(html) {
+  render(textLabel) {
     this.element = document.createElement('div');
-    this.element.className = 'tooltip';
-    this.element.innerHTML = html;
-
+    this.element.classList = 'tooltip';
+    this.element.innerHTML = textLabel;
     document.body.append(this.element);
   }
 
-  moveTooltip(event) {
-    const left = event.clientX + 10;
-    const top = event.clientY + 10;
-
-    // TODO: Add logic for window borders
-
-    this.element.style.left = left + 'px';
-    this.element.style.top = top + 'px';
+  remove() {
+    this.element?.remove();
   }
 
   destroy() {
-    document.removeEventListener('pointerover', this.onMouseOver);
-    document.removeEventListener('pointerout', this.onMouseOut);
-    this.removeTooltip();
+    document.removeEventListener('pointerover', this.showTooltipPointeroverHandle);
+    document.removeEventListener('pointerout', this.hideTooltipPointeroutHandle);
+
+    this.remove();
+    this.element = null;
+    Tooltip.activeTooltip = null;
   }
 }
 
+/* FIXME: Работает все правильно. Зачем так export??? */
 const tooltip = new Tooltip();
 
 export default tooltip;

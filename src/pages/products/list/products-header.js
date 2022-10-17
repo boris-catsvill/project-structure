@@ -23,7 +23,7 @@ const header = [
     template: data => {
       return `<div 
           class="sortable-table__cell" 
-          data-tooltip="${`${data.category.title} / <b>${data.title}</b>`}"
+          data-tooltip="${`${data.category?.title} / <b>${data.title}</b>`}"
         >${data.title}</div>`;
     },
     customSorting: (prevItem, nextItem) => {
@@ -40,13 +40,23 @@ const header = [
     id: 'price',
     title: 'Price',
     sortable: true,
-    sortType: 'number'
+    sortType: 'number',
+    template: data => {
+      return `<div class="sortable-table__cell">
+          $${data}
+        </div>`;
+    }
   },
   {
-    id: 'sales',
-    title: 'Sales',
+    id: 'status',
+    title: 'Status',
     sortable: true,
-    sortType: 'number'
+    sortType: 'number',
+    template: data => {
+      return `<div class="sortable-table__cell">
+          ${data > 0 ? 'Active' : 'Inactive'}
+        </div>`;
+    }
   }
 ];
 
