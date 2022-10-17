@@ -1,0 +1,86 @@
+.notification {
+  background-color: var(--black);
+  opacity: 0.8;
+  border-radius: 4px;
+  -webkit-animation: fadeOut 0.3s linear;
+          animation: fadeOut 0.3s linear;
+  display: none;
+  position: fixed;
+  right: 75px;
+  bottom: 75px;
+}
+
+.notification.show {
+  display: block;
+  -webkit-animation: fadeIn 0.3s linear;
+          animation: fadeIn 0.3s linear;
+}
+
+.notification__content {
+  padding: 16px 24px 16px 64px;
+  font-size: 16px;
+  line-height: 20px;
+  color: var(--white);
+  position: relative;
+}
+
+.notification.notification_success .notification__content:after,
+.notification.notification_error .notification__content:after {
+  content: "";
+  position: absolute;
+  left: 24px;
+  top: 50%;
+  width: 24px;
+  height: 24px;
+  transform: translate(0, -50%);
+  background-size: 24px 24px;
+}
+
+.notification.notification_success .notification__content:after {
+  background: url(./svg/icon-circle-check.svg) center no-repeat;
+}
+
+.notification.notification_error .notification__content:after {
+  background: url(./svg/icon-error.svg) center no-repeat;
+} 
+
+.notification__content a {
+  color: var(--middle-blue);
+  text-decoration: none;
+}
+
+@-webkit-keyframes fadeOut {
+  from {
+    opacity: 0.8;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 0.8;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@-webkit-keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.8;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.8;
+  }
+}

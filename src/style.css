@@ -1,0 +1,244 @@
+.main {
+  display: grid;
+  grid-template-columns: 256px 1fr;
+  grid-template-rows: minmax(100vh, auto);
+  grid-template-areas: "sidebar content";
+}
+
+.content {
+  grid-area: content;
+  background: var(--grey-skeleton);
+  padding: 24px 36px;
+}
+
+.sidebar {
+  grid-area: sidebar;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  grid-template-columns: 100%;
+  background: var(--white);
+  box-shadow: 6px 0 18px rgba(0, 0, 0, 0.06);
+  padding: 24px 26px;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+}
+
+.is-collapsed-sidebar .sidebar ul {
+  margin-left: -3px;
+}
+
+.is-collapsed-sidebar .sidebar ul a span,
+.is-collapsed-sidebar .sidebar ul button span {
+  display: none;
+}
+
+.is-collapsed-sidebar .sidebar__title {
+  font-size: 12px;
+  line-height: 1.2;
+  margin-left: -16px;
+  text-align: center;
+  width: 48px;
+}
+
+.is-collapsed-sidebar .main {
+  grid-template-columns: 70px 1fr;
+}
+
+.is-collapsed-sidebar .sidebar__nav_bottom li {
+  height: 24px;
+}
+
+.sidebar__title {
+  font-size: 24px;
+  line-height: 36px;
+  height: 36px;
+  color: var(--dark-blue);
+  margin-top: 0;
+  margin-bottom: 32px;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+}
+
+.sidebar__title a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.sidebar__title a:hover {
+  text-decoration: underline;
+}
+
+.sidebar__nav {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+.sidebar__nav li {
+  margin-bottom: 16px;
+}
+
+.sidebar__nav li:last-child {
+  margin-bottom: 0;
+}
+
+.sidebar__nav li a,
+.sidebar__nav li button {
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--dark-blue);
+  text-decoration: none;
+  padding-left: 32px;
+  position: relative;
+}
+
+.sidebar__nav li a i,
+.sidebar__nav li button i {
+  color: var(--grey-light);
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translate(0, -50%);
+}
+
+.sidebar__nav li a:hover,
+.sidebar__nav li a:focus,
+.sidebar__nav li a:active,
+.sidebar__nav li.active a,
+.sidebar__nav li a:hover i,
+.sidebar__nav li a:focus i,
+.sidebar__nav li a:active i,
+.sidebar__nav li.active a i,
+.sidebar__nav li button:hover,
+.sidebar__nav li.active button,
+.sidebar__nav li button:hover i,
+.sidebar__nav li.active button i {
+  color: var(--blue);
+}
+
+.sidebar__toggler {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  border: none;
+  outline: none;
+  background: none;
+  cursor: pointer;
+  height: 24px;
+}
+
+.content__top-panel {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.content__top-panel .form-inline {
+  width: 50%;
+}
+
+.page-title {
+  font-weight: 600;
+  font-size: 28px;
+  line-height: 36px;
+  color: var(--grey);
+  margin: 0;
+}
+
+.page-title .link {
+  text-decoration: none;
+  color: var(--blue);
+}
+
+.page-title .link.disabled {
+  color: inherit;
+  pointer-events: none;
+}
+
+.block-title {
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 30px;
+  color: var(--grey);
+  margin: 40px 0 24px;
+}
+
+.content-box {
+  padding: 34px 32px 48px;
+  background-color: var(--white);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  margin-bottom: 24px;
+}
+
+.content-box.content-box_small {
+  padding: 16px 32px;
+}
+
+.progress-bar {
+  background-color: var(--grey);
+  box-shadow: none;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 10px;
+  /* TODO: uncomment after implementation */
+  /*display: none;*/
+  z-index: 1;
+}
+
+.progress-bar__line {
+  height: 100%;
+  box-shadow: none;
+  animation: progress-bar-stripes 2s linear infinite;
+  background: var(--blue)
+  linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.15) 25%,
+    transparent 25%,
+    transparent 50%,
+    rgba(255, 255, 255, 0.15) 50%,
+    rgba(255, 255, 255, 0.15) 75%,
+    transparent 75%,
+    transparent
+  );
+  background-size: 40px 40px;
+}
+
+@keyframes progress-bar-stripes {
+  from {
+    background-position: 40px 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}
+
+.main.is-loading .progress-bar {
+  display: block;
+}
+
+.dashboard__charts {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-gap: 24px;
+  --chart-height: 50;
+}
+
+.dashboard__chart_orders {
+  --chart-column-color: var(--yellow);
+}
+
+.dashboard__chart_sales {
+  --chart-column-color: var(--green);
+}
+
+.dashboard__chart_customers {
+  --chart-column-color: var(--purple);
+}
+
+.dashboard .sortable-table {
+  --cols: 6;
+}

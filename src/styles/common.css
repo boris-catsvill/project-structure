@@ -1,5 +1,5 @@
 @import url("https://fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap");
-@import url("../assets/fonts/css/fontello.css");
+@import url("./assets/fonts/css/fontello.css");
 @import url("variables.css");
 @import url("form.css");
 
@@ -62,13 +62,13 @@ button.is-loading::before {
 }
 
 .button-primary.is-loading::before {
-  background: url("/components/product-form/icon-loading-circle-white.svg") center
+  background: url("./svg/icon-loading-circle-white.svg") center
     no-repeat;
   background-size: cover;
 }
 
 .button-primary-outline.is-loading::before {
-  background: url("/components/product-form/icon-loading-circle-blue.svg") center
+  background: url("./svg/icon-loading-circle-blue.svg") center
     no-repeat;
   background-size: cover;
 }
