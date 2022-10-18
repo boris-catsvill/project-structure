@@ -1,6 +1,6 @@
 # Admin Dashboard
 
-### The finished site - https://zippy-sorbet-5609af.netlify.app
+### The finished site - https://admin-page766.netlify.app/
 
 **Important!**
 
