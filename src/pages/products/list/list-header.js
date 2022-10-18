@@ -1,3 +1,4 @@
+const numFormat = new Intl.NumberFormat("en");
 const header = [
   {
     id: 'images',
@@ -39,13 +40,21 @@ const header = [
     id: 'price',
     title: 'Price',
     sortable: true,
-    sortType: 'number'
+    sortType: 'number',
+    template: data => {
+      return `<div class="sortable-table__cell">$${numFormat.format(data)}</div>`;
+    }
   },
   {
-    id: 'sales',
-    title: 'Sales',
+    id: 'status',
+    title: 'Status',
     sortable: true,
-    sortType: 'number'
+    sortType: 'number',
+    template: data => {
+      return `<div class="sortable-table__cell">
+          ${data > 0 ? 'Active' : 'Inactive'}
+        </div>`;
+    }
   },
 ];
 
