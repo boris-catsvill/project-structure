@@ -10,6 +10,13 @@ export default class SortableTable {
     sorted = {
       id: headersConfig.find(item => item.sortable).id,
       order: 'asc',
+    },
+    templateTableRow = (id, html) => {
+      return `
+        <div class="sortable-table__row">
+          ${html}
+        </div>
+      `
     }
   } = {}) {
     this.headersConfig = headersConfig;
@@ -24,6 +31,8 @@ export default class SortableTable {
     
     this.data = [];
     this.loadingData = false;
+
+    this.templateTableRow = templateTableRow;
 
     this.render();
 
@@ -222,19 +231,10 @@ export default class SortableTable {
 
   getTableBodyRows(data) {
     return data.map(item => {
-      if (typeof(item.id) === 'string') {
-        return `
-          <a href="/products/${item.id}" class="sortable-table__row">
-            ${this.getTableBodyRow(item)}
-          </a>
-        `
-      } else {
-        return `
-          <div class="sortable-table__row">
-            ${this.getTableBodyRow(item)}
-          </div>
-        `
-      }
+      const id = item.id;
+      const html = this.getTableBodyRow(item);
+
+      return this.templateTableRow(id, html);
     }).join('');
   }
 

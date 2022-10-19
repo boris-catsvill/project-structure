@@ -57,6 +57,13 @@ export default class Page {
 
     const sortableTable = new SortableTable(header, {
       url: `api/rest/products?_embed=subcategory.category`,
+      templateTableRow: (id, html) => {
+        return `
+          <a href="/products/${id}" class="sortable-table__row">
+            ${html}
+          </a>
+        `
+      }
     });
 
     this.components.doubleSlider = doubleSlider;

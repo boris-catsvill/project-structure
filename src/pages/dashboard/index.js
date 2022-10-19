@@ -79,7 +79,14 @@ export default class Page {
 
     const sortableTable = new SortableTable(header, {
       url: `api/dashboard/bestsellers?_start=0&_end=30&from=${from.toISOString()}&to=${to.toISOString()}`,
-      isSortLocally: true
+      isSortLocally: true,
+      templateTableRow: (id, html) => {
+        return `
+          <a href="/products/${id}" class="sortable-table__row">
+            ${html}
+          </a>
+        `;
+      }
     })
 
     this.components.rangePicker = rangePicker;
