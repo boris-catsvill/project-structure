@@ -218,3 +218,69 @@
 .main.is-loading .progress-bar {
   display: block;
 }
+
+
+
+/* Dashboard */
+.dashboard__charts {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-gap: 24px;
+  --chart-height: 50;
+}
+
+.dashboard__chart_orders {
+  --chart-column-color: var(--yellow);
+}
+
+.dashboard__chart_sales {
+  --chart-column-color: var(--green);
+}
+
+.dashboard__chart_customers {
+  --chart-column-color: var(--purple);
+}
+
+.dashboard .sortable-table {
+  --cols: 6;
+}
+
+
+
+/* Products */
+.products-list form.form-inline {
+  display: grid;
+  grid-template-columns: 3fr 3fr 2fr;
+  grid-gap: 46px;
+}
+
+.products-list form.form-inline .form-group{
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center ;
+}
+
+.products-list form.form-inline .form-label {
+  margin-bottom: 0;
+  margin-right: 16px;
+}
+
+
+
+/* Categories */
+.categories ul.sortable-list {
+  list-style: none;
+}
+
+
+
+/* Sales */
+.sales .sortable-table {
+  --cols: 5;
+}
+
+.sales .sortable-table__row {
+  grid-template-rows: none;
+  grid-template-columns: 10% 33% 33% 12% 12%;
+  grid-template-areas: none;
+}
