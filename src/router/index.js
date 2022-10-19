@@ -20,6 +20,13 @@ export default class Router {
         this.navigate(href);
       }
     });
+    
+    document.addEventListener('pointerdown', event => {
+      const target = event.target.closest('.sidebar__toggler');
+      if (target) {
+        document.body.classList.toggle('is-collapsed-sidebar');
+      }
+    });
   }
 
   static instance() {
