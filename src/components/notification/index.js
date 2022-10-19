@@ -40,7 +40,7 @@ export default class NotificationMessage {
 
         parent.append(this.element);
 
-        const timerId = setTimeout(() => {
+        this.timerId = setTimeout(() => {
             this.remove();
         }, this.duration - minusBlinktime);
 

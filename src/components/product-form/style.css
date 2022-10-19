@@ -71,6 +71,7 @@ body {
   position: relative;
   padding: 0;
   margin: 12px 0;
+  list-style-type: none
 }
 
 .sortable-list__item {

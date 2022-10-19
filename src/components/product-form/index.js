@@ -99,11 +99,11 @@ export default class ProductForm {
   }
   
   async render () {
-    const categoriesPromise = this.loadCategoriesList();
-    
     const productPromise = this.productId ? this.loadProductData(this.productId) : Promise.resolve([this.defaultFormData]);
 
-    const [categoriesData, productResponse] = await Promise.all([categoriesPromise, productPromise]);
+    const categoriesPromise = this.loadCategoriesList();
+
+    const [productResponse, categoriesData] = await Promise.all([productPromise, categoriesPromise]);
 
     const [productData] = productResponse;
     
@@ -199,8 +199,8 @@ export default class ProductForm {
 
     const select = wrapper.firstElementChild;
 
-    for(const category of this.categories) {
-      for(const item of category.subcategories) {
+    for (const category of this.categories) {
+      for (const item of category.subcategories) {
         select.append(new Option(`${category.title} > ${item.title}`, item.id));
       }
     }
@@ -233,7 +233,6 @@ export default class ProductForm {
           body: formData,
           referrer: ''
         });
-        console.log(result)
 
         imageListContainer.firstElementChild.append(this.getImageItem(result.data.link, file.name));
 
@@ -259,19 +258,8 @@ export default class ProductForm {
     notification.show(this.subElements.productForm);
   }
 
-  createProductId (obj) {
-    document.location.pathname = `/products/${obj.id}`
-  }
-
   onSubmit = (event) => {
     event.preventDefault();
-
-    const type = 'success';
-    let massage = '';
-
-    this.productId ? massage = 'Товар сохранен' : massage = 'Товар добавлен';
-
-    this.createNotification(massage, type);
     
     this.save();
   }
@@ -288,16 +276,14 @@ export default class ProductForm {
         body: JSON.stringify(obj)
       });
 
-      this.createProductId(obj)
-      
-      this.dispatchEvent(obj.id)
+      this.dispatchEvent(result.id, 'success')
     } catch (error) {
-      console.error('ой-ой', error);
+      this.dispatchEvent('', 'error')
     }
   }
 
-  dispatchEvent (id) {
-    const event = this.productId ? new CustomEvent('product-updated', { detail: id }) : new CustomEvent('product-saved');
+  dispatchEvent (id, status) {
+    const event = this.productId ? new CustomEvent('product-updated', { detail: {id, status} }) : new CustomEvent('product-saved', { detail: {id, status} });
 
     this.element.dispatchEvent(event);
   }
@@ -349,9 +335,14 @@ export default class ProductForm {
     }
   }
 
-  destroy () {
+  destroy() {
     this.remove();
     this.element = null;
-    this.subElements = null;
+    this.subElements = {};
+    this.selected = {
+      from: new Date(),
+      to: new Date()
+    };
+    return this;
   }
 }

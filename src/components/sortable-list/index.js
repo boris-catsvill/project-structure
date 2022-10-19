@@ -56,7 +56,6 @@ export default class SortableList {
     }
   
     addItems() {
-      // item is a DOM element
       for (const item of this.items) {
         item.classList.add('sortable-list__item');
       }
@@ -117,7 +116,7 @@ export default class SortableList {
       this.placeholderElement = this.createPlaceholderElement(offsetWidth, offsetHeight);
   
       this.draggingElem.after(this.placeholderElement);
-      // move to the end, to be over other list elements
+      
       this.element.append(this.draggingElem);
       this.moveDraggingAt(clientX, clientY);
       this.addDocumentEventListeners();

@@ -1,5 +1,6 @@
 import ProductForm from "../../../components/product-form/index.js";
 import select from '../../../utils/select.js';
+import NotificationMessage from "../../../components/notification/index.js";
 
 const BACKEND_URL = process.env.BACKEND_URL;
 
@@ -46,6 +47,32 @@ export default class Page {
     if (product === '') this.subElements.productForm.querySelector('#subcategory').value = 'tovary-dlya-doma';
   }
 
+  initEventListeners () {
+    this.productForm.element.addEventListener('product-updated', (event) => {
+      this.NotificationMessage({
+        type: event.detail.status,
+        name: event.detail.status === 'success' ? 'Товар сохранен' : 'Ошибка сохранения'
+      });
+    });
+    this.productForm.element.addEventListener('product-saved', (event) => {
+      this.NotificationMessage({
+        type: event.detail.status,
+        name: event.detail.status === 'success' ? 'Товар сохранен' : 'Ошибка сохранения'
+      });
+
+      document.location.pathname = `/products/${event.detail.id}`
+    });
+  }
+
+  NotificationMessage (message) {
+    const notification = new NotificationMessage(message.name, {
+      duration: 2000,
+      type: message.type
+    });
+
+    notification.show(this.subElements.productForm);
+  }
+
   async render() {
     const wrapper = document.createElement('div');
     wrapper.innerHTML = this.getTeamplate();
@@ -57,6 +84,7 @@ export default class Page {
     select();
 
     await this.initComponents();
+    this.initEventListeners()
 
     return this.element;
   }

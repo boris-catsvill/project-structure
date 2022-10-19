@@ -8,20 +8,12 @@ export default function() {
     }
 
     let pathname = document.location.pathname;
-    const r = pathname.indexOf('/', 1)
+    const link = pathname.indexOf('/', 1)
 
-    if (r !== -1) {
-        pathname = pathname.slice(0, r);
+    if (link !== -1) {
+        pathname = pathname.slice(0, link);
     }
     
-    const a = asideNav.querySelector(`a[href="${pathname}"]`);
-    a.parentElement.classList.add('active');
-
-    const asideToggle = aside.lastElementChild.querySelector('button');
-    
-    asideToggle.addEventListener('mouseup', () => {
-        if (document.body.className === '') {
-            document.body.classList.add('is-collapsed-sidebar')
-        } else document.body.classList.remove('is-collapsed-sidebar');
-    })
+    const linkActive = asideNav.querySelector(`a[href="${pathname}"]`);
+    linkActive.parentElement.classList.add('active');
 }

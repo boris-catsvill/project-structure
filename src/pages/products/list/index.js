@@ -3,6 +3,7 @@ import DoubleSlider from "../../../components/double-slider/index.js";
 import header from "../list/list-header.js"
 import fetchJson from "../../../utils/fetch-json.js";
 import select from '../../../utils/select.js';
+import style from './style.css'
 
 const BACKEND_URL = process.env.BACKEND_URL;
 
@@ -107,8 +108,9 @@ export default class Page {
 
     this.subElements.filterName.addEventListener('input', (event) => {
       const value = event.target.value;
-
-      this.updateByName(value);
+    
+      this.timerId = clearInterval( this.timerId)
+      this.timerId = setTimeout(this.updateByName, 500, value);
     });
 
     this.components.doubleSlider.element.addEventListener('range-select', (event) => {

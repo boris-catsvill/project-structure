@@ -79,7 +79,6 @@ export default class Categories {
             str += liElement;
         }
         wrapper.innerHTML = str; 
-
         return wrapper.children;
     }
 
@@ -116,22 +115,27 @@ export default class Categories {
             } else elem.classList.add('category_open');
         }));
 
-        window.addEventListener('sortable-list-reorder', (event) => {
+        this.element.addEventListener('sortable-list-reorder', (event) => {
             const target = event.target;
 
             this.save(target);
-            this.createNotification(target);
+            // this.createNotification(target);
         });
     }
 
-    createNotification (target) {
-        const massage = 'Category order saved';
+    createNotification (target, type, massage) {
         const notification = new Notification(massage, {
             duration: 2000,
-            type: 'success'
+            type: type
         });
 
         notification.show(target);
+    }
+
+    callNotification (target, type) {
+        const notificationMassage = type === 'success' ? 'Category order saved' : 'Error save';
+
+        this.createNotification(target, type, notificationMassage)
     }
 
     async save (target) {
@@ -145,8 +149,10 @@ export default class Categories {
                 },
                 body: JSON.stringify(data)
             });
+
+            this.callNotification(target, 'success');
         } catch (error) {
-            console.error('ой-ой', error);
+            this.callNotification(target, 'error');
         }
     } 
 
