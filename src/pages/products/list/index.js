@@ -3,10 +3,33 @@ import RangeSlider from "../../../components/double-slider";
 import SortableTable from "../../../components/sortable-table";
 import header from './products-header';
 
+import fetchJson from '../../../utils/fetch-json.js';
+
+const BACKEND_URL = 'https://course-js.javascript.ru/';
+
 export default class Page {
   element;
   subElements = {};
   components = {};
+  url = new URL('api/rest/products?_embed=subcategory.category&_sort=title&_order=asc&_start=0&_end=30', BACKEND_URL);
+
+  async updateComponents (from, to) {
+    const data = await this.loadData(from, to);
+
+    this.components.sortableTable.onWindowScroll(this.from, this.to);
+    this.element.querySelector('.sortable-table__body').innerHTML = '';
+    this.components.sortableTable.update(data);
+  }
+
+  async loadData(from, to) {
+    this.url.searchParams.set('price_gte', from);
+    this.url.searchParams.set('price_lte', to);
+
+
+    const data = await fetchJson(this.url);
+
+    return data;
+  }
 
   async render() {
     const element = document.createElement('div');
@@ -15,32 +38,36 @@ export default class Page {
 
     this.element = element.firstElementChild;
 
-    this.getRangeSlider();
-    this.getSortableTable();
+    this.subElements = this.getSubElements(this.element);
+
+    this.initComponents();
+    this.renderComponents();
+    this.initEventListeners();
 
     return this.element;
   }
 
-  getRangeSlider() {
-    const rangeSliderContainer = this.element.querySelector('[data-elem="sliderContainer"]');
-
+  initComponents() {
     const rangeSlider = new RangeSlider();
 
-    rangeSliderContainer.append(rangeSlider.element);
+    const sortableTable = new SortableTable(header, {
+      url: `api/rest/products`
+    })
 
-    this.components.rangeSlider = rangeSlider;
+    this.components = {
+      rangeSlider,
+      sortableTable
+    }
+
   }
 
-  getSortableTable() {
-    const tableContainer = this.element.querySelector('[data-elem="productsContainer"]');
+  renderComponents() {
+    Object.keys(this.components).forEach(componentName => {
+      const root = this.subElements[componentName];
+      const { element } = this.components[componentName];
 
-    const sortableTable = new SortableTable(header, {
-      url: 'api/rest/products'
-    });
-
-    tableContainer.append(sortableTable.element);
-
-    this.components.sortableTable = sortableTable;
+      root.append(element);
+    })
   }
 
   getTemplate() {
@@ -58,7 +85,7 @@ export default class Page {
             <label class="form-label">Сортировать по:</label>
             <input type="text" data-elem="filterName" class="form-control" placeholder="Название товара">
           </div>
-          <div class="form-group" data-elem="sliderContainer">
+          <div class="form-group" data-element="rangeSlider">
             <label class="form-label">Цена:</label>
             <!-- rage-slider component -->
           </div>
@@ -73,29 +100,41 @@ export default class Page {
         </form>
       </div>
 
-
-      <div data-elem="productsContainer" class="products-list__container">
+      <div data-element="sortableTable" class="products-list__container">
         <!-- sortable-table component -->
       </div>
     </div>
     `
   }
 
-  initComponents() {
-    const productId = '101-planset-lenovo-yt3-x90l-64-gb-3g-lte-cernyj';
+  initEventListeners() {
+    this.components.rangeSlider.element.addEventListener('range-select', event => {
+      const  { from, to } = event.detail;
 
-    this.components.productFrom = new ProductForm(productId);
+      this.updateComponents(from, to);
+    });
+
+    window.addEventListener('scroll', this.onWindowScroll);
   }
 
-  async renderComponents() {
-    const element = await this.components.productFrom.render();
+  getSubElements(element) {
+    const elements = element.querySelectorAll('[data-element]');
 
-    this.element.append(element);
+    return [...elements].reduce((accum, subElement) => {
+      accum[subElement.dataset.element] = subElement;
+
+      return accum;
+    }, {});
   }
 
   destroy() {
-    for (const component of Object.values(this.components)) {
-      component.destroy();
+    this.remove();
+    this.element = null;
+  }
+
+  remove () {
+    if (this.element) {
+      this.element.remove();
     }
   }
 }

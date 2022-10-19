@@ -41,37 +41,31 @@ export default class Page {
 
     this.element = wrapper.firstElementChild;
 
-    this.getRangePicker();
-    this.getColumnChart();
-    this.getSortableTable();
-
     this.subElements = this.getSubElements(this.element);
+
+    this.initComponents();
+    this.renderComponents();
+    this.initEventListeners();
 
     return this.element;
   }
 
-  getRangePicker() {
-    const rangePickerContainer = this.element.querySelector('[data-element="rangePicker"]');
-    const { from, to } = this.getDefaultRange();
-
-    const rangePicker = new RangePicker({
-      from: from,
-      to: to
-    });
-
-    this.initEventListeners(rangePicker);
-
-    rangePickerContainer.append(rangePicker.element);
-  }
-
-  getColumnChart() {
-    const ordersContainer = this.element.querySelector('[data-element="ordersChart"]');
-    const salesContainer = this.element.querySelector('[data-element="salesChart"]');
-    const customersContainer = this.element.querySelector('[data-element="customersChart"]');
-
-    const { from, to } = this.getDefaultRange();
+  initComponents() {
+    const now = new Date();
+    const to = new Date();
+    const from = new Date(now.setMonth(now.getMonth() - 1));
 
     const formatHeading = value => `$${new Intl.NumberFormat('en-EN').format(value)}`;
+
+    const rangePicker = new RangePicker({
+      from,
+      to
+    })
+
+    const sortableTable = new SortableTable(header, {
+      url: `api/dashboard/bestsellers?_start=0&_end=30&from=${from.toISOString()}&to=${to.toISOString()}`,
+      isSortLocally: true
+    })
 
     const ordersChart = new ColumnChart({
       url: 'api/dashboard/orders',
@@ -102,27 +96,22 @@ export default class Page {
       label: 'customers',
     });
 
-    ordersContainer.append(ordersChart.element);
-    salesContainer.append(salesChart.element);
-    customersContainer.append(customersChart.element);
-
-    this.components.ordersChart = ordersChart;
-    this.components.salesChart = salesChart;
-    this.components.customersChart = customersChart;
+    this.components = {
+      sortableTable,
+      ordersChart,
+      salesChart,
+      customersChart,
+      rangePicker
+    }
   }
 
-  getSortableTable() {
-    const tableContainer = this.element.querySelector('[data-element="sortableTable"]');
+  renderComponents() {
+    Object.keys(this.components).forEach(componentName => {
+      const root = this.subElements[componentName];
+      const { element } = this.components[componentName];
 
-    const sortableTable = new SortableTable(header, {
-      url: 'api/dashboard/bestsellers',
-      isSortLocally: true
-    });
-
-    sortableTable.onWindowScroll = null;
-    tableContainer.append(sortableTable.element);
-
-    this.components.sortableTable = sortableTable;
+      root.append(element);
+    })
   }
 
   getDefaultRange() {
@@ -162,7 +151,7 @@ export default class Page {
 
   getSubElements(element) {
     const elements = element.querySelectorAll('[data-element]');
-
+    console.log(elements)
     return [...elements].reduce((accum, subElement) => {
       accum[subElement.dataset.element] = subElement;
 
@@ -170,18 +159,15 @@ export default class Page {
     }, {});
   }
 
-  initEventListeners(rangePicker) {
-    document.addEventListener('date-select', () => {
-      const from = rangePicker.selected.from;
-      const to = rangePicker.selected.to;
+  initEventListeners() {
+    this.components.rangePicker.element.addEventListener('date-select', event => {
+      const { from, to } = event.detail;
 
       this.updateComponents(from, to);
     });
   }
 
   destroy () {
-    document.removeEventListener('date-select', this.element);
-
     this.remove();
     this.element = null;
   }

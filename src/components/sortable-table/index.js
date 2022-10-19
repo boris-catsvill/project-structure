@@ -7,8 +7,8 @@ export default class SortableTable {
   subElements = {};
   data = [];
   loading = false;
-  step = 20;
-  start = 1;
+  step = 30;
+  start = 0;
   end = this.start + this.step;
 
   onWindowScroll = async () => {
@@ -67,9 +67,9 @@ export default class SortableTable {
       order: 'asc'
     },
     isSortLocally = false,
-    step = 20,
-    start = 1,
-    end = start + step
+    step = 30,
+    start = 0,
+    end = start + step,
   } = {}) {
     this.headersConfig = headersConfig;
     this.url = new URL(url, BACKEND_URL);
