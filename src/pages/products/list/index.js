@@ -19,7 +19,7 @@ export default class Page {
   resetFilters() {
     this.sliderMinValue = 1;
     this.sliderMaxValue = 4000;
-    this.components.doubleSlider.reset(this.sliderMinValue, this.sliderMaxValue);
+    this.components.doubleSlider.update('isReset');
 
     
     this.searchInTitle = '';

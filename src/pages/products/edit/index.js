@@ -5,8 +5,8 @@ export default class Page {
   subElements = {};
   components = {};
 
-  constructor() {
-    this.productId = '';
+  constructor(productId = '') {
+    this.productId = productId;
   }
 
   getComponents() {
@@ -24,13 +24,7 @@ export default class Page {
     }
   }
 
-  getProductId() {
-    const path = window.location.pathname.split('/');
-    return path[path.length - 1] === 'add' ? '' : path[path.length - 1];
-  }
-
   async render() {
-    this.productId = this.getProductId();
 
     const element = document.createElement('div');
     element.innerHTML = this.getTemplate();

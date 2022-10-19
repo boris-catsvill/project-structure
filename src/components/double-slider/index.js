@@ -104,25 +104,19 @@ export default class DoubleSlider {
     return { from, to }
   }
 
-  reset() {
-    console.log(this.subElements.from)
-    console.log(this.subElements.to)
-    this.subElements.from.innerHTML = this.formatValue(this.min);
-    this.subElements.to.innerHTML = this.formatValue(this.max)
+  update(isReset = '') {
+    if (isReset) {
+      this.subElements.from.innerHTML = this.formatValue(this.min);
+      this.subElements.to.innerHTML = this.formatValue(this.max);
+    }
 
-    const left = '0%';
-    const right = '0%';
-
-    this.subElements.sliderLeft.style.left = left;
-    this.subElements.sliderRight.style.right = right;
-
-    this.subElements.progress.style.left = left;
-    this.subElements.progress.style.right = right;
-  }
-
-  update() {
-    const left = Math.floor((this.selected.from - this.min) / (this.max - this.min) * 100) + '%';
-    const right = Math.floor((this.max - this.selected.to) / (this.max - this.min) * 100) + '%';
+    const left = isReset
+      ? '0%'
+      : Math.floor((this.selected.from - this.min) / (this.max - this.min) * 100) + '%';
+    
+      const right = isReset
+      ? '0%'
+      : Math.floor((this.max - this.selected.to) / (this.max - this.min) * 100) + '%';
 
     this.subElements.sliderLeft.style.left = left;
     this.subElements.sliderRight.style.right = right;

@@ -29,6 +29,8 @@ export default class ProductForm {
 
   constructor(productId = '') {
     this.productId = productId;
+    this.categoriesUrl = 'api/rest/categories';
+    this.productInfoUrl = 'api/rest/products';
 
     this.render();
   }
@@ -93,13 +95,7 @@ export default class ProductForm {
     }
 
     for (const fieldName of formFields) {
-      let value = this.subElements.productForm.querySelector(`[name="${fieldName}"]`).value;
-      
-      if (['discount', 'price', 'quantity', 'status'].some(item => item === fieldName)) {
-        value = parseInt(value);
-      }
-
-      formValues[fieldName] = value;
+      formValues[fieldName] = this.getFormValue(fieldName);
     }
 
     for (const image of productImages) {
@@ -110,6 +106,14 @@ export default class ProductForm {
     }
 
     return formValues
+  }
+
+  getFormValue(fieldName) {
+    const value = this.subElements.productForm.querySelector(`[name="${fieldName}"]`).value;
+
+    return ['discount', 'price', 'quantity', 'status'].includes(fieldName)
+      ? parseInt(value)
+      : value
   }
 
   uploadImageHandler = () => {
@@ -150,6 +154,19 @@ export default class ProductForm {
     imageInput.click()
   }
 
+  getRequests() {
+    const categoriesURL = new URL(this.categoriesUrl, process.env.BACKEND_URL);
+    categoriesURL.searchParams.set('_sort', 'weight');
+    categoriesURL.searchParams.set('_refs', 'subcategory')
+    const promiseCategories = fetchJson(categoriesURL);
+
+    const productInfoURL = new URL(this.productInfoUrl, process.env.BACKEND_URL);
+    productInfoURL.searchParams.set('id', `${this.productId}`);
+    const fetchProductInfo = fetchJson(productInfoURL);
+
+    return { promiseCategories, fetchProductInfo };
+  }
+
   async render() {
     const wrapper = document.createElement('div');
     wrapper.innerHTML = this.getTemplate();
@@ -157,12 +174,12 @@ export default class ProductForm {
     
     this.subElements = this.getSubElements();
     this.element = this.element.firstElementChild;
-    
-    const promiseCategories = fetchJson(`${process.env.BACKEND_URL}api/rest/categories?_sort=weight&_refs=subcategory`);
+
+    const { promiseCategories, fetchProductInfo } = this.getRequests();
 
     const promiseProductInfo = this.productId
-    ? fetchJson(`${process.env.BACKEND_URL}api/rest/products?id=${this.productId}`)
-    : Promise.resolve(this.defaultFormData)
+    ? fetchProductInfo
+    : Promise.resolve(this.defaultFormData);
 
 
     const [categories, responseProductInfo] = await Promise.all([

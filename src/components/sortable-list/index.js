@@ -10,6 +10,12 @@ export default class SortableList {
     this.render();
   }
 
+  addEventListeners() {
+    this.element.addEventListener('pointerdown', event => {
+      this.pointerDownHandler(event);
+    })
+  }
+
   render() {
     const wrapper = document.createElement('div');
     wrapper.innerHTML = `
@@ -22,9 +28,7 @@ export default class SortableList {
     }
     this.element.append(...this.items);
 
-    this.element.addEventListener('pointerdown', event => {
-      this.pointerDownHandler(event);
-    })
+    this.addEventListeners();
   }
 
   removeEventListeners() {

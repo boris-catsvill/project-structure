@@ -14,7 +14,7 @@ export default class RangePicker {
 
     this.initDateFrom = new Date(from);
     this.language = 'ru-RU';
-    this.days = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+    this.days = [];
 
     this.render();
   }
@@ -125,6 +125,7 @@ export default class RangePicker {
 
     date.setDate(1);
     const currentMonth = date.toLocaleString(this.language, {month: 'long'});
+    this.days = this.getDaysOfWeek();
 
     let table = `
     <div class="rangepicker__calendar">
@@ -159,6 +160,20 @@ export default class RangePicker {
 
     table += '</div></div>';
     return table;
+  }
+
+  getDaysOfWeek() {
+    let date = new Date(1970, 0, 5);
+    const days = [];
+    for (let i = 0; i < 7; i++) {
+      const day = date.toLocaleString(this.language, {weekday: 'short'});
+      days.push(day);
+      date =  new Date(date.setDate(date.getDate() + 1));
+    }
+
+    return days.map(day => {
+      return day[0].toUpperCase() + day.slice(1);
+    })
   }
 
   initSelectedRange() {

@@ -37,32 +37,25 @@
   background: url(icon-circle-error.svg) center no-repeat;
 }
 
-.show {
+.show {  
   display: block;
-  -webkit-animation: fadeIn 0.3s linear;
-  animation: fadeIn 0.3s linear;
+  -webkit-animation-name: fadeInOut;
+  -webkit-animation-duration: calc(var(--value));
+  -webkit-animation-timing-function: ease;
+
+  animation-name: fadeInOut;
+  animation-duration: calc(var(--value) * 1.1);
+  animation-timing-function: ease;
 }
 
-.close {
-  display: block;
-  -webkit-animation: fadeOut 0.3s linear;
-  animation: fadeOut 0.3s linear;
+@keyframes fadeInOut {
+  0% {opacity: 0;} 
+  50% {opacity: 0.8;}
+  100% {opacity: 0;}
 }
 
-@keyframes fadeOut {
-  from {
-    opacity: 0.8;
-  }
-  to {
-    opacity: 0;
-  }
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 0.8;
-  }
-}
+@-webkit-keyframes fadeInOut {
+  0% {opacity: 0;} 
+  50% {opacity: 0.8;}
+  100% {opacity: 0;}
+ }

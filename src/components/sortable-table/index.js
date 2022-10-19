@@ -37,11 +37,6 @@ export default class SortableTable {
     this.addedDataRows(data);
   }
 
-  // update(data) {
-  //   this.data = data;
-  //   this.addedDataRows(data);
-  // }
-
   async loadData(id = this.sorted.id, order = this.sorted.order) {
     this.url.searchParams.set('_sort', id);
     this.url.searchParams.set('_order', order);
@@ -227,7 +222,7 @@ export default class SortableTable {
 
   getTableBodyRows(data) {
     return data.map(item => {
-      if (item.brand) {
+      if (typeof(item.id) === 'string') {
         return `
           <a href="/products/${item.id}" class="sortable-table__row">
             ${this.getTableBodyRow(item)}

@@ -30,24 +30,25 @@ export default class ColumnChart {
 
   render() {
     const columnChart = document.createElement('div');
+    columnChart.innerHTML = this.getTemplate();
+    this.element = columnChart.firstElementChild;
 
-    columnChart.className = 'column-chart column-chart_loading';
+    this.subElements = this.getSubElements();
+  }
 
-    columnChart.setAttribute('style', `--chart-height: ${this.chartHeight}`);
-
-    columnChart.innerHTML = `
-      <div class="column-chart__title">
-        ${this.label}
-        ${this.getLinkProps()}
-      </div>
-      <div class="column-chart__container">
-        <div data-element="header" class="column-chart__header"></div>
-        <div data-element="body" class="column-chart__chart"></div>
+  getTemplate() {
+    return `
+      <div class="column-chart column-chart_loading" style="--chart-height: ${this.chartHeight}">
+        <div class="column-chart__title">
+          ${this.label}
+          ${this.getLinkProps()}
+        </div>
+        <div class="column-chart__container">
+          <div data-element="header" class="column-chart__header"></div>
+          <div data-element="body" class="column-chart__chart"></div>
+        </div>
       </div>
     `
-
-    this.element = columnChart;
-    this.subElements = this.getSubElements();
   }
 
   getLinkProps() {
@@ -101,15 +102,20 @@ export default class ColumnChart {
     `
   }
 
-  async update(from, to) {
-    this.element.classList.add('column-chart_loading');
-
+  async loadData(from, to) {
     this.range.from = from;
     this.range.to = to;
     this.url.searchParams.set('from', from.toISOString());
     this.url.searchParams.set('to', to.toISOString());
 
     const data = await fetchJson(this.url);
+    return data;
+  }
+
+  async update(from, to) {
+    this.element.classList.add('column-chart_loading');
+
+    const data = await this.loadData(from, to);
 
     if (Object.values(data).length) {
       this.subElements.header.textContent = this.getHeaderProps(data);

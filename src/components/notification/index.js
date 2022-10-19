@@ -13,7 +13,7 @@ export default class NotificationMessage {
 
   get template() {
     return `
-      <div class="notification notification__${this.type} show">
+      <div class="notification notification__${this.type} show" style="--value:${this.duration / 1000}s">
         <div class="notification__content">
           ${this.text}
         </div>
@@ -39,12 +39,8 @@ export default class NotificationMessage {
   }
 
   remove() {
-    this.element.classList.add('close');
-    
-    setTimeout(() => {
-      this.element?.remove();
-      clearTimeout(this.timer);
-    }, 300)
+    this.element?.remove();
+    clearTimeout(this.timer);
   }
 
   destroy() {
