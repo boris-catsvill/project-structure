@@ -2,7 +2,7 @@
 <meta charset="utf-8">
 
 <head>
-  <title>Админка для магазина</title>
+  <title>Shop Admin</title>
   <link rel="apple-touch-icon-precomposed" href="/assets/favicon/apple-touch-icon-precomposed.png">
   <link rel="icon" href="/assets/favicon/favicon.png">
 </head>
@@ -41,8 +41,7 @@
     </ul>
     <ul class="sidebar__nav sidebar__nav_bottom">
       <li>
-      <!-- TODO: implement toggling  -->
-        <button type="button" class="sidebar__toggler">
+        <button type="button" class="sidebar__toggler" onclick="toggleSidebar()">
           <i class="icon-toggle-sidebar"></i> <span>Toggle sidebar</span>
         </button>
       </li>
@@ -51,5 +50,10 @@
   <section class="content" id="content">
 
   </section>
+  <script>
+    function toggleSidebar() {
+      document.body.classList.toggle('is-collapsed-sidebar')
+    }
+  </script>
 </main>
 </body>

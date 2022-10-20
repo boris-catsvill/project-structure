@@ -21,7 +21,8 @@ module.exports = {
     publicPath: '/',
     filename: '[name].bundle.js',
     path: path.join(__dirname, '../dist'),
-    chunkFilename: '[name]-[id].js'
+    chunkFilename: '[name]-[id].js',
+    globalObject: 'self'
   },
   module: {
     rules: [
@@ -65,10 +66,12 @@ module.exports = {
         {
           from: path.join(__dirname, '../src/assets'),
           to: "assets/[path][name][ext]",
+          noErrorOnMissing: true,
         },
         {
           from: path.join(__dirname, '../src/components/product-form/*.svg'),
           to: "[name][ext]",
+          noErrorOnMissing: true,
         }
       ]
     })
