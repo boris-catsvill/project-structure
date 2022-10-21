@@ -1,0 +1,17 @@
+<!doctype html>
+<meta charset="utf-8">
+<link rel="stylesheet" href="./../../styles/all.css">
+<body>
+
+<div id="holder"></div>
+
+<script type="module">
+  import CategoriesPage from './index.js';
+
+  const categoriesPage = new CategoriesPage();
+  // categoriesPage.model = response;
+
+  const name = await categoriesPage.render();
+  holder.append(name);
+</script>
+</body>
