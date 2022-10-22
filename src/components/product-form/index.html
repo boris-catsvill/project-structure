@@ -1,0 +1,42 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>ProductForm</title>
+
+<link rel="stylesheet" href="style.css">
+
+<style>
+  #root {
+    width: 800px;
+    margin: 40px auto;
+  }
+</style>
+
+<body>
+
+<div id="root"></div>
+
+<script type="module">
+  import ProductForm from './index.js';
+
+  const productId = '101-planset-lenovo-tab-p10-tb-x705l-32-gb-3g-lte-belyj';
+  const productForm = new ProductForm(productId);
+
+  const renderForm = async () => {
+    await productForm.render();
+
+    productForm.element.addEventListener('product-saved', event => {
+      console.error('product-saved', event.detail);
+    });
+
+    productForm.element.addEventListener('product-updated', event => {
+      console.error('product-updated', event.detail);
+    })
+
+    root.append(productForm.element);
+  };
+
+  renderForm();
+</script>
+</body>
+
+

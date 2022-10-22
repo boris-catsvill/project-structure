@@ -1,0 +1,72 @@
+<!DOCTYPE HTML>
+<meta charset="utf-8">
+
+<head>
+  <title>Админка для магазина</title>
+  <link rel="apple-touch-icon-precomposed" href="./assets/favicon/apple-touch-icon-precomposed.png">
+  <link rel="icon" href="./assets/favicon/favicon.png">
+  <link rel="stylesheet" href="./styles/all.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<main class="main">
+  <div class="progress-bar">
+    <div class="progress-bar__line"></div>
+  </div>
+  <aside class="sidebar">
+    <h2 class="sidebar__title">
+      <a href="/">shop admin</a>
+    </h2>
+    <ul class="sidebar__nav">
+      <li>
+        <a href="/" data-page="dashboard">
+          <i class="icon-dashboard"></i> <span>Dashboard</span>
+        </a>
+      </li>
+      <li>
+        <a href="/products" data-page="products">
+          <i class="icon-products"></i> <span>Products</span>
+        </a>
+      </li>
+      <li>
+        <a href="/categories" data-page="categories">
+          <i class="icon-categories"></i> <span>Categories</span>
+        </a>
+      </li>
+      <li>
+        <a href="/sales" data-page="sales">
+          <i class="icon-sales"></i> <span>Sales</span>
+        </a>
+      </li>
+    </ul>
+    <ul class="sidebar__nav sidebar__nav_bottom">
+      <li>
+        <button type="button" class="sidebar__toggler">
+          <i class="icon-toggle-sidebar"></i> <span>Toggle sidebar</span>
+        </button>
+      </li>
+    </ul>
+  </aside>
+  <section class="content" id="content">
+
+  </section>
+</main>
+
+<script type="module">
+  import Page from './index.js';
+
+  const contentNode = document.querySelector('#content');
+
+  async function initialize () {
+    const page = new Page();
+    const element = await page.render();
+
+    contentNode.innerHTML = '';
+    contentNode.append(element);
+  }
+
+  initialize();
+</script>
+</body>

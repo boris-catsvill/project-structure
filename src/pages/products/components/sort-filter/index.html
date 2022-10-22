@@ -1,0 +1,16 @@
+<!doctype html>
+<meta charset="utf-8">
+<link rel="stylesheet" href="./../../../../styles/all.css">
+<body>
+
+<div id="holder" class="content-box content-box_small"></div>
+
+<script type="module">
+  import SortFilter from "./index.js";
+
+  const sortFilter = new SortFilter();
+
+  const name = await sortFilter.render();
+  holder.append(name);
+</script>
+</body>

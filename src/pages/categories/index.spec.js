@@ -9,7 +9,6 @@ describe('tests categories page', () => {
       .once(JSON.stringify(categoriesData));
 
     categoriesPage = new CategoriesPage();
-    categoriesPage.model = categoriesData;
 
     const element = categoriesPage.render();
 
