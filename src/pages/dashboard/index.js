@@ -9,7 +9,7 @@ const BACKEND_URL = 'https://course-js.javascript.ru/';
 
 export default class Page {
   element;
-  subelements = {};
+  subElements = {};
   components = {};
   url = new URL('api/dashboard/bestsellers', BACKEND_URL);
 
@@ -37,7 +37,7 @@ export default class Page {
 
   async render() {
     const wrapper = document.createElement('div');
-    wrapper.innerHTML = this.template();
+    wrapper.innerHTML = this.getTemplate();
 
     this.element = wrapper.firstElementChild;
 
@@ -62,6 +62,7 @@ export default class Page {
       to
     })
 
+    console.log(from.toISOString())
     const sortableTable = new SortableTable(header, {
       url: `api/dashboard/bestsellers?_start=0&_end=30&from=${from.toISOString()}&to=${to.toISOString()}`,
       isSortLocally: true
@@ -114,15 +115,7 @@ export default class Page {
     })
   }
 
-  getDefaultRange() {
-    const now = new Date();
-    const to = new Date();
-    const from = new Date(now.setMonth(now.getMonth() - 1));
-
-    return { from, to };
-  }
-
-  template() {
+  getTemplate() {
     return `
     <div class="dashboard">
       <div class="content__top-panel">
@@ -151,7 +144,6 @@ export default class Page {
 
   getSubElements(element) {
     const elements = element.querySelectorAll('[data-element]');
-    console.log(elements)
     return [...elements].reduce((accum, subElement) => {
       accum[subElement.dataset.element] = subElement;
 
