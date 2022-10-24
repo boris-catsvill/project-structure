@@ -155,6 +155,7 @@ export default class Page {
     this.subElements = this.getSubElements();
 
     this.initListeners();
+    // TODO: change await to Promise
     await this.getColumnChart();
     await this.getRangePicker();
     await this.getSortableTable();
@@ -169,11 +170,9 @@ export default class Page {
     const elements = this.element.querySelectorAll("[data-element]");
 
     for (const subElement of elements) {
-      const name = subElement.dataset.element;
-
+      const name = subElement.dataset.element; 
       result[name] = subElement;
     }
-    
     return result;
   }
 
