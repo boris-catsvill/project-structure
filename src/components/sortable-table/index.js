@@ -1,6 +1,6 @@
-import fetchJson from "../../utils/fetch-json.js";
+import fetchJson from "/src/utils/fetch-json.js";
 
-const BACKEND_URL = 'https://course-js.javascript.ru';
+const BACKEND_URL = process.env.BACKEND_URL;
 
 export default class SortableTable {
   element;
@@ -69,7 +69,7 @@ export default class SortableTable {
     step = 20,
     start = 1,
     end = start + step
-  } = {}) {
+  } = {}, isLinkable = true) {
 
     this.headersConfig = headersConfig;
     this.url = new URL(url, BACKEND_URL);
@@ -78,6 +78,7 @@ export default class SortableTable {
     this.step = step;
     this.start = start;
     this.end = end;
+    this.isLinkable = isLinkable;
 
     this.render();
   }
@@ -164,11 +165,17 @@ export default class SortableTable {
   }
 
   getTableRows(data) {
-    return data.map(item => `
-      <div class="sortable-table__row">
-        ${this.getTableRow(item, data)}
-      </div>`
-    ).join('');
+    return this.isLinkable 
+    ? data.map(item => `
+        <a href="/products/${item.id}" class="sortable-table__row">
+          ${this.getTableRow(item, data)}
+        </a>`
+      ).join('')
+    : data.map(item => `
+        <div class="sortable-table__row">
+          ${this.getTableRow(item, data)}
+        </div>`
+      ).join('');
   }
 
   getTableRow(item) {
