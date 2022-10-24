@@ -12,30 +12,13 @@ export default class Page {
   components = {};
   url = new URL('api/rest/orders', BACKEND_URL);
 
-
-  onWindowScroll = async () => {
-    const { bottom } = this.element.getBoundingClientRect();
-    const { id, order } = this.sorted;
-
-    if (bottom < document.documentElement.clientHeight && !this.loading && !this.isSortLocally) {
-      this.start = this.end;
-      this.end = this.start + this.step;
-
-      this.loading = true;
-
-      const data = await this.loadData(id, order, this.start, this.end);
-
-      this.update(data);
-
-      this.loading = false;
-    }
-  }
-
-
   async updateComponents (from, to) {
     const data = await this.loadData(from, to);
 
     this.element.querySelector('.sortable-table__body').innerHTML = '';
+
+    this.components.sortableTable.url.searchParams.set('createdAt_gte', from.toISOString());
+    this.components.sortableTable.url.searchParams.set('createdAt_lte', to.toISOString());
 
     this.components.sortableTable.update(data);
   }
@@ -48,14 +31,6 @@ export default class Page {
     this.url.searchParams.set('_end', '30');
     this.url.searchParams.set('_sort', 'createdAt');
     this.url.searchParams.set('_order', 'desc');
-
-    this.components.sortableTable.rangeParameters = true;
-
-    this.components.sortableTable.from.query = 'createdAt_gte';
-    this.components.sortableTable.from.value = from.toISOString();
-
-    this.components.sortableTable.to.query = 'createdAt_lte';
-    this.components.sortableTable.to.value = to.toISOString();
 
     const data = await fetchJson(this.url);
 
@@ -118,8 +93,6 @@ export default class Page {
       url: `api/rest/orders?createdAt_gte=${from.toISOString()}&createdAt_lte=${to.toISOString()}`,
       isRowTypeLink: false,
     })
-
-    // sortableTable.onWindowScroll = null;
 
     this.components = {
       sortableTable,

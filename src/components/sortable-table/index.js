@@ -10,11 +10,6 @@ export default class SortableTable {
   step = 30;
   start = 0;
   end = this.start + this.step;
-
-  rangeParameters = false;
-  from = {};
-  to = {};
-
   stopFetching = false;
 
   onWindowScroll = async () => {
@@ -27,12 +22,15 @@ export default class SortableTable {
 
       this.loading = true;
 
-      const data = await this.loadData(id, order, this.start, this.end, this.rangeParameters);
-      this.update(data);
+      const data = await this.loadData(id, order, this.start, this.end);
 
       if (data.length === 0) {
         this.stopFetching = true;
       };
+
+      if (!this.stopFetching) {
+        this.update(data);
+      }
 
       this.loading = false;
     }
@@ -111,16 +109,11 @@ export default class SortableTable {
     this.initEventListeners();
   }
 
-  async loadData(id, order, start = this.start, end = this.end, rangeParameters = false) {
+  async loadData(id, order, start = this.start, end = this.end) {
     this.url.searchParams.set('_sort', id);
     this.url.searchParams.set('_order', order);
     this.url.searchParams.set('_start', start);
     this.url.searchParams.set('_end', end);
-
-    if(rangeParameters) {
-      this.url.searchParams.set(this.from.query, this.from.value);
-      this.url.searchParams.set(this.to.query, this.to.value);
-    }
 
     this.element.classList.add('sortable-table_loading');
     this.element.querySelector('.loading-line').classList.add('sortable-table__loading-line');
@@ -241,7 +234,7 @@ export default class SortableTable {
   async sortOnServer (id, order) {
     const start = 0;
     const end = start + this.step;
-    const data = await this.loadData(id, order, start, end, this.rangeParameters);
+    const data = await this.loadData(id, order, start, end);
 
     this.renderRows(data);
   }

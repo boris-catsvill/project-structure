@@ -32,7 +32,7 @@ const header = [
     template: (data = []) => {
       return `
         <div class="sortable-table__cell">
-          $${data}
+          $${new Intl.NumberFormat('en-EN').format(data)}
         </div>
     `;
     }
