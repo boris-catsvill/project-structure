@@ -9,6 +9,8 @@ export default class ProductListPage {
   components = {};
 
   async getSortableTable() {
+    this.url = new URL('api/rest/products', process.env.BACKEND_URL);
+    this.url.searchParams.set('_embed', 'subcategory.category');
     const { sortableTable } = this.subElements;
 
     this.sortableTableElement = new SortableTable(header, { url: this.url });
