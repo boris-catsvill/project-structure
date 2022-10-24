@@ -50,7 +50,8 @@ export default class Router {
 
     document.dispatchEvent(new CustomEvent('route', {
       detail: {
-        page: this.page
+        page: this.page,
+        match: match
       }
     }));
   }
