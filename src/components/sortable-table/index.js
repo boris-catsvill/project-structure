@@ -11,19 +11,28 @@ export default class SortableTable {
   start = 0;
   end = this.start + this.step;
 
+  rangeParameters = false;
+  from = {};
+  to = {};
+
+  stopFetching = false;
+
   onWindowScroll = async () => {
     const { bottom } = this.element.getBoundingClientRect();
     const { id, order } = this.sorted;
 
-    if (bottom < document.documentElement.clientHeight && !this.loading && !this.isSortLocally) {
+    if (bottom < document.documentElement.clientHeight && !this.loading && !this.isSortLocally && !this.stopFetching) {
       this.start = this.end;
       this.end = this.start + this.step;
 
       this.loading = true;
 
-      const data = await this.loadData(id, order, this.start, this.end);
-
+      const data = await this.loadData(id, order, this.start, this.end, this.rangeParameters);
       this.update(data);
+
+      if (data.length === 0) {
+        this.stopFetching = true;
+      };
 
       this.loading = false;
     }
@@ -70,6 +79,7 @@ export default class SortableTable {
     step = 30,
     start = 0,
     end = start + step,
+    isRowTypeLink = true,
   } = {}) {
     this.headersConfig = headersConfig;
     this.url = new URL(url, BACKEND_URL);
@@ -78,6 +88,7 @@ export default class SortableTable {
     this.step = step;
     this.start = start;
     this.end = end;
+    this.isRowTypeLink = isRowTypeLink;
 
     this.render();
   }
@@ -100,12 +111,16 @@ export default class SortableTable {
     this.initEventListeners();
   }
 
-  async loadData(id, order, start = this.start, end = this.end) {
-    this.url.searchParams.set('_embed', 'subcategory.category');
+  async loadData(id, order, start = this.start, end = this.end, rangeParameters = false) {
     this.url.searchParams.set('_sort', id);
     this.url.searchParams.set('_order', order);
     this.url.searchParams.set('_start', start);
     this.url.searchParams.set('_end', end);
+
+    if(rangeParameters) {
+      this.url.searchParams.set(this.from.query, this.from.value);
+      this.url.searchParams.set(this.to.query, this.to.value);
+    }
 
     this.element.classList.add('sortable-table_loading');
     this.element.querySelector('.loading-line').classList.add('sortable-table__loading-line');
@@ -170,11 +185,14 @@ export default class SortableTable {
   }
 
   getTableRows(data) {
-    return data.map(item =>  `
-      <a href="/products/${item.id}" class="sortable-table__row">
+    return data.map(item =>
+      this.isRowTypeLink
+      ? `<a href="/products/${item.id}" class="sortable-table__row">
         ${this.getTableRow(item, data)}
-      </a>
-      `
+      </a>`
+      : `<div class="sortable-table__row">
+        ${this.getTableRow(item, data)}
+      </div>`
     ).join('');
   }
 
@@ -221,9 +239,9 @@ export default class SortableTable {
   }
 
   async sortOnServer (id, order) {
-    const start = 1;
+    const start = 0;
     const end = start + this.step;
-    const data = await this.loadData(id, order, start, end);
+    const data = await this.loadData(id, order, start, end, this.rangeParameters);
 
     this.renderRows(data);
   }

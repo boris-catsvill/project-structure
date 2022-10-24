@@ -10,7 +10,57 @@ export default class Page {
   element;
   subElements = {};
   components = {};
-  url = new URL('api/dashboard/bestsellers', BACKEND_URL);
+  url = new URL('api/rest/orders', BACKEND_URL);
+
+
+  onWindowScroll = async () => {
+    const { bottom } = this.element.getBoundingClientRect();
+    const { id, order } = this.sorted;
+
+    if (bottom < document.documentElement.clientHeight && !this.loading && !this.isSortLocally) {
+      this.start = this.end;
+      this.end = this.start + this.step;
+
+      this.loading = true;
+
+      const data = await this.loadData(id, order, this.start, this.end);
+
+      this.update(data);
+
+      this.loading = false;
+    }
+  }
+
+
+  async updateComponents (from, to) {
+    const data = await this.loadData(from, to);
+
+    this.element.querySelector('.sortable-table__body').innerHTML = '';
+
+    this.components.sortableTable.update(data);
+  }
+
+
+  async loadData(from, to) {
+    this.url.searchParams.set('createdAt_gte', from.toISOString());
+    this.url.searchParams.set('createdAt_lte', to.toISOString());
+    this.url.searchParams.set('_start', '0');
+    this.url.searchParams.set('_end', '30');
+    this.url.searchParams.set('_sort', 'createdAt');
+    this.url.searchParams.set('_order', 'desc');
+
+    this.components.sortableTable.rangeParameters = true;
+
+    this.components.sortableTable.from.query = 'createdAt_gte';
+    this.components.sortableTable.from.value = from.toISOString();
+
+    this.components.sortableTable.to.query = 'createdAt_lte';
+    this.components.sortableTable.to.value = to.toISOString();
+
+    const data = await fetchJson(this.url);
+
+    return data;
+  }
 
   render() {
     const wrapper = document.createElement('div');
@@ -23,7 +73,7 @@ export default class Page {
     this.initComponents();
     this.renderComponents();
 
-    // this.initEventListeners();
+    this.initEventListeners();
 
     return this.element;
   }
@@ -61,8 +111,15 @@ export default class Page {
     })
 
     const sortableTable = new SortableTable(header, {
-      url: `api/rest/orders?createdAt_gte=${from.toISOString()}&createdAt_lte=${to.toISOString()}&_sort=createdAt&_order=desc&_start=0&_end=30`,
+      sorted: {
+        id: 'createdAt',
+        order: 'desc'
+      },
+      url: `api/rest/orders?createdAt_gte=${from.toISOString()}&createdAt_lte=${to.toISOString()}`,
+      isRowTypeLink: false,
     })
+
+    // sortableTable.onWindowScroll = null;
 
     this.components = {
       sortableTable,
@@ -79,6 +136,15 @@ export default class Page {
     }, {});
   }
 
+  initEventListeners() {
+    this.components.rangePicker.element.addEventListener('date-select', event => {
+      const { from, to } = event.detail;
+
+      this.components.sortableTable.stopFetching = false;
+      this.updateComponents(from, to);
+    });
+  }
+
   destroy () {
     this.remove();
     this.element = null;
@@ -90,9 +156,3 @@ export default class Page {
     }
   }
 }
-
-//api/rest/orders?createdAt_gte=2022-09-23T16%3A57%3A43.508Z&createdAt_lte=2022-10-23T16%3A57%3A43.508Z&_sort=createdAt&_order=desc&_start=0&_end=30
-
-
-//my panel
-///api/rest/orders?createdAt_gte=2022-09-23T16%3A49%3A59.133Z&createdAt_lte=2022-10-23T16%3A49%3A59.133Z&_sort=id&_order=asc&_start=0&_end=30&_embed=subcategory.category

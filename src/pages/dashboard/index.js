@@ -62,7 +62,6 @@ export default class Page {
       to
     })
 
-    console.log(from.toISOString())
     const sortableTable = new SortableTable(header, {
       url: `api/dashboard/bestsellers?_start=0&_end=30&from=${from.toISOString()}&to=${to.toISOString()}`,
       isSortLocally: true

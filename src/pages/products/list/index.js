@@ -12,12 +12,14 @@ export default class Page {
   subElements = {};
   components = {};
   url = new URL('api/rest/products?_embed=subcategory.category&_sort=title&_order=asc&_start=0&_end=30', BACKEND_URL);
+  form;
+  to;
 
   async updateComponents (from, to) {
     const data = await this.loadData(from, to);
 
-    this.components.sortableTable.onWindowScroll(this.from, this.to);
     this.element.querySelector('.sortable-table__body').innerHTML = '';
+
     this.components.sortableTable.update(data);
   }
 
@@ -51,7 +53,7 @@ export default class Page {
     const rangeSlider = new RangeSlider();
 
     const sortableTable = new SortableTable(header, {
-      url: `api/rest/products`
+      url: `api/rest/products?_embed=subcategory.category`
     })
 
     this.components = {
@@ -110,6 +112,9 @@ export default class Page {
   initEventListeners() {
     this.components.rangeSlider.element.addEventListener('range-select', event => {
       const  { from, to } = event.detail;
+
+      this.from = from;
+      this.to = to;
 
       this.updateComponents(from, to);
     });
