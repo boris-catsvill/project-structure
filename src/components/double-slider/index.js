@@ -4,8 +4,8 @@ export default class DoubleSlider {
   dragging;
 
   constructor({
-    min = 50,
-    max = 150,
+    min = 0,
+    max = 4000,
     formatValue = value => '$' + value,
     selected = { from: min, to: max }
   } = {}) {

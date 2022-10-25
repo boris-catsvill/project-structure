@@ -8,15 +8,86 @@ export default class ProductListPage {
   subElements = {};
   components = {};
 
-  async getSortableTable() {
+  async renderMinMaxSlider() {
+    const url = new URL('api/rest/products', process.env.BACKEND_URL);
+    url.searchParams.set('_embed', 'subcategory.category');
+    url.searchParams.set('_sort', 'price');
+    url.searchParams.set('_order', 'asc');
+    url.searchParams.set('_start', '0');
+    url.searchParams.set('_end', '30');
+
+    console.log(url);
+
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+      let min = data;
+      console.log('min', min);
+      return data;
+    } catch (error) {
+      console.log(error);
+    }
+
+    url.searchParams.set('_order', 'desc');
+
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+      let max = data;
+      console.log('max', max);
+      return data;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  // _embed=subcategory.category&price_gte=1315&price_lte=4000&_sort=title&_order=asc&_start=0&_end=30
+
+  async renderComponents() {
+    const { sortableTable, doubleSlider } = this.subElements;
     this.url = new URL('api/rest/products', process.env.BACKEND_URL);
     this.url.searchParams.set('_embed', 'subcategory.category');
-    const { sortableTable } = this.subElements;
+
+    console.log(this.url);
+
+    await this.renderMinMaxSlider();
+
+    // this.url.searchParams.set('price_gte', this.minSlider);
+    // this.url.searchParams.set('price_lte', this.maxSlider);
+
+    console.log(this.url);
+
+    this.doubleSliderElement = new DoubleSlider({ min: this.minSlider, max: this.maxSlider }); 
 
     this.sortableTableElement = new SortableTable(header, { url: this.url });
 
     sortableTable.append(this.sortableTableElement.element);
+    doubleSlider.append(this.doubleSliderElement.element);
   }
+
+  // <div class="form-group" data-element="sliderContainer">
+  //           <label class="form-label">Price:</label>
+  //           <div class="range-slider">
+  //             <span data-elem="from">$0</span>
+  //             <div data-elem="inner" class="range-slider__inner">
+  //               <span
+  //                 data-elem="progress"
+  //                 class="range-slider__progress"
+  //                 style="left: 0%; right: 0%"
+  //               ></span>
+  //               <span
+  //                 data-elem="thumbLeft"
+  //                 class="range-slider__thumb-left"
+  //                 style="left: 0%"
+  //               ></span>
+  //               <span
+  //                 data-elem="thumbRight"
+  //                 class="range-slider__thumb-right"
+  //                 style="right: 0%"
+  //               ></span>
+  //             </div>
+  //             <span data-elem="to">$4000</span>
+  //           </div>
+  //         </div>
 
   get template() {
     return `
@@ -36,29 +107,8 @@ export default class ProductListPage {
               placeholder="Product name"
             />
           </div>
-          <div class="form-group" data-elem="sliderContainer">
-            <label class="form-label">Price:</label>
-            <div class="range-slider">
-              <span data-elem="from">$0</span>
-              <div data-elem="inner" class="range-slider__inner">
-                <span
-                  data-elem="progress"
-                  class="range-slider__progress"
-                  style="left: 0%; right: 0%"
-                ></span>
-                <span
-                  data-elem="thumbLeft"
-                  class="range-slider__thumb-left"
-                  style="left: 0%"
-                ></span>
-                <span
-                  data-elem="thumbRight"
-                  class="range-slider__thumb-right"
-                  style="right: 0%"
-                ></span>
-              </div>
-              <span data-elem="to">$4000</span>
-            </div>
+          <div data-element="doubleSlider">
+            <!-- double-slider component -->
           </div>
           <div class="form-group">
             <label class="form-label">Status:</label>
@@ -81,12 +131,10 @@ export default class ProductListPage {
     const element = document.createElement('div');
 
     element.innerHTML = this.template;
-
     this.element = element.firstElementChild;
-
     this.subElements = this.getSubElements();
 
-    await this.getSortableTable();
+    await this.renderComponents();
 
     // this.initComponents();
     // await this.renderComponents();
