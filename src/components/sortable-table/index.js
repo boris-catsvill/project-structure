@@ -150,7 +150,7 @@ export default class SortableTable {
   }
 
   getHeaderRow({id, title, sortable}) {
-    const order = this.sorted.id === id ? this.sorted.order : 'asc';
+    const order = this.sorted.id === id ? this.sorted.order : 'desc';
 
     return `
       <div class="sortable-table__cell" data-id="${id}" data-sortable="${sortable}" data-order="${order}">
@@ -220,7 +220,11 @@ export default class SortableTable {
   }
 
   initEventListeners() {
-    this.subElements.header.addEventListener('pointerdown', this.onSortClick);
+    this.subElements.header.addEventListener('pointerdown', event => {
+      if (event.button === 0) {
+        this.onSortClick(event);
+      }
+    });
 
     window.addEventListener('scroll', this.onWindowScroll);
   }

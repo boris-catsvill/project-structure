@@ -1,4 +1,14 @@
 /* Product list */
+.products-list {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.products-list .products-list__container {
+  height: 100%;
+}
+
 .products-list form.form-inline {
   grid-template-columns: 3fr 3fr 2fr;
   grid-gap: 46px;

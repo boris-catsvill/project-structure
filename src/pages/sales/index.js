@@ -14,11 +14,12 @@ export default class Page {
 
   async updateComponents (from, to) {
     const data = await this.loadData(from, to);
+    const sortableTableURL = this.components.sortableTable.url;
 
     this.element.querySelector('.sortable-table__body').innerHTML = '';
 
-    this.components.sortableTable.url.searchParams.set('createdAt_gte', from.toISOString());
-    this.components.sortableTable.url.searchParams.set('createdAt_lte', to.toISOString());
+    sortableTableURL.searchParams.set('createdAt_gte', from.toISOString());
+    sortableTableURL.searchParams.set('createdAt_lte', to.toISOString());
 
     this.components.sortableTable.update(data);
   }
@@ -47,7 +48,6 @@ export default class Page {
 
     this.initComponents();
     this.renderComponents();
-
     this.initEventListeners();
 
     return this.element;
