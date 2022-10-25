@@ -1,5 +1,7 @@
 export default class NotificationMessage {
-  constructor(message = "", { duration = 0, type = "error" } = {}) {
+  static element;
+
+  constructor(message = '', { duration = 0, type = 'error' } = {}) {
     this.message = message;
     this.duration = duration;
     this.type = type;
@@ -31,7 +33,7 @@ export default class NotificationMessage {
   render() {
     this.checkElement();
 
-    const element = document.createElement("div");
+    const element = document.createElement('div');
     element.innerHTML = this.templateHTML;
     NotificationMessage.element = element.firstElementChild;
     this.element = element.firstElementChild;
@@ -39,10 +41,7 @@ export default class NotificationMessage {
 
   show(element = document.body) {
     element.append(NotificationMessage.element);
-    NotificationMessage.timeout = setTimeout(
-      () => this.remove(),
-      this.duration
-    );
+    NotificationMessage.timeout = setTimeout(() => this.remove(), this.duration);
   }
 
   removeGlobalElement() {

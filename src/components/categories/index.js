@@ -56,11 +56,10 @@ export default class Categories {
 
   getSubcategoryRequestBody() {
     const resultArray = [];
-    let accruedWeight = 1;
 
-    for (const listItem of this.element.querySelectorAll('.categories__sortable-list-item')) {
-      resultArray.push({ id: listItem.dataset.id, weight: accruedWeight++ });
-    }
+    this.element.querySelectorAll('.categories__sortable-list-item').forEach((item, index) => {
+      resultArray.push({ id: item.dataset.id, weight: index + 1 });
+    });
 
     return JSON.stringify(resultArray);
   }
@@ -114,8 +113,6 @@ export default class Categories {
   }
 
   destroy() {
-    this.element.removeEventListener('pointerdown', this.onHeaderPointerdownHandler);
-    this.element.removeEventListener('sortable-list-reorder', this.onSortableListReorderHandle);
     this.subcategorySortableList?.destroy();
     this.remove();
     this.element = null;

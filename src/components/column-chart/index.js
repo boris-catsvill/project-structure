@@ -98,8 +98,8 @@ export default class ColumnChart {
   async getDataFromServer(dateFrom = '', dateTo = '') {
     try {
       this.data = await fetchJson(this.url + `?from=${dateFrom}&to=${dateTo}`);
-    } catch (e) {
-      throw new Error(e);
+    } catch (error) {
+      throw new Error(error);
     }
   }
 
@@ -125,14 +125,17 @@ export default class ColumnChart {
   }
 
   initEventListeners() {
-    this.subElements.container.addEventListener('mouseover', event => {
+    const { container } = this.subElements;
+
+    container.addEventListener('mouseover', event => {
       const target = event.target.closest('[data-tooltip]');
       if (target) {
         target.classList.add('is-hovered');
         this.subElements.body.classList.add('has-hovered');
       }
     });
-    this.subElements.container.addEventListener('mouseout', event => {
+
+    container.addEventListener('mouseout', event => {
       const target = event.target.closest('[data-tooltip]');
       if (target) {
         target.classList.remove('is-hovered');

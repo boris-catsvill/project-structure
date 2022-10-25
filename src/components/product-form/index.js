@@ -11,7 +11,7 @@ export default class ProductForm {
   formElements = {};
   subElements = {};
 
-  constructor(productId = null) {
+  constructor(productId = '') {
     this.productId = productId;
   }
 
@@ -104,9 +104,7 @@ export default class ProductForm {
 
   getTemplateOptionsCategory(data) {
     return data.subcategories?.map(
-      item => `<option value="${item.id}">
-        ${escapeHtml(data.title + ' > ' + item.title)}
-      </option>`
+      item => new Option(escapeHtml(data.title) + ' > ' + escapeHtml(item.title), item.id).outerHTML
     );
   }
 

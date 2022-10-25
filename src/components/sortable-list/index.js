@@ -127,10 +127,6 @@ export default class SortableList {
   }
 
   destroy() {
-    this.element.addEventListener('pointerdown', this.onItemPointerdownHandler);
-    this.element.removeEventListener('pointermove', this.onItemPointermoveHandler);
-    this.element.removeEventListener('pointerup', this.onItemPointerupHandler);
-
     this.remove();
     this.element = null;
     this.selectedItem = null;

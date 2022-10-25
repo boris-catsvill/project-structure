@@ -1,21 +1,22 @@
 class Tooltip {
   static activeTooltip;
   element;
+  offsetHTMLElement = 20;
 
-  showTooltipPointeroverHandle = e => {
-    const target = e.target.closest('[data-tooltip]');
+  showTooltipPointeroverHandle = event => {
+    const target = event.target.closest('[data-tooltip]');
     if (!target) return;
-    this.render(e.target.dataset?.tooltip);
+    this.render(event.target.dataset?.tooltip);
 
     document.addEventListener('pointermove', this.elementPointermoveHandle);
   };
 
-  elementPointermoveHandle = e => {
-    this.element.style.top = e.clientY + 20 + 'px';
-    this.element.style.left = e.clientX + 'px';
+  elementPointermoveHandle = event => {
+    this.element.style.top = event.clientY + this.offsetHTMLElement + 'px';
+    this.element.style.left = event.clientX + 'px';
   };
 
-  hideTooltipPointeroutHandle = e => {
+  hideTooltipPointeroutHandle = event => {
     this.remove();
 
     document.removeEventListener('pointermove', this.elementPointermoveHandle);
@@ -24,9 +25,9 @@ class Tooltip {
   constructor() {
     if (!Tooltip.activeTooltip) {
       Tooltip.activeTooltip = this;
-    } else {
-      return Tooltip.activeTooltip;
     }
+
+    return Tooltip.activeTooltip;
   }
 
   initEventListners() {
