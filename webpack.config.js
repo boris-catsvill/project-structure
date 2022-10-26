@@ -1,12 +1,15 @@
+
+require('dotenv').config();
+
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 let mode = 'development';
-if (process.env.NODE_ENV === 'production') {
-  mode = 'production';
-}
+// if (process.env.NODE_ENV === 'production') {
+//   mode = 'production';
+// }
 
 module.exports = {
   mode,
@@ -53,6 +56,15 @@ module.exports = {
     hot: true,
   },
   plugins: [
+    new webpack.DefinePlugin({
+      // 'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
+      'process.env.BACKEND_URL': JSON.stringify(process.env.BACKEND_URL),
+      'process.env.IMGUR_CLIENT_ID': JSON.stringify(process.env.IMGUR_CLIENT_ID),
+      'process.env.IMGUR_CLIENT': JSON.stringify(process.env.IMGUR_CLIENT),
+      'process.env.CATEGORIES_URL': JSON.stringify(process.env.CATEGORIES_URL),
+      'process.env.PRODUCTS_URL': JSON.stringify(process.env.PRODUCTS_URL),
+      'process.env.SALES_URL': JSON.stringify(process.env.SALES_URL),
+    }),
     new webpack.HotModuleReplacementPlugin(),
     new HtmlWebpackPlugin({
       template: path.join(__dirname, 'src', 'index.html'),

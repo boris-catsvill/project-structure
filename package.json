@@ -50,6 +50,7 @@
     "webpack-dev-server": "^4.11.1"
   },
   "dependencies": {
+    "dotenv": "^16.0.3",
     "mini-css-extract-plugin": "^2.6.1"
   }
 }

@@ -18,7 +18,7 @@ export default class ColumnChart {
       } = {},
     } = {}) {
       this.formatHeading = formatHeading;
-      this.range = {from: from.toISOString(), to: to.toISOString()};
+      this.range = {from: from, to: to};
       
       this.url = new URL(url);
       this.updateURLByRange();
@@ -26,7 +26,7 @@ export default class ColumnChart {
       this.title = title;
       this.linkOfTitle = this.getLinkOfTitle(link);
 
-      this.render();
+      // this.render();
     }
 
     getLinkOfTitle(link) {
@@ -132,12 +132,12 @@ export default class ColumnChart {
       return result;
     }
 
-    async render() {
+    render() {
       this.element = this.elementOfBodyColumnChart;
       this.subElements = this.getSubElements();
 
-      await this.updateData();
-      this.updateElement();
+      // await this.updateData();
+      // this.updateElement();
     }
 
 

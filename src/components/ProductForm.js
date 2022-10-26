@@ -7,11 +7,6 @@ import errorHandler from "../store/errorHandler.js";
 import grabIcon from '../styles/svg/icon-grab.svg';
 import trashIcon from '../styles/svg//icon-trash.svg';
 
-const IMGUR_CLIENT_ID = '28aaa2e823b03b1';
-const IMGUR_CLIENT = 'https://api.imgur.com/';
-
-
-
 export default class ProductForm {
   subElements = {}
   data = {}
@@ -30,8 +25,10 @@ export default class ProductForm {
     this.urls = {
       categories: categoriesURL,
       product: productURL,
-      images: new URL(imageURL, IMGUR_CLIENT),
+      images: imageURL,
     };
+
+    console.log(this)
   }
 
   setSearchParamsOfURLs() {
@@ -83,6 +80,7 @@ export default class ProductForm {
 
   getImage(image) {
     const { source, url } = image;
+    console.log(image, '1111')
     const escapedSource = escapeHtml(source);
     const escapedUrl = escapeHtml(url);
 
@@ -186,7 +184,7 @@ export default class ProductForm {
     );
   }
 
-  getElement() {
+  get elementDOM() {
     const wrapper = document.createElement('div');
     const form = (
       `<div class="product-form">
@@ -227,6 +225,7 @@ export default class ProductForm {
 
   async fetchUnmutableRequest(url) {
     try {
+      console.log(url)
       const response = await fetch(url.toString());
       if (response.ok) {return await response.json();} 
       
@@ -277,6 +276,7 @@ export default class ProductForm {
   }
 
   async getData() {
+    console.log('start')
     this.setSearchParamsOfURLs();
 
     const namesOfURLs = Object.keys(this.urls);
@@ -284,7 +284,7 @@ export default class ProductForm {
       .filter((_, index) => this.isRequiredURL(namesOfURLs[index]));
     
     const responses = requiredURLs.map(this.fetchUnmutableRequest);
-
+    console.log(responses)
     const dataOfResponses = await Promise.all(responses);
     
     const entriesOfResponses = dataOfResponses.map((data, index) => {
@@ -332,7 +332,7 @@ export default class ProductForm {
       const response = await fetch(images.toString(), {
         method: 'POST',
         headers: {
-          Authorization: `Client-ID ${IMGUR_CLIENT_ID}`,
+          Authorization: `Client-ID ${process.env.IMGUR_CLIENT_ID}`,
         },
         body: formData,
         referrer: ''
@@ -357,7 +357,7 @@ export default class ProductForm {
   }
 
   loadImgHander = () => {
-
+    if (!this.subElements.sortableList) this.setSubElements();
     const {productForm, sortableList} = this.subElements;
 
     const inputIMGLoader = this.getInputIMGLoader();
@@ -368,13 +368,14 @@ export default class ProductForm {
       formData.append(inputIMGLoader.name, file);
 
       const link = await this.postImage(formData);
-
+      console.log(link, 'link')
       if (!link) {
         inputIMGLoader.remove();
         return;
       }
 
       const image = {source: file.name, url: link};
+      console.log(sortableList)
       this.images.push(image);
       sortableList.append(...SortableList.addClassesOfItems([this.getImage(image)]));
 
@@ -451,17 +452,19 @@ export default class ProductForm {
     imageListContainer.append(sortableList.element);
   }
 
-  async render() {
+  async update() {
     this.data = await this.getData();
-    this.element = this.getElement();
+
     this.createImages();
 
-    this.setSubElements();
-    this.addEventListeners();
-    
     if (this.productId) { this.createProduct(); }
 
-    return this.element;
+  }
+
+  render() {
+    this.element = this.elementDOM;
+    this.setSubElements();
+    this.addEventListeners();
   }
 
   remove() {

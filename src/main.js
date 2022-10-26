@@ -1,8 +1,9 @@
-import DashboardPage from "./pages/DashBoardPage.js";
-import SalesPage from './pages/SalesPage.js';
-import CategoriesPage from './pages/CategoriesPage.js';
-import ProductsPage from './pages/ProductsPage.js';
-import ProductFormPage from './pages/ProductFormPage.js';
+
+import DashboardPage from "./pages/DashBoardPage/DashBoardPage.js";
+import SalesPage from './pages/SalesPage/SalesPage.js';
+import CategoriesPage from './pages/CategoriesPage/CategoriesPage.js';
+import ProductsPage from './pages/ProductsPage/ProductsPage.js';
+import ProductFormPage from './pages/ProductFormPage/ProductFormPage.js';
 import UndefinedPage from './pages/UndefinedPage.js';
 
 import NotificationMessage from "./components/Notification.js";
@@ -10,6 +11,9 @@ import Sidebar from "./components/Sidebar.js";
 import Tooltip from './components/Tooltip.js';
 
 import errorHandler from "./store/errorHandler.js";
+
+import Router from "./pages/Router.js";
+import SortableTable from "./components/SortableTable.js";
 
 const BACKEND_URL = 'https://course-js.javascript.ru/';
 
@@ -19,178 +23,111 @@ export default class Page {
 	range = {}
 	subElements = {}
 	contentContainer = null
-	showingPage = null
-	currentPathnameOfPage = window.location.pathname;
+	activePage = null
 
-	sidebarWrapper = new Sidebar()
+	router = new Router();
+	tooltip = new Tooltip();
+	sidebar = new Sidebar();
 
 	constructor() {
-	  if (Page.currentAdminPage) { return Page.currentAdminPage; }
-	  Page.currentAdminPage = this;
+		if (Page.currentAdminPage) { return Page.currentAdminPage; }
+		Page.currentAdminPage = this;
 
-	  this.range = this.createRange();
+		this.range = this.createRange();
 
-	  this.pages = {
-	    '/': DashboardPage,
-	    '/products': ProductsPage,
-	    '/categories': CategoriesPage,
-	    '/sales': SalesPage
-	  };
-	  this.urlsOfAJAX = {
-	    '/': 'api/dashboard/',
-	    '/products': 'api/rest/products',
-	    '/categories': ['/api/rest/categories', 'api/rest/subcategories'],
-	    '/sales': 'api/rest/orders',
-	  };
-
-	  this.render();
+		this.initialize();
 	}
 
 	createRange() {
-	  const firstDate = new Date();
-	  const secondDate = new Date();
+		const firstDate = new Date();
+		const secondDate = new Date();
 
-	  const monthOfSecondDate = secondDate.getMonth();
-	  firstDate.setMonth(monthOfSecondDate - 1);
+		const monthOfSecondDate = secondDate.getMonth();
+		firstDate.setMonth(monthOfSecondDate - 1);
 
-	  return { from: firstDate, to: secondDate };
+		return { from: firstDate, to: secondDate };
 	}
 
-	toggleProgressbar() {
-	  const { progressBar } = this.subElements;
-	  progressBar.hidden = !progressBar.hidden;
-	}
-
-	toggleSidebarHandler = () => {
-	  document.body.classList.toggle('is-collapsed-sidebar');
-	}
-
-	get mainElement() {
-	  const wrapper = document.createElement('div');
-	  const bodyOfWrapper = `
+	get elementDOM() {
+		const wrapper = document.createElement('div');
+		const bodyOfWrapper = `
 			<main class="main">
 				<div class="progress-bar" data-element="progressBar" hidden>
 					<div class="progress-bar__line"></div>
 				</div>
 				<section class="content" id="content"></section>
 			</main>`;
-	  wrapper.innerHTML = bodyOfWrapper;
 
-	  const mainElement = wrapper.firstElementChild;
-	  mainElement
-	  	.querySelector('[data-element="progressBar"]')
-		.insertAdjacentElement('afterend', this.sidebarWrapper.element);
+		wrapper.innerHTML = bodyOfWrapper;
 
-	  return mainElement;
-	}
-
-
-	getDataOfProductFormPage() {
-	  const [id] = this.currentPathnameOfPage.match(/([a-z0-9_-]+$)/i) ?? [];
-	  return {
-	    mainClass: this,
-	    productId: id === 'add' ? null : id,
-	    urls: { ...this.urlsOfAJAX, backendURL: BACKEND_URL }
-	  };
-	}
-
-	getDataOfPlainPage() {
-	  const { from, to } = this.range;
-	  return {
-	    mainClass: this,
-	    range: {
-	      from: from.toString(),
-	      to: to.toString()
-	    },
-	    url: [this.urlsOfAJAX[this.currentPathnameOfPage], BACKEND_URL],
-	  };
-	}
-
-	updateShowingPage() {
-	  try {
-		this.showingPage?.destroy();
-		this.toggleProgressbar();
-
-		const [isFormPage] = this.currentPathnameOfPage.match(/\/products\/([a-z0-9_-]+)/i) ?? [];
-
-		const inputData = isFormPage
-		  ? this.getDataOfProductFormPage()
-		  : this.getDataOfPlainPage();
-
-		const Constructor = isFormPage
-		  ? ProductFormPage
-		  : this.pages[this.currentPathnameOfPage] ?? UndefinedPage;
-
-		this.showingPage = new Constructor(inputData);
-
-		this.contentContainer.append(this.showingPage.element);
-
-		this.sidebarWrapper.setActiveNavItemHandler(this.currentPathnameOfPage);
-		this.toggleProgressbar();
-
-	  } catch (error) {
-	    this.toggleProgressbar();
-	    errorHandler(error);
-	  }
-
-	}
-
-	changePageByCustomEventHandler = (event) => {
-	  const { href } = event.detail;
-	  this.currentPathnameOfPage = href;
-
-	  this.updateShowingPage();
-	}
-
-	changePageByPushStateHandler = () => {
-	  this.currentPathnameOfPage = document.location.pathname;
-	  this.updateShowingPage();
-	}
-
-	selectPageHandler = (event) => {
-
-	  const elementA = event.target.closest('a');
-
-	  const href = elementA?.getAttribute('href') ?? '';
-
-	  if (!elementA) { return; }
-	  if (!href.startsWith('/')) { return; }
-	  event.preventDefault();
-	  window.history.pushState(null, null, href);
-
-	  event.target.dispatchEvent(new CustomEvent('page-selected', {
-	    bubbles: true,
-	    detail: { href }
-	  }));
+		return wrapper.firstElementChild;
 	}
 
 	setSubElements() {
-	  const elements = document.querySelectorAll('[data-element]');
+		const elements = this.element.querySelectorAll('[data-element]');
 
-	  for (const element of elements) {
-	    const name = element.dataset.element;
-	    this.subElements[name] = element;
-	  }
+		for (const element of elements) {
+			const name = element.dataset.element;
+			this.subElements[name] = element;
+		}
+	}
+
+	toggleProgressbar() {
+		const { progressBar } = this.subElements;
+		progressBar.hidden = !progressBar.hidden;
+	}
+
+	updateActivePage = async () => {
+		try {
+			this.toggleProgressbar();
+			const activePage = this.router.activePage;
+			activePage.render(this, this.range);
+			
+			this.contentContainer.append(activePage.element);
+			this.sidebar.setActiveNavItemHandler(document.location.pathname);
+
+			await activePage?.update();
+			console.log('updated')
+			this.toggleProgressbar();
+
+		} catch (error) {
+			this.toggleProgressbar();
+			//errorHandler(error);
+		}
 	}
 
 	setEventListeners() {
-	  this.element.addEventListener('click', this.selectPageHandler);
-	  this.element.addEventListener('page-selected', this.changePageByCustomEventHandler);
-	  window.addEventListener('popstate', this.changePageByPushStateHandler);
-
+		window.addEventListener('page-selected', this.updateActivePage)
 	}
 
 	render() {
-	  this.element = this.mainElement;
-	  document.body.append(this.element);
+		this.element = this.elementDOM;
+		this.setSubElements();
 
-	  this.contentContainer = document.querySelector('#content');
+		this.contentContainer = this.element.querySelector('#content');
 
-	  this.setSubElements();
-	  this.setEventListeners();
-	  (new Tooltip()).initialize();
+		this.element.append(this.sidebar.element)
+		document.body.append(this.element);
 
-	  this.updateShowingPage();
+		this.setEventListeners();
+		this.updateActivePage();
+	}
+
+
+	initialize() {
+		this.router
+			.addRoute(/^\/$/, DashboardPage)
+			.addRoute(/^\/products$/, ProductsPage)
+			.addRoute(/^\/products\/add$/, ProductFormPage)
+			.addRoute(/^\/products\/([\w()-]+)$/, ProductFormPage)
+			.addRoute(/^\/sales$/, SalesPage)
+			.addRoute(/^\/categories$/, CategoriesPage)
+			.setUndefinedPage(UndefinedPage)
+			.listen();
+
+		this.tooltip.initialize();
+		this.sidebar.render();
+		this.render();
 	}
 }
 

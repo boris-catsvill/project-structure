@@ -1,25 +1,25 @@
-import CategoriesList from "../components/CategoriesList.js";
-import NotificationMessage from "../components/Notification.js";
 
-import errorHandler from "../store/errorHandler.js";
+import NotificationMessage from "../../components/Notification.js";
+
+import errorHandler from "../../store/errorHandler.js";
+import getComponents from "./getComponents.js";
 
 export default class CategoriesPage {
-  constructor({mainClass, url}) {
-    const [[categoriesPath, subcategoriesPath], backendURL] = url;
-    this.mainClass = mainClass;
-    this.categoriesURL = [categoriesPath, backendURL];
-    this.subcategoriesURL = new URL(subcategoriesPath, backendURL);
-    this.render();
-  }
 
-  get categoriesElement() {
+  subcategoriesURL = `${process.env.BACKEND_URL}/api/rest/subcategories`
+  getComponents = getComponents
+  childrenComponents = []
+  subElements = []
+
+  get elementDOM() {
     const wrapper = document.createElement('div');
     const categories = `
-        <div class="categories">
+        <div class="categories" >
             <div class="content__top-panel">
                 <h1 class="page-title">Категории товаров</h1>
             </div>
             <p>Подкатегории можно перетаскивать, меняя их порядок внутри своей категории.</p>
+            <div data-element="categoriesList"></div>
         </div>`;
     wrapper.innerHTML = categories;
     return wrapper.firstElementChild; 
@@ -27,7 +27,7 @@ export default class CategoriesPage {
 
   async fetchNewPositions(items) {
     try {
-      const response = await fetch(this.subcategoriesURL.toString(), {
+      const response = await fetch(this.subcategoriesURL, {
         method: 'PATCH',
         headers: {
           "Content-Type": "application/json"
@@ -46,8 +46,8 @@ export default class CategoriesPage {
       notification.show();
 
     } catch (error) {
-      errorHandler(error);
-      throw new Error(error.message);
+      //errorHandler(error);
+      //throw new Error(error.message);
     }
   }
 
@@ -68,16 +68,37 @@ export default class CategoriesPage {
   }
 
   async update() {
-    const categoriesList = new CategoriesList(this.categoriesURL);
-    const childElement = await categoriesList.render();
-    this.element.append(childElement);
+    this.childrenComponents.forEach((component) => component.element?.remove());
+    
+    this.childrenComponents = this.getComponents(this.range).map(([ComponentChild, containerName, inputData]) => {
+      const component = new ComponentChild(...inputData);
+      component?.render();
+      console.log(containerName, this.subElements)
+      console.log(this.subElements[containerName]);
+      this.subElements[containerName].append(component.element);
+      return component
+    });
+
+    const updateComponents = this.childrenComponents.map(componentChild => componentChild?.update())
+    await Promise.all(updateComponents)
+  }
+
+  setSubElements() {
+    const elements = this.element.querySelectorAll('[data-element]');
+    for (const element of elements) {
+      const name = element.dataset.element;
+      this.subElements[name] = element;
+    }
+  }
+
+  addEventListeners() {
+    this.element.addEventListener('position-changed', this.changedPositionOfSortableListHandler);
   }
 
   render() {
-    this.element = this.categoriesElement;
-    this.element.addEventListener('position-changed', this.changedPositionOfSortableListHandler);
-    this.update();
-    return this.element;
+    this.element = this.elementDOM;
+    this.setSubElements();
+    this.addEventListeners();
   }
 
   remove() {
@@ -86,6 +107,7 @@ export default class CategoriesPage {
   }
 
   destroy() {
+    this.childrenComponents.forEach((component) => component?.destroy())
     this.remove();
   }
 

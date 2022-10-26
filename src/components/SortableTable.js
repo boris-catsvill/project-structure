@@ -19,8 +19,8 @@ export default class SortableTable {
       order,
       start: 0,
       end: 30,
-      from: new Date(range.from).toISOString(),
-      to: new Date(range.to).toISOString(),
+      from: new Date(range.from),
+      to: new Date(range.to),
       '_embed': 'subcategory.category',
     };
 
@@ -39,7 +39,7 @@ export default class SortableTable {
       }
       return acc;
     }, {});
-    this.render();
+    // this.render();
   }
 
   getArrowOfSort() {
@@ -288,14 +288,11 @@ export default class SortableTable {
     return result;
   }
 
-  async render() {
+  render() {
     this.element = this.getTableElement();
     
     this.subElements = this.getSubElements();
     this.addEventListeners();
-
-    this.data = await this.getDataFromServer();
-    this.updateElement();
   }
 
   remove() {

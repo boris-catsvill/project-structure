@@ -2,12 +2,9 @@ export default class Sidebar {
 
   subElements = {};
   activeNavItem = null
+  element = null;
 
-  constructor() {
-    this.render();
-  }
-
-  get sidebarElement() {
+  get elementDOM() {
     const wrapper = document.createElement('div');
     const bodyOfWrapper = `
         <aside class="sidebar">
@@ -44,6 +41,7 @@ export default class Sidebar {
 						</li>
 					</ul>
 				</aside>`;
+
     wrapper.innerHTML = bodyOfWrapper;
     return wrapper.firstElementChild;
   }
@@ -61,17 +59,18 @@ export default class Sidebar {
     document.body.classList.toggle('is-collapsed-sidebar');
   }
 
-  setActiveNavItemHandler = (href) => {
+  setActiveNavItemHandler = (path) => {
     
     const { sidebarNav } = this.subElements;
-    const [formatedHref] = href.match(/^\/[^/]*/i);
+    const [formatedPath] = path.match(/^\/[^/]*/i);
 
-    const target = sidebarNav.querySelector(`[data-page="${formatedHref}"]`);
+    const newActiveNavItem = sidebarNav.querySelector(`[data-page="${formatedPath}"]`);
+    if (!newActiveNavItem) return;
 
+    newActiveNavItem?.classList.add('active');
     this.activeNavItem?.classList.remove('active');
-
-    target?.classList.add('active');
-    this.activeNavItem = target;
+    
+    this.activeNavItem = newActiveNavItem;
   }
 
   setEventListeners() {
@@ -80,8 +79,9 @@ export default class Sidebar {
   }
 
   render() {
-    this.element = this.sidebarElement;
+    this.element = this.elementDOM;
     this.activeNavItem = this.element.querySelector('.active');
+
     this.setSubElements();
     this.setEventListeners();
   }

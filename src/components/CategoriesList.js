@@ -7,8 +7,7 @@ export default class CategoriesList {
   element = null
 
   constructor(url) {
-    const [path, backedURL] = url;
-    this.url = new URL(path, backedURL);
+    this.url = new URL(url);
     this.setSearchParams();
   }
 
@@ -57,20 +56,17 @@ export default class CategoriesList {
     return categoryElement;
   }
 
-  get categoriesList() {
-    const element = document.createElement('div');
-    element.setAttribute('data-element', 'categoriesContainer');
+  get elementDOM() {
+    const wrapper = document.createElement('div');
+    const bodyOfWrapper = '<div data-element="categoriesContainer"></div>';
 
-    const bodyOfelement = this.data.map((category) => this.getCategory(category));
-
-    element.append(...bodyOfelement);
-    return element;
+    wrapper.innerHTML = bodyOfWrapper;
+    return wrapper.firstElementChild;
   }
 
   async setData() {
     const response = await fetch(this.url.toString());
     this.data = await response.json();
-
   }
 
   toggleOfOpenCategoryHandler = (event) => {
@@ -80,11 +76,21 @@ export default class CategoriesList {
     elementForToggle.classList.toggle('category_open');
   }
 
-  async render() {
-    await this.setData();
-    this.element = this.categoriesList;
+  addEventListeners() {
     this.element.addEventListener('click', this.toggleOfOpenCategoryHandler);
-    return this.element;
+  }
+
+  render() {
+    this.element = this.elementDOM;
+    this.addEventListeners();
+  }
+
+  async update() {
+    await this.setData();
+    const bodyOfelement = this.data.map((category) => this.getCategory(category))
+    console.log(bodyOfelement)
+    this.element.append(...bodyOfelement);
+
   }
 
   remove() {

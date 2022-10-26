@@ -4,22 +4,22 @@ export default class UndefinedPage {
       this.render();
     }
 
-    get undefinedElement() {
-      const undefinedElement = document.createElement('div');
-      const bodyOfUndefinedElement = `<a href="/">Страница не найдена. Перейти на главную</a>`;
+    get elementDOM() {
+      const container = document.createElement('div');
+      const bodyOfcontainer = `<a href="/">Страница не найдена. Перейти на главную</a>`;
   
-      undefinedElement.innerHTML = bodyOfUndefinedElement;
-      return undefinedElement;
+      container.innerHTML = bodyOfcontainer;
+      return container;
     }
 
     render() {
-      this.element = this.undefinedElement;
-      return this.undefinedElement;
+      this.element = this.elementDOM;
     }
     remove() {
     this.element?.remove();
     this.element = null;
     }
+
     destroy() {
       this.remove();
     }
