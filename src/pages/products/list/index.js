@@ -11,9 +11,13 @@ export default class Page {
   element;
   subElements = {};
   components = {};
-  url = new URL('api/rest/products?_embed=subcategory.category&_sort=title&_order=asc&_start=0&_end=30', BACKEND_URL);
+  url = new URL('api/rest/products?_embed=subcategory.category&_sort=title&_order=asc&_start=0&_end=30', BACKEND_URL); //changeable url
   sortableTableURL = '';
-  data = [];
+  min = 0;
+  max = 4000;
+  step = 30;
+  start = 0;
+  end = this.step + this.start;
 
   async updateComponents (from, to) {
     const data = await this.loadData(from, to);
@@ -90,10 +94,15 @@ export default class Page {
   }
 
   initComponents() {
-    const rangeSlider = new RangeSlider();
+    const rangeSlider = new RangeSlider({
+      min: this.min,
+      max: this.max
+    });
 
     const sortableTable = new SortableTable(header, {
-      url: `api/rest/products?_embed=subcategory.category`
+      url: `api/rest/products?_embed=subcategory.category`,
+      step: this.step,
+      start: this.start
     })
 
     this.sortableTableURL = sortableTable.url;
@@ -102,7 +111,6 @@ export default class Page {
       rangeSlider,
       sortableTable
     }
-
   }
 
   renderComponents() {
@@ -152,21 +160,26 @@ export default class Page {
     if ( button ) {
       button.addEventListener('click', async () => {
         const data = await fetchJson(initialURL);
+
         this.components.sortableTable.update(data);
+
+        this.url = initialURL;
 
         sortableTable.classList.remove('sortable-table_empty')
         placeholder.innerHTML = '';
         filterStatus.value = '';
         filterName.value = '';
 
-        rangeSlider.selected.from = 0;
-        rangeSlider.selected.to = 4000;
+        //clear RangeSlider values
+        rangeSlider.selected.from = this.min;
+        rangeSlider.selected.to = this.max;
         rangeSlider.update();
-        from.textContent = '$0';
-        to.textContent = '$4000';
+        from.textContent = `${this.min}`;
+        to.textContent = `${this.max}`;
 
-        this.url = initialURL;
+        //clear SortableTable values
         this.components.sortableTable.url = initialURL;
+        this.components.sortableTable.end = this.end;
       })
     }
   }
@@ -217,18 +230,14 @@ export default class Page {
     });
 
     this.subElements.filterStatus.addEventListener('change', event => {
-
-      this.sortableTableURL.searchParams.set('_start', '0');
-      this.sortableTableURL.searchParams.set('_end', '30');
+      this.components.sortableTable.end = this.end;
       this.components.sortableTable.stopFetching = false;
 
       this.sortByStatus(event.target.value);
     })
 
     this.subElements.filterName.addEventListener('input', event => {
-
-      this.sortableTableURL.searchParams.set('_start', '0');
-      this.sortableTableURL.searchParams.set('_end', '30');
+      this.components.sortableTable.end = this.end;
       this.components.sortableTable.stopFetching = false;
 
       this.sortByName(event.target.value);
