@@ -1,9 +1,11 @@
 export default class SortableTable {
+  
+  element = null;
   subElements = {}
   statusOfLoading = 'fulfilled'
   data = []
 
-  constructor(headerConfig, { 
+  constructor(headerConfig, {
     url = ``,
     sorted: {
       id: field = headerConfig.find(cell => cell.sortable).id,
@@ -39,7 +41,6 @@ export default class SortableTable {
       }
       return acc;
     }, {});
-    // this.render();
   }
 
   getArrowOfSort() {
@@ -69,7 +70,7 @@ export default class SortableTable {
 
   getCellOfTableHeader({ title, sortable, id }) {
     const isSortedCell = id === this.paramOfSort.field;
-    const [dataOrder, elementOfSort] = isSortedCell 
+    const [dataOrder, elementOfSort] = isSortedCell
       ? [`data-order="${this.paramOfSort.order}"`, this.getArrowOfSort()]
       : ['', ''];
     return (
@@ -87,7 +88,7 @@ export default class SortableTable {
 
   getCellOfTableBody(value, key) {
 
-    return this.templates[key] 
+    return this.templates[key]
       ? this.templates[key](value)
       : `<div class="sortable-table__cell">${value}</div>`;
   }
@@ -107,7 +108,7 @@ export default class SortableTable {
     return elementsOfTableBody;
   }
 
-  getTableElement() {
+  get elementDOM() {
     const wrapper = document.createElement('div');
     wrapper.innerHTML = (
       `<div class="sortable-table sortable-table_loading">
@@ -122,21 +123,10 @@ export default class SortableTable {
     return wrapper.firstElementChild;
   }
 
-  updateElement() {
-    const { body, header, loading } = this.subElements;
-  
-    header.innerHTML = this.getTableHeader();
-    body.innerHTML = this.getTableBody();
-    
-    if (this.isSortLocally) {
-      loading.remove();
-    }
-  }
-
-  updateQueryStringOfURL({ from, to, field, order, start, end, _embed } = this.paramOfSort) {
+  urlSetSearchParams({ from, to, field, order, start, end, _embed } = this.paramOfSort) {
     if (this.showingPage === 'ProductsPage') {
       this.url.searchParams.set('_embed', _embed);
-    } 
+    }
     if (this.showingPage === 'DashboardPage') {
       this.url.searchParams.set('from', from);
       this.url.searchParams.set('to', to);
@@ -150,62 +140,6 @@ export default class SortableTable {
     this.url.searchParams.set('_order', order);
     this.url.searchParams.set('_start', start);
     this.url.searchParams.set('_end', end);
-  }
-
-  sortByHeaderHandler = (event) => {
-    if (this.statusOfLoading === 'pending') {return;}
-    const sortableTarget = event.target.closest('div[data-sortable="true"]');
-    if (!sortableTarget) {return;}
-    let { dataset: 
-      { 
-        order = 'asc',  
-        id: field
-      } 
-    } = sortableTarget;
-    if (this.paramOfSort.field === field) {
-      order = this.paramOfSort.order === 'asc' ? 'desc' : 'asc';
-    }
-    this.paramOfSort = {...this.paramOfSort, ...{field, order} };
-    this.sort();
-  }
-
-  scrollHandler = () => {
-    const scrollHeight = Math.max(
-      document.body.scrollHeight, document.documentElement.scrollHeight,
-      document.body.offsetHeight, document.documentElement.offsetHeight,
-      document.body.clientHeight, document.documentElement.clientHeight
-    );
-    const windowHeight = document.documentElement.clientHeight;
-    const scrolled = window.pageYOffset + windowHeight;
-    const limitOfScrolling = scrollHeight - windowHeight / 6;
-
-    if (scrolled > limitOfScrolling && this.statusOfLoading === 'fulfilled') {
-      this.paramOfSort.end = this.paramOfSort.end + 30;
-      this.getDataFromServer().then(data => { 
-        this.data = data;
-        this.updateElement();
-      }); 
-    }
-  };
-
-  resetParamsOfSortHandler = (startParams) => async () => {
-    this.paramOfSort = startParams;
-    this.data = await this.getDataFromServer();
-    this.updateElement();
-  }
-  
-  addEventListeners() {
-    const { header, emptyPlaceholder} = this.subElements;
-    if (this.showingPage !== 'DashboardPage') {
-      document.addEventListener('scroll', this.scrollHandler);
-    }
-    header.addEventListener('pointerdown', this.sortByHeaderHandler);
-    
-    emptyPlaceholder.addEventListener('click', this.resetParamsOfSortHandler({...this.paramOfSort}));
-  }
-
-  removeEventListeners() {
-    document.removeEventListener('scroll', this.scrollHandler);
   }
 
   switchStatusOfLoading() {
@@ -228,21 +162,27 @@ export default class SortableTable {
     switcherStatusOfLoading[this.statusOfLoading]();
   }
 
-  async getDataFromServer() {
-    this.switchStatusOfLoading();
-    this.updateQueryStringOfURL();
+  async getData() {
+    try {
+      this.switchStatusOfLoading();
+      this.urlSetSearchParams();
 
-    const response = await fetch(this.url.toString());
-    const sortedata = await response.json();
+      const response = await fetch(this.url.toString());
+      const sortedata = await response.json();
 
-    if (!sortedata.length) { this.statusOfLoading = 'fulfilledWithEmptyValue';}
-    this.switchStatusOfLoading();
+      if (!sortedata.length) { this.statusOfLoading = 'fulfilledWithEmptyValue'; }
 
-    return sortedata;
+      this.switchStatusOfLoading();
+      return sortedata;
+
+    } catch (error) {
+      throw new Error(error.message)
+    }
+    
   }
 
   async sortOnServer() {
-    return await this.getDataFromServer();
+    return await this.getData();
   }
 
   sortOnClient() {
@@ -253,12 +193,23 @@ export default class SortableTable {
       firstItem = firstItem[field];
       secondItem = secondItem[field];
 
-      const resultOfComparing = typeof firstItem === 'string' 
-        ? firstItem.localeCompare(secondItem, ["ru", "en"], {caseFirst: 'upper', number: true})
+      const resultOfComparing = typeof firstItem === 'string'
+        ? firstItem.localeCompare(secondItem, ["ru", "en"], { caseFirst: 'upper', number: true })
         : firstItem - secondItem;
       return resultOfComparing * paramOfShift;
     });
     return sortedData;
+  }
+
+  updateElement() {
+    const { body, header, loading } = this.subElements;
+
+    header.innerHTML = this.getTableHeader();
+    body.innerHTML = this.getTableBody();
+
+    if (this.isSortLocally) {
+      loading.remove();
+    }
   }
 
   async sort() {
@@ -272,26 +223,78 @@ export default class SortableTable {
     this.updateElement();
   }
 
-  async update(from = this.paramOfSort.from, to = this.paramOfSort.to) {
-    this.paramOfSort = {...this.paramOfSort, ...{from: from.toISOString(), to: to.toISOString()}};
+  async update() {
+    this.data = await this.getData();
+    this.updateElement();
+  }
+
+  setSubElements() {
+    const elements = this.element.querySelectorAll('div[data-element]');
+    for (const element of elements) {
+      const name = element.dataset.element;
+      this.subElements[name] = element;
+    }
+  }
+
+  sortByHeaderHandler = (event) => {
+    if (this.statusOfLoading === 'pending') { return; }
+    const sortableTarget = event.target.closest('div[data-sortable="true"]');
+    if (!sortableTarget) { return; }
+    let { dataset:
+      {
+        order = 'asc',
+        id: field
+      }
+    } = sortableTarget;
+    if (this.paramOfSort.field === field) {
+      order = this.paramOfSort.order === 'asc' ? 'desc' : 'asc';
+    }
+    this.paramOfSort = { ...this.paramOfSort, ...{ field, order } };
+    this.sort();
+  }
+
+  scrollHandler = () => {
+    const scrollHeight = Math.max(
+      document.body.scrollHeight, document.documentElement.scrollHeight,
+      document.body.offsetHeight, document.documentElement.offsetHeight,
+      document.body.clientHeight, document.documentElement.clientHeight
+    );
+    const windowHeight = document.documentElement.clientHeight;
+    const scrolled = window.pageYOffset + windowHeight;
+    const limitOfScrolling = scrollHeight - windowHeight / 6;
+
+    if (scrolled > limitOfScrolling && this.statusOfLoading === 'fulfilled') {
+      this.paramOfSort.end = this.paramOfSort.end + 30;
+      this.getDataFromServer().then(data => {
+        this.data = data;
+        this.updateElement();
+      });
+    }
+  };
+
+  resetParamsOfSortHandler = (startParams) => async () => {
+    this.paramOfSort = startParams;
     this.data = await this.getDataFromServer();
     this.updateElement();
   }
 
-  getSubElements() {
-    const result = {};
-    const subElements = this.element.querySelectorAll('div[data-element]');
-    for (const subElement of subElements) {
-      const name = subElement.dataset.element;
-      result[name] = subElement;
+  addEventListeners() {
+    const { header, emptyPlaceholder } = this.subElements;
+    if (this.showingPage !== 'DashboardPage') {
+      document.addEventListener('scroll', this.scrollHandler);
     }
-    return result;
+    header.addEventListener('pointerdown', this.sortByHeaderHandler);
+
+    emptyPlaceholder.addEventListener('click', this.resetParamsOfSortHandler({ ...this.paramOfSort }));
+  }
+
+  removeEventListeners() {
+    document.removeEventListener('scroll', this.scrollHandler);
   }
 
   render() {
-    this.element = this.getTableElement();
-    
-    this.subElements = this.getSubElements();
+    this.element = this.elementDOM;
+    this.setSubElements()
     this.addEventListeners();
   }
 

@@ -1,14 +1,9 @@
-import RangePicker from '../../components/RangePicker.js';
-import SortableTable from '../../components/SortableTable.js';
-import ColumnChart from '../../components/ColumnChart.js';
-
 import getComponents from './getComponents.js';
 
 export default class DashboardPage {
-  static containersForFillig = ['rangePicker', 'orders-chart', 'sales-chart', 'customers-chart', 'sortableTable'];
 
+  element = null
   subElements = {}
-  elements = []
 
   getComponents = getComponents
   childrenComponents = []
@@ -20,6 +15,7 @@ export default class DashboardPage {
   }
 
   get elementDOM() {
+    
     const wrapper = document.createElement('div');
     const dashbord = `
         <div class="dashboard">
@@ -50,6 +46,23 @@ export default class DashboardPage {
     }
   }
 
+  async update() {
+
+    this.childrenComponents.forEach((childComponent) => childComponent.element?.remove());
+    
+    this.childrenComponents = this.getComponents(this.range).map(([ChildComponent, nameOfContainerForFilling, inputData]) => {
+
+      const childComponent = new ChildComponent(...inputData);
+      childComponent.render();
+
+      this.subElements[nameOfContainerForFilling].append(childComponent.element);
+      return childComponent;
+    });
+
+    const updatedDataOfChildComponents = this.childrenComponents.map(childComponent => childComponent?.update())
+    await Promise.all(updatedDataOfChildComponents)
+  }
+
   updateRange(newRange) {
     const { from, to } = newRange;
 
@@ -58,20 +71,6 @@ export default class DashboardPage {
 
     this.mainClass.range.from = new Date(from);
     this.mainClass.range.to = new Date(to);
-  }
-
-  async update() {
-    this.childrenComponents.forEach((component) => component.element?.remove());
-    
-    this.childrenComponents = this.getComponents(this.range).map(([ComponentChild, containerName, inputData]) => {
-      const component = new ComponentChild(...inputData);
-      component.render();
-      this.subElements[containerName].append(component.element);
-      return component
-    });
-
-    const updateComponents = this.childrenComponents.map(componentChild => componentChild?.update())
-    await Promise.all(updateComponents)
   }
 
   changeRangeHandler = (event) => {
@@ -84,6 +83,7 @@ export default class DashboardPage {
   }
 
   render(mainClass, range) {
+
     this.mainClass = mainClass;
     this.range = {
       from: new Date(range.from),

@@ -16,7 +16,7 @@ export default (range) => [
         [
             header,
             {
-                url: `${process.env.BACKEND_URL}/api/dashboard/bestsellers`,
+                url: `${process.env.BACKEND_URL}${process.env.BESTSELLERS_DASHBOARD_URL}`,
                 isSortLocally: true,
                 showingPage: 'DashboardPage',
                 range
@@ -28,8 +28,8 @@ export default (range) => [
         'ordersChart',
         [
             {
-                url: `${process.env.BACKEND_URL}/api/dashboard/orders`,
-                label: 'orders',
+                url: `${process.env.BACKEND_URL}${process.env.ORDERS_DASHBOARD_URL}`,
+                label: 'Заказы',
                 range,
                 link: '#'
             }
@@ -40,8 +40,8 @@ export default (range) => [
         'salesChart',
         [
             {
-                url: `${process.env.BACKEND_URL}/api/dashboard/sales`,
-                label: 'sales',
+                url: `${process.env.BACKEND_URL}${process.env.SALES_DASHBOARD_URL}`,
+                label: 'Продажи',
                 range,
                 link: '/sales',
                 formatHeading: item => {
@@ -55,8 +55,8 @@ export default (range) => [
         'customersChart',
         [
             {
-                url: `${process.env.BACKEND_URL}/api/dashboard/customers`,
-                label: 'customers',
+                url: `${process.env.BACKEND_URL}${process.env.CUSTOMERS_DASHBOARD_URL}`,
+                label: 'Клиенты',
                 range,
                 link: '#'
             }

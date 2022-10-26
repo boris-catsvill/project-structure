@@ -2,6 +2,7 @@ import getComponents from "./getComponents"
 
 export default class SalesPage {
 
+  element = null
   subElements = {}
   wrappersOfElementHTML = []
 
@@ -15,6 +16,7 @@ export default class SalesPage {
   }
 
   get elementDOM() {
+    
     const wrapper = document.createElement('div');
     const dashbord = `
         <div class="sales full-height flex-column">
@@ -24,22 +26,26 @@ export default class SalesPage {
             </div>
       <div data-element="sortableTable" class="full-height flex-column"></div>
       </div>`;
+
     wrapper.innerHTML = dashbord;
     return wrapper.firstElementChild;
   }
 
   async update() {
-    this.childrenComponents.forEach((component) => component.element?.remove());
+
+    this.childrenComponents.forEach((childComponent) => childComponent.element?.remove());
     
-    this.childrenComponents = this.getComponents(this.range).map(([ComponentChild, containerName, inputData]) => {
-      const component = new ComponentChild(...inputData);
-      component.render();
-      this.subElements[containerName].append(component.element);
-      return component
+    this.childrenComponents = this.getComponents(this.range).map(([ChildComponent, nameOfContainerForFilling, inputData]) => {
+
+      const childComponent = new ChildComponent(...inputData);
+      childComponent.render();
+
+      this.subElements[nameOfContainerForFilling].append(childComponent.element);
+      return childComponent;
     });
 
-    const updateComponents = this.childrenComponents.map(componentChild => componentChild?.update())
-    await Promise.all(updateComponents)
+    const updatedDataOfChildComponents = this.childrenComponents.map(childComponent => childComponent?.update())
+    await Promise.all(updatedDataOfChildComponents)
   }
 
 

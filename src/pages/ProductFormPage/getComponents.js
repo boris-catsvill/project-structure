@@ -1,16 +1,20 @@
 import ProductForm from "../../components/ProductForm";
 
-export default () => [
-    [
-        ProductForm,
-        'productForm',
+export default () => {
+    const [id] = document.location.pathname.match(/([a-z0-9_-]+$)/i) ?? [];
+    console.log(`${process.env.BACKEND_URL}${process.env.PRODUCTS_REST_URL}`)
+    return [
         [
-            (document.location.pathname.match(/([a-z0-9_-]+$)/i) ?? [])[0],
-            {
-                imageURL: new URL(`${process.env.IMGUR_CLIENT}`),
-                categoriesURL: new URL(`${process.env.BACKEND_URL}${process.env.CATEGORIES_URL}`),
-                productURL: new URL(`${process.env.BACKEND_URL}${process.env.PRODUCTS_URL}`),
-            }
+            ProductForm,
+            'productForm',
+            [
+                id === 'add' ? null : id,
+                {
+                    imageURL: `${process.env.IMGUR_CLIENT_URL}`,
+                    categoriesURL: `${process.env.BACKEND_URL}${process.env.CATEGORIES_REST_URL}`,
+                    productURL: `${process.env.BACKEND_URL}${process.env.PRODUCTS_REST_URL}`,
+                }
+            ],
         ],
-    ],
-];
+    ];
+}

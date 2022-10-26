@@ -2,17 +2,19 @@
 import getComponents from "./getComponents"
 
 export default class ProductFormPage {
-    subElements= {}
-    element = null
-    productId = (document.location.pathname.match(/([a-z0-9_-]+$)/i) ?? [])[0]
 
-    getComponents = getComponents
-    childrenComponents = []
-    mainClass = null
+  element = null
+  subElements = {}
+  productId = (document.location.pathname.match(/([a-z0-9_-]+$)/i) ?? [])[0]
 
-    get elementDOM() {
-      const wrapper = document.createElement('div');
-      const bodyOfWrapper = `
+  getComponents = getComponents
+  childrenComponents = []
+  mainClass = null
+
+  get elementDOM() {
+
+    const wrapper = document.createElement('div');
+    const bodyOfWrapper = `
         <div class="products-edit">
           <div class="content__top-panel">
             <h1 class="page-title">
@@ -21,46 +23,50 @@ export default class ProductFormPage {
           </div>
           <div class="contentBox" data-element="productForm"></div>
         </div>`;
-      wrapper.innerHTML = bodyOfWrapper;
-      return wrapper.firstElementChild;
-    }
-  
-    async update() {
-      this.childrenComponents.forEach((component) => component.element?.remove());
-      
-      this.childrenComponents = this.getComponents().map(([ComponentChild, containerName, inputData]) => {
-        const component = new ComponentChild(...inputData);
-        component.render();
-        this.subElements[containerName].append(component.element);
-        return component
-      });
-  
-      const updateComponents = this.childrenComponents.map(componentChild => componentChild?.update())
-      await Promise.all(updateComponents)
-    }
 
-    setSubElements() {
-      const elements = this.element.querySelectorAll('[data-element]');
+    wrapper.innerHTML = bodyOfWrapper;
+    return wrapper.firstElementChild;
+  }
 
-      for (const element of elements) {
-        const name = element.dataset.element;
-        this.subElements[name] = element;
-      }
-    }
+  async update() {
 
-    render(mainClass) {
-      this.mainClass = mainClass;
-      this.element = this.elementDOM;
-      this.setSubElements();
-    }
+    this.childrenComponents.forEach((childComponent) => childComponent.element?.remove());
+    
+    this.childrenComponents = this.getComponents(this.range).map(([ChildComponent, nameOfContainerForFilling, inputData]) => {
 
-    remove() {
-      this.element.remove();
-      this.element = null;
-    }
+      const childComponent = new ChildComponent(...inputData);
+      childComponent.render();
 
-    destroy() {
-      this.childrenComponents.forEach((component) => component?.destroy())
-      this.remove();
+      this.subElements[nameOfContainerForFilling].append(childComponent.element);
+      return childComponent;
+    });
+
+    const updatedDataOfChildComponents = this.childrenComponents.map(childComponent => childComponent?.update())
+    await Promise.all(updatedDataOfChildComponents)
+  }
+
+  setSubElements() {
+    const elements = this.element.querySelectorAll('[data-element]');
+
+    for (const element of elements) {
+      const name = element.dataset.element;
+      this.subElements[name] = element;
     }
+  }
+
+  render(mainClass) {
+    this.mainClass = mainClass;
+    this.element = this.elementDOM;
+    this.setSubElements();
+  }
+
+  remove() {
+    this.element.remove();
+    this.element = null;
+  }
+
+  destroy() {
+    this.childrenComponents.forEach((component) => component?.destroy())
+    this.remove();
+  }
 }

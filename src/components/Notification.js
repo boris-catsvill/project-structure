@@ -1,6 +1,9 @@
 export default class NotificationMessage {
+
   static globalNotifictionElement = null
 
+  element = null
+  
   constructor({message = '', wrapperOfElement = document.body, duration = 0, type = ''} = {}) {
     this.message = message;
     this.duration = duration;
@@ -21,21 +24,21 @@ export default class NotificationMessage {
   }
 
   render() {
-    this.constructor.globalNotifictionElement = this.createElement();
+    NotificationMessage.globalNotifictionElement = this.createElement();
   }
 
   createTimer() {
-    this.constructor.timeoutID = setTimeout(() => {this.destroy();}, this.duration);
+    NotificationMessage.timeoutID = setTimeout(() => {this.destroy();}, this.duration);
   }
 
   removeTimer() {
-    clearTimeout(this.constructor.timeoutID);
-    this.constructor.timeoutID = null;
+    clearTimeout(NotificationMessage.timeoutID);
+    NotificationMessage.timeoutID = null;
   }
 
   remove() {
-      this.constructor.globalNotifictionElement?.remove();
-      this.constructor.globalNotifictionElement = null;
+    NotificationMessage.globalNotifictionElement?.remove();
+    NotificationMessage.globalNotifictionElement = null;
   }
 
   destroy() {
@@ -46,9 +49,9 @@ export default class NotificationMessage {
 
   show() {
     this.destroy();
-    if (!this.constructor.globalNotifictionElement) {this.render();}
+    if (!NotificationMessage.globalNotifictionElement) {this.render();}
     this.duration = this.durationStart;
     this.createTimer();
-    this.wrapperOfElement.append(this.constructor.globalNotifictionElement);
+    this.wrapperOfElement.append(NotificationMessage.globalNotifictionElement);
   }
 }

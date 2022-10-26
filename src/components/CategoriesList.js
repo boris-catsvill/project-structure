@@ -50,8 +50,8 @@ export default class CategoriesList {
     wrapper.innerHTML = categoryBody;
     const categoryElement = wrapper.firstElementChild;
     
-    const subCatListContainer = categoryElement.querySelector('[data-element="subCatListContainer"]');
-    subCatListContainer.append(new SortableList({items: subcategoryList}).element);
+    const subcategoriesListContainer = categoryElement.querySelector('[data-element="subCatListContainer"]');
+    subcategoriesListContainer.append(new SortableList({items: subcategoryList}).element);
     
     return categoryElement;
   }
@@ -65,8 +65,14 @@ export default class CategoriesList {
   }
 
   async setData() {
-    const response = await fetch(this.url.toString());
-    this.data = await response.json();
+    try {
+
+      const response = await fetch(this.url.toString());
+      this.data = await response.json();
+
+    } catch (error) {
+      throw new Error(error.message)
+    }
   }
 
   toggleOfOpenCategoryHandler = (event) => {
@@ -88,9 +94,7 @@ export default class CategoriesList {
   async update() {
     await this.setData();
     const bodyOfelement = this.data.map((category) => this.getCategory(category))
-    console.log(bodyOfelement)
     this.element.append(...bodyOfelement);
-
   }
 
   remove() {

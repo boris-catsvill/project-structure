@@ -9,7 +9,7 @@ export default (range) => [
         [
             header,
             {
-                url: `${process.env.BACKEND_URL}/api/rest/products`,
+                url: `${process.env.BACKEND_URL}${process.env.PRODUCTS_REST_URL}`,
                 isSortLocally: false,
                 showingPage: 'ProductsPage',
                 range

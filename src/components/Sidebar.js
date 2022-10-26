@@ -1,8 +1,9 @@
 export default class Sidebar {
-
+  
+  element = null;
   subElements = {};
   activeNavItem = null
-  element = null;
+  
 
   get elementDOM() {
     const wrapper = document.createElement('div');

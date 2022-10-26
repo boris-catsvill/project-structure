@@ -1,6 +1,12 @@
 class Tooltip {
 
+  static instance = null
+
   tooltiptarget = null
+  shift = {
+    x: 10,
+    y: 10
+  }
 
   constructor() {
     if (!Tooltip.instance) { Tooltip.instance = this; } 
@@ -67,8 +73,8 @@ class Tooltip {
 
   pointerMoveHandler = (event) => {
     const { clientX, clientY } = event;
-    this.element.style.left = clientX + 10 + 'px';
-    this.element.style.top = clientY + 15 + 'px';
+    this.element.style.left = clientX + this.shift.x + 'px';
+    this.element.style.top = clientY + this.shift.y + 'px';
   }
 
   addPointerMoveListener() {

@@ -49,7 +49,7 @@ export default class DoubleSlider {
   getSubElements() {
     const result = {};
     const elements = this.element.querySelectorAll('[data-element]');
-    for (let element of elements) {
+    for (const element of elements) {
       const name = element.dataset.element.match(/(left|right|progress|to|from)/)[0];
       result[name] = element;
     }
@@ -125,6 +125,5 @@ export default class DoubleSlider {
   }
   destroy() {
     this.remove();
-    this.element.removeEventListener('pointerdown', this.pointerDownHandler);
   }
 }

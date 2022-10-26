@@ -7,6 +7,8 @@ export default class SortableList {
       return element;
     });
   }
+
+  element = null;
   
   constructor({items}, parentContainer) {
     this.items = SortableList.addClassesOfItems(items);
@@ -60,7 +62,7 @@ export default class SortableList {
       bubbles: true,
       detail: {
         startPositions: this.items,
-        endPositions: Array.from(this.element.children),
+        endPositions: [...this.elements.children],
       }
     }));
   }

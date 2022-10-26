@@ -2,13 +2,14 @@ export default class Router {
     static instance = null;
 
     constructor() {
-        if (!Router.instance) Router.instance = this;
-
+        if (Router.instance) { return Router.instance; }
+        
         this.routes = [];
         this.activePage = null;
         this.undefinedPage = null;
 
-        return Router.instance;
+        Router.instance = this;
+        return this;
     }
 
     addRoute(pattern, page) {
@@ -28,13 +29,11 @@ export default class Router {
 
         const activeRoute = this.routes.find(({ pattern }) => path.match(pattern));
 
-        const activePage = new (activeRoute?.page ?? UndefinedPage)()
-        this.activePage = activePage;
+        this.activePage = new (activeRoute?.page ?? this.undefinedPage)()
         
         document.documentElement.dispatchEvent(new CustomEvent('page-selected', {
             bubbles: true,
         }));
-        console.log(this.activePage)
     }
 
     pathSelectedHandler = (event) => {
@@ -57,6 +56,7 @@ export default class Router {
 
     listen() {
         window.addEventListener('click', this.pathSelectedHandler);
+
         window.addEventListener('popstate', this.setActivePageHandler);
         window.addEventListener('path-selected', this.setActivePageHandler);
 
@@ -66,5 +66,6 @@ export default class Router {
     destroy() {
         Router.instance = null;
         this.activePage = null;
+        this.undefinedPage = null
     }
 }

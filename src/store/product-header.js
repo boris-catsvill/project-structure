@@ -1,7 +1,7 @@
 const header = [
   {
     id: 'images',
-    title: 'Image',
+    title: 'Фото',
     sortable: false,
     template: data => {
       if (!data[0]?.url) {return `<div class="sortable-table__cell"></div>`;}

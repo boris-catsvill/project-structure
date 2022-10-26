@@ -13,25 +13,21 @@ import Tooltip from './components/Tooltip.js';
 import errorHandler from "./store/errorHandler.js";
 
 import Router from "./pages/Router.js";
-import SortableTable from "./components/SortableTable.js";
 
-const BACKEND_URL = 'https://course-js.javascript.ru/';
-
-export default class Page {
-	static currentAdminPage
+export default class AdminPage {
+	static instance = null
 
 	range = {}
 	subElements = {}
 	contentContainer = null
-	activePage = null
 
 	router = new Router();
 	tooltip = new Tooltip();
 	sidebar = new Sidebar();
 
 	constructor() {
-		if (Page.currentAdminPage) { return Page.currentAdminPage; }
-		Page.currentAdminPage = this;
+		if (AdminPage.instance) { return AdminPage.instance; }
+		AdminPage.instance = this;
 
 		this.range = this.createRange();
 
@@ -79,20 +75,23 @@ export default class Page {
 
 	updateActivePage = async () => {
 		try {
+			
 			this.toggleProgressbar();
+
 			const activePage = this.router.activePage;
+
 			activePage.render(this, this.range);
 			
 			this.contentContainer.append(activePage.element);
 			this.sidebar.setActiveNavItemHandler(document.location.pathname);
 
-			await activePage?.update();
-			console.log('updated')
+			await activePage.update();
+
 			this.toggleProgressbar();
 
 		} catch (error) {
 			this.toggleProgressbar();
-			//errorHandler(error);
+			errorHandler(error);
 		}
 	}
 

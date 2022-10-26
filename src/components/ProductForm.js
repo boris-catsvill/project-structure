@@ -1,13 +1,14 @@
 import escapeHtml from "../store/escape-html.js";
+
 import SortableList from '../components/SortableList.js';
 import NotificationMessage from "./Notification.js";
-
-import errorHandler from "../store/errorHandler.js";
 
 import grabIcon from '../styles/svg/icon-grab.svg';
 import trashIcon from '../styles/svg//icon-trash.svg';
 
 export default class ProductForm {
+
+  element = null
   subElements = {}
   data = {}
   images = []
@@ -20,33 +21,31 @@ export default class ProductForm {
       imageURL,
     }
   ) {
-    this.productId = productId;
-  
-    this.urls = {
-      categories: categoriesURL,
-      product: productURL,
-      images: imageURL,
-    };
 
-    console.log(this)
+    this.productId = productId;
+    this.urls = {
+      categories: new URL(categoriesURL),
+      products: new URL(productURL),
+      images: new URL(imageURL),
+    };
   }
 
   setSearchParamsOfURLs() {
-    const {categories, product} = this.urls;
+    const { categories, products } = this.urls;
 
     categories.searchParams.set('_sort', 'weigh');
     categories.searchParams.set('_refs', 'subcategory');
 
-    product.searchParams.set('id', this.productId);
+    products.searchParams.set('id', this.productId);
   }
 
   deleteSearchParamsOfURLs() {
-    const {categories, product} = this.urls;
+    const { categories, products } = this.urls;
 
     categories.searchParams.delete('_sort');
     categories.searchParams.delete('_refs');
 
-    product.searchParams.delete('id');
+    products.searchParams.delete('id');
   }
 
   getTitle() {
@@ -79,8 +78,8 @@ export default class ProductForm {
   }
 
   getImage(image) {
+
     const { source, url } = image;
-    console.log(image, '1111')
     const escapedSource = escapeHtml(source);
     const escapedUrl = escapeHtml(url);
 
@@ -98,6 +97,7 @@ export default class ProductForm {
           <img src=${trashIcon} data-delete-handle="" alt="delete">
         </button>
       </li>`;
+
     return wrapper.firstElementChild;
   }
 
@@ -112,25 +112,31 @@ export default class ProductForm {
   }
 
   getCategory(category) {
-    const { title: titleOfCat, subcategories } = category;
+
+    const { title: titleOfCategory, subcategories } = category;
+    const { subcategory: activeSubcategory } = this.data.products[0];
 
     const options = subcategories.map((subcategory) => {
-      const {id, title: titleOfSubcat} = subcategory;
-      const text = `${escapeHtml(`${titleOfCat} > ${titleOfSubcat}`)}`;
-      return `<option value="${escapeHtml(id)}">${text}</option>`;
+
+      const { id, title: titleOfSubcategory } = subcategory;
+
+      const escapedTitleOfCategory = escapeHtml(`${titleOfCategory}`)
+      const escapedTitleOfSubcategory = escapeHtml(`${titleOfSubcategory}`)
+
+      const text = `${escapedTitleOfCategory} > ${escapedTitleOfSubcategory}`;
+      const activeStatus = activeSubcategory === id;
+
+      return new Option(text, `${escapeHtml(id)}`, false, activeStatus)
+
     });
 
-    return options.join('');
+    return options;
   }
 
   getCategories() {
-    const { categories = [] } = this.data;
-    
     return (
       `<label class="form-label">Категория</label>
-      <select class="form-control" name="subcategory">
-        ${categories.map(this.getCategory).join('')}
-      </select>`
+      <select class="form-control" name="subcategory" data-element="subcategories"></select>`
     );
   }
 
@@ -223,24 +229,41 @@ export default class ProductForm {
     return wrapper.firstElementChild;
   }
 
-  async fetchUnmutableRequest(url) {
+  async fetchGetData(url) {
     try {
-      console.log(url)
-      const response = await fetch(url.toString());
-      if (response.ok) {return await response.json();} 
-      
-      throw new Error('Ошибка сети/Ошибка на сервере');
+      this.setSearchParamsOfURLs()
+
+      const response = await fetch(url);
+
+      this.deleteSearchParamsOfURLs();
+
+      if (!response.ok) { throw new Error('Ошибка'); }
+      return await response.json();
+
+
     } catch (error) {
-      errorHandler(error);
-      //throw new Error(error);
+      throw new Error(error.message);
     }
   }
 
-  async fetchMutableRequest(method, body) {
-    const { product } = this.urls;
-    const {productForm} = this.subElements;
+  showSuccessNotification() {
+    const notification = new NotificationMessage({
+      message: 'Товар сохранен',
+      wrapperOfElement: document.body,
+      duration: 3000,
+      type: 'success'
+    });
+
+    notification.show();
+  }
+
+  async fetchPostData(method, body) {
+
+    const { products } = this.urls;
+    const { productForm } = this.subElements;
+
     try {
-      const response = await fetch(product.toString(), {
+      const response = await fetch(products, {
         method,
         headers: {
           "Content-Type": "application/json"
@@ -248,62 +271,34 @@ export default class ProductForm {
         body: JSON.stringify(body)
       });
 
-      if (!response.ok) {throw new Error('Ошибка сети/Ошибка на сервере');}
+      if (!response.ok) { throw new Error('Ошибка'); }
+
+      this.showSuccessNotification();
 
       if (method === 'PUT') {
-        const elementA = document.createElement('a');
-        elementA.setAttribute('href', `/products/${body['id']}`);
-        productForm.append(elementA);
-        elementA.click();
+        const linkToEditProductForm = document.createElement('a');
+        linkToEditProductForm.setAttribute('href', `/products/${body['id']}`);
+
+        productForm.append(linkToEditProductForm);
+
+        linkToEditProductForm.click();
       }
-      const notification = new NotificationMessage({
-        message: 'Товар сохранен',
-        wrapperOfElement: document.body,
-        duration: 3000,
-        type: 'success'
-      });
-      notification.show();
 
     } catch (error) {
-      errorHandler(error);
-      //throw new Error("Ошибка сети/Ошибка на сервере");
+      throw new Error(error.message);
     }
   }
 
-  isRequiredURL(nameOfUrl) {
-    const validURLs = this.productId ? ['product', 'categories'] : ['categories'];
-    return validURLs.includes(nameOfUrl);
-  }
-
-  async getData() {
-    console.log('start')
-    this.setSearchParamsOfURLs();
-
-    const namesOfURLs = Object.keys(this.urls);
-    const requiredURLs = Object.values(this.urls)
-      .filter((_, index) => this.isRequiredURL(namesOfURLs[index]));
-    
-    const responses = requiredURLs.map(this.fetchUnmutableRequest);
-    console.log(responses)
-    const dataOfResponses = await Promise.all(responses);
-    
-    const entriesOfResponses = dataOfResponses.map((data, index) => {
-      const nameOfData = namesOfURLs[index];
-      if (nameOfData === 'product') {this.images = data[0]?.images ?? [];}
-      return [nameOfData, data];
-    });
-
-    this.deleteSearchParamsOfURLs();
-    return Object.fromEntries(entriesOfResponses);
-  }
-
   getFormatedFormData() {
+
     const keysWithNumberValue = ['discount', 'price', 'quantity', 'status'];
+
     const formatedFormData = {
       images: this.images,
     };
 
     const { productForm } = this.subElements;
+
     const formData = new FormData(productForm);
     formData.delete('url');
     formData.delete('source');
@@ -319,12 +314,12 @@ export default class ProductForm {
   }
 
   toggleStatusOfLoadingImage() {
-    const { productForm} = this.subElements;
+    const { productForm } = this.subElements;
     productForm.uploadImage.classList.toggle("is-loading");
     productForm.uploadImage.disabled = !productForm.uploadImage.disabled;
   }
 
-  async postImage(formData) {
+  async fetchPostImage(formData) {
     try {
       const { images } = this.urls;
       this.toggleStatusOfLoadingImage();
@@ -338,15 +333,14 @@ export default class ProductForm {
         referrer: ''
       });
 
-      if (!response.ok) {throw new Error("Ошибка сети/Ошибка на сервере");}
+      if (!response.ok) { throw new Error("Ошибка сети/Ошибка на сервере"); }
       const responseJSON = await response.json();
 
       this.toggleStatusOfLoadingImage();
       return responseJSON.data.link;
 
     } catch (error) {
-      errorHandler(error);
-      //throw new Error("Ошибка сети/Ошибка на сервере");
+      throw new Error("Ошибка сети/Ошибка на сервере");
     }
   }
 
@@ -357,8 +351,7 @@ export default class ProductForm {
   }
 
   loadImgHander = () => {
-    if (!this.subElements.sortableList) this.setSubElements();
-    const {productForm, sortableList} = this.subElements;
+    const { productForm, sortableList } = this.subElements;
 
     const inputIMGLoader = this.getInputIMGLoader();
 
@@ -367,15 +360,15 @@ export default class ProductForm {
       const file = inputIMGLoader.files[0];
       formData.append(inputIMGLoader.name, file);
 
-      const link = await this.postImage(formData);
-      console.log(link, 'link')
+      const link = await this.fetchPostImage(formData);
+
       if (!link) {
         inputIMGLoader.remove();
         return;
       }
 
-      const image = {source: file.name, url: link};
-      console.log(sortableList)
+      const image = { source: file.name, url: link };
+
       this.images.push(image);
       sortableList.append(...SortableList.addClassesOfItems([this.getImage(image)]));
 
@@ -384,24 +377,24 @@ export default class ProductForm {
 
     productForm.append(inputIMGLoader);
     inputIMGLoader.click();
-  } 
+  }
 
   submitHandler = (event) => {
     event.preventDefault();
     const formData = this.getFormatedFormData();
 
-    const method = this.productId 
+    const method = this.productId
       ? 'PATCH'
       : 'PUT';
 
-    this.fetchMutableRequest(method, formData);
+    this.fetchPostData(method, formData);
   }
 
   removeListItemHandler = (event) => {
     event.preventDefault();
     const target = event.target;
 
-    if (!target.closest('[data-delete-handle]')) {return;}
+    if (!target.closest('[data-delete-handle]')) { return; }
 
     const listItem = target.closest('[data-element="sortableItem"]');
     const inputs = listItem.querySelectorAll('input');
@@ -410,10 +403,59 @@ export default class ProductForm {
     for (const input of inputs) {
       imageForRemoving[input.name] = input.value;
     }
-  
+
     const { url: remUrl, source: remSource } = imageForRemoving;
 
-    this.images = this.images.filter(({url, source}) => (url !== remUrl) && (source !== remSource));
+    this.images = this.images.filter(({ url, source }) => (url !== remUrl) && (source !== remSource));
+  }
+
+  fillFormFields() {
+
+    const { subcategories, productForm } = this.subElements;
+    const elementsOfSubcategories = this.data.categories.flatMap(category => this.getCategory(category));
+
+    subcategories.append(...elementsOfSubcategories);
+
+    if (this.productId) {
+
+      const fieldNamesForFilling = ['title', 'description', 'price', 'discount', 'quantity', 'status'];
+
+      Array.from(productForm.elements).forEach((element) => {
+ 
+        const name = element.name;
+
+        if (fieldNamesForFilling.includes(name)) {
+          const value = this.data.products[0][name];
+          productForm[name].value = value;
+        }
+
+      });
+
+    }
+  }
+
+  createSortableImages() {
+    const { imageListContainer } = this.subElements;
+    const sortableList = new SortableList({ items: this.images.map(this.getImage) });
+    imageListContainer.append(sortableList.element);
+  }
+
+  async update() {
+    const nameOfDataForFetchGet = this.productId ? ['categories', 'products'] : ['categories'];
+
+    const responses = nameOfDataForFetchGet.map(positionName => this.fetchGetData(this.urls[positionName]));
+    const dataOfResponses = await Promise.all(responses)
+
+    dataOfResponses.forEach((data, index) => {
+      const nameOfData = nameOfDataForFetchGet[index];
+      this.data[nameOfData] = data;
+      if (nameOfData === 'products') { this.images = data[0]?.images ?? []; }
+    });
+
+    this.createSortableImages();
+
+    if (!this.subElements.sortableList) this.setSubElements();
+    this.fillFormFields();
   }
 
   setSubElements() {
@@ -430,35 +472,6 @@ export default class ProductForm {
     productForm.addEventListener('submit', this.submitHandler);
     productForm.uploadImage.addEventListener('click', this.loadImgHander);
     imageListContainer.addEventListener('pointerdown', this.removeListItemHandler);
-  }
-
-  createProduct() {
-    const namesForFilling = ['title', 'description', 'price', 'discount', 'quantity', 'status'];
-
-    const productForm = this.element.querySelector('[data-element="productForm"]');
-
-    Array.from(productForm.elements).forEach((element) => {
-      const name = element.name;
-      if (namesForFilling.includes(name)) {
-        const value = this.data.product[0][name];
-        productForm[name].value = value;
-      }
-    });
-  }
-
-  createImages() {
-    const imageListContainer = this.element.querySelector('[data-element="imageListContainer"]');
-    const sortableList = new SortableList({items: this.images.map(this.getImage)});
-    imageListContainer.append(sortableList.element);
-  }
-
-  async update() {
-    this.data = await this.getData();
-
-    this.createImages();
-
-    if (this.productId) { this.createProduct(); }
-
   }
 
   render() {

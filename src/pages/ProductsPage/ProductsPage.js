@@ -2,7 +2,8 @@
 import getComponents from "./getComponents"
 
 export default class ProductsPage {
-
+  
+  element = null
   subElements = {}
   getComponents = getComponents
   childrenComponents = []
@@ -24,6 +25,7 @@ export default class ProductsPage {
             </div>
             <div data-element="sortableTable" class="products-list__container"></div>
         </div>`;
+
     wrapper.innerHTML = products;
     return wrapper.firstElementChild;
   }
@@ -37,17 +39,20 @@ export default class ProductsPage {
   }
 
   async update() {
-    this.childrenComponents.forEach((component) => component.element?.remove());
+
+    this.childrenComponents.forEach((childComponent) => childComponent.element?.remove());
     
-    this.childrenComponents = this.getComponents(this.range).map(([ComponentChild, containerName, inputData]) => {
-      const component = new ComponentChild(...inputData);
-      component.render();
-      this.subElements[containerName].append(component.element);
-      return component
+    this.childrenComponents = this.getComponents(this.range).map(([ChildComponent, nameOfContainerForFilling, inputData]) => {
+
+      const childComponent = new ChildComponent(...inputData);
+      childComponent.render();
+
+      this.subElements[nameOfContainerForFilling].append(childComponent.element);
+      return childComponent;
     });
 
-    const updateComponents = this.childrenComponents.map(componentChild => componentChild?.update())
-    await Promise.all(updateComponents)
+    const updatedDataOfChildComponents = this.childrenComponents.map(childComponent => childComponent?.update())
+    await Promise.all(updatedDataOfChildComponents)
   }
 
   async render(mainClass, range) {
