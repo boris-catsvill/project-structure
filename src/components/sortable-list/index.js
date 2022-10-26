@@ -1,191 +1,134 @@
 export default class SortableList {
   element;
+  placeholderItem;
+  selectedItem;
+  shiftsSelectedItem = {};
 
-  onDocumentPointerMove = ({clientX, clientY}) => {
-    this.moveDraggingAt(clientX, clientY);
+  onItemPointerdownHandler = event => {
+    event.preventDefault();
+    const target = event.target;
+    const selectedItem = target.closest('.sortable-list__item');
 
-    const {firstElementChild, children} = this.element;
-    const {top: firstElementTop} = firstElementChild.getBoundingClientRect();
-    const {bottom} = this.element.getBoundingClientRect();
+    if (!selectedItem) return;
 
-    if (clientY < firstElementTop) {
-      this.movePlaceholderAt(0);
-    } else if (clientY > bottom) {
-      this.movePlaceholderAt(children.length);
-    } else {
-      for (let i = 0; i < children.length; i++) {
-        const li = children[i];
-
-        // ignore to prevent bugs when dragging between elements
-        if (li !== this.draggingElem) {
-          const {top, bottom} = li.getBoundingClientRect();
-          const {offsetHeight: height} = li;
-
-          if (clientY > top && clientY < bottom) {
-            // inside the element (y-axis)
-            if (clientY < top + height / 2) {
-              // upper half of the element
-              this.movePlaceholderAt(i);
-              break;
-            } else {
-              // lower half of the element
-              this.movePlaceholderAt(i + 1);
-              break;
-            }
-          }
-        }
-      }
+    if (target.closest('[data-delete-handle]')) {
+      selectedItem.remove();
     }
 
-    this.scrollIfCloseToWindowEdge(clientY);
+    if (target.closest('[data-grab-handle]')) {
+      this.selectedItem = selectedItem;
+
+      this.elementInitialIndex = [...this.element.children].indexOf(this.selectedItem);
+
+      selectedItem.style.width = selectedItem.offsetWidth + 'px';
+      selectedItem.style.height = selectedItem.offsetHeight + 'px';
+      selectedItem.classList.add('sortable-list__item_dragging');
+
+      this.setShiftsSelectedItem(event);
+      this.setPosition(event);
+
+      this.selectedItem.before(this.placeholderItem);
+      this.element.prepend(this.selectedItem);
+
+      this.element.addEventListener('pointermove', this.onItemPointermoveHandler);
+      this.element.addEventListener('pointerup', this.onItemPointerupHandler);
+    }
   };
 
-  onDocumentPointerUp = () => {
-    this.dragStop();
+  onItemPointermoveHandler = event => {
+    event.preventDefault();
+
+    this.setPosition(event);
+    this.movePlaceholder();
   };
 
-  constructor({items = []} = {}) {
+  onItemPointerupHandler = event => {
+    const placeholderIndex = [...this.element.children].indexOf(this.placeholderItem);
+
+    this.placeholderItem.after(this.selectedItem);
+    this.placeholderItem.remove();
+
+    this.selectedItem.style.width = '';
+    this.selectedItem.style.height = '';
+    this.selectedItem.style.left = '';
+    this.selectedItem.style.top = '';
+    this.selectedItem.classList.remove('sortable-list__item_dragging');
+
+    this.element.removeEventListener('pointermove', this.onItemPointermoveHandler);
+    this.element.removeEventListener('pointerup', this.onItemPointerupHandler);
+
+    this.selectedItem = null;
+
+    if (placeholderIndex !== this.elementInitialIndex + 1) {
+      this.element.dispatchEvent(
+        new CustomEvent('sortable-list-reorder', {
+          bubbles: true
+        })
+      );
+    }
+  };
+
+  setPosition({ clientX, clientY }) {
+    this.selectedItem.style.left = clientX - this.shiftsSelectedItem.x + 'px';
+    this.selectedItem.style.top = clientY - this.shiftsSelectedItem.y + 'px';
+  }
+
+  setShiftsSelectedItem({ pageX, pageY }) {
+    this.shiftsSelectedItem = {
+      x: pageX - this.selectedItem.getBoundingClientRect().left,
+      y: pageY - this.selectedItem.getBoundingClientRect().top
+    };
+  }
+
+  movePlaceholder() {
+    const previousItem = this.placeholderItem.previousElementSibling;
+    const nextItem = this.placeholderItem.nextElementSibling;
+
+    if (
+      this.selectedItem.getBoundingClientRect().bottom <=
+      previousItem?.getBoundingClientRect().bottom
+    ) {
+      previousItem.before(this.placeholderItem);
+    }
+
+    if (this.selectedItem.getBoundingClientRect().top >= nextItem?.getBoundingClientRect().top) {
+      nextItem.after(this.placeholderItem);
+    }
+  }
+
+  setPlaceholder() {
+    this.placeholderItem = document.createElement('div');
+    this.placeholderItem.className = 'sortable-list__item sortable-list__placeholder';
+  }
+
+  constructor({ items = [] } = {}) {
     this.items = items;
-
     this.render();
   }
 
   render() {
-    this.element = document.createElement('ul');
-    this.element.className = 'sortable-list';
+    const wrapper = document.createElement('ul');
+    wrapper.classList.add('sortable-list');
+    wrapper.dataset.element = 'list';
+    this.items.forEach(item => item.classList.add('sortable-list__item'));
+    wrapper.append(...this.items);
+    this.element = wrapper;
 
-    this.addItems();
-    this.initEventListeners();
+    this.initEventlisteners();
+    this.setPlaceholder();
   }
 
-  initEventListeners() {
-    this.element.addEventListener('pointerdown', event => this.onPointerDown(event));
-  }
-
-  addItems() {
-    // item is a DOM element
-    for (let item of this.items) {
-      item.classList.add('sortable-list__item');
-    }
-
-    this.element.append(...this.items);
-  }
-
-  onPointerDown(event) {
-    if (event.which !== 1) { // must be left-button
-      return false;
-    }
-
-    const itemElem = event.target.closest('.sortable-list__item');
-
-    if (itemElem) {
-      if (event.target.closest('[data-grab-handle]')) {
-        event.preventDefault();
-
-        this.dragStart(itemElem, event);
-      }
-
-      if (event.target.closest('[data-delete-handle]')) {
-        event.preventDefault();
-
-        itemElem.remove();
-      }
-    }
-  }
-
-  dragStart(itemElem, {clientX, clientY}) {
-    this.elementInitialIndex = [...this.element.children].indexOf(itemElem);
-
-    this.pointerInitialShift = {
-      x: clientX - itemElem.getBoundingClientRect().x,
-      y: clientY - itemElem.getBoundingClientRect().y
-    };
-
-    this.draggingElem = itemElem;
-
-    this.placeholderElem = document.createElement('li');
-    this.placeholderElem.className = 'sortable-list__placeholder';
-
-    // itemElem will get position:fixed
-    // so its width will be auto-set to fit the parent container
-    itemElem.style.width = `${itemElem.offsetWidth}px`;
-    itemElem.style.height = `${itemElem.offsetHeight}px`;
-
-    this.placeholderElem.style.width = itemElem.style.width;
-    this.placeholderElem.style.height = itemElem.style.height;
-
-    itemElem.classList.add('sortable-list__item_dragging');
-
-    itemElem.after(this.placeholderElem);
-
-    // move to the end, to be over other list elements
-    this.element.append(itemElem);
-
-    this.moveDraggingAt(clientX, clientY);
-
-    document.addEventListener('pointermove', this.onDocumentPointerMove);
-    document.addEventListener('pointerup', this.onDocumentPointerUp);
-  }
-
-  moveDraggingAt(clientX, clientY) {
-    this.draggingElem.style.left = clientX - this.pointerInitialShift.x + 'px';
-    this.draggingElem.style.top = clientY - this.pointerInitialShift.y + 'px';
-  }
-
-  scrollIfCloseToWindowEdge(clientY) {
-    const scrollingValue = 10;
-    const threshold = 20;
-
-    if (clientY < threshold) {
-      window.scrollBy(0, -scrollingValue);
-    } else if (clientY > document.documentElement.clientHeight - threshold) {
-      window.scrollBy(0, scrollingValue);
-    }
-  }
-
-  movePlaceholderAt(index) {
-    const currentElement = this.element.children[index];
-
-    if (currentElement !== this.placeholderElem) {
-      this.element.insertBefore(this.placeholderElem, currentElement);
-    }
-  }
-
-  dragStop() {
-    const placeholderIndex = [...this.element.children].indexOf(this.placeholderElem);
-
-    // drop element back
-    this.placeholderElem.replaceWith(this.draggingElem);
-    this.draggingElem.classList.remove('sortable-list__item_dragging');
-
-    this.draggingElem.style.left = '';
-    this.draggingElem.style.top = '';
-    this.draggingElem.style.width = '';
-    this.draggingElem.style.height = '';
-
-    document.removeEventListener('pointermove', this.onDocumentPointerMove);
-    document.removeEventListener('pointerup', this.onDocumentPointerUp);
-
-    this.draggingElem = null;
-
-    if (placeholderIndex !== this.elementInitialIndex) {
-      this.element.dispatchEvent(new CustomEvent('sortable-list-reorder', {
-        bubbles: true,
-        details: {
-          from: this.elementInitialIndex,
-          to: placeholderIndex
-        }
-      }));
-    }
+  initEventlisteners() {
+    this.element.addEventListener('pointerdown', this.onItemPointerdownHandler);
   }
 
   remove() {
-    this.element.remove();
-    document.removeEventListener('pointermove', this.onDocumentPointerMove);
-    document.removeEventListener('pointerup', this.onDocumentPointerUp);
+    this.element?.remove();
   }
 
   destroy() {
     this.remove();
+    this.element = null;
+    this.selectedItem = null;
   }
 }
