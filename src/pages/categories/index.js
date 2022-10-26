@@ -5,15 +5,22 @@ export default class CategoriesPage {
   element;
   subElements = {};
   components = {};
+  categoriesData = [];
 
-  async initComponents() {
-    const categoriesData = await fetchJson(
-      `${process.env.BACKEND_URL}api/rest/categories?_sort=weight&_refs=subcategory`
-    );
+  async loadCategoriesData() {
+    try {
+      const data = await fetchJson(
+        `${process.env.BACKEND_URL}api/rest/categories?_sort=weight&_refs=subcategory`
+      );
 
-    const categoriesContainer = categoriesData.map(item => new Categories(item));
-
-    this.components.categoriesContainer = categoriesContainer;
+      return data;
+    } catch (error) {
+      const notification = new NotificationMessage(error, {
+        duration: 2000,
+        type: 'error'
+      });
+      notification.show();
+    }
   }
 
   get template() {
@@ -37,17 +44,19 @@ export default class CategoriesPage {
     this.element = element.firstElementChild;
     this.subElements = this.getSubElements(this.element);
 
-    await this.initComponents();
+    this.categoriesData = await this.loadCategoriesData();
 
-    this.renderComponents();
+    this.renderCategories();
 
     return this.element;
   }
 
-  renderComponents() {
-    this.components.categoriesContainer.forEach(item =>
-      this.subElements.categoriesContainer.append(item.element)
-    );
+  renderCategories() {
+    this.categoriesData
+      .map(item => new Categories(item))
+      .forEach(item => {
+        this.subElements.categoriesContainer.append(item.element);
+      });
   }
 
   getSubElements(element) {
