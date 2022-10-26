@@ -6,6 +6,10 @@ export default class EditProductPage {
   components = {};
   productId;
 
+  constructor(productId = '') {
+    this.productId = productId[1];
+  }
+
   async initComponents() {
     const productContainer = new ProductForm(this.productId);
 
@@ -32,12 +36,6 @@ export default class EditProductPage {
   }
 
   async render() {
-    const pathname = window.location.pathname;
-
-    if (!pathname.match(/^\/products\/add$/i)) {
-      this.productId = pathname.split('/')[2];
-    }
-
     const element = document.createElement('div');
 
     element.innerHTML = this.template;
