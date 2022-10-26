@@ -55,7 +55,6 @@ export default class Page {
     progressBar.style.display = "block";
 
     const { from, to } = event.detail;
-    console.log(event.detail);
 
     this.getChartsUpdate(from, to);
     this.getSortableTableUpdate(from, to);

@@ -1,4 +1,3 @@
-// import ProductForm from '../../../components/product-form';
 import DoubleSlider from '../../../components/double-slider';
 import SortableTable from '../../../components/sortable-table';
 import header from './products-header';
@@ -8,6 +7,79 @@ export default class ProductListPage {
   subElements = {};
   components = {};
 
+  initListeners() {
+    const { filterStatus, doubleSlider, filterName } = this.subElements;
+    doubleSlider.addEventListener('range-select', this.onDoubleSliderChange);
+    filterStatus.addEventListener('change', this.onStatusChange);
+    filterName.addEventListener('input', this.onNameChange);
+  }
+
+  removeListeners() {
+    const { filterStatus, doubleSlider, filterName } = this.subElements;
+    doubleSlider.removeEventListener('range-select', this.onDoubleSliderChange);
+    filterStatus.removeEventListener('change', this.onStatusChange);
+    filterName.removeEventListener('input', this.onNameChange);
+  }
+
+  onDoubleSliderChange = (event) => {
+    console.log(event);
+    const { from, to } = event.detail;
+    this.minSlider = from;
+    this.maxSlider = to;
+
+    this.updateComponents();
+  };
+
+  async updateComponents() {
+    const { sortableTable } = this.subElements;
+    this.sortableTableElement.destroy();
+
+    this.url.searchParams.set('price_gte', this.minSlider);
+    this.url.searchParams.set('price_lte', this.maxSlider);
+
+    this.sortableTableElement = new SortableTable(header, { url: this.url });
+
+    sortableTable.append(this.sortableTableElement.element);
+  }
+
+  onStatusChange = (event) => {
+    const targetValue = event.target.value;
+    console.log(targetValue);
+
+    if (targetValue === '') {
+      this.url.searchParams.delete('status');
+    } else {
+      this.url.searchParams.set('status', targetValue);
+    }
+
+    this.updateComponents();
+  };
+
+  onNameChange = (event) => {
+    const targetValue = event.target.value;
+    console.log(targetValue);
+
+    if (targetValue) {
+      this.url.searchParams.set('title_like', targetValue);
+    } else {
+      this.url.searchParams.delete('title_like');
+    }
+
+    this.url.searchParams.set('title_like', targetValue);
+
+    setTimeout(() => this.updateComponents(), 1000);
+  }
+
+  async fetchData(url) {
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   async renderMinMaxSlider() {
     const url = new URL('api/rest/products', process.env.BACKEND_URL);
     url.searchParams.set('_embed', 'subcategory.category');
@@ -16,45 +88,27 @@ export default class ProductListPage {
     url.searchParams.set('_start', '0');
     url.searchParams.set('_end', '30');
 
-    console.log(url);
-
-    try {
-      const response = await fetch(url);
-      const data = await response.json();
-      let min = data;
-      console.log('min', min);
-      return data;
-    } catch (error) {
-      console.log(error);
-    }
+    let min = this.fetchData(url);
 
     url.searchParams.set('_order', 'desc');
 
-    try {
-      const response = await fetch(url);
-      const data = await response.json();
-      let max = data;
-      console.log('max', max);
-      return data;
-    } catch (error) {
-      console.log(error);
-    }
+    let max = this.fetchData(url);
+
+    [min, max] = await Promise.all([min, max]);
+
+    this.minSlider = min[0].price;
+    this.maxSlider = max[0].price;
   }
-  // _embed=subcategory.category&price_gte=1315&price_lte=4000&_sort=title&_order=asc&_start=0&_end=30
 
   async renderComponents() {
     const { sortableTable, doubleSlider } = this.subElements;
     this.url = new URL('api/rest/products', process.env.BACKEND_URL);
     this.url.searchParams.set('_embed', 'subcategory.category');
 
-    console.log(this.url);
-
     await this.renderMinMaxSlider();
 
-    // this.url.searchParams.set('price_gte', this.minSlider);
-    // this.url.searchParams.set('price_lte', this.maxSlider);
-
-    console.log(this.url);
+    this.url.searchParams.set('price_gte', this.minSlider);
+    this.url.searchParams.set('price_lte', this.maxSlider);
 
     this.doubleSliderElement = new DoubleSlider({ min: this.minSlider, max: this.maxSlider }); 
 
@@ -63,31 +117,6 @@ export default class ProductListPage {
     sortableTable.append(this.sortableTableElement.element);
     doubleSlider.append(this.doubleSliderElement.element);
   }
-
-  // <div class="form-group" data-element="sliderContainer">
-  //           <label class="form-label">Price:</label>
-  //           <div class="range-slider">
-  //             <span data-elem="from">$0</span>
-  //             <div data-elem="inner" class="range-slider__inner">
-  //               <span
-  //                 data-elem="progress"
-  //                 class="range-slider__progress"
-  //                 style="left: 0%; right: 0%"
-  //               ></span>
-  //               <span
-  //                 data-elem="thumbLeft"
-  //                 class="range-slider__thumb-left"
-  //                 style="left: 0%"
-  //               ></span>
-  //               <span
-  //                 data-elem="thumbRight"
-  //                 class="range-slider__thumb-right"
-  //                 style="right: 0%"
-  //               ></span>
-  //             </div>
-  //             <span data-elem="to">$4000</span>
-  //           </div>
-  //         </div>
 
   get template() {
     return `
@@ -102,7 +131,7 @@ export default class ProductListPage {
             <label class="form-label">Sort by:</label>
             <input
               type="text"
-              data-elem="filterName"
+              data-element="filterName"
               class="form-control"
               placeholder="Product name"
             />
@@ -112,7 +141,7 @@ export default class ProductListPage {
           </div>
           <div class="form-group">
             <label class="form-label">Status:</label>
-            <select class="form-control" data-elem="filterStatus">
+            <select class="form-control" data-element="filterStatus">
               <option value="" selected="">Any</option>
               <option value="1">Active</option>
               <option value="0">Inactive</option>
@@ -120,7 +149,7 @@ export default class ProductListPage {
           </div>
         </form>
       </div>
-      <div data-element="sortableTable">
+      <div data-element="sortableTable" class="products-list__container">
         <!-- sortable-table component -->
       </div>
     </div>
@@ -135,6 +164,7 @@ export default class ProductListPage {
     this.subElements = this.getSubElements();
 
     await this.renderComponents();
+    this.initListeners();
 
     // this.initComponents();
     // await this.renderComponents();
@@ -170,5 +200,6 @@ export default class ProductListPage {
     for (const component of Object.values(this.components)) {
       component.destroy();
     }
+    this.removeListeners();
   }
 }
