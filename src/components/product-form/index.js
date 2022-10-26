@@ -215,9 +215,11 @@ export default class ProductForm {
 
     this.initEventListeners();
 
-    this.setCategoriesDataOnForm(await this.loadCategoriesData());
+    const [loadedCategoriesData, loadedProductData] = await this.loadData();
+
+    this.setCategoriesDataOnForm(loadedCategoriesData);
     if (this.productId) {
-      this.setProductDataOnForm(await this.loadProductData());
+      this.setProductDataOnForm(loadedProductData[0]);
     } else {
       const sortableImageList = new SortableList();
       this.subElements.imageListContainer.append(sortableImageList.element);
@@ -226,29 +228,31 @@ export default class ProductForm {
     return this.element;
   }
 
-  async loadCategoriesData() {
-    const requestURL = new URL('api/rest/categories', BACKEND_URL);
-    requestURL.searchParams.set('_sort', 'weight');
-    requestURL.searchParams.set('_refs', 'subcategory');
-
+  loadData() {
     try {
-      const data = await fetchJson(requestURL);
-      return data;
+      return Promise.all([this.loadCategoriesData(), this.loadProductData()]);
     } catch (error) {
       throw new Error(error);
     }
   }
 
-  async loadProductData() {
-    const requestURL = new URL('api/rest/products', BACKEND_URL);
-    requestURL.searchParams.set('id', this.productId);
+  loadCategoriesData() {
+    const requestURL = new URL('api/rest/categories', BACKEND_URL);
+    requestURL.searchParams.set('_sort', 'weight');
+    requestURL.searchParams.set('_refs', 'subcategory');
 
-    try {
-      const data = await fetchJson(requestURL);
-      return data[0];
-    } catch (error) {
-      throw new Error(error);
+    return fetchJson(requestURL);
+  }
+
+  loadProductData() {
+    if (this.productId) {
+      const requestURL = new URL('api/rest/products', BACKEND_URL);
+      requestURL.searchParams.set('id', this.productId);
+
+      return fetchJson(requestURL);
     }
+
+    return Promise.resolve(null);
   }
 
   initEventListeners() {
