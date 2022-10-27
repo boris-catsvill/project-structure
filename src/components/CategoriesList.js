@@ -33,11 +33,19 @@ export default class CategoriesList {
     return wrapper.firstElementChild;
   }
 
+  createSortableList(wrapper) {
+
+    const subcategoryList = subcategories.map(this.getSubCategoryList);
+
+    const subcategoriesListContainer = wrapper.querySelector('[data-element="subCatListContainer"]');
+    subcategoriesListContainer.append(new SortableList({ items: subcategoryList }).element);
+  } 
+
   getCategory(category) {
     const wrapper = document.createElement('div');
 
     const { id, subcategories, title } = category;
-    const subcategoryList = subcategories.map(this.getSubCategoryList);
+
 
     const categoryBody = `
         <div class="category category_open" data-id="${id}" data-element="category">
@@ -52,9 +60,7 @@ export default class CategoriesList {
     wrapper.innerHTML = categoryBody;
     const categoryElement = wrapper.firstElementChild;
 
-    const subcategoriesListContainer = categoryElement.querySelector('[data-element="subCatListContainer"]');
-    subcategoriesListContainer.append(new SortableList({ items: subcategoryList }).element);
-
+    createSortableList(categoryElement);
     return categoryElement;
   }
 
