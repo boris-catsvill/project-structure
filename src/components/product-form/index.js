@@ -2,7 +2,6 @@ import SortableList from '../sortable-list/index.js';
 import escapeHtml from '../../utils/escape-html.js';
 import fetchJson from '../../utils/fetch-json.js';
 
-const IMGUR_CLIENT_ID = '28aaa2e823b03b1';
 const BACKEND_URL = 'https://course-js.javascript.ru';
 
 export default class ProductForm {
@@ -43,7 +42,7 @@ export default class ProductForm {
         const result = await fetchJson('https://api.imgur.com/3/image', {
           method: 'POST',
           headers: {
-            Authorization: `Client-ID ${IMGUR_CLIENT_ID}`,
+            Authorization: `Client-ID ${process.env.IMGUR_CLIENT_ID}`,
           },
           body: formData,
           referrer: ''
@@ -70,7 +69,7 @@ export default class ProductForm {
 
     const productPromise = this.productId
       ? this.loadProductData(this.productId)
-      : Promise.resolve(this.defaultFormData);
+      : Promise.resolve([this.defaultFormData]);
 
     const [categoriesData, productResponse] = await Promise.all([
       categoriesPromise, productPromise
@@ -94,6 +93,7 @@ export default class ProductForm {
   async save() {
     const product = this.getFormData();
 
+     //ругается на CORS POLICY при попытке загрузки через process.env.BACKEND_URL
     try {
       const result = await fetchJson(`${BACKEND_URL}/api/rest/products`, {
         method: this.productId ? 'PATCH' : 'PUT',
@@ -254,6 +254,7 @@ export default class ProductForm {
     `;
   }
 
+  //ругается на CORS POLICY при попытке загрузки через process.env.BACKEND_URL, почему-то только в этом компоненте
   async loadProductData (productId) {
     return fetchJson(`${BACKEND_URL}/api/rest/products?id=${productId}`);
   }
@@ -320,12 +321,12 @@ export default class ProductForm {
     wrapper.innerHTML = `
       <li class="products-edit__imagelist-item sortable-list__item">
         <span>
-          <img src="./icon-grab.svg" data-grab-handle alt="grab">
+          <img src="/assets/icons/icon-grab.svg" data-grab-handle alt="grab">
           <img class="sortable-table__cell-img" alt="${escapeHtml(name)}" src="${escapeHtml(url)}">
           <span>${escapeHtml(name)}</span>
         </span>
         <button type="button">
-          <img src="./icon-trash.svg" alt="delete" data-delete-handle>
+          <img src="/assets/icons/icon-trash.svg" alt="delete" data-delete-handle>
         </button>
       </li>`;
 

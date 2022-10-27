@@ -1,17 +1,13 @@
-import ProductForm from "../../../components/product-form";
 import RangeSlider from "../../../components/double-slider";
 import SortableTable from "../../../components/sortable-table";
 import header from './products-header';
-
 import fetchJson from '../../../utils/fetch-json.js';
-
-const BACKEND_URL = 'https://course-js.javascript.ru/';
 
 export default class Page {
   element;
   subElements = {};
   components = {};
-  url = new URL('api/rest/products?_embed=subcategory.category&_sort=title&_order=asc&_start=0&_end=30', BACKEND_URL); //changeable url
+  url = new URL('api/rest/products?_embed=subcategory.category&_sort=title&_order=asc&_start=0&_end=30', process.env.BACKEND_URL);
   sortableTableURL = '';
   min = 0;
   max = 4000;
@@ -19,7 +15,7 @@ export default class Page {
   start = 0;
   end = this.step + this.start;
 
-  async updateComponents (from, to) {
+  async updateComponents(from, to) {
     const data = await this.loadData(from, to);
 
     this.element.querySelector('.sortable-table__body').innerHTML = '';
@@ -39,22 +35,6 @@ export default class Page {
     const data = await fetchJson(this.url);
 
     return data;
-  }
-
-  async render() {
-    const element = document.createElement('div');
-
-    element.innerHTML = this.getTemplate();
-
-    this.element = element.firstElementChild;
-
-    this.subElements = this.getSubElements(this.element);
-
-    this.initComponents();
-    this.renderComponents();
-    this.initEventListeners();
-
-    return this.element;
   }
 
   async sortByStatus(state) {
@@ -93,63 +73,7 @@ export default class Page {
     this.renderPlaceholder(data);
   }
 
-  initComponents() {
-    const rangeSlider = new RangeSlider({
-      min: this.min,
-      max: this.max
-    });
-
-    const sortableTable = new SortableTable(header, {
-      url: `api/rest/products?_embed=subcategory.category`,
-      step: this.step,
-      start: this.start
-    })
-
-    this.sortableTableURL = sortableTable.url;
-
-    this.components = {
-      rangeSlider,
-      sortableTable
-    }
-  }
-
-  renderComponents() {
-    Object.keys(this.components).forEach(componentName => {
-      const root = this.subElements[componentName];
-      const { element } = this.components[componentName];
-
-      root.append(element);
-    })
-  }
-
-  renderPlaceholder(data) {
-    const placeholder = this.element.querySelector('[data-element="emptyPlaceholder"]');
-    const sortableTable = this.element.querySelector('.sortable-table');
-
-    if (data.length === 0) {
-      sortableTable.classList.add('sortable-table_empty')
-      placeholder.innerHTML = this.getPlaceholderTemplate();
-
-      const clearFiltersButton = this.element.querySelector('.button-primary-outline');
-      this.clearFilters(clearFiltersButton);
-
-    } else {
-      sortableTable.classList.remove('sortable-table_empty')
-      placeholder.innerHTML = '';
-    }
-  }
-
-  getPlaceholderTemplate() {
-    return `
-    <div>
-      <p>Не найдено товаров удовлетворяющих выбранному критерию</p>
-      <button type="button" class="button-primary-outline">Очистить фильтры</button>
-    </div>
-    `
-  }
-
   async clearFilters(button) {
-    const initialURL = new URL('api/rest/products?_embed=subcategory.category&_sort=title&_order=asc&_start=0&_end=30', BACKEND_URL)
     const placeholder = this.element.querySelector('[data-element="emptyPlaceholder"]');
     const sortableTable = this.element.querySelector('.sortable-table');
     const { filterStatus, filterName } = this.subElements;
@@ -159,12 +83,14 @@ export default class Page {
 
     if ( button ) {
       button.addEventListener('click', async () => {
-        const data = await fetchJson(initialURL);
+        this.clearURL(this.url);
+        this.clearURL(this.sortableTableURL);
+
+        const data = await fetchJson(this.url);
 
         this.components.sortableTable.update(data);
 
-        this.url = initialURL;
-
+        //clear Page
         sortableTable.classList.remove('sortable-table_empty')
         placeholder.innerHTML = '';
         filterStatus.value = '';
@@ -178,10 +104,26 @@ export default class Page {
         to.textContent = `${this.max}`;
 
         //clear SortableTable values
-        this.components.sortableTable.url = initialURL;
         this.components.sortableTable.end = this.end;
+        this.components.sortableTable.start = this.start;
       })
     }
+  }
+
+  async render() {
+    const element = document.createElement('div');
+
+    element.innerHTML = this.getTemplate();
+
+    this.element = element.firstElementChild;
+
+    this.subElements = this.getSubElements(this.element);
+
+    this.initComponents();
+    this.renderComponents();
+    this.initEventListeners();
+
+    return this.element;
   }
 
   getTemplate() {
@@ -221,29 +163,6 @@ export default class Page {
     `
   }
 
-  initEventListeners() {
-    this.components.rangeSlider.element.addEventListener('range-select', event => {
-      const  { from, to } = event.detail;
-
-      this.components.sortableTable.stopFetching = false;
-      this.updateComponents(from, to);
-    });
-
-    this.subElements.filterStatus.addEventListener('change', event => {
-      this.components.sortableTable.end = this.end;
-      this.components.sortableTable.stopFetching = false;
-
-      this.sortByStatus(event.target.value);
-    })
-
-    this.subElements.filterName.addEventListener('input', event => {
-      this.components.sortableTable.end = this.end;
-      this.components.sortableTable.stopFetching = false;
-
-      this.sortByName(event.target.value);
-    })
-  }
-
   getSubElements(element) {
     const elements = element.querySelectorAll('[data-element]');
 
@@ -254,14 +173,103 @@ export default class Page {
     }, {});
   }
 
-  destroy() {
-    this.remove();
-    this.element = null;
+  initComponents() {
+    const rangeSlider = new RangeSlider({
+      min: this.min,
+      max: this.max
+    });
+
+    const sortableTable = new SortableTable(header, {
+      url: `api/rest/products?_embed=subcategory.category`,
+      step: this.step,
+      start: this.start
+    })
+
+    this.sortableTableURL = sortableTable.url;
+
+    this.components = {
+      rangeSlider,
+      sortableTable
+    }
   }
 
-  remove () {
-    if (this.element) {
-      this.element.remove();
+  renderComponents() {
+    Object.keys(this.components).forEach(componentName => {
+      const root = this.subElements[componentName];
+      const { element } = this.components[componentName];
+
+      root.append(element);
+    })
+  }
+
+  initEventListeners() {
+    this.components.rangeSlider.element.addEventListener('range-select', event => {
+      const  { from, to } = event.detail;
+
+      this.components.sortableTable.end = this.end;
+      this.components.sortableTable.start = this.start;
+      this.components.sortableTable.stopFetching = false;
+
+      this.updateComponents(from, to);
+    });
+
+    this.subElements.filterStatus.addEventListener('change', event => {
+      this.components.sortableTable.end = this.end;
+      this.components.sortableTable.start = this.start;
+      this.components.sortableTable.stopFetching = false;
+
+      this.sortByStatus(event.target.value);
+    })
+
+    this.subElements.filterName.addEventListener('input', event => {
+      this.components.sortableTable.end = this.end;
+      this.components.sortableTable.start = this.start;
+      this.components.sortableTable.stopFetching = false;
+
+      this.sortByName(event.target.value);
+    })
+  }
+
+  getPlaceholderTemplate() {
+    return `
+    <div>
+      <p>Не найдено товаров удовлетворяющих выбранному критерию</p>
+      <button type="button" class="button-primary-outline">Очистить фильтры</button>
+    </div>
+    `
+  }
+
+  renderPlaceholder(data) {
+    const placeholder = this.element.querySelector('[data-element="emptyPlaceholder"]');
+    const sortableTable = this.element.querySelector('.sortable-table');
+
+    if (data.length === 0) {
+      sortableTable.classList.add('sortable-table_empty')
+      placeholder.innerHTML = this.getPlaceholderTemplate();
+
+      const clearFiltersButton = this.element.querySelector('.button-primary-outline');
+      this.clearFilters(clearFiltersButton);
+
+    } else {
+      sortableTable.classList.remove('sortable-table_empty')
+      placeholder.innerHTML = '';
+    }
+  }
+
+  clearURL(url) {
+    url.searchParams.set('_sort', 'title');
+    url.searchParams.set('_order', 'asc');
+    url.searchParams.set('_start', `${this.start}`);
+    url.searchParams.set('_end', `${this.end}`);
+    url.searchParams.delete('status');
+    url.searchParams.delete('price_gte');
+    url.searchParams.delete('price_lte');
+    url.searchParams.delete('title_like');
+  }
+
+  destroy() {
+    for (const component of Object.values(this.components)) {
+      component.destroy();
     }
   }
 }

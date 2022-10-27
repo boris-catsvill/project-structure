@@ -1,13 +1,41 @@
 import SortableList from '../../components/sortable-list/index.js';
 import NotificationMessage from '../../components/notification/index.js'
-
 import fetchJson from '../../utils/fetch-json.js';
-const BACKEND_URL = 'https://course-js.javascript.ru/';
+
 
 export default class Page {
   element;
-  url = new URL('api/rest/categories?_sort=weight&_refs=subcategory', BACKEND_URL)
+  url = new URL('api/rest/categories?_sort=weight&_refs=subcategory', process.env.BACKEND_URL)
   data = [];
+
+  async update(data) {
+    try {
+      await fetchJson(`${process.env.BACKEND_URL}api/rest/subcategories`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      });
+
+      const notification = new NotificationMessage('Category order saved', {
+        duration: 2000,
+        type: 'success'
+      });
+
+      notification.show();
+
+    } catch (error) {
+      console.error('something went wrong', error);
+
+      const notification = new NotificationMessage('Category order saving error', {
+        duration: 2000,
+        type: 'error'
+      });
+
+      notification.show();
+    }
+  }
 
   async render() {
     this.data = await fetchJson(this.url);
@@ -113,35 +141,6 @@ export default class Page {
     return data;
   }
 
-  async update(data) {
-    try {
-      await fetchJson(`${BACKEND_URL}api/rest/subcategories`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-      });
-
-      const notification = new NotificationMessage('Category order saved', {
-        duration: 2000,
-        type: 'success'
-      });
-
-      notification.show();
-
-    } catch (error) {
-      console.error('something went wrong', error);
-
-      const notification = new NotificationMessage('Category order saving error', {
-        duration: 2000,
-        type: 'error'
-      });
-
-      notification.show();
-    }
-  }
-
   closeOnClick() {
     const categoriesHeaders = this.element.querySelectorAll('.category__header');
 
@@ -159,12 +158,12 @@ export default class Page {
     });
   }
 
-  destroy() {
+  destroy () {
     this.remove();
     this.element = null;
   }
 
-  remove() {
+  remove () {
     if (this.element) {
       this.element.remove();
     }

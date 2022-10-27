@@ -364,8 +364,8 @@ form .form-control::placeholder {
 }
 
 form textarea {
-  resize: none;
-  min-height: 186px;
+  resize: vertical;
+  min-height: 250px;
 }
 
 form select.form-control {

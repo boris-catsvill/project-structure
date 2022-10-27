@@ -1,7 +1,5 @@
 import fetchJson from '../../utils/fetch-json.js';
 
-const BACKEND_URL = 'https://course-js.javascript.ru/'
-
 export default class ColumnChart {
 
   chartHeight = 50
@@ -16,7 +14,7 @@ export default class ColumnChart {
       to: new Date()
     },
   } = {}) {
-    this.url = new URL(url, BACKEND_URL)
+    this.url = new URL(url, process.env.BACKEND_URL)
 
     this.range = range;
     this.label = label;
@@ -70,7 +68,7 @@ export default class ColumnChart {
   }
 
   getLink() {
-    return this.link ? `<a class='column-chart__link' href='${this.link}'>View all</a>` : '';
+    return this.link ? `<a class='column-chart__link' href='${this.link}'>Подробнее</a>` : '';
   }
 
 
@@ -78,7 +76,7 @@ export default class ColumnChart {
     return `
       <div class="column-chart column-chart_loading" style"...">
         <div class='column-chart__title'>
-          Total ${this.label}
+          ${this.label}
           ${this.getLink()}
         </div>
         <div class='column-chart__container'>

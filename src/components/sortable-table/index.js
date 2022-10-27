@@ -1,7 +1,5 @@
 import fetchJson from '../../utils/fetch-json.js';
 
-const BACKEND_URL = 'https://course-js.javascript.ru';
-
 export default class SortableTable {
   element;
   subElements = {};
@@ -80,7 +78,7 @@ export default class SortableTable {
     isRowTypeLink = true,
   } = {}) {
     this.headersConfig = headersConfig;
-    this.url = new URL(url, BACKEND_URL);
+    this.url = new URL(url, process.env.BACKEND_URL);
     this.sorted = sorted;
     this.isSortLocally = isSortLocally;
     this.step = step;
@@ -203,7 +201,6 @@ export default class SortableTable {
         : `<div class="sortable-table__cell">${item[id]}</div>`
     }).join('');
   }
-
 
   getTable() {
     return `

@@ -1,16 +1,13 @@
 import RangePicker from '../../components/range-picker/index.js';
 import SortableTable from '../../components/sortable-table/index.js';
 import header from './sales-header.js';
-
 import fetchJson from '../../utils/fetch-json.js';
-
-const BACKEND_URL = 'https://course-js.javascript.ru/';
 
 export default class Page {
   element;
   subElements = {};
   components = {};
-  url = new URL('api/rest/orders', BACKEND_URL);
+  url = new URL('api/rest/orders', process.env.BACKEND_URL);
 
   async updateComponents (from, to) {
     const data = await this.loadData(from, to);
@@ -23,7 +20,6 @@ export default class Page {
 
     this.components.sortableTable.update(data);
   }
-
 
   async loadData(from, to) {
     this.url.searchParams.set('createdAt_gte', from.toISOString());
@@ -53,7 +49,6 @@ export default class Page {
     return this.element;
   }
 
-
   getTemplate(){
     return `
     <div class="sales full-height flex-column">
@@ -66,13 +61,13 @@ export default class Page {
     `
   }
 
-  renderComponents() {
-    Object.keys(this.components).forEach(componentName => {
-      const root = this.subElements[componentName];
-      const { element } = this.components[componentName];
+  getSubElements(element) {
+    const elements = element.querySelectorAll('[data-element]');
+    return [...elements].reduce((accum, subElement) => {
+      accum[subElement.dataset.element] = subElement;
 
-      root.append(element);
-    })
+      return accum;
+    }, {});
   }
 
   initComponents() {
@@ -100,13 +95,13 @@ export default class Page {
     }
   }
 
-  getSubElements(element) {
-    const elements = element.querySelectorAll('[data-element]');
-    return [...elements].reduce((accum, subElement) => {
-      accum[subElement.dataset.element] = subElement;
+  renderComponents() {
+    Object.keys(this.components).forEach(componentName => {
+      const root = this.subElements[componentName];
+      const { element } = this.components[componentName];
 
-      return accum;
-    }, {});
+      root.append(element);
+    })
   }
 
   initEventListeners() {
@@ -118,14 +113,9 @@ export default class Page {
     });
   }
 
-  destroy () {
-    this.remove();
-    this.element = null;
-  }
-
-  remove () {
-    if (this.element) {
-      this.element.remove();
+  destroy() {
+    for (const component of Object.values(this.components)) {
+      component.destroy();
     }
   }
 }

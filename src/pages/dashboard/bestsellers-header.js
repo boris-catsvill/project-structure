@@ -1,7 +1,7 @@
 const header = [
   {
     id: 'images',
-    title: 'Image',
+    title: 'Фото',
     sortable: false,
     template: data => {
       return `
@@ -13,13 +13,13 @@ const header = [
   },
   {
     id: 'title',
-    title: 'Name',
+    title: 'Название',
     sortable: true,
     sortType: 'string'
   },
   {
     id: 'subcategory',
-    title: 'Category',
+    title: 'Категория',
     sortable: false,
     template: (data = []) => {
       return `
@@ -31,13 +31,13 @@ const header = [
   },
   {
     id: 'quantity',
-    title: 'Quantity',
+    title: 'Количество',
     sortable: true,
     sortType: 'number'
   },
   {
     id: 'price',
-    title: 'Price',
+    title: 'Цена',
     sortable: true,
     sortType: 'number',
     template: (data = []) => {
@@ -49,15 +49,10 @@ const header = [
     }
   },
   {
-    id: 'status',
-    title: 'Status',
+    id: 'sales',
+    title: 'Продажи',
     sortable: true,
     sortType: 'number',
-    template: data => {
-      return `<div class="sortable-table__cell">
-          ${data > 0 ? 'Active' : 'Inactive'}
-        </div>`;
-    }
   },
 ];
 
