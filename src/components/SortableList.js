@@ -62,7 +62,7 @@ export default class SortableList {
       bubbles: true,
       detail: {
         startPositions: this.items,
-        endPositions: [...this.elements.children],
+        endPositions: [...this.element.children],
       }
     }));
   }

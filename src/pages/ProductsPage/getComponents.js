@@ -11,8 +11,12 @@ export default (range) => [
             {
                 url: `${process.env.BACKEND_URL}${process.env.PRODUCTS_REST_URL}`,
                 isSortLocally: false,
-                showingPage: 'ProductsPage',
-                range
+                range,
+                searchParams: {
+                    '_embed': 'subcategory.category',
+                    '_start': 0,
+                    '_end': 30,
+                },
             }
         ]
     ],

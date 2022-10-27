@@ -18,8 +18,14 @@ export default (range) => [
             {
                 url: `${process.env.BACKEND_URL}${process.env.BESTSELLERS_DASHBOARD_URL}`,
                 isSortLocally: true,
-                showingPage: 'DashboardPage',
-                range
+                pagination: false,
+                range,
+                searchParams: {
+                    from: new Date(range.from),
+                    to: new Date(range.to),
+                    '_start': 0,
+                    '_end': 30,
+                },
             }
         ]
     ],

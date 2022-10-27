@@ -11,23 +11,21 @@ export default class SortableTable {
       id: field = headerConfig.find(cell => cell.sortable).id,
       order = 'asc'
     } = {},
-    range,
     isSortLocally = false,
-    showingPage = 'DashboardPage'
+    pagination = true,
+    clickableRows = true,
+    searchParams
   } = {}) {
 
     this.paramOfSort = {
-      field: this.showingPage === 'SalesPage' ? 'createdAt' : field,
-      order,
-      start: 0,
-      end: 30,
-      from: new Date(range.from),
-      to: new Date(range.to),
-      '_embed': 'subcategory.category',
+      ...searchParams,
+      '_sort': searchParams._sort ? searchParams._sort : field,
+      '_order': order,
     };
 
     this.isSortLocally = isSortLocally;
-    this.showingPage = showingPage;
+    this.pagination = pagination;
+    this.clickableRows = clickableRows
 
     this.headerConfig = headerConfig;
 
@@ -94,8 +92,8 @@ export default class SortableTable {
   }
 
   getRowOfTableBody(rowItem) {
-    const typeOfContainer = this.showingPage === 'SalesPage' ? 'div' : 'a';
-    const href = this.showingPage === 'SalesPage' ? '' : `href="/products/${rowItem.id}"`;
+    const typeOfContainer = this.clickableRows ? 'a' : 'div';
+    const href = this.clickableRows ? `href="/products/${rowItem.id}"` : '';
     return (
       `<${typeOfContainer} ${href} class="sortable-table__row" data-element="rowOfTableBody">
           ${this.cells.map(key => this.getCellOfTableBody(rowItem[key], key)).join('')}
@@ -123,23 +121,10 @@ export default class SortableTable {
     return wrapper.firstElementChild;
   }
 
-  urlSetSearchParams({ from, to, field, order, start, end, _embed } = this.paramOfSort) {
-    if (this.showingPage === 'ProductsPage') {
-      this.url.searchParams.set('_embed', _embed);
-    }
-    if (this.showingPage === 'DashboardPage') {
-      this.url.searchParams.set('from', from);
-      this.url.searchParams.set('to', to);
-    }
-    if (this.showingPage === 'SalesPage') {
-      this.url.searchParams.set('createdAt_gte', from);
-      this.url.searchParams.set('createdAt_lte', to);
-    }
-
-    this.url.searchParams.set('_sort', field);
-    this.url.searchParams.set('_order', order);
-    this.url.searchParams.set('_start', start);
-    this.url.searchParams.set('_end', end);
+  urlSetSearchParams() {
+    Object.entries(this.paramOfSort).forEach(([key, value]) => {
+      this.url.searchParams.set(key, value)
+    })
   }
 
   switchStatusOfLoading() {
@@ -280,7 +265,7 @@ export default class SortableTable {
 
   addEventListeners() {
     const { header, emptyPlaceholder } = this.subElements;
-    if (this.showingPage !== 'DashboardPage') {
+    if (this.pagination) {
       document.addEventListener('scroll', this.scrollHandler);
     }
     header.addEventListener('pointerdown', this.sortByHeaderHandler);
