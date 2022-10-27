@@ -83,7 +83,7 @@ export default class AdminPage {
 			activePage.render(this, this.range);
 			
 			this.contentContainer.append(activePage.element);
-			this.sidebar.setActiveNavItemHandler(document.location.pathname);
+			this.sidebar.setActiveNavItemHandler();
 
 			await activePage.update();
 
@@ -92,6 +92,7 @@ export default class AdminPage {
 		} catch (error) {
 			this.toggleProgressbar();
 			errorHandler(error);
+			throw new Error(error)
 		}
 	}
 

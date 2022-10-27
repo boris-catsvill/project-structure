@@ -60,7 +60,9 @@ export default class Sidebar {
     document.body.classList.toggle('is-collapsed-sidebar');
   }
 
-  setActiveNavItemHandler = (path) => {
+  setActiveNavItemHandler = () => {
+    
+    const path = document.location.pathname;
     
     const { sidebarNav } = this.subElements;
     const [formatedPath] = path.match(/^\/[^/]*/i);
@@ -68,8 +70,8 @@ export default class Sidebar {
     const newActiveNavItem = sidebarNav.querySelector(`[data-page="${formatedPath}"]`);
     if (!newActiveNavItem) return;
 
-    newActiveNavItem?.classList.add('active');
     this.activeNavItem?.classList.remove('active');
+    newActiveNavItem?.classList.add('active');
     
     this.activeNavItem = newActiveNavItem;
   }
@@ -80,11 +82,13 @@ export default class Sidebar {
   }
 
   render() {
+
     this.element = this.elementDOM;
     this.activeNavItem = this.element.querySelector('.active');
 
     this.setSubElements();
     this.setEventListeners();
+
   }
 
   remove() {

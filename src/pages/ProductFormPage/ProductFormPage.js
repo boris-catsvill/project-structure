@@ -5,11 +5,15 @@ export default class ProductFormPage {
 
   element = null
   subElements = {}
-  productId = (document.location.pathname.match(/([a-z0-9_-]+$)/i) ?? [])[0]
 
   getComponents = getComponents
   childrenComponents = []
   mainClass = null
+
+  constructor() {
+  const  [estimatedId] = document.location.pathname.match(/([a-z0-9_-]+$)/i) ?? [];
+  this.productId = estimatedId === 'add' ? null : estimatedId;
+  }
 
   get elementDOM() {
 

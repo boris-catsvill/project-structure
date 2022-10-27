@@ -23,6 +23,7 @@ export default class ProductForm {
   ) {
 
     this.productId = productId;
+
     this.urls = {
       categories: new URL(categoriesURL),
       products: new URL(productURL),
@@ -114,7 +115,7 @@ export default class ProductForm {
   getCategory(category) {
 
     const { title: titleOfCategory, subcategories } = category;
-    const { subcategory: activeSubcategory } = this.data.products[0];
+    const { subcategory: activeSubcategory } = this.productId ? this.data.products[0] : { subcategory: null };
 
     const options = subcategories.map((subcategory) => {
 
@@ -447,6 +448,7 @@ export default class ProductForm {
     const dataOfResponses = await Promise.all(responses)
 
     dataOfResponses.forEach((data, index) => {
+      
       const nameOfData = nameOfDataForFetchGet[index];
       this.data[nameOfData] = data;
       if (nameOfData === 'products') { this.images = data[0]?.images ?? []; }
