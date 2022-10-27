@@ -15,26 +15,20 @@ export default class Page {
   start = 0;
   end = this.step + this.start;
 
-  async updateComponents(from, to) {
-    const data = await this.loadData(from, to);
-
-    this.element.querySelector('.sortable-table__body').innerHTML = '';
+  async sortByPrice(from, to) {
+    this.url.searchParams.set('price_gte', from);
+    this.url.searchParams.set('price_lte', to);
 
     this.sortableTableURL.searchParams.set('price_gte', from);
     this.sortableTableURL.searchParams.set('price_lte', to);
 
+    const data = await fetchJson(this.url);
+
+    this.element.querySelector('.sortable-table__body').innerHTML = '';
+
     this.components.sortableTable.update(data);
 
     this.renderPlaceholder(data);
-  }
-
-  async loadData(from, to) {
-    this.url.searchParams.set('price_gte', from);
-    this.url.searchParams.set('price_lte', to);
-
-    const data = await fetchJson(this.url);
-
-    return data;
   }
 
   async sortByStatus(state) {
@@ -60,9 +54,9 @@ export default class Page {
     this.renderPlaceholder(data);
   }
 
-  async sortByName(value) {
-    this.url.searchParams.set('title_like', value);
-    this.sortableTableURL.searchParams.set('title_like', value);
+  async sortByName(name) {
+    this.url.searchParams.set('title_like', name);
+    this.sortableTableURL.searchParams.set('title_like', name);
 
     const data = await fetchJson(this.url);
 
@@ -210,7 +204,7 @@ export default class Page {
       this.components.sortableTable.start = this.start;
       this.components.sortableTable.stopFetching = false;
 
-      this.updateComponents(from, to);
+      this.sortByPrice(from, to);
     });
 
     this.subElements.filterStatus.addEventListener('change', event => {
@@ -244,10 +238,11 @@ export default class Page {
     const sortableTable = this.element.querySelector('.sortable-table');
 
     if (data.length === 0) {
+      const clearFiltersButton = this.element.querySelector('.button-primary-outline');
+
       sortableTable.classList.add('sortable-table_empty')
       placeholder.innerHTML = this.getPlaceholderTemplate();
 
-      const clearFiltersButton = this.element.querySelector('.button-primary-outline');
       this.clearFilters(clearFiltersButton);
 
     } else {

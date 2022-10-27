@@ -98,6 +98,7 @@ export default class Page {
       url: `api/dashboard/bestsellers?_start=0&_end=30&from=${from.toISOString()}&to=${to.toISOString()}`,
       isSortLocally: true
     })
+    sortableTable.onWindowScroll = null;
 
     const ordersChart = new ColumnChart({
       url: 'api/dashboard/orders',
