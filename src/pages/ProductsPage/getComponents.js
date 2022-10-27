@@ -1,4 +1,4 @@
-import header from "../../store/product-header";
+import header from "../../utils/product-header";
 
 import SortableTable from "../../components/SortableTable";
 

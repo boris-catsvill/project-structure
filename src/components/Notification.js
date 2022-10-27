@@ -12,7 +12,7 @@ export default class NotificationMessage {
     this.type = type;
   }
 
-  createElement() {
+  get elementDOM() {
     const element = document.createElement('div');
     const bodyElement = `
       <div class="notification notification_${this.type} show">
@@ -24,7 +24,7 @@ export default class NotificationMessage {
   }
 
   render() {
-    NotificationMessage.globalNotifictionElement = this.createElement();
+    NotificationMessage.globalNotifictionElement = this.elementDOM;
   }
 
   createTimer() {

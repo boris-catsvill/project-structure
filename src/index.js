@@ -1,4 +1,4 @@
-import Page from "./main";
-import './styles/all.css';
+import App from "./App";
+import './index.css';
 
-const page = new Page();
+new App();

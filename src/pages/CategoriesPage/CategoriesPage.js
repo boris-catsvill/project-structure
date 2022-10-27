@@ -1,7 +1,7 @@
 
 import NotificationMessage from "../../components/Notification.js";
 
-import errorHandler from "../../store/errorHandler.js";
+import errorHandler from "../../utils/errorHandler.js";
 import getComponents from "./getComponents.js";
 
 export default class CategoriesPage {

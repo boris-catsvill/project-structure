@@ -1,3 +1,5 @@
+import fetchJson from "../utils/fetchJson";
+
 export default class ColumnChart {
 
   chartHeight = 50;
@@ -49,7 +51,7 @@ export default class ColumnChart {
     element.innerHTML = bodyOfElement;
     return element.firstElementChild;
   }
-  
+
   getScale() {
     return this.data.length > 0 ? (this.chartHeight / Math.max(...this.data)) : 1;
   }
@@ -97,20 +99,14 @@ export default class ColumnChart {
   }
 
   async updateData() {
-    try {
-      this.switchStatusOfLoading();
-      this.urlSetSearchParams();
+    this.switchStatusOfLoading();
+    this.urlSetSearchParams();
 
-      const response = await fetch(this.url);
-      const data = await response.json();
-      this.data = Object.values(data);
+    const response = await fetchJson(this.url);
+    this.data = Object.values(response);
 
-      this.updateProperties();
-      this.switchStatusOfLoading();
-
-    } catch (error) {
-      throw new Error(error.message);
-    }
+    this.updateProperties();
+    this.switchStatusOfLoading();
   }
 
   async update() {

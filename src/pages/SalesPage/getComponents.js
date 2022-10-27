@@ -1,4 +1,4 @@
-import header from "../../store/sales-header";
+import header from "../../utils/sales-header";
 
 import SortableTable from "../../components/SortableTable";
 import RangePicker from "../../components/RangePicker";

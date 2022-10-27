@@ -6,15 +6,14 @@ import ProductsPage from './pages/ProductsPage/ProductsPage.js';
 import ProductFormPage from './pages/ProductFormPage/ProductFormPage.js';
 import UndefinedPage from './pages/UndefinedPage.js';
 
-import NotificationMessage from "./components/Notification.js";
 import Sidebar from "./components/Sidebar.js";
 import Tooltip from './components/Tooltip.js';
 
-import errorHandler from "./store/errorHandler.js";
+import errorHandler from "./utils/errorHandler.js";
 
 import Router from "./pages/Router.js";
 
-export default class AdminPage {
+export default class App {
 	static instance = null
 
 	range = {}
@@ -26,8 +25,8 @@ export default class AdminPage {
 	sidebar = new Sidebar();
 
 	constructor() {
-		if (AdminPage.instance) { return AdminPage.instance; }
-		AdminPage.instance = this;
+		if (App.instance) { return App.instance; }
+		App.instance = this;
 
 		this.range = this.createRange();
 

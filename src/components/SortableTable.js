@@ -1,5 +1,7 @@
+import fetchJson from "../utils/fetchJson";
+
 export default class SortableTable {
-  
+
   element = null;
   subElements = {}
   statusOfLoading = 'fulfilled'
@@ -148,22 +150,17 @@ export default class SortableTable {
   }
 
   async getData() {
-    try {
-      this.switchStatusOfLoading();
-      this.urlSetSearchParams();
 
-      const response = await fetch(this.url.toString());
-      const sortedata = await response.json();
+    this.switchStatusOfLoading();
+    this.urlSetSearchParams();
 
-      if (!sortedata.length) { this.statusOfLoading = 'fulfilledWithEmptyValue'; }
+    const response = await fetchJson(this.url.toString());
 
-      this.switchStatusOfLoading();
-      return sortedata;
+    if (!response.length) { this.statusOfLoading = 'fulfilledWithEmptyValue'; }
 
-    } catch (error) {
-      throw new Error(error.message)
-    }
-    
+    this.switchStatusOfLoading();
+    return response;
+
   }
 
   async sortOnServer() {

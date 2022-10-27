@@ -1,5 +1,7 @@
 import SortableList from "./SortableList.js";
 
+import fetchJson from "../utils/fetchJson.js";
+
 import grabIcon from '../styles/svg/icon-grab.svg';
 
 export default class CategoriesList {
@@ -49,10 +51,10 @@ export default class CategoriesList {
 
     wrapper.innerHTML = categoryBody;
     const categoryElement = wrapper.firstElementChild;
-    
+
     const subcategoriesListContainer = categoryElement.querySelector('[data-element="subCatListContainer"]');
-    subcategoriesListContainer.append(new SortableList({items: subcategoryList}).element);
-    
+    subcategoriesListContainer.append(new SortableList({ items: subcategoryList }).element);
+
     return categoryElement;
   }
 
@@ -65,19 +67,12 @@ export default class CategoriesList {
   }
 
   async setData() {
-    try {
-
-      const response = await fetch(this.url.toString());
-      this.data = await response.json();
-
-    } catch (error) {
-      throw new Error(error.message)
-    }
+    this.data = await fetchJson(this.url.toString())
   }
 
   toggleOfOpenCategoryHandler = (event) => {
     const target = event.target.closest('[data-element="categoryHeader"]');
-    if (!target) {return;}
+    if (!target) { return; }
     const elementForToggle = event.target.closest('[data-element="category"]');
     elementForToggle.classList.toggle('category_open');
   }

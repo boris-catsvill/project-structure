@@ -1,7 +1,9 @@
-import escapeHtml from "../store/escape-html.js";
+import escapeHtml from "../utils/escape-html.js";
 
 import SortableList from '../components/SortableList.js';
 import NotificationMessage from "./Notification.js";
+
+import fetchJson from "../utils/fetchJson.js";
 
 import grabIcon from '../styles/svg/icon-grab.svg';
 import trashIcon from '../styles/svg//icon-trash.svg';
@@ -231,20 +233,15 @@ export default class ProductForm {
   }
 
   async fetchGetData(url) {
-    try {
-      this.setSearchParamsOfURLs()
 
-      const response = await fetch(url);
+    this.setSearchParamsOfURLs()
 
-      this.deleteSearchParamsOfURLs();
+    const response = await fetchJson(url);
 
-      if (!response.ok) { throw new Error('Ошибка'); }
-      return await response.json();
+    this.deleteSearchParamsOfURLs();
 
+    return response;
 
-    } catch (error) {
-      throw new Error(error.message);
-    }
   }
 
   showSuccessNotification() {
@@ -263,31 +260,25 @@ export default class ProductForm {
     const { products } = this.urls;
     const { productForm } = this.subElements;
 
-    try {
-      const response = await fetch(products, {
-        method,
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(body)
-      });
+    await fetchJson(products, {
+      method,
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(body)
+    });
 
-      if (!response.ok) { throw new Error('Ошибка'); }
+    this.showSuccessNotification();
 
-      this.showSuccessNotification();
+    if (method === 'PUT') {
+      const linkToEditProductForm = document.createElement('a');
+      linkToEditProductForm.setAttribute('href', `/products/${body['id']}`);
 
-      if (method === 'PUT') {
-        const linkToEditProductForm = document.createElement('a');
-        linkToEditProductForm.setAttribute('href', `/products/${body['id']}`);
+      productForm.append(linkToEditProductForm);
 
-        productForm.append(linkToEditProductForm);
-
-        linkToEditProductForm.click();
-      }
-
-    } catch (error) {
-      throw new Error(error.message);
+      linkToEditProductForm.click();
     }
+
   }
 
   getFormatedFormData() {
@@ -321,28 +312,22 @@ export default class ProductForm {
   }
 
   async fetchPostImage(formData) {
-    try {
-      const { images } = this.urls;
-      this.toggleStatusOfLoadingImage();
 
-      const response = await fetch(images.toString(), {
-        method: 'POST',
-        headers: {
-          Authorization: `Client-ID ${process.env.IMGUR_CLIENT_ID}`,
-        },
-        body: formData,
-        referrer: ''
-      });
+    const { images } = this.urls;
+    this.toggleStatusOfLoadingImage();
 
-      if (!response.ok) { throw new Error("Ошибка сети/Ошибка на сервере"); }
-      const responseJSON = await response.json();
+    const response = await fetchJson(images.toString(), {
+      method: 'POST',
+      headers: {
+        Authorization: `Client-ID ${process.env.IMGUR_CLIENT_ID}`,
+      },
+      body: formData,
+      referrer: ''
+    });
 
-      this.toggleStatusOfLoadingImage();
-      return responseJSON.data.link;
+    this.toggleStatusOfLoadingImage();
+    return response.data.link;
 
-    } catch (error) {
-      throw new Error("Ошибка сети/Ошибка на сервере");
-    }
   }
 
   getInputIMGLoader() {
@@ -422,7 +407,7 @@ export default class ProductForm {
       const fieldNamesForFilling = ['title', 'description', 'price', 'discount', 'quantity', 'status'];
 
       Array.from(productForm.elements).forEach((element) => {
- 
+
         const name = element.name;
 
         if (fieldNamesForFilling.includes(name)) {
@@ -448,7 +433,7 @@ export default class ProductForm {
     const dataOfResponses = await Promise.all(responses)
 
     dataOfResponses.forEach((data, index) => {
-      
+
       const nameOfData = nameOfDataForFetchGet[index];
       this.data[nameOfData] = data;
       if (nameOfData === 'products') { this.images = data[0]?.images ?? []; }
