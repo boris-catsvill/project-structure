@@ -39,7 +39,7 @@ export default class ColumnChart {
   }
 
   getClassName() {
-    return this.data.length === 0 ? 'column-chart column-chart_loading' : 'column-chart';
+    return Object.keys(this.data).length ? 'column-chart' : 'column-chart column-chart_loading';
   }
 
   getTemplate() {
@@ -72,13 +72,11 @@ export default class ColumnChart {
   }
 
   update(newData = []) {
-    this.data = newData;
-
-    this.elementColumns.innerHTML = this.getColumnProps(this.data);
-    this.elementHeader.innerHTML = this.getHeader();
-    if (!this.data.length) {
-      this.element.className = this.getClassName();
-    } else {
+    if (Object.keys(newData).length !== 0) {
+      this.data = newData;
+      this.elementColumns.innerHTML = this.getColumnProps(this.data);
+      this.elementHeader.innerHTML = this.getHeader();
+      console.log(1);
       this.element.className = this.getClassName();
     }
   }

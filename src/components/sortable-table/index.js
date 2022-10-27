@@ -203,11 +203,7 @@ export default class SortableTable {
     const data = await this.fetchData(this.id, this.order, this.start, this.end);
     this.data = data;
     this.initEventListeners();
-    if (this.isSortLocally) {
-      this.sortOnClient(this.id, this.order);
-    } else {
-      this.sortOnServer(this.id, this.order);
-    }
+    this.update(this.data);
   }
 
   getSubElements() {

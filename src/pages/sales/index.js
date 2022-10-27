@@ -8,12 +8,12 @@ export default class Page {
   subElements = {};
   components = {};
 
-  async render() {
+  render() {
     const wrapper = document.createElement('div');
     wrapper.innerHTML = this.getTemplate();
     this.element = wrapper.firstElementChild;
     this.subElements = this.getSubElements();
-    await this.createComponents();
+    this.createComponents();
     this.initComponents();
     this.initEventListeners();
     return this.element;

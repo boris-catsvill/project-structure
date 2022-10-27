@@ -15,8 +15,10 @@ export default class Page {
     wrapper.innerHTML = this.getTemplate();
     this.element = wrapper.firstElementChild;
     this.subElements = this.getSubElements();
-    await this.createComponents();
+    this.createComponents();
     this.initComponents();
+    await this.fetchColumnData();
+
     this.initEventListeners();
     return this.element;
   }
@@ -59,11 +61,10 @@ export default class Page {
     `;
   }
 
-  async createComponents() {
+  createComponents() {
     const now = new Date();
     const to = new Date();
     const from = new Date(now.setMonth(now.getMonth() - 1));
-    const [ordersData, salesData, customersData] = await this.getDataForColumnCharts(from, to);
     const picker = new RangePicker({
       from,
       to
@@ -72,7 +73,6 @@ export default class Page {
     this.components.rangePicker = picker;
 
     const orders = new ColumnChart({
-      data: ordersData,
       label: 'Заказы',
       link: '#'
     });
@@ -80,7 +80,6 @@ export default class Page {
     this.components.ordersChart = orders;
 
     const sales = new ColumnChart({
-      data: salesData,
       label: 'Продажи',
       formatHeading: data => `$${data}`
     });
@@ -88,7 +87,6 @@ export default class Page {
     this.components.salesChart = sales;
 
     const customers = new ColumnChart({
-      data: customersData,
       label: 'Посетители'
     });
 
@@ -115,6 +113,14 @@ export default class Page {
     });
   }
 
+  async fetchColumnData() {
+    const now = new Date();
+    const to = new Date();
+    const from = new Date(now.setMonth(now.getMonth() - 1));
+
+    await this.update(from, to);
+  }
+
   initEventListeners() {
     this.components.rangePicker.element.addEventListener('date-select', event => {
       const { from, to } = event.detail;
@@ -130,6 +136,7 @@ export default class Page {
     ordersChart.update(ordersData);
     salesChart.update(salesData);
     customersChart.update(customersData);
+
     if (data.length) {
       sortableTable.element.classList.remove('sortable-table_empty');
       sortableTable.update(data);

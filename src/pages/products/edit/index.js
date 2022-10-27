@@ -4,7 +4,9 @@ import NotificationMessage from '../../../components/notification';
 export default class Page {
   element;
   components = {};
-
+  constructor(productId = '') {
+    this.productId = productId;
+  }
   async render() {
     const element = document.createElement('div');
 
@@ -29,15 +31,11 @@ export default class Page {
             </div>`;
   }
   createComponents() {
-    const productId = decodeURI(window.location.pathname)
-      .replace(/^\/products\//, '')
-      .replace(/^add$/, '');
-
     const pageProductTitle = this.element.querySelector(`.page-title`);
     let textNode;
 
-    if (productId) {
-      this.components.productFrom = new ProductForm(productId);
+    if (this.productId) {
+      this.components.productFrom = new ProductForm(this.productId);
       textNode = document.createTextNode(' / Edit');
     } else {
       this.components.productFrom = new ProductForm();

@@ -1,4 +1,6 @@
 export default class NotificationMessage {
+  static timer;
+  static element;
   constructor(message = '', { type = 'error', duration = 0 } = {}) {
     this.message = message;
     this.type = type;
@@ -35,11 +37,14 @@ export default class NotificationMessage {
   render() {
     this.checkElementNotification();
     this.element = this.getTemplate();
-    NotificationMessage.element = this.element;
   }
   show(element = document.body) {
-    element.append(NotificationMessage.element);
+    if (NotificationMessage.element) {
+      NotificationMessage.element.remove();
+    }
+    element.append(this.element);
     NotificationMessage.timer = setTimeout(() => this.remove(), this.duration);
+    NotificationMessage.element = this;
   }
   remove() {
     this.element?.remove();

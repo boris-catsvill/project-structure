@@ -45,7 +45,7 @@ export default class ProductForm {
   dispatchEvent(id, status) {
     const event = this.productId
       ? new CustomEvent('product-updated', { detail: { id, status } })
-      : new CustomEvent('product-saved', { detail: { id, status } });
+      : new CustomEvent('product-saved', { detail: { status } });
 
     this.element.dispatchEvent(event);
   }
@@ -74,7 +74,7 @@ export default class ProductForm {
             Authorization: `Client-ID ${process.env.IMGUR_CLIENT_ID}`
           },
           body: formData,
-          referrer: 'it'
+          referrer: ''
         });
 
         imageListContainer.firstElementChild.append(this.getImageItem(result.data.link, file.name));
