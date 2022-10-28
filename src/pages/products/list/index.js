@@ -89,6 +89,7 @@ export default class ProductListPage {
     url.searchParams.set('_end', '30');
 
     let min = this.fetchData(url);
+    
 
     url.searchParams.set('_order', 'desc');
 
@@ -166,9 +167,6 @@ export default class ProductListPage {
     await this.renderComponents();
     this.initListeners();
 
-    // this.initComponents();
-    // await this.renderComponents();
-
     return this.element;
   }
 
@@ -180,21 +178,8 @@ export default class ProductListPage {
       const name = subElement.dataset.element; 
       result[name] = subElement;
     }
-    console.log(result);
     return result;
   }
-
-  // initComponents() {
-  //   const productId = '101-planset-lenovo-yt3-x90l-64-gb-3g-lte-cernyj';
-
-  //   this.components.productFrom = new ProductForm(productId);
-  // }
-
-  // async renderComponents() {
-  //   const element = await this.components.productFrom.render();
-
-  //   this.element.append(element);
-  // }
 
   destroy() {
     for (const component of Object.values(this.components)) {
