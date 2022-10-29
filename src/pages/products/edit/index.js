@@ -39,6 +39,8 @@ export default class AddProductPage {
     this.remove();
     this.element = null;
     this.subElements = null;
+    Object.values(this.components).forEach(value => value.destroy());
+    this.components = null;
   }
 
   getSubElements() {

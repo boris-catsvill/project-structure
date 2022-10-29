@@ -1,7 +1,7 @@
 import AddProductPage from "./index.js";
 import categoriesData from './__mocks__/categories-data.js';
 
-describe('tests add product page', () => {
+describe('tests edit product page', () => {
   let productPage;
 
   beforeEach(async () => {

@@ -7,6 +7,7 @@ export default class SortableTable {
   dataFilters = {};
   offset = 0;
   loading = false;
+  abortController = new AbortController();
 
   constructor(headersConfig,
               {
@@ -18,7 +19,8 @@ export default class SortableTable {
                   order: 'asc'
                 },
                 pageSize = 30,
-                itemUri
+                itemUri,
+                dataFilters
               } = {}) {
     this.url = new URL(url, BACKEND_URL);
     this.data = data;
@@ -28,6 +30,7 @@ export default class SortableTable {
     this.abortController = new AbortController();
     this.pageSize = pageSize;
     this.itemUri = itemUri;
+    this.dataFilters = dataFilters;
     this.render();
   }
 
@@ -57,7 +60,12 @@ export default class SortableTable {
 
   async sortOnServer(id, order) {
     const dataFromServer = await this.getDataFromServer(id, order, this.offset, this.pageSize);
-    this.updateBody(dataFromServer);
+    if (dataFromServer.length === 0) {
+      this.element.classList.add('sortable-table_empty');
+    } else {
+      this.element.classList.remove('sortable-table_empty');
+      this.updateBody(dataFromServer);
+    }
   }
 
   async getDataFromServer(id, order, offset, size) {
@@ -101,10 +109,6 @@ export default class SortableTable {
         <div data-element="loading" class="loading-line"></div>
 
         <div data-element="emptyPlaceholder" class="sortable-table__empty-placeholder">
-          <div>
-            <p>No products satisfies your filter criteria</p>
-            <button type="button" class="button-primary-outline" data-element="resetFilterButton">Reset all filters</button>
-          </div>
         </div>
 
       </div>
@@ -112,12 +116,6 @@ export default class SortableTable {
   }
 
   updateBody(data) {
-    if (data.length === 0) {
-      this.element.classList.add('sortable-table_empty');
-    } else {
-      this.element.classList.remove('sortable-table_empty');
-    }
-
     this.subElements.body.innerHTML += data
       .map((rowData) => {
         const href = (this.itemUri !== undefined)
@@ -216,18 +214,25 @@ export default class SortableTable {
     this.element = div.firstElementChild;
     this.subElements = this.getSubElements();
     this.addEventListeners();
-    await this.sort();
+    await this.sort(this.dataFilters);
   }
 
   addEventListeners() {
-    this.subElements.header.addEventListener("pointerdown", this.onSortClick);
-    this.subElements.header.addEventListener("pointerdown", event => this.onLoadMoreClick(event));
-    this.subElements.resetFilterButton.addEventListener(
-      'pointerdown',
-      this.onResetFilterButtonClick,
+    this.subElements.header.addEventListener(
+      "pointerdown",
+      this.onSortClick,
       this.abortController.signal
-    )
-    document.addEventListener('scroll', this.onWindowScroll);
+    );
+    this.subElements.header.addEventListener(
+      "pointerdown",
+      event => this.onLoadMoreClick(event),
+      this.abortController.signal
+    );
+    document.addEventListener(
+      'scroll',
+      this.onWindowScroll,
+      this.abortController.signal
+    );
   }
 
   onWindowScroll = async () => {
@@ -273,6 +278,7 @@ export default class SortableTable {
   remove() {
     if (this.element) {
       this.element.remove();
+      document.removeEventListener('scroll', this.onWindowScroll);
     }
   }
 
@@ -305,12 +311,4 @@ export default class SortableTable {
     return div.firstElementChild;
   }
 
-  onResetFilterButtonClick = async (event) => {
-    event.preventDefault();
-    await this.sort({});
-    this.element.dispatchEvent(new CustomEvent(
-      'reset-table', {
-        bubbles: true
-      }));
-  }
 }

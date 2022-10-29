@@ -1,6 +1,6 @@
 const BACKEND_URL = 'https://course-js.javascript.ru';
-import SortableTable from "../../../components/sortable-table";
-import SortFilter from "../components/sort-filter";
+import SortableTable from "../../../components/sortable-table/index.js";
+import SortFilter from "../components/sort-filter/index.js";
 import header from "./header.js";
 
 export default class ProductsPage {
@@ -14,6 +14,7 @@ export default class ProductsPage {
 
     await this.createComponents();
     this.renderComponents();
+    this.addEmptyPlaceholder();
     this.addEventListeners();
 
     return this.element;
@@ -45,6 +46,8 @@ export default class ProductsPage {
     this.element = null;
     this.subElements = null;
     this.abortController.abort();
+    Object.values(this.components).forEach(value => value.destroy());
+    this.components = null;
   }
 
   getSubElements() {
@@ -74,6 +77,20 @@ export default class ProductsPage {
     });
   }
 
+  addEmptyPlaceholder() {
+    const {productsContainer} = this.components;
+    const {emptyPlaceholder} = productsContainer.subElements;
+    const div = document.createElement('div');
+    div.innerHTML = `
+      <div>
+        <p>No products satisfies your filter criteria</p>
+        <button type="button" class="button-primary-ouclassName" data-element="resetFilterButton">Reset all filters
+        </button>
+      </div>
+    `;
+    emptyPlaceholder.append(div);
+  }
+
   addEventListeners() {
     const {sortFilter} = this.subElements;
     sortFilter.addEventListener(
@@ -82,10 +99,10 @@ export default class ProductsPage {
       this.abortController.signal
     )
 
-    const {productsContainer} = this.components;
-    productsContainer.element.addEventListener(
-      'reset-table',
-      this.onReset,
+    const resetButton = this.element.querySelector('[data-element=resetFilterButton]');
+    resetButton.addEventListener(
+      'pointerdown',
+      this.onResetFilterButtonClick,
       this.abortController.signal
     );
 
@@ -120,11 +137,9 @@ export default class ProductsPage {
       }, {});
   }
 
-  onReset = () => {
-    let {sortFilter} = this.components;
-    sortFilter.destroy()
-    sortFilter = new SortFilter();
-    this.components.sortFilter = sortFilter;
-    this.renderComponents();
+  onResetFilterButtonClick = async () => {
+    const {productsContainer} = this.components;
+    productsContainer.sort({});
   }
+
 }
