@@ -138,8 +138,12 @@ export default class ProductsPage {
   }
 
   onResetFilterButtonClick = async () => {
-    const {productsContainer} = this.components;
+    const {productsContainer, sortFilter} = this.components;
     productsContainer.sort({});
+
+    sortFilter.remove();
+    sortFilter.render();
+    this.subElements.sortFilter.append(sortFilter.element);
   }
 
 }
