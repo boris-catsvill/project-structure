@@ -223,11 +223,6 @@ export default class SortableTable {
       this.onSortClick,
       this.abortController.signal
     );
-    this.subElements.header.addEventListener(
-      "pointerdown",
-      event => this.onLoadMoreClick(event),
-      this.abortController.signal
-    );
     document.addEventListener(
       'scroll',
       this.onWindowScroll,

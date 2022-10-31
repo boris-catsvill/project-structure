@@ -41,7 +41,6 @@
     </ul>
     <ul class="sidebar__nav sidebar__nav_bottom">
       <li>
-      <!-- TODO: implement toggling  -->
         <button type="button" class="sidebar__toggler">
           <i class="icon-toggle-sidebar"></i> <span>Toggle sidebar</span>
         </button>
@@ -52,4 +51,31 @@
 
   </section>
 </main>
+<script type="module">
+  const defaultActiveItem = document.querySelector('.icon-dashboard').closest('li');
+  defaultActiveItem.classList.add('active');
+
+  const elements = document.querySelector('.sidebar__nav');
+  elements.addEventListener(
+    'pointerdown',
+    onPointerDown
+  );
+
+  const toggler = document.querySelector('.sidebar__toggler');
+  toggler.addEventListener(
+    'pointerdown',
+    event => {
+      document.body.classList.toggle('is-collapsed-sidebar');
+    }
+  );
+
+  function onPointerDown(event) {
+    const closest = event.target.closest('li');
+    if (!closest) {
+      return;
+    }
+    document.querySelectorAll('.sidebar__nav li').forEach(element => element.classList.remove('active'));
+    closest.classList.add('active');
+  }
+</script>
 </body>
