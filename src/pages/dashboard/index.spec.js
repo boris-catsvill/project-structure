@@ -1,6 +1,6 @@
 import { default as DashboardPage } from './index.js';
 
-describe('routes-browser-history-api/dashboard-page', () => {
+describe('dashboard-page tests', () => {
   let dashboardPage;
 
   beforeEach(async () => {

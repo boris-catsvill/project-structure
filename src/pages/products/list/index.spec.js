@@ -1,7 +1,7 @@
 import ProductsPage from "./index.js";
 import {products} from '../__mocks__/products-data.js';
 
-describe('tests product page', () => {
+describe('tests product page list', () => {
   let productPage;
 
   beforeEach(async () => {

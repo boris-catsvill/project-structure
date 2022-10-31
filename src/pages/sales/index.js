@@ -9,8 +9,7 @@ export default class SalesPage {
 
   async render() {
     const div = document.createElement('div');
-    div.innerHTML = this.getTemplate()
-    ;
+    div.innerHTML = this.getTemplate();
     this.element = div.firstElementChild;
     this.subElements = this.getSubElements();
 

@@ -1,5 +1,4 @@
 import SortableList from './../sortable-list/index.js';
-import escapeHtml from './utils/escape-html.js';
 import fetchJson from './utils/fetch-json.js';
 
 const IMGUR_CLIENT_ID = '28aaa2e823b03b1';
@@ -256,8 +255,10 @@ export default class ProductForm {
     this.remove();
     this.element = null;
     this.subElements = null;
-    this.sortableList.destroy();
-    this.sortableList = null;
+    if (this.sortableList) {
+      this.sortableList.destroy();
+      this.sortableList = null;
+    }
   }
 
   getSubElements() {

@@ -33,9 +33,9 @@ describe('tests categories page', () => {
   });
 
   it('should contains all categories', () => {
-      const categories = categoriesPage.element.querySelectorAll('.category');
-      expect(categories.length).toEqual(categoriesData.length);
-    }
+    const categories = categoriesPage.element.querySelectorAll('.category');
+    expect(categories.length).toEqual(categoriesData.length);
+  }
   );
 
   it('should contains all sortable list from SortableList component', () => {

@@ -33,7 +33,10 @@ export default class CategoriesPage {
   }
 
   async getData() {
-    this.model = await fetchJson(BACKEND_URL + '/api/rest/categories?_sort=weight&_refs=subcategory');
+    const url = new URL('/api/rest/categories', BACKEND_URL);
+    url.searchParams.set('_sort', 'weight');
+    url.searchParams.set('_refs', 'subcategory');
+    this.model = await fetchJson(url);
   }
 
   renderPageElements() {

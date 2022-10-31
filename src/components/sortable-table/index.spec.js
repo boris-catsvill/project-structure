@@ -46,7 +46,7 @@ const headerConfig = [
   },
 ];
 
-describe('async-code-fetch-api-part-1/sortable-table-v3', () => {
+describe('sortable-table tests', () => {
   let sortableTable;
 
   beforeEach(() => {
@@ -92,9 +92,9 @@ describe('async-code-fetch-api-part-1/sortable-table-v3', () => {
 
     const [row1, row2, row3] = body.children;
 
-    expect(row1).toHaveTextContent('10.5\" Планшет Apple iPad Pro Wi-Fi+Cellular 64 ГБ , LTE серый');
-    expect(row2).toHaveTextContent('13.3\" Рюкзак XD Design Bobby Hero Small серый');
-    expect(row3).toHaveTextContent('13.3\" Ультрабук ASUS VivoBook S13 S330FA-EY127T серебристый');
+    expect(row1).toHaveTextContent('10.5" Планшет Apple iPad Pro Wi-Fi+Cellular 64 ГБ , LTE серый');
+    expect(row2).toHaveTextContent('13.3" Рюкзак XD Design Bobby Hero Small серый');
+    expect(row3).toHaveTextContent('13.3" Ультрабук ASUS VivoBook S13 S330FA-EY127T серебристый');
   });
 
   it('should call "sortOnClient" for sorting on the client side', async () => {

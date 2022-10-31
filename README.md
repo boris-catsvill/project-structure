@@ -10,7 +10,6 @@ For correct build via Webpack you must have:
 Данный проект был разработан в рамках курса ["JavaScript/​DOM/​Интерфейсы" для программистов](https://learn.javascript.ru/courses/js)
 проекта [learn.javascript.ru](https://learn.javascript.ru/)
 
-> Этот курс предназначен для изучения JavaScript программистами, а также для тех, кто разрабатывал на нём эпизодически и теперь хочет освоить профессионально.
 
 Проект - это фронтенд часть типичной "Панели управления" для магазина товаров,
 реализованная на чистом JavaScript.
@@ -35,11 +34,3 @@ For correct build via Webpack you must have:
 ## To build project:
 
 `npm run build` - "соберет" проект в "production" режиме.
-
-## Teacher
-
-**Владимир Шевчук**
-
-* [<img alt="GitHub" width="18px" src="https://raw.githubusercontent.com/boris-catsvill/project-structure/master/tech-stack/github-logo.png" /> GitHub](https://github.com/dosandk)
-* [<img alt="learn.javascript" width="18px" src="https://raw.githubusercontent.com/boris-catsvill/project-structure/master/tech-stack/learn-javascript-logo.png" /> learn.javascript](http://learn.javascript.ru/profile/v-shevchuk)
-* [<img alt="Linkedin" width="18px" src="https://raw.githubusercontent.com/boris-catsvill/project-structure/master/tech-stack/linkedin-logo.png" /> Linkedin](https://www.linkedin.com/in/dosandk/)

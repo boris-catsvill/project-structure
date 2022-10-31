@@ -1,6 +1,6 @@
 import SortableList from './index.js';
 
-describe('tests-for-frontend-apps/sortable-list', () => {
+describe('sortable-list tests', () => {
   let sortableList;
 
   const data = [1, 2, 3];

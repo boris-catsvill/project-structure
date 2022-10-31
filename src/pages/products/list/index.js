@@ -60,7 +60,7 @@ export default class ProductsPage {
 
   async createComponents() {
     const productsContainer = await new SortableTable(header, {
-      url: BACKEND_URL + '/api/rest/products',
+      url: new URL('/api/rest/products', BACKEND_URL),
       itemUri: '/products'
     });
     const sortFilter = new SortFilter();
