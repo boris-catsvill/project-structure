@@ -15,4 +15,8 @@ export default class {
 
     return this.element;
   }
+
+  remove() {
+    this.element.remove();
+  }
 }

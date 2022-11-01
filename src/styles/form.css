@@ -55,6 +55,7 @@ form.form-grid .form-group__two-col {
   display: grid;
   grid-template-columns: auto 1fr;
   grid-gap: 16px;
+  text-align: center;
 }
 
 form .form-label {
@@ -63,6 +64,8 @@ form .form-label {
   line-height: 20px;
   color: var(--table-grey);
   margin-bottom: 8px;
+  display: flex;
+  align-items: center;
 }
 
 form .form-control {
