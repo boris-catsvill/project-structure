@@ -20,15 +20,24 @@ export default class Categories {
 
   async renderComponents() {
     const { subcategories } = this.subElements;
-    // const subcategoryItems = this.subcategories.map((item) => )
+    const subcategoryItems = this.subcategories.map((item) => this.renderSubcategories(item)); 
 
     this.sortableListElement = new SortableList({ items: subcategoryItems });
 
     subcategories.append(this.sortableListElement.element);
   }
 
-  renderSubcategories() {
+  renderSubcategories({ count, id, title }) {
+    const wrapper = document.createElement('li');
+    wrapper.classList.add('categories__sortable-list-item');
+    wrapper.dataset.id = id;
+    wrapper.dataset.grabHandle = '';
 
+    wrapper.innerHTML = `
+      <strong>${title}</strong>
+      <span><b>${count}</b> products</span>
+    `;
+    return wrapper;
   }
 
   // <ul class="sortable-list">
@@ -77,7 +86,7 @@ export default class Categories {
     this.element = element.firstElementChild;
     this.subElements = this.getSubElements();
 
-    // await this.renderComponents();
+    await this.renderComponents();
     this.initListeners();
 
     return this.element;
