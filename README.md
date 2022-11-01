@@ -17,7 +17,7 @@ For correct build via Webpack you must have:
 
 ## Preview
 
-[**Versel**](project-structure-17oe846uo-k1ntsugi1.vercel.app) - деплой
+[**Versel**](https://project-structure-bif6atven-k1ntsugi1.vercel.app/) - деплой
 
 [![preview](./preview.png)](https://project-structure/)
 
