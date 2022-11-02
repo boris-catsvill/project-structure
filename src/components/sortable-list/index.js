@@ -16,8 +16,13 @@ export default class SortableList {
   }
 
   onDragClick = (event) => {
+    event.preventDefault();
+    const itemElem = event.target.closest('.sortable-list__item');
     const onDrag = event.target.closest("[data-grab-handle]");
-    if (onDrag) {
+    console.log(onDrag);
+
+    if (!itemElem) return;
+    if (itemElem && onDrag) {
       event.preventDefault();
       this.draggable = event.target.closest("li");
       this.onDragItem(event);
@@ -33,7 +38,7 @@ export default class SortableList {
     this.draggableCoords(event);
 
     this.draggable.classList.add("sortable-list__item_dragging");
-    this.draggable.before(this.addPlaceholder());
+    this.draggable.after(this.addPlaceholder());
 
     document.addEventListener("pointermove", this.onMoveItem);
     document.addEventListener("pointerup", this.onDropItem);

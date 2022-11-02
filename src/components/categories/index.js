@@ -4,7 +4,7 @@ export default class Categories {
   element;
   subElements = {};
 
-  constructor({ id, title, count, weight, subcategories }) { 
+  constructor({ id, title, count, weight, subcategories }) {
     this.id = id;
     this.title = title;
     this.count = count;
@@ -14,49 +14,42 @@ export default class Categories {
     this.render();
   }
 
-  initListeners() {}
+  initListeners() {
+    document.addEventListener('pointerdown', this.subcatOpenOnClick);
+  }
 
-  removeListeners() {}
+  removeListeners() {
+    document.removeEventListener('pointerdown', this.subcatOpenOnClick);
+  }
+
+  subcatOpenOnClick(event) {
+    const target = event.target.closest('.category__header');
+    if (!target) return;
+
+    target.parentElement.classList.toggle('category_open');
+  }
 
   async renderComponents() {
     const { subcategories } = this.subElements;
-    const subcategoryItems = this.subcategories.map((item) => this.renderSubcategories(item)); 
+    const subcategoryItems = this.subcategories.map(item => this.renderSubcategories(item));
 
     this.sortableListElement = new SortableList({ items: subcategoryItems });
 
     subcategories.append(this.sortableListElement.element);
   }
 
-  renderSubcategories({ count, id, title }) {
+  renderSubcategories(item) {
     const wrapper = document.createElement('li');
     wrapper.classList.add('categories__sortable-list-item');
-    wrapper.dataset.id = id;
+    wrapper.dataset.id = item.id;
     wrapper.dataset.grabHandle = '';
 
     wrapper.innerHTML = `
-      <strong>${title}</strong>
-      <span><b>${count}</b> products</span>
+      <strong>${item.title}</strong>
+      <span><b>${item.count}</b> products</span>
     `;
     return wrapper;
   }
-
-  // <ul class="sortable-list">
-  //   <li class="categories__sortable-list-item sortable-list__item" data-grab-handle=""
-  //       data-id="tovary-dlya-doma">
-  //     <strong>Товары для дома</strong>
-  //     <span><b>11</b> products</span>
-  //   </li>
-  //   <li class="categories__sortable-list-item sortable-list__item" data-grab-handle=""
-  //       data-id="krasota-i-zdorove">
-  //     <strong>Красота и здоровье</strong>
-  //     <span><b>11</b> products</span>
-  //   </li>
-  //   <li class="categories__sortable-list-item sortable-list__item" data-grab-handle=""
-  //       data-id="tovary-dlya-kuxni">
-  //     <strong>Товары для кухни</strong>
-  //     <span><b>13</b> products</span>
-  //   </li>
-  // </ul>
 
   get template() {
     return `
@@ -75,10 +68,6 @@ export default class Categories {
     `;
   }
 
-  getSubcategoriesTemplate() {
-
-  }
-
   async render() {
     const element = document.createElement('div');
 
@@ -94,19 +83,24 @@ export default class Categories {
 
   getSubElements() {
     const result = {};
-    const elements = this.element.querySelectorAll("[data-element]");
+    const elements = this.element.querySelectorAll('[data-element]');
 
     for (const subElement of elements) {
-      const name = subElement.dataset.element; 
+      const name = subElement.dataset.element;
       result[name] = subElement;
     }
     return result;
   }
 
-  destroy() {
-    for (const component of Object.values(this.components)) {
-      component.destroy();
+  remove() {
+    if (this.element) {
+      this.element.remove();
     }
+    this.removeListeners();
+  }
+
+  destroy() {
+    this.element.remove();
     this.removeListeners();
   }
 }

@@ -5,18 +5,6 @@ export default class CategoriesPage {
   subElements = {};
   categoriesData = [];
 
-  // constructor() {
-  //   this.render();
-  // }
-
-  // initListeners() {}
-
-  // removeListeners() {}
-
-  // this.categoriesData.map((item) => new Categories(item).forEach((item) => {
-  //   categoriesComponent.append(item.element);
-  // }));
-
   async getCategoriesData() {
     const url = new URL('api/rest/categories', process.env.BACKEND_URL);
     url.searchParams.set('_sort', 'weight');
@@ -35,18 +23,6 @@ export default class CategoriesPage {
     this.categoriesData.map((item) => new Categories(item)).forEach((item) => {
       categoriesComponent.append(item.element);
     });
-
-    
-    // this.categoriesData
-    //   .map(item => new Categories(item))
-    //   .forEach(item => {
-    //     this.subElements.categoriesContainer.append(item.element);
-    // });
-
-
-    // this.categoriesComponentElement = new Categories();
-
-    // categoriesComponent.append(this.categoriesComponentElement.element);
   }
 
   get template() {
@@ -72,7 +48,6 @@ export default class CategoriesPage {
     this.subElements = this.getSubElements();
 
     this.renderComponents();
-    // this.initListeners();
 
     return this.element;
   }
@@ -103,11 +78,9 @@ export default class CategoriesPage {
     if (this.element) {
       this.element.remove();
     }
-    this.removeListeners();
   }
 
   destroy() {
     this.element.remove();
-    this.removeListeners();
   }
 }
