@@ -1,6 +1,6 @@
 import RangePicker from '../../components/range-picker/index.js';
 import SortableTable from '../../components/sortable-table/index.js';
-// import header from './sales-header.js';
+import header from './sales-header.js';
 
 export default class SalesPage {
   element;
@@ -15,15 +15,15 @@ export default class SalesPage {
     from = "from",
     to = "to",
     id = "title",
-    order = "asc",
+    order = "desc",
     start = 1,
     end = 20
   ) {
     const pathNameURL = `${process.env.BACKEND_URL}api/rest/orders`;
     const fetchURL = new URL(pathNameURL);
 
-    fetchURL.searchParams.set("from", from.toISOString());
-    fetchURL.searchParams.set("to", to.toISOString());
+    fetchURL.searchParams.set("createdAt_gte", from.toISOString());
+    fetchURL.searchParams.set("createdAt_lte", to.toISOString());
     fetchURL.searchParams.set("_sort", id);
     fetchURL.searchParams.set("_order", order);
     fetchURL.searchParams.set("_start", start);
@@ -41,7 +41,7 @@ export default class SalesPage {
     }
   }
 
-  renderComponents() {
+  async renderComponents() {
     const { rangePicker, sortableTable } = this.subElements;
     const { from, to } = this.range;
 
@@ -54,6 +54,11 @@ export default class SalesPage {
 
     rangePicker.append(this.rangePickerElement.element);
     sortableTable.append(this.sortableTableElement.element);
+  }
+
+  async getSortableTableUpdate(from, to) {
+    const data = await this.fetchSortableTableData(from, to);
+    this.sortableTableElement.renderRows(data);
   }
 
   get template() {
@@ -72,7 +77,7 @@ export default class SalesPage {
     `;
   }
 
-  render() {
+  async render() {
     const element = document.createElement("div");
 
     element.innerHTML = this.template;
@@ -81,7 +86,7 @@ export default class SalesPage {
 
     // this.initListeners();
     // TODO: change await to Promise
-    // await this.getColumnChart();
+    await this.renderComponents();
     // await this.getRangePicker();
     // await this.getSortableTable();
 
@@ -100,6 +105,9 @@ export default class SalesPage {
     }
     return result;
   }
+
+  initListeners() {};
+  removeListeners() {};
 
   remove() {
     if (this.element) {
