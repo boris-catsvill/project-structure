@@ -8,7 +8,6 @@ export default class RangePicker {
   };
 
   static formatDate (date) {
-    console.log(date.toLocaleString('ru', {dateStyle: 'short'}));
     return date.toLocaleString('ru', {dateStyle: 'short'})
   }
 

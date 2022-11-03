@@ -34,7 +34,7 @@ export default class SalesPage {
       const data = await response.json();
 
       this.element.classList.remove("sortable-table_loading");
-
+      
       return data;
     } catch (error) {
       console.log(error);
@@ -47,7 +47,7 @@ export default class SalesPage {
 
     this.rangePickerElement = new RangePicker(this.range);
     this.sortableTableElement = new SortableTable(header, {
-      url: "api/rest/orders",
+      url: `api/rest/orders?_start=0&_end=20&createdAt_gte=${from.toISOString()}&createdAt_lte=${to.toISOString()}`,
     });
 
     this.getSortableTableUpdate(from, to);
@@ -55,6 +55,17 @@ export default class SalesPage {
     rangePicker.append(this.rangePickerElement.element);
     sortableTable.append(this.sortableTableElement.element);
   }
+
+  onDateSelect = async (event) => {
+    const progressBar = document.querySelector(".progress-bar");
+    progressBar.style.display = "block";
+
+    const { from, to } = event.detail;
+
+    this.getSortableTableUpdate(from, to);
+
+    progressBar.style.display = "none";
+  };
 
   async getSortableTableUpdate(from, to) {
     const data = await this.fetchSortableTableData(from, to);
@@ -84,14 +95,12 @@ export default class SalesPage {
     this.element = element.firstElementChild;
     this.subElements = this.getSubElements();
 
-    // this.initListeners();
-    // TODO: change await to Promise
+    this.initListeners();
     await this.renderComponents();
-    // await this.getRangePicker();
-    // await this.getSortableTable();
 
-    // const progressBar = document.querySelector(".progress-bar");
-    // progressBar.style.display = "none";
+
+    const progressBar = document.querySelector(".progress-bar");
+    progressBar.style.display = "none";
     return this.element;
   }
 
@@ -106,8 +115,13 @@ export default class SalesPage {
     return result;
   }
 
-  initListeners() {};
-  removeListeners() {};
+  initListeners() {
+    this.element.addEventListener("date-select", this.onDateSelect);
+  }
+
+  removeListeners() {
+    this.element.removeEventListener("date-select", this.onDateSelect);
+  }
 
   remove() {
     if (this.element) {
