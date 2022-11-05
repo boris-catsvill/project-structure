@@ -8,7 +8,7 @@ export default class Router {
     this.initEventListeners();
   }
 
-  initEventListeners () {
+  initEventListeners() {
     document.addEventListener('click', (event) => {
       const link = event.target.closest('a');
       if (!link) return;
@@ -50,12 +50,12 @@ export default class Router {
 
     document.dispatchEvent(new CustomEvent('route', {
       detail: {
-        page: this.page
+        page: this.page,
       }
     }));
   }
 
-  async changePage (path, match) {
+  async changePage(path, match) {
     if (this.page && this.page.destroy) {
       this.page.destroy();
     }
@@ -63,22 +63,22 @@ export default class Router {
     return await renderPage(path, match);
   }
 
-  navigate (path) {
+  navigate(path) {
     history.pushState(null, null, path);
     this.route();
   }
 
-  addRoute (pattern, path) {
-    this.routes.push({pattern, path});
+  addRoute(pattern, path) {
+    this.routes.push({ pattern, path });
     return this;
   }
 
-  setNotFoundPagePath (path) {
+  setNotFoundPagePath(path) {
     this.notFoundPagePath = path;
     return this;
   }
 
-  listen () {
+  listen() {
     window.addEventListener('popstate', () => this.route());
     this.route();
   }
