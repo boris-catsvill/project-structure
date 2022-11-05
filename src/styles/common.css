@@ -1,10 +1,10 @@
-@import url("https://fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap");
-@import url("../assets/fonts/css/fontello.css");
-@import url("variables.css");
-@import url("form.css");
+@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap');
+@import url('../assets/fonts/css/fontello.css');
+@import url('variables.css');
+@import url('form.css');
 
 body {
-  font-family: "Source Sans Pro", sans-serif;
+  font-family: 'Source Sans Pro', sans-serif;
 }
 
 * {
@@ -17,6 +17,7 @@ body {
 
 .button-primary,
 .button-primary-outline {
+  min-height: 38px;
   outline: none;
   font-weight: 600;
   font-size: 16px;
@@ -48,7 +49,7 @@ body {
 }
 
 button.is-loading::before {
-  content: "";
+  content: '';
   display: grid;
   width: 24px;
   height: 24px;
@@ -62,14 +63,12 @@ button.is-loading::before {
 }
 
 .button-primary.is-loading::before {
-  background: url("/components/product-form/icon-loading-circle-white.svg") center
-    no-repeat;
+  background: url('../assets/icons/icon-loading-circle-white.svg') center no-repeat;
   background-size: cover;
 }
 
 .button-primary-outline.is-loading::before {
-  background: url("/components/product-form/icon-loading-circle-blue.svg") center
-    no-repeat;
+  background: url('../assets/icons/icon-loading-circle-blue.svg') center no-repeat;
   background-size: cover;
 }
 
@@ -97,9 +96,9 @@ button.is-loading > span {
   background: var(--grey-skeleton);
   background: linear-gradient(
     267.58deg,
-    var(--grey-skeleton) 0%,
-    var(--grey-light) 80%,
-    var(--grey-skeleton) 100%
+    var(--grey-light) 0%,
+    var(--grey-skeleton) 80%,
+    var(--grey-light) 100%
   );
   background-size: 200%;
   border-radius: 2px;

@@ -8,54 +8,54 @@ import fetchJson from '../../utils/fetch-json.js';
 const BACKEND_URL = 'https://course-js.javascript.ru/';
 
 export default class Page {
-  element
+  element;
+  subElements = {};
+  components = {};
 
   constructor() {
-    this.to = new Date()
-    
-    this.from = new Date()
+    this.to = new Date();
+
+    this.from = new Date();
     this.from.setMonth(this.from.getMonth() - 1);
 
-    this.url = new URL(`${BACKEND_URL}api/dashboard/bestsellers`)
-    this.url.searchParams.set('from', this.from.toISOString())
-    this.url.searchParams.set('to', this.to.toISOString())
+    this.url = new URL(`${BACKEND_URL}api/dashboard/bestsellers`);
+    this.url.searchParams.set('from', this.from.toISOString());
+    this.url.searchParams.set('to', this.to.toISOString());
   }
 
-  
   render() {
-    const element = document.createElement("div");
+    const element = document.createElement('div');
     element.innerHTML = this.template;
     this.element = element.firstElementChild;
-    this.subElements = this.getSubElements()
-    this.componentsObj = {}
 
-    this.initComponents()
-    this.appendComponents()
-    this.initEventListeners()
+    this.getSubElements();
+    this.initComponents();
+    this.appendComponents();
+    this.initEventListeners();
 
-    return this.element
+    return this.element;
   }
 
   initComponents() {
-    this.initRangePicker()
-    this.initColumnChart()
-    this.initSortableTable()
+    this.initRangePicker();
+    this.initColumnChart();
+    this.initSortableTable();
   }
 
   async updateComponents() {
-    this.url.searchParams.set('from', this.from.toISOString())
-    this.url.searchParams.set('to', this.to.toISOString())
+    this.url.searchParams.set('from', this.from.toISOString());
+    this.url.searchParams.set('to', this.to.toISOString());
 
-    this.componentsObj.sortableTable.updateData(this.url)
+    this.components.sortableTable.updateData(this.url);
 
-    this.componentsObj.ordersChart.update(this.from.toISOString(), this.to.toISOString())
-    this.componentsObj.salesChart.update(this.from.toISOString(), this.to.toISOString())
-    this.componentsObj.customersChart.update(this.from.toISOString(), this.to.toISOString())
+    this.components.ordersChart.update(this.from.toISOString(), this.to.toISOString());
+    this.components.salesChart.update(this.from.toISOString(), this.to.toISOString());
+    this.components.customersChart.update(this.from.toISOString(), this.to.toISOString());
   }
 
   initRangePicker() {
-    const rangePicker = new RangePicker({from: this.from, to: this.to})
-    this.componentsObj.rangePicker = rangePicker
+    const rangePicker = new RangePicker({ from: this.from, to: this.to });
+    this.components.rangePicker = rangePicker;
   }
 
   initColumnChart(from = this.from, to = this.to) {
@@ -66,8 +66,8 @@ export default class Page {
         from: from,
         to: to
       },
-      link: 'sales',
-    })
+      link: 'sales'
+    });
     const salesChart = new ColumnChart({
       url: 'api/dashboard/sales',
       label: 'sales',
@@ -75,55 +75,68 @@ export default class Page {
         from: from,
         to: to
       },
-      formatHeading: data => `${new Intl.NumberFormat('en-EN', { style: 'currency', currency: 'USD', maximumFractionDigits: 0}).format(data)}`,
-    })
+      formatHeading: data =>
+        `${new Intl.NumberFormat('en-EN', {
+          style: 'currency',
+          currency: 'USD',
+          maximumFractionDigits: 0
+        }).format(data)}`
+    });
     const customersChart = new ColumnChart({
       url: 'api/dashboard/customers',
       label: 'customers',
       range: {
         from: from,
         to: to
-      },
-    })
+      }
+    });
 
-    this.componentsObj.ordersChart = ordersChart
-    this.componentsObj.salesChart = salesChart
-    this.componentsObj.customersChart = customersChart
+    this.components.ordersChart = ordersChart;
+    this.components.salesChart = salesChart;
+    this.components.customersChart = customersChart;
   }
 
   initSortableTable(url = this.url.href) {
     const sortableTable = new SortableTable(header, {
       url: url,
-      isSortLocally: true,
+      isSortLocally: true
     });
 
-    this.componentsObj.sortableTable = sortableTable
+    this.components.sortableTable = sortableTable;
   }
 
   appendComponents() {
-    Object.keys(this.componentsObj).forEach(componentName => {
-      this.subElements[componentName].append(this.componentsObj[componentName].element)
-    })
+    Object.keys(this.components).forEach(componentName => {
+      this.subElements[componentName].append(this.components[componentName].element);
+    });
   }
 
-  initEventListeners() {
-    this.componentsObj.rangePicker.element.addEventListener('date-select', this.dateSelectEvent)
-  }
+  clearData = event => {
+    this.to = new Date();
+    this.from = new Date();
+    this.from.setMonth(this.from.getMonth() - 1);
+
+    this.updateComponents();
+    this.components.rangePicker.setCustomRange(this.from, this.to);
+  };
 
   dateSelectEvent = event => {
-    this.from = event.detail.from
-    this.to = event.detail.to
-    this.updateComponents()
+    this.from = event.detail.from;
+    this.to = event.detail.to;
+    this.updateComponents();
+  };
+
+  initEventListeners() {
+    this.components.rangePicker.element.addEventListener('date-select', this.dateSelectEvent);
+    document.addEventListener('clear-data', this.clearData);
   }
 
   getSubElements() {
-    const subElements = this.element.querySelectorAll('[data-element]')
+    const elements = this.element.querySelectorAll('[data-element]');
 
-    return [...subElements].reduce((accum, element) => {
-      accum[element.dataset.element] = element
-
-      return accum
-    }, {})
+    for (const element of elements) {
+      this.subElements[element.dataset.element] = element;
+    }
   }
 
   get template() {
@@ -141,7 +154,7 @@ export default class Page {
         <h3 class="block-title">Best sellers</h3>
         <div data-element="sortableTable"></div>
       </div>
-    `
+    `;
   }
 
   remove() {
@@ -150,7 +163,7 @@ export default class Page {
 
   destroy() {
     this.remove();
-    Object.keys(this.componentsObj).forEach(componentName => this.componentsObj[componentName].destroy())
-    document.removeEventListener('date-select', this.dateSelectEvent)
+    Object.keys(this.components).forEach(componentName => this.components[componentName].destroy());
+    document.removeEventListener('clear-data', this.clearData);
   }
 }

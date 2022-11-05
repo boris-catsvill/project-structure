@@ -1,64 +1,63 @@
 export default class Tooltip {
-  static prevTooltip
-  element
+  static prevTooltip;
+  element;
 
   constructor() {
     if (Tooltip.prevTooltip) {
-      return Tooltip.prevTooltip
+      return Tooltip.prevTooltip;
     }
     Tooltip.prevTooltip = this;
   }
 
   initialize() {
-    this.addListeners()
-  }
-  
-  addListeners() {
-    document.addEventListener('pointerover', this.tooltipOver)
-    document.addEventListener('pointerout', this.tooltipOut)
+    this.addListeners();
   }
 
-  render () {
-    const element = document.createElement("div");
+  render() {
+    const element = document.createElement('div');
     element.innerHTML = this.template;
     this.element = element.firstElementChild;
   }
 
-  get template () {
-    return `
-      <div class="tooltip"></div>
-    `
-  }
-
   tooltipOver = event => {
-    if (!event.target.dataset.tooltip) return
-    this.render()
+    if (!event.target.dataset.tooltip) return;
+    this.render();
     document.body.append(this.element);
-    this.element.innerHTML = event.target.dataset.tooltip
-    event.target.addEventListener('pointermove', this.tooltipMove)
-  }
+    this.element.innerHTML = event.target.dataset.tooltip;
+    event.target.addEventListener('pointermove', this.tooltipMove);
+  };
 
   tooltipMove = event => {
-    const paddingX = 10
-    const paddingY = 5
+    const paddingX = 10;
+    const paddingY = 5;
     this.element.style.left = event.clientX + paddingX + 'px';
-    this.element.style.top = event.clientY + paddingY + 'px'
-  }
+    this.element.style.top = event.clientY + paddingY + 'px';
+  };
 
   tooltipOut = event => {
-    this.element?.remove()
-    event.target.removeEventListener('pointermove', this.tooltipMove)
+    this.element?.remove();
+    event.target.removeEventListener('pointermove', this.tooltipMove);
+  };
+
+  addListeners() {
+    document.addEventListener('pointerover', this.tooltipOver);
+    document.addEventListener('pointerout', this.tooltipOut);
   }
 
+  get template() {
+    return `
+      <div class="tooltip"></div>
+    `;
+  }
 
   remove() {
-    this.element?.remove()
+    this.element?.remove();
   }
 
   destroy() {
-    this.remove()
-    document.removeEventListener("pointerover", this.tooltipOver)
-    document.removeEventListener("pointerout", this.tooltipOut)
-    document.removeEventListener("pointermove", this.tooltipMove)
+    this.remove();
+    document.removeEventListener('pointerover', this.tooltipOver);
+    document.removeEventListener('pointerout', this.tooltipOut);
+    document.removeEventListener('pointermove', this.tooltipMove);
   }
 }

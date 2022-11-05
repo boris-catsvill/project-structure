@@ -1,31 +1,3 @@
-/* Common styles */
-@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap');
-
-body {
-  font-family: 'Source Sans Pro', sans-serif;
-}
-
-:root {
-  --blue: #109cf1;
-  --dark-blue: #334d6e;
-  --light-blue: #cfebfc;
-  --middle-blue: #9fd7f9;
-  --yellow: #ffb946;
-  --red: #f7685b;
-  --green: #2ed47a;
-  --purple: #885af8;
-  --black: #192a3e;
-  --table-black: #323c47;
-  --table-grey: #707683;
-  --grey: #90a0b7;
-  --grey-light: #c2cfe0;
-  --grey-extra-light: #eff1f4;
-  --grey-skeleton: #f5f6f8;
-  --grey-middle: #e0e4eb;
-  --white: #ffffff;
-}
-
-/* SortableTable styles */
 .sortable-table {
   background-color: var(--white);
   max-width: 100%;
@@ -36,9 +8,10 @@ body {
 
 .sortable-table__row {
   display: grid;
-  grid: auto-flow / 80px calc(50% - 80px) 20% 15% 15%;
+  grid: auto-flow / 80px calc(50% - 80px) 20% 10% 10% 10%;
   text-decoration: none;
 }
+
 .sortable-table__row.bold {
   font-weight: bold;
 }
@@ -50,7 +23,8 @@ body {
   color: var(--table-black);
   display: flex;
   align-items: center;
-  border-top: 1px solid var(--grey-light);
+  text-align: initial;
+  border-top: 1px solid var(--grey-extra-light);
 }
 
 .sortable-table__cell:first-child {
@@ -68,6 +42,10 @@ body {
 
 .sortable-table__header .sortable-table__cell[data-sortable] {
   cursor: pointer;
+}
+
+.sortable-table__header .sortable-table__cell[data-sortable]:hover {
+  color: var(--grey);
 }
 
 .sortable-table__cell-img {
@@ -108,7 +86,6 @@ body {
   background-color: var(--grey-skeleton);
 }
 
-
 .sortable-table_empty {
   display: flex;
   flex-direction: column;
@@ -135,6 +112,8 @@ body {
   align-items: center;
   justify-content: center;
   color: var(--grey);
+  height: 80vh;
+  text-align: center;
 }
 
 .sortable-table-image {
@@ -157,38 +136,10 @@ body {
   display: grid;
 }
 
-/* Loading line */
-
 .sortable-table__loading-line {
+  position: relative;
   grid-column: 1 / 7;
-  display: none;
-  margin: 16px;
+  padding: 25px 21px;
   --loading-line-height: 20px;
-}
-
-.loading-line {
-  animation-duration: 1.5s;
-  animation-fill-mode: forwards;
-  animation-iteration-count: infinite;
-  animation-name: backgroundMovement;
-  animation-timing-function: linear;
-  background: var(--grey-skeleton);
-  background: linear-gradient(
-    267.58deg,
-    var(--grey-middle) 0%,
-    var(--grey-skeleton) 80%,
-    var(--grey-middle) 100%
-  );
-  background-size: 200%;
-  border-radius: 2px;
-  height: var(--loading-line-height);
-}
-
-@keyframes backgroundMovement {
-  0% {
-    background-position: 100%;
-  }
-  100% {
-    background-position: -100%;
-  }
+  border-top: 1px solid var(--grey-extra-light);
 }
