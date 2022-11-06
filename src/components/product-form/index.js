@@ -2,8 +2,6 @@ import SortableList from '../sortable-list/index.js';
 import escapeHtml from '../../utils/escape-html.js';
 import fetchJson from '../../utils/fetch-json.js';
 
-const BACKEND_URL = 'https://course-js.javascript.ru';
-
 export default class ProductForm {
   element;
   subElements = {};
@@ -93,9 +91,8 @@ export default class ProductForm {
   async save() {
     const product = this.getFormData();
 
-     //ругается на CORS POLICY при попытке загрузки через process.env.BACKEND_URL
     try {
-      const result = await fetchJson(`${BACKEND_URL}/api/rest/products`, {
+      const result = await fetchJson(`${process.env.BACKEND_URL}api/rest/products`, {
         method: this.productId ? 'PATCH' : 'PUT',
         headers: {
           'Content-Type': 'application/json'
@@ -254,13 +251,12 @@ export default class ProductForm {
     `;
   }
 
-  //ругается на CORS POLICY при попытке загрузки через process.env.BACKEND_URL, почему-то только в этом компоненте
   async loadProductData (productId) {
-    return fetchJson(`${BACKEND_URL}/api/rest/products?id=${productId}`);
+    return fetchJson(`${process.env.BACKEND_URL}api/rest/products?id=${productId}`);
   }
 
   async loadCategoriesList () {
-    return fetchJson(`${BACKEND_URL}/api/rest/categories?_sort=weight&_refs=subcategory`);
+    return fetchJson(`${process.env.BACKEND_URL}api/rest/categories?_sort=weight&_refs=subcategory`);
   }
 
   createCategoriesSelect () {

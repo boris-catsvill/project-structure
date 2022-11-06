@@ -6,11 +6,12 @@ import fetchJson from '../../utils/fetch-json.js';
 export default class Page {
   element;
   url = new URL('api/rest/categories?_sort=weight&_refs=subcategory', process.env.BACKEND_URL)
+  updateURL = new URL('api/rest/subcategories', process.env.BACKEND_URL)
   data = [];
 
   async update(data) {
     try {
-      await fetchJson(`${process.env.BACKEND_URL}api/rest/subcategories`, {
+      await fetchJson(this.updateURL, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json'
@@ -121,7 +122,9 @@ export default class Page {
   getDataForPatch(target) {
     const data = [];
 
-    for (let i = 0; i < target.children.length; i++) {
+    const subcategories = target.querySelectorAll('li');
+
+    for (let i = 0; i < subcategories.length; i++) {
       const item = {
         id: '',
         title: '',
@@ -130,9 +133,9 @@ export default class Page {
         weight: 0
       }
 
-      item.id = target.children[i].dataset.id;
-      item.title = target.children[i].firstElementChild.textContent;
-      item.count = parseInt(target.children[i].querySelector('b').textContent);
+      item.id = subcategories[i].dataset.id;
+      item.title = subcategories[i].firstElementChild.textContent;
+      item.count = parseInt(subcategories[i].querySelector('b').textContent);
       item.category = target.closest('[data-id]').dataset.id;
       item.weight = i + 1;
 
@@ -148,12 +151,7 @@ export default class Page {
       elem.addEventListener('click', event => {
         const parent = event.target.closest('.category');
 
-        if ( parent.classList.contains('category_open') ) {
-          parent.classList.remove('category_open')
-        } else {
-          parent.classList.add('category_open')
-        };
-
+        parent.classList.toggle('category_open')
       });
     });
   }
