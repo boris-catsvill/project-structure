@@ -1,40 +1,52 @@
+import fetchJson from '../../utils/fetch-json.js';
+
+const BACKEND_URL = process.env.BACKEND_URL;
+
 export default class ColumnChart {
   element;
   subElements = {};
   chartHeight = 50;
 
   constructor({
-    data = [],
     label = '',
     link = '',
-    value = 0
+    formatHeading = data => data,
+    url = '',
+    range = {
+      from: new Date(),
+      to: new Date(),
+    }
   } = {}) {
-    this.data = data;
+    this.url = new URL(url, BACKEND_URL);
+    this.range = range;
     this.label = label;
     this.link = link;
-    this.value = value;
+    this.formatHeading = formatHeading;
 
     this.render();
   }
 
-  getColumnBody(data) {
-    const maxValue = Math.max(...data);
+  async loadData(from, to) {
+    this.element.classList.add('column-chart_loading');
+    this.subElements.header.textContent = '';
+    this.subElements.body.innerHTML = '';
 
-    return data
-    .map(item => {
-      const scale = this.chartHeight / maxValue;
-      const percent = (item / maxValue * 100).toFixed(0);
+    this.url.searchParams.set('from', from.toISOString());
+    this.url.searchParams.set('to', to.toISOString());
 
-      return `<div style="--value: ${Math.floor(item * scale)}" data-tooltip="${percent}%"></div>`;
-    })
-    .join('');
+    const data = await fetchJson(this.url);
+
+    this.setNewRange(from, to);
+
+    if (data && Object.values(data).length) {
+      this.subElements.header.textContent = this.getHeaderValue(data);
+      this.subElements.body.innerHTML = this.getColumnBody(data);
+
+      this.element.classList.remove('column-chart_loading');
+    }
   }
 
-  getLink() {
-    return this.link ? `<a class="column-chart__link" href="${this.link}">View all</a>` : '';
-  }
-
-  get template () {
+  getTemplate() {
     return `
       <div class="column-chart column-chart_loading" style="--chart-height: ${this.chartHeight}">
         <div class="column-chart__title">
@@ -42,33 +54,43 @@ export default class ColumnChart {
           ${this.getLink()}
         </div>
         <div class="column-chart__container">
-          <div data-element="header" class="column-chart__header">
-            ${this.value}
-          </div>
-          <div data-element="body" class="column-chart__chart">
-            ${this.getColumnBody(this.data)}
-          </div>
+          <div data-element="header" class="column-chart__header"></div>
+          <div data-element="body" class="column-chart__chart"></div>
         </div>
       </div>
     `;
   }
 
-  async render() {
-    const element = document.createElement('div');
-
-    element.innerHTML = this.template;
-    this.element = element.firstElementChild;
-
-    if (this.data.length) {
-      this.element.classList.remove(`column-chart_loading`);
-    }
-
-    this.subElements = this.getSubElements(this.element);
-
-    return this.element;
+  getHeaderValue(data) {
+    return this.formatHeading(Object.values(data).reduce((accum, item) => (accum + item), 0));
   }
 
-  getSubElements (element) {
+  setNewRange(from, to) {
+    this.range.from = from;
+    this.range.to = to;
+  }
+
+  getColumnBody(data) {
+    const maxValue = Math.max(...Object.values(data));
+
+    return Object.entries(data).map(([key, value]) => {
+      const scale = this.chartHeight / maxValue;
+      const percent = (value / maxValue * 100).toFixed(0);
+      const tooltip = `<span>
+        <small>${key.toLocaleString('default', {dateStyle: 'medium'})}</small>
+        <br>
+        <strong>${percent}%</strong>
+      </span>`;
+
+      return `<div style="--value: ${Math.floor(value * scale)}" data-tooltip="${tooltip}"></div>`;
+    }).join('');
+  }
+
+  getLink() {
+    return this.link ? `<a class="column-chart__link" href="${this.link}">View all</a>` : '';
+  }
+
+  getSubElements(element) {
     const elements = element.querySelectorAll('[data-element]');
 
     return [...elements].reduce((accum, subElement) => {
@@ -78,12 +100,31 @@ export default class ColumnChart {
     }, {});
   }
 
-  update ({headerData, bodyData}) {
-    this.subElements.header.textContent = headerData;
-    this.subElements.body.innerHTML = this.getColumnBody(bodyData);
+  render() {
+    const { from, to } = this.range;
+    const element = document.createElement('div');
+
+    element.innerHTML = this.getTemplate();
+
+    this.element = element.firstElementChild;
+    this.subElements = this.getSubElements(this.element);
+
+    this.loadData(from, to);
+  }
+
+  async update(from, to) {
+    return await this.loadData(from, to);
+  }
+
+  remove() {
+    if (this.element) {
+      this.element.remove();
+    }
   }
 
   destroy() {
-    this.element.remove();
+    this.remove();
+    this.element = null;
+    this.subElements = {};
   }
 }
