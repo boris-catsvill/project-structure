@@ -3,12 +3,12 @@ const header = [
     id: 'images',
     title: 'Фото',
     sortable: false,
-    template: data => {
+    template: (data = []) => {
       return `
-          <div class="sortable-table__cell">
-            <img class="sortable-table-image" alt="Image" src="${data[0].url}">
-          </div>
-        `;
+        <div class="sortable-table__cell">
+          <img class="sortable-table-image" alt="Image" src="${data[0]?.url}">
+        </div>
+      `;
     }
   },
   {
@@ -49,10 +49,15 @@ const header = [
     }
   },
   {
-    id: 'sales',
-    title: 'Продажи',
+    id: 'status',
+    title: 'Статус',
     sortable: true,
     sortType: 'number',
+    template: data => {
+      return `<div class="sortable-table__cell">
+        ${data > 0 ? 'Активен' : 'Неактивен'}
+      </div>`;
+    }
   },
 ];
 

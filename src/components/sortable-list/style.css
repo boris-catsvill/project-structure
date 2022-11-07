@@ -1,7 +1,36 @@
+/* Common styles */
+@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap');
+
+body {
+  font-family: 'Source Sans Pro', sans-serif;
+}
+
+:root {
+  --blue: #109cf1;
+  --dark-blue: #334d6e;
+  --light-blue: #cfebfc;
+  --middle-blue: #9fd7f9;
+  --yellow: #ffb946;
+  --red: #f7685b;
+  --green: #2ed47a;
+  --purple: #885af8;
+  --black: #192a3e;
+  --table-black: #323c47;
+  --table-grey: #707683;
+  --grey: #90a0b7;
+  --grey-light: #c2cfe0;
+  --grey-extra-light: #eff1f4;
+  --grey-skeleton: #f5f6f8;
+  --grey-middle: #e0e4eb;
+  --white: #ffffff;
+}
+
+/* SortableList styles */
 .sortable-list {
   position: relative;
-  padding: 0;
+  padding: 50px;
   margin: 12px 0;
+  list-style-type: none;
 }
 
 .sortable-list__item {
@@ -18,6 +47,7 @@
   margin: 16px 0;
   position: relative;
   box-sizing: border-box;
+  user-select: none;
 }
 
 .sortable-list__item[data-grab-handle],
@@ -79,6 +109,7 @@
 
 .sortable-list__placeholder {
   border: 1px solid var(--blue);
-  margin: 3px 0;
+  margin: 16px 0;
   border-radius: 4px;
+  box-sizing: border-box;
 }

@@ -218,3 +218,16 @@
 .main.is-loading .progress-bar {
   display: block;
 }
+
+.full-height {
+  height: 100%;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.sales .sortable-table__row {
+  grid: auto-flow / 10% 33% 33% 12% 12%;
+}

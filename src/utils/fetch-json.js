@@ -1,3 +1,4 @@
+import NotificationMessage from '../components/notification/index.js'
 // same as fetch, but throws FetchError in case of errors
 // status >= 400 is an error
 // network error / json error are errors
@@ -48,7 +49,12 @@ export class FetchError extends Error {
 // handle uncaught failed fetch through
 window.addEventListener('unhandledrejection', event => {
   if (event.reason instanceof FetchError) {
-    alert(event.reason.message);
+    const notification = new NotificationMessage(`${event.reason.message}`, {
+      duration: 2000,
+      type: 'error'
+    });
+
+    notification.show();
   }
 });
 
