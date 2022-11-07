@@ -5,6 +5,10 @@ export default class Page {
   element;
   components = {};
 
+  constructor([, match]) {
+    this.productID = match;
+  }
+
   render() {
     const element = document.createElement('div');
 
@@ -32,9 +36,7 @@ export default class Page {
   }
 
   initComponents() {
-    const productID = this.defineProductID();
-
-    const productForm = new ProductForm(productID)
+    const productForm = new ProductForm(this.productID)
 
     this.components = {
       productForm,
@@ -44,7 +46,7 @@ export default class Page {
   async renderForm(productForm) {
     await productForm.render();
 
-    productForm.element.addEventListener('product-saved', event => {
+    productForm.element.addEventListener('product-saved', () => {
       const notification = new NotificationMessage('Товар сохранен', {
         duration: 2000,
         type: 'success'
@@ -53,7 +55,7 @@ export default class Page {
       notification.show();
     });
 
-    productForm.element.addEventListener('product-updated', event => {
+    productForm.element.addEventListener('product-updated', () => {
       const notification = new NotificationMessage('Товар обновлен', {
         duration: 2000,
         type: 'success'
@@ -64,16 +66,6 @@ export default class Page {
 
     const contentBox = this.element.querySelector('.content-box');
     contentBox.append(productForm.element);
-  }
-
-  defineProductID() {
-    const pathname = window.location.pathname.slice('10');
-
-    if (pathname === 'add') {
-      return '';
-    }
-
-    return pathname;
   }
 
   destroy() {

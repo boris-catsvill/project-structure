@@ -67,7 +67,7 @@ export default class Page {
     this.renderPlaceholder(data);
   }
 
-  async clearFilters(button) {
+   clearFilters(button) {
     const placeholder = this.element.querySelector('[data-element="emptyPlaceholder"]');
     const sortableTable = this.element.querySelector('.sortable-table');
     const { filterStatus, filterName } = this.subElements;
@@ -238,10 +238,10 @@ export default class Page {
     const sortableTable = this.element.querySelector('.sortable-table');
 
     if (data.length === 0) {
-      const clearFiltersButton = this.element.querySelector('.button-primary-outline');
-
-      sortableTable.classList.add('sortable-table_empty')
       placeholder.innerHTML = this.getPlaceholderTemplate();
+      sortableTable.classList.add('sortable-table_empty')
+
+      const clearFiltersButton = this.element.querySelector('.button-primary-outline');
 
       this.clearFilters(clearFiltersButton);
 
