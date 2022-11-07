@@ -1,89 +1,126 @@
+import fetchJson from './../../utils/fetch-json.js'
+
 export default class ColumnChart {
-  element;
   subElements = {};
   chartHeight = 50;
 
-  constructor({
-    data = [],
-    label = '',
-    link = '',
-    value = 0
-  } = {}) {
+  constructor(
+    {
+      data,
+      label,
+      link,
+      value,
+      range = {
+        from: new Date(),
+        to: new Date(),
+      },
+      formatHeading = d => d,
+      url
+    } = {}) {
+    this.range = range;
     this.data = data;
     this.label = label;
     this.link = link;
-    this.value = value;
+    this.value = formatHeading(value);
+    this.formatHeading = formatHeading;
+    this.url = new URL(url, process.env.BACKEND_URL);
 
     this.render();
   }
 
-  getColumnBody(data) {
-    const maxValue = Math.max(...data);
-
-    return data
-    .map(item => {
-      const scale = this.chartHeight / maxValue;
-      const percent = (item / maxValue * 100).toFixed(0);
-
-      return `<div style="--value: ${Math.floor(item * scale)}" data-tooltip="${percent}%"></div>`;
-    })
-    .join('');
+  render() {
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = this.getTemplate();
+    this.element = wrapper.firstElementChild;
+    this.subElements = this.getSubElements();
+    this.renderChart();
+    const {from, to} = this.range;
+    this.update(from, to);
   }
 
-  getLink() {
-    return this.link ? `<a class="column-chart__link" href="${this.link}">View all</a>` : '';
-  }
 
-  get template () {
+  getTemplate() {
     return `
-      <div class="column-chart column-chart_loading" style="--chart-height: ${this.chartHeight}">
-        <div class="column-chart__title">
-          Total ${this.label}
-          ${this.getLink()}
-        </div>
-        <div class="column-chart__container">
-          <div data-element="header" class="column-chart__header">
-            ${this.value}
-          </div>
-          <div data-element="body" class="column-chart__chart">
-            ${this.getColumnBody(this.data)}
-          </div>
-        </div>
-      </div>
-    `;
+            <div class="column-chart column-chart_loading" style="--chart-height: ${this.chartHeight}">
+              <div class="column-chart__title">
+                ${this.makeLabel()}
+                ${this.makeLinkElement()}
+              </div>
+              <div class="column-chart__container">
+                <div data-element="header" class="column-chart__header">${this.value}</div>
+                <div data-element="body" class="column-chart__chart"/>
+            </div>
+        `;
   }
 
-  async render() {
-    const element = document.createElement('div');
+  makeLabel() {
+    return 'Total ' + this.label;
+  }
 
-    element.innerHTML = this.template;
-    this.element = element.firstElementChild;
+  makeLinkElement() {
+    return (this.link)
+      ? `<a href="${this.link}" class="column-chart__link">View all</a>`
+      : '';
+  }
 
-    if (this.data.length) {
-      this.element.classList.remove(`column-chart_loading`);
+  async update(from, to) {
+    this.data = null;
+    this.element.classList.add("column-chart_loading");
+    this.url.searchParams.set('from', from.toISOString());
+    this.url.searchParams.set('to', to.toISOString());
+    this.data = await fetchJson(this.url);
+    this.renderHeader();
+    this.renderChart();
+    this.element.classList.toggle("column-chart_loading");
+    return this.data;
+  }
+
+  makeBarData([_date, value], maxValue) {
+    const scale = this.chartHeight / maxValue;
+    return {
+      value: String(Math.floor(scale * value, 0)),
+      dataTooltip: (value / maxValue * 100).toFixed(0),
+    };
+  }
+
+  renderChart() {
+    if (!this.data) {
+      return;
     }
-
-    this.subElements = this.getSubElements(this.element);
-
-    return this.element;
+    const {body} = this.subElements;
+    body.innerHTML = '';
+    const maxValue = Math.max(...Object.values(this.data));
+    for (const dataKey of Object.entries(this.data)) {
+      const div = document.createElement('div');
+      const barData = this.makeBarData(dataKey, maxValue);
+      div.innerHTML = `<div style="--value: ${barData.value}" data-tooltip="${barData.dataTooltip}%"></div>`;
+      body.append(div.firstElementChild);
+    }
   }
 
-  getSubElements (element) {
-    const elements = element.querySelectorAll('[data-element]');
-
-    return [...elements].reduce((accum, subElement) => {
-      accum[subElement.dataset.element] = subElement;
-
-      return accum;
-    }, {});
-  }
-
-  update ({headerData, bodyData}) {
-    this.subElements.header.textContent = headerData;
-    this.subElements.body.innerHTML = this.getColumnBody(bodyData);
+  renderHeader() {
+    const totalValue = Object.values(this.data).reduce((a, b) => a + b, 0);
+    const {header} = this.subElements;
+    header.innerHTML = this.formatHeading(totalValue);
   }
 
   destroy() {
-    this.element.remove();
+    this.remove();
+    this.element = null;
+    this.subElements = {};
+  }
+
+  remove() {
+    if (this.element) {
+      this.element.remove();
+    }
+  }
+
+  getSubElements() {
+    const elements = this.element.querySelectorAll("[data-element]");
+    return [...elements].reduce((accum, subElement) => {
+      accum[subElement.dataset.element] = subElement;
+      return accum;
+    }, {});
   }
 }
