@@ -10,6 +10,7 @@ export default class RangePicker {
     this.clickCount = 2;
 
     this.year = from.getFullYear();
+    this.actualYear = new Date().getFullYear();
 
     this.monthFrom = from.getMonth();
     this.monthFromName = this.getMonthName(this.monthFrom);
@@ -163,21 +164,19 @@ export default class RangePicker {
   getMonthName(month) {
     if (typeof month === 'number') {
       const monthName = new Intl.DateTimeFormat('en-EN', { month: 'long' }).format(
-        new Date(2022, month, 1)
+        new Date(this.actualYear, month, 1)
       );
       return monthName;
     } else if (typeof month === 'string') {
-      const monthNumber = new Date(`2022, ${month}, 1`);
+      const monthNumber = new Date(this.actualYear, month, 1);
       return monthNumber.getMonth();
     }
   }
 
   getMonthDays(month) {
     const obj = {};
-    this.subElements.monthElems[0].dateTime;
-    obj.allDays = 32 - new Date(this.year, month, 32).getDate();
-    obj.firstDay = new Date(this.year, month, 1).getDay() - 1;
-    if (obj.firstDay < 0) obj.firstDay = 7;
+    obj.allDays = new Date(this.year, month, 0).getDate();
+    obj.firstDay = new Date(this.year, month, 1).getDay();
     return obj;
   }
 
@@ -185,7 +184,7 @@ export default class RangePicker {
     const weekArr = [];
     for (let i = 0; i < 7; i++) {
       const weekName = new Intl.DateTimeFormat('en-EN', { weekday: 'short' }).format(
-        new Date(2022, 7, i + 1)
+        new Date(this.actualYear, 7, i + 1)
       );
       weekArr.push(weekName);
     }
@@ -250,7 +249,7 @@ export default class RangePicker {
       str += `<button type="button" class="rangepicker__cell" data-value="${date}">${i}</button>`;
     }
     template.innerHTML = str;
-    template.children[0].style.setProperty('--start-from', monthDays.firstDay + 1);
+    template.children[0].style.setProperty('--start-from', monthDays.firstDay);
 
     return template.innerHTML;
   }

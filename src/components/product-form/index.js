@@ -2,8 +2,8 @@ import SortableList from '../sortable-list/index.js';
 import Notification from '../../components/notification';
 import fetchJson from '../../utils/fetch-json.js';
 
-const IMGUR_CLIENT_ID = '28aaa2e823b03b1';
-const BACKEND_URL = 'https://course-js.javascript.ru';
+const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID;
+const BACKEND_URL = process.env.BACKEND_URL;
 
 export default class ProductForm {
   element;
@@ -39,10 +39,10 @@ export default class ProductForm {
   }
 
   fetchProduct() {
-    return fetchJson(`${BACKEND_URL}/api/rest/products?id=${this.productId}`);
+    return fetchJson(`${BACKEND_URL}api/rest/products?id=${this.productId}`);
   }
   fetchCategories() {
-    return fetchJson(`${BACKEND_URL}/api/rest/categories?_sort=weight&_refs=subcategory`);
+    return fetchJson(`${BACKEND_URL}api/rest/categories?_sort=weight&_refs=subcategory`);
   }
 
   renderForm() {
@@ -125,7 +125,7 @@ export default class ProductForm {
   async sendData(formData) {
     try {
       const method = this.productId ? 'PATCH' : 'PUT';
-      const response = await fetchJson(`${BACKEND_URL}/api/rest/products`, {
+      const response = await fetchJson(`${BACKEND_URL}api/rest/products`, {
         method: method,
         headers: {
           'Content-Type': 'application/json'

@@ -3,7 +3,7 @@ import SortableTable from '../../../components/sortable-table';
 
 import header from './product-header';
 
-const BACKEND_URL = 'https://course-js.javascript.ru/';
+const BACKEND_URL = process.env.BACKEND_URL;
 
 export default class Page {
   element;
@@ -50,10 +50,18 @@ export default class Page {
     );
     const rangeEnd = this.subElements.sliderContainer.querySelector('[data-element="endValue"]');
 
-    status ? this.url.searchParams.set('status', status) : this.url.searchParams.delete('status');
-    name
-      ? this.url.searchParams.set('title_like', name)
-      : this.url.searchParams.delete('title_like');
+    if (status) {
+      this.url.searchParams.set('status', status);
+    } else {
+      this.url.searchParams.delete('status');
+    }
+
+    if (name) {
+      this.url.searchParams.set('title_like', name);
+    } else {
+      this.url.searchParams.delete('title_like');
+    }
+
     this.url.searchParams.set('price_gte', rangeStart.textContent.replace('$', ''));
     this.url.searchParams.set('price_lte', rangeEnd.textContent.replace('$', ''));
 

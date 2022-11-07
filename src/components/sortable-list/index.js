@@ -43,7 +43,7 @@ export default class SortableList {
     this.item = target.closest('li');
     this.itemHeight = this.item.clientHeight;
     this.itemWidth = this.item.clientWidth;
-    this.index = Array.from([...this.element.children]).indexOf(this.item);
+    this.index = Array.from(this.element.children).indexOf(this.item);
 
     this.containerTop = this.element.getBoundingClientRect().top;
     this.containerBottom = this.element.getBoundingClientRect().bottom;
@@ -58,6 +58,8 @@ export default class SortableList {
     this.element.append(this.item);
     this.element.children[this.index].before(this.placeholder);
 
+    this.scroll = window.pageYOffset;
+
     this.moveOn(event, this.shiftX, this.shiftY);
 
     this.indexArr = [0, 0];
@@ -68,21 +70,24 @@ export default class SortableList {
   };
 
   onMouseMove = event => {
-    this.moveOn(event, this.shiftX, this.shiftY);
+    const shiftY = this.shiftY - (this.scroll - window.pageYOffset);
+    const coordinateY = event.clientY;
 
-    if (event.clientY < 50) {
+    if (event.clientY < this.itemHeight / 2) {
       scrollBy(0, -10);
-    } else if (event.clientY > this.clientHeight - 50) {
+    } else if (event.clientY > this.clientHeight - this.itemHeight / 2) {
       scrollBy(0, 10);
     }
 
-    if (event.clientY < this.containerTop + this.itemHeight / 2) {
+    this.moveOn(event, this.shiftX, shiftY);
+
+    if (coordinateY < this.containerTop + this.itemHeight / 2) {
       this.element.prepend(this.placeholder);
-    } else if (event.clientY > this.containerBottom - this.itemHeight / 2) {
+    } else if (coordinateY > this.containerBottom - this.itemHeight / 2) {
       this.element.append(this.placeholder);
     } else {
       for (let i = this.containerTop; i < this.containerBottom; i += this.itemHeight) {
-        if (event.clientY > i && event.clientY < i + this.itemHeight) {
+        if (coordinateY > i && coordinateY < i + this.itemHeight) {
           this.indexArr.push(i);
           this.indexArr.shift();
           if (this.indexArr[0] - this.indexArr[1] === this.itemHeight) {
@@ -117,8 +122,8 @@ export default class SortableList {
   };
 
   dispatchCustomEvent = () => {
-    let elements = this.element.querySelectorAll('[data-id]');
-    let elementsId = [];
+    const elements = this.element.querySelectorAll('[data-id]');
+    const elementsId = [];
     for (const element of elements) {
       elementsId.push(element.dataset.id);
     }

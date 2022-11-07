@@ -5,10 +5,13 @@ export default class Page {
   subElements = {};
   components = {};
 
+  constructor(productId) {
+    this.productId = productId;
+  }
+
   async render() {
     const element = document.createElement('div');
 
-    this.productId = document.location.pathname.split('/').at(-1);
     this.pageTitle = this.productId === 'add' ? 'Add' : 'Edit';
 
     element.innerHTML = this.template;

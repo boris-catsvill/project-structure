@@ -2,13 +2,13 @@ import SortableList from '../sortable-list';
 import fetchJson from '../../utils/fetch-json.js';
 import Notification from '../../components/notification';
 
-const BACKEND_URL = 'https://course-js.javascript.ru';
+const BACKEND_URL = process.env.BACKEND_URL;
 
 export default class Categories {
   element;
 
   constructor(url) {
-    this.url = new URL(BACKEND_URL + '/' + url);
+    this.url = new URL(BACKEND_URL + url);
   }
 
   async render() {
@@ -38,7 +38,7 @@ export default class Categories {
   async patchData(data) {
     try {
       const method = 'PATCH';
-      const response = await fetchJson(`${BACKEND_URL}/api/rest/subcategories`, {
+      const response = await fetchJson(`${BACKEND_URL}api/rest/subcategories`, {
         method: method,
         headers: {
           'Content-Type': 'application/json'

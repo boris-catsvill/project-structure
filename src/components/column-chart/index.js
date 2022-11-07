@@ -1,6 +1,6 @@
 import fetchJson from '../../utils/fetch-json.js';
 
-const BACKEND_URL = 'https://course-js.javascript.ru';
+const BACKEND_URL = process.env.BACKEND_URL;
 
 export default class ColumnChart {
   element;
@@ -19,7 +19,7 @@ export default class ColumnChart {
     this.range = range;
     this.formatHeading = formatHeading;
 
-    this.url = new URL(BACKEND_URL + '/' + url);
+    this.url = new URL(BACKEND_URL + url);
 
     this.render();
     this.getSubElements();

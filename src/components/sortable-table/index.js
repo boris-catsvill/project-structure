@@ -1,6 +1,6 @@
 import fetchJson from '../../utils/fetch-json.js';
 
-const BACKEND_URL = 'https://course-js.javascript.ru/';
+const BACKEND_URL = process.env.BACKEND_URL;
 
 export default class SortableTable {
   element;
@@ -9,6 +9,7 @@ export default class SortableTable {
   constructor(headerConfig, { url = '', isSortLocally = false } = {}) {
     this.headerConfig = headerConfig;
 
+    this.isLoading = false;
     this.sortDirect = false;
     this.isSortLocally = isSortLocally;
     this.start = 0;
@@ -27,7 +28,7 @@ export default class SortableTable {
     element.innerHTML = this.template;
     this.element = element.firstElementChild;
 
-    let firstSortElem = null;
+    let firstSortElem;
     for (const item of this.headerConfig) {
       if (item.sortable) {
         firstSortElem = this.element.querySelector(`[data-id="${item.id}"]`);
@@ -61,6 +62,7 @@ export default class SortableTable {
   }
 
   async addData(start = 0, end = 30) {
+    this.isLoading = true;
     this.url.searchParams.set('_start', start);
     this.url.searchParams.set('_end', end);
 
@@ -69,6 +71,7 @@ export default class SortableTable {
     const addTemp = document.createElement('div');
     addTemp.innerHTML = this.bodyRows(data).join('');
     this.subElements.body.append(...addTemp.children);
+    this.isLoading = false;
   }
 
   async updateData(url) {
@@ -77,12 +80,7 @@ export default class SortableTable {
     this.url = url;
 
     let data = {};
-    try {
-      data = await fetchJson(this.url.href).catch(error => console.error(error));
-    } catch (error) {
-      console.log(error);
-      return;
-    }
+    data = await fetchJson(this.url.href).catch(error => console.error(error));
 
     if (data.length === 0) {
       if (this.subElements.table.classList.contains('sortable-table_empty')) return;
@@ -192,18 +190,16 @@ export default class SortableTable {
     this.sortDirect = !this.sortDirect;
   };
 
-  onScrollHandler = event => {
+  onScrollHandler = async () => {
     const countNewItems = 30;
     const toBottom =
       document.documentElement.getBoundingClientRect().bottom -
       document.documentElement.clientHeight;
 
-    // Пытался написать (toBottom < 100) чтобы подгрузка была заранее, но из за этого подгрузка выполнялась много раз, а не один
-    // При (toBottom === 100) происходит пропуск значения 100
-    if (toBottom === 0) {
+    if (toBottom < 200 && !this.isLoading) {
       this.start += countNewItems;
       this.end += countNewItems;
-      this.addData(this.start, this.end);
+      await this.addData(this.start, this.end);
     }
   };
 
