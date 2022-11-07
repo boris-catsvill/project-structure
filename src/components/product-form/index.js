@@ -1,10 +1,6 @@
 import SortableList from './../sortable-list/index.js';
 import fetchJson from './utils/fetch-json.js';
 
-const IMGUR_CLIENT_ID = '28aaa2e823b03b1';
-const IMGUR_URL = 'https://api.imgur.com';
-const BACKEND_URL = 'https://course-js.javascript.ru';
-
 export default class ProductForm {
   abortController = new AbortController();
   API_PATH = '/api/rest';
@@ -100,7 +96,7 @@ export default class ProductForm {
   }
 
   async getCategoriesData() {
-    return fetchJson(`${BACKEND_URL}${this.API_PATH}/categories?_sort=weight&_refs=subcategory`,
+    return fetchJson(`${process.env.BACKEND_URL}${this.API_PATH}/categories?_sort=weight&_refs=subcategory`,
       {
         signal: this.abortController.signal
       }
@@ -116,7 +112,7 @@ export default class ProductForm {
     if (!this.productId) {
       return this.defaultProductData;
     }
-    const url = new URL(`${this.API_PATH}/products`, `${BACKEND_URL}`);
+    const url = new URL(`${this.API_PATH}/products`, `${process.env.BACKEND_URL}`);
     url.searchParams.set('id', this.productId);
     const fetchResult = await fetchJson(url,
       {
@@ -184,7 +180,7 @@ export default class ProductForm {
       updateBody['id'] = this.productId;
     }
 
-    const response = await fetchJson(`${BACKEND_URL}${this.API_PATH}/products`,
+    const response = await fetchJson(`${process.env.BACKEND_URL}${this.API_PATH}/products`,
       {
         method: `${(this.productId) ? 'PATCH' : 'PUT'}`,
         headers: {
@@ -278,10 +274,10 @@ export default class ProductForm {
     const formData = new FormData();
     formData.append('image', file);
     try {
-      const response = await fetch(`${IMGUR_URL}/3/image`, {
+      const response = await fetch(`${process.env.IMGUR_URL}/3/image`, {
         method: 'POST',
         headers: {
-          Authorization: `Client-ID ${IMGUR_CLIENT_ID}`
+          Authorization: `Client-ID ${process.env.IMGUR_CLIENT_ID}`
         },
         body: formData,
         referrer: ''

@@ -1,4 +1,3 @@
-const BACKEND_URL = 'https://course-js.javascript.ru';
 import SortableTable from "../../../components/sortable-table/index.js";
 import SortFilter from "../components/sort-filter/index.js";
 import header from "./header.js";
@@ -60,7 +59,7 @@ export default class ProductsPage {
 
   async createComponents() {
     const productsContainer = await new SortableTable(header, {
-      url: new URL('/api/rest/products', BACKEND_URL),
+      url: new URL('/api/rest/products', process.env.BACKEND_URL),
       itemUri: '/products'
     });
     const sortFilter = new SortFilter();

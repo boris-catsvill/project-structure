@@ -1,4 +1,3 @@
-const BACKEND_URL = 'https://course-js.javascript.ru';
 import SortableTable from "./../../components/sortable-table/index.js";
 import RangePicker from "./../../components/range-picker/index.js";
 import header from "./header.js";
@@ -64,7 +63,7 @@ export default class SalesPage {
     const rangePicker = new RangePicker(dateRange);
 
     const ordersContainer = await new SortableTable(header, {
-      url: BACKEND_URL + '/api/rest/orders',
+      url: process.env.BACKEND_URL + '/api/rest/orders',
       dataFilters: this.makeDateQueryParam(dateRange)
     });
 

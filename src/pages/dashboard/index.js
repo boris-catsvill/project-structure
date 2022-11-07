@@ -3,8 +3,6 @@ import SortableTable from './../../components/sortable-table/index.js';
 import ColumnChart from './../../components/column-chart/index.js';
 import header from './bestsellers-header.js';
 
-const BACKEND_URL = 'https://course-js.javascript.ru';
-
 export default class Page {
   abortController = new AbortController();
   startDate = new Date(2022, 9, 1);
@@ -64,7 +62,7 @@ export default class Page {
       formatHeading: data => `$${data}`
     });
 
-    const url = new URL('/api/dashboard/bestsellers', BACKEND_URL);
+    const url = new URL('/api/dashboard/bestsellers',process.env.BACKEND_URL);
     const sortableTable = new SortableTable(header, {url});
 
     this.pageComponents = {rangePicker, ordersChart, customersChart, salesChart, sortableTable};

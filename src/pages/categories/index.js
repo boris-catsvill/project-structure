@@ -1,8 +1,6 @@
 import SortableList from "../../components/sortable-list/index.js";
 import fetchJson from "../../utils/fetch-json.js";
 
-const BACKEND_URL = 'https://course-js.javascript.ru';
-
 export default class CategoriesPage {
   model = [];
   components = [];
@@ -33,7 +31,7 @@ export default class CategoriesPage {
   }
 
   async getData() {
-    const url = new URL('/api/rest/categories', BACKEND_URL);
+    const url = new URL('/api/rest/categories', process.env.BACKEND_URL);
     url.searchParams.set('_sort', 'weight');
     url.searchParams.set('_refs', 'subcategory');
     this.model = await fetchJson(url);
@@ -138,7 +136,7 @@ export default class CategoriesPage {
         weight: i + 1
       })
     }
-    fetchJson(BACKEND_URL + '/api/rest/subcategories',
+    fetchJson(process.env.BACKEND_URL + '/api/rest/subcategories',
       {
         method: 'PATCH',
         headers: {
