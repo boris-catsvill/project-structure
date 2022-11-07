@@ -45,8 +45,10 @@ export default class SortableList {
     this.itemWidth = this.item.clientWidth;
     this.index = Array.from(this.element.children).indexOf(this.item);
 
-    this.containerTop = this.element.getBoundingClientRect().top;
-    this.containerBottom = this.element.getBoundingClientRect().bottom;
+    this.actualScrollY = window.pageYOffset;
+
+    this.containerTop = this.element.getBoundingClientRect().top + this.actualScrollY;
+    this.containerBottom = this.element.getBoundingClientRect().bottom + this.actualScrollY;
 
     this.shiftX = event.pageX - this.item.getBoundingClientRect().left;
     this.shiftY = event.pageY - this.item.getBoundingClientRect().top;
@@ -58,8 +60,6 @@ export default class SortableList {
     this.element.append(this.item);
     this.element.children[this.index].before(this.placeholder);
 
-    this.scroll = window.pageYOffset;
-
     this.moveOn(event, this.shiftX, this.shiftY);
 
     this.indexArr = [0, 0];
@@ -70,8 +70,7 @@ export default class SortableList {
   };
 
   onMouseMove = event => {
-    const shiftY = this.shiftY - (this.scroll - window.pageYOffset);
-    const coordinateY = event.clientY;
+    const shiftY = this.shiftY - (this.actualScrollY - window.pageYOffset);
 
     if (event.clientY < this.itemHeight / 2) {
       scrollBy(0, -10);
@@ -81,13 +80,13 @@ export default class SortableList {
 
     this.moveOn(event, this.shiftX, shiftY);
 
-    if (coordinateY < this.containerTop + this.itemHeight / 2) {
+    if (event.pageY < this.containerTop + this.itemHeight / 2) {
       this.element.prepend(this.placeholder);
-    } else if (coordinateY > this.containerBottom - this.itemHeight / 2) {
+    } else if (event.pageY > this.containerBottom - this.itemHeight / 2) {
       this.element.append(this.placeholder);
     } else {
       for (let i = this.containerTop; i < this.containerBottom; i += this.itemHeight) {
-        if (coordinateY > i && coordinateY < i + this.itemHeight) {
+        if (event.pageY > i && event.pageY < i + this.itemHeight) {
           this.indexArr.push(i);
           this.indexArr.shift();
           if (this.indexArr[0] - this.indexArr[1] === this.itemHeight) {
