@@ -67,7 +67,7 @@ export default class Page {
     this.renderPlaceholder(data);
   }
 
-   clearFilters(button) {
+  async clearFilters() {
     const placeholder = this.element.querySelector('[data-element="emptyPlaceholder"]');
     const sortableTable = this.element.querySelector('.sortable-table');
     const { filterStatus, filterName } = this.subElements;
@@ -75,33 +75,29 @@ export default class Page {
     const from = this.element.querySelector('[data-element="from"]');
     const to = this.element.querySelector('[data-element="to"]');
 
-    if ( button ) {
-      button.addEventListener('click', async () => {
-        this.clearURL(this.url);
-        this.clearURL(this.sortableTableURL);
+    this.clearURL(this.url);
+    this.clearURL(this.sortableTableURL);
 
-        const data = await fetchJson(this.url);
+    const data = await fetchJson(this.url);
 
-        this.components.sortableTable.update(data);
+    this.components.sortableTable.update(data);
 
-        //clear Page
-        sortableTable.classList.remove('sortable-table_empty')
-        placeholder.innerHTML = '';
-        filterStatus.value = '';
-        filterName.value = '';
+    //clear Page
+    sortableTable.classList.remove('sortable-table_empty')
+    placeholder.innerHTML = '';
+    filterStatus.value = '';
+    filterName.value = '';
 
-        //clear RangeSlider values
-        rangeSlider.selected.from = this.min;
-        rangeSlider.selected.to = this.max;
-        rangeSlider.update();
-        from.textContent = `${this.min}`;
-        to.textContent = `${this.max}`;
+    //clear RangeSlider values
+    rangeSlider.selected.from = this.min;
+    rangeSlider.selected.to = this.max;
+    rangeSlider.update();
+    from.textContent = `${this.min}`;
+    to.textContent = `${this.max}`;
 
-        //clear SortableTable values
-        this.components.sortableTable.end = this.end;
-        this.components.sortableTable.start = this.start;
-      })
-    }
+    //clear SortableTable values
+    this.components.sortableTable.end = this.end;
+    this.components.sortableTable.start = this.start;
   }
 
   async render() {
@@ -243,8 +239,9 @@ export default class Page {
 
       const clearFiltersButton = this.element.querySelector('.button-primary-outline');
 
-      this.clearFilters(clearFiltersButton);
-
+      clearFiltersButton.onclick = () => {
+        this.clearFilters();
+      };
     } else {
       sortableTable.classList.remove('sortable-table_empty')
       placeholder.innerHTML = '';
