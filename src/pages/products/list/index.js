@@ -129,9 +129,9 @@ export default class ProductsPage {
       result.price_lte = priceFilter.to;
     }
     return Object.entries(result)
-      .filter(([_k, v]) => v !== undefined && v !== '')
-      .reduce((accum, [k, v]) => {
-        accum[k] = v;
+      .filter(([_key, value]) => value !== undefined && value !== '')
+      .reduce((accum, [key, value]) => {
+        accum[key] = value;
         return accum;
       }, {});
   }

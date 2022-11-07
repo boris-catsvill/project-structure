@@ -50,14 +50,12 @@ export default class ProductForm {
     const {productForm} = this.subElements;
     productForm.addEventListener(
       'submit',
-      this.save,
-      this.abortController.signal
+      this.save
     );
 
     this.element.querySelector('#uploadImage').addEventListener(
       'pointerdown',
-      this.uploadImageHandler,
-      this.abortController.signal
+      this.uploadImageHandler
     );
 
   }
@@ -119,10 +117,11 @@ export default class ProductForm {
         signal: this.abortController.signal
       }
     );
-    if (fetchResult.length !== 1) {
+    const [result] = fetchResult;
+    if (result === undefined) {
       throw new Error(`Product data for ${this.productId} is not correctly`);
     }
-    return fetchResult[0];
+    return result;
   }
 
   fillProduct(productData) {
@@ -170,8 +169,6 @@ export default class ProductForm {
   onLoadImageHandler() {
     const input = this.element.querySelector('#fileInput');
     const [file] = input.files;
-
-    console.error(file);
   }
 
   async onSaveEventHandler() {
@@ -182,7 +179,7 @@ export default class ProductForm {
 
     const response = await fetchJson(`${process.env.BACKEND_URL}${this.API_PATH}/products`,
       {
-        method: `${(this.productId) ? 'PATCH' : 'PUT'}`,
+        method: this.productId ? 'PATCH' : 'PUT',
         headers: {
           'Content-Type': 'application/json;charset=utf-8'
         },

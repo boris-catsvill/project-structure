@@ -5,7 +5,7 @@ import header from './bestsellers-header.js';
 
 export default class Page {
   abortController = new AbortController();
-  startDate = new Date(2022, 9, 1);
+  startDate = new Date();
   pageComponents = [];
 
   render() {

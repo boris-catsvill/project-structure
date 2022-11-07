@@ -40,7 +40,7 @@ export default class CategoriesPage {
   renderPageElements() {
     const {categoriesContainer} = this.subElements;
     for (const data of this.model) {
-      let categoryElement = this.getCategoryElement(data);
+      const categoryElement = this.getCategoryElement(data);
       const catElements = data.subcategories
         .map(catData => this.renderCategoryListElement(catData));
       const sortableList = new SortableList({items: catElements});
