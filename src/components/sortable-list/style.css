@@ -23,6 +23,12 @@
 .sortable-list__item[data-grab-handle],
 .sortable-list__item [data-grab-handle] {
   cursor: grab;
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Chrome/Safari/Opera */
+  -khtml-user-select: none; /* Konqueror */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none;
 }
 
 .sortable-list__item [data-delete-handle] {
@@ -81,4 +87,5 @@
   border: 1px solid var(--blue);
   margin: 3px 0;
   border-radius: 4px;
+  box-sizing: border-box;
 }

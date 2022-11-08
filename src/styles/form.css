@@ -62,7 +62,6 @@ form .form-label {
   font-size: 16px;
   line-height: 20px;
   color: var(--table-grey);
-  margin-bottom: 8px;
 }
 
 form .form-control {
@@ -75,6 +74,7 @@ form .form-control {
   line-height: 20px;
   color: var(--dark-blue);
   outline: none;
+  width: 100%;
 }
 
 form.form-grid .form-control {
@@ -102,6 +102,7 @@ form.form-inline {
   display: grid;
   grid: auto-flow / repeat(auto-fit, minmax(50px, 1fr));
   grid-gap: 16px;
+  align-items: center;
 }
 
 form.form-inline .form-group {

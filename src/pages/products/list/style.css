@@ -1,0 +1,9 @@
+.product-list form.form-inline {
+  grid-template-columns: 3fr 3fr 2fr;
+  grid-gap: 24px;
+}
+
+.product-list form .form-control,
+.product-list form .range-slider {
+  margin-top: 5px;
+}

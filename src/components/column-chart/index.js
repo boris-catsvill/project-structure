@@ -1,89 +1,144 @@
+import fetchJson from '../../utils/fetch-json.js';
+
+const BACKEND_URL = process.env.BACKEND_URL;
+
 export default class ColumnChart {
   element;
   subElements = {};
   chartHeight = 50;
 
   constructor({
-    data = [],
+    url = '',
+    range = { from, to },
     label = '',
     link = '',
-    value = 0
+    formatHeading = data => data
   } = {}) {
-    this.data = data;
     this.label = label;
     this.link = link;
-    this.value = value;
+    this.range = range;
+    this.formatHeading = formatHeading;
+
+    this.url = new URL(BACKEND_URL + url);
 
     this.render();
+    this.getSubElements();
+    this.update(this.range.from, this.range.to);
+    this.initEventListeners();
   }
 
-  getColumnBody(data) {
-    const maxValue = Math.max(...data);
-
-    return data
-    .map(item => {
-      const scale = this.chartHeight / maxValue;
-      const percent = (item / maxValue * 100).toFixed(0);
-
-      return `<div style="--value: ${Math.floor(item * scale)}" data-tooltip="${percent}%"></div>`;
-    })
-    .join('');
+  render() {
+    const element = document.createElement('div');
+    element.innerHTML = this.template;
+    this.element = element.firstElementChild;
   }
 
-  getLink() {
-    return this.link ? `<a class="column-chart__link" href="${this.link}">View all</a>` : '';
+  async fetchData(from, to) {
+    this.url.searchParams.set('from', from);
+    this.url.searchParams.set('to', to);
+
+    const data = await fetchJson(this.url);
+
+    return data;
   }
 
-  get template () {
+  mouseOver = event => {
+    const target = event.target.closest('[data-tooltip]');
+    if (target === null) return;
+
+    this.subElements.body.classList.add('has-hovered');
+    target.classList.add('is-hovered');
+
+    target.addEventListener('mouseout', this.mouseOut);
+  };
+
+  mouseOut = event => {
+    const target = event.target.closest('[data-tooltip]');
+
+    this.subElements.body.classList.remove('has-hovered');
+    target.classList.remove('is-hovered');
+  };
+
+  async update(from, to) {
+    this.element.classList.add('column-chart_loading');
+
+    const data = await this.fetchData(from, to);
+
+    const value = Object.values(data).reduce((a, b) => a + b, 0);
+
+    this.element.classList.remove('column-chart_loading');
+
+    this.subElements.body.innerHTML = this.dataTemplate(data);
+    this.subElements.header.innerHTML = this.formatHeading(value);
+  }
+
+  initEventListeners() {
+    this.element.addEventListener('mouseover', this.mouseOver);
+  }
+
+  getSubElements() {
+    const elements = this.element.querySelectorAll('[data-element]');
+
+    for (const element of elements) {
+      this.subElements[element.dataset.element] = element;
+    }
+  }
+
+  dataTemplate(data) {
+    const date = Object.keys(data);
+    const values = Object.values(data);
+
+    const maxData = Math.max(...values);
+    const coef = 100 / maxData;
+
+    const dataTemplateArr = Object.entries(data).map(item => {
+      const value = item[1];
+      const date = new Date(item[0]);
+
+      const dateString = `${date.getDate()} ${new Intl.DateTimeFormat('en-US', {
+        month: 'short'
+      }).format(date)} ${date.getFullYear()}`;
+
+      const coefValue = value * coef;
+      const heightCol = Math.floor((this.chartHeight / 100) * coefValue);
+
+      return `<div style="--value: ${heightCol}" data-tooltip="${this.tooltipTemplate(
+        dateString,
+        value
+      )}"></div>`;
+    });
+
+    return [...dataTemplateArr].join('');
+  }
+
+  tooltipTemplate(date, value) {
     return `
-      <div class="column-chart column-chart_loading" style="--chart-height: ${this.chartHeight}">
-        <div class="column-chart__title">
-          Total ${this.label}
-          ${this.getLink()}
-        </div>
-        <div class="column-chart__container">
-          <div data-element="header" class="column-chart__header">
-            ${this.value}
-          </div>
-          <div data-element="body" class="column-chart__chart">
-            ${this.getColumnBody(this.data)}
-          </div>
-        </div>
-      </div>
+      <div><small>${date}</small></div><strong>${value}</strong>
     `;
   }
 
-  async render() {
-    const element = document.createElement('div');
-
-    element.innerHTML = this.template;
-    this.element = element.firstElementChild;
-
-    if (this.data.length) {
-      this.element.classList.remove(`column-chart_loading`);
-    }
-
-    this.subElements = this.getSubElements(this.element);
-
-    return this.element;
+  get template() {
+    return `
+      <div class="column-chart" style="--chart-height: ${this.chartHeight}">
+        <div class="column-chart__title">
+          Total ${this.label}
+          ${this.link ? `<a href="/${this.link}" class="column-chart__link">View all</a>` : ''}
+        </div>
+        <div class="column-chart__container">
+          <div data-element="header" class="column-chart__header">${this.formatHeading(
+            this.value
+          )}</div>
+          <div data-element="body" class="column-chart__chart"></div>
+        </div>
+    `;
   }
 
-  getSubElements (element) {
-    const elements = element.querySelectorAll('[data-element]');
-
-    return [...elements].reduce((accum, subElement) => {
-      accum[subElement.dataset.element] = subElement;
-
-      return accum;
-    }, {});
-  }
-
-  update ({headerData, bodyData}) {
-    this.subElements.header.textContent = headerData;
-    this.subElements.body.innerHTML = this.getColumnBody(bodyData);
+  remove() {
+    this.element?.remove();
   }
 
   destroy() {
-    this.element.remove();
+    this.remove();
+    this.element = null;
   }
 }

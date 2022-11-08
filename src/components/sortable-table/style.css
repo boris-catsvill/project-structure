@@ -8,9 +8,10 @@
 
 .sortable-table__row {
   display: grid;
-  grid: auto-flow / 80px calc(50% - 80px) 20% 15% 15%;
+  grid: auto-flow / 80px calc(50% - 80px) 20% 10% 10% 10%;
   text-decoration: none;
 }
+
 .sortable-table__row.bold {
   font-weight: bold;
 }
@@ -22,7 +23,8 @@
   color: var(--table-black);
   display: flex;
   align-items: center;
-  border-top: 1px solid var(--grey-light);
+  text-align: initial;
+  border-top: 1px solid var(--grey-extra-light);
 }
 
 .sortable-table__cell:first-child {
@@ -40,6 +42,10 @@
 
 .sortable-table__header .sortable-table__cell[data-sortable] {
   cursor: pointer;
+}
+
+.sortable-table__header .sortable-table__cell[data-sortable]:hover {
+  color: var(--grey);
 }
 
 .sortable-table__cell-img {
@@ -106,6 +112,8 @@
   align-items: center;
   justify-content: center;
   color: var(--grey);
+  height: 80vh;
+  text-align: center;
 }
 
 .sortable-table-image {
@@ -124,6 +132,14 @@
   color: var(--dark-blue);
 }
 
-.sortable-table .sortable-table__loading-line {
-  display: none;
+.sortable-table.sortable-table_loading .sortable-table__loading-line {
+  display: grid;
+}
+
+.sortable-table__loading-line {
+  position: relative;
+  grid-column: 1 / 7;
+  padding: 25px 21px;
+  --loading-line-height: 20px;
+  border-top: 1px solid var(--grey-extra-light);
 }
