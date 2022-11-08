@@ -1,5 +1,5 @@
-import RangePicker from '../../components/range-picker/index.js';
-import SortableTable from '../../components/sortable-table/index.js';
+import RangePicker from './../../components/range-picker/index.js';
+import SortableTable from './../../components/sortable-table/index.js';
 import header from './sales-header.js';
 
 const BACKEND_URL = process.env.BACKEND_URL;

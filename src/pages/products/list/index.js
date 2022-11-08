@@ -1,5 +1,5 @@
-import DoubleSlider from '../../../components/double-slider';
-import SortableTable from '../../../components/sortable-table';
+import DoubleSlider from './../../../components/double-slider';
+import SortableTable from './../../../components/sortable-table';
 
 import header from './product-header';
 

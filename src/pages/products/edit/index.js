@@ -1,4 +1,4 @@
-import ProductForm from '../../../components/product-form';
+import ProductForm from './../../../components/product-form';
 
 export default class Page {
   element;

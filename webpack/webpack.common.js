@@ -20,7 +20,7 @@ module.exports = {
   output: {
     publicPath: '/',
     filename: '[name].bundle.js',
-    path: path.join(__dirname, '../dist'),
+    path: path.join(__dirname, '../build'),
     chunkFilename: '[name]-[id].js',
     globalObject: 'self'
   },
@@ -59,19 +59,19 @@ module.exports = {
       // Options similar to the same options in webpackOptions.output
       // both options are optional
       filename: '[name].css',
-      chunkFilename: '[id].css',
+      chunkFilename: '[id].css'
     }),
     new CopyWebpackPlugin({
       patterns: [
         {
           from: path.join(__dirname, '../src/assets'),
-          to: "assets/[path][name][ext]",
-          noErrorOnMissing: true,
+          to: 'assets/[path][name][ext]',
+          noErrorOnMissing: true
         },
         {
           from: path.join(__dirname, '../src/components/product-form/*.svg'),
-          to: "[name][ext]",
-          noErrorOnMissing: true,
+          to: '[name][ext]',
+          noErrorOnMissing: true
         }
       ]
     })

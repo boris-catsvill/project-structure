@@ -1,6 +1,6 @@
-import RangePicker from '../../components/range-picker/index.js';
-import SortableTable from '../../components/sortable-table/index.js';
-import ColumnChart from '../../components/column-chart/index.js';
+import RangePicker from './../../components/range-picker/index.js';
+import SortableTable from './../../components/sortable-table/index.js';
+import ColumnChart from './../../components/column-chart/index.js';
 import header from './bestsellers-header.js';
 
 const BACKEND_URL = process.env.BACKEND_URL;
