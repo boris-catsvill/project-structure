@@ -63,7 +63,7 @@ export default class Page {
     const sortableTable = new SortableTable(header, {
       url: 'api/rest/products?_embed=subcategory.category',
       range: this.range,
-      rowTemplate: (HTML, item) => `<a href="/products/${item.id}" class="sortable-table__row">${HTML}</a>`
+      rowTemplate: (html, item) => `<a href="/products/${item.id}" class="sortable-table__row">${html}</a>`
     });
 
     this.components = {
@@ -73,8 +73,10 @@ export default class Page {
   }
 
   getComponents() {
-    this.subElements.sliderContainer.append(this.components.doubleSlider.element);
-    this.subElements.productsContainer.append(this.components.sortableTable.element);
+    const { sliderContainer, productsContainer } = this.subElements;
+
+    sliderContainer.append(this.components.doubleSlider.element);
+    productsContainer.append(this.components.sortableTable.element);
   }
 
   async render() {
@@ -147,6 +149,9 @@ export default class Page {
     this.element = null;
     this.subElements = {};
     this.components = {};
+    Object.values(this.components).forEach((component) => {
+      component.destroy();
+    });
   }
 
 }

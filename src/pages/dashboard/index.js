@@ -100,11 +100,12 @@ export default class Page {
   }
 
   getComponents() {
-    this.subElements.rangePicker.append(this.components.rangePicker.element);
-    this.subElements.sortableTable.append(this.components.sortableTable.element);
-    this.subElements.ordersChart.append(this.components.ordersChart.element);
-    this.subElements.salesChart.append(this.components.salesChart.element);
-    this.subElements.customersChart.append(this.components.customersChart.element);
+    Object.keys(this.components).forEach(component => {
+      const root = this.subElements[component];
+      const { element } = this.components[component];
+
+      root.append(element);
+    });
   }
 
   getSubElements(element) {
@@ -155,16 +156,20 @@ export default class Page {
   }
 
   async update(from, to) {
+    const { sortableTable, ordersChart, salesChart, customersChart } = this.components;
+
     const data = await this.loadData(from, to);
 
-    this.components.sortableTable.update(data);
-    this.components.ordersChart.update(from, to);
-    this.components.salesChart.update(from, to);
-    this.components.customersChart.update(from, to);
+    sortableTable.update(data);
+    ordersChart.update(from, to);
+    salesChart.update(from, to);
+    customersChart.update(from, to);
   }
 
   initEventListeners() {
-    this.components.rangePicker.element.addEventListener('date-select', this.onRangeSelect);
+    const { rangePicker } = this.components;
+
+    rangePicker.element.addEventListener('date-select', this.onRangeSelect);
   }
 
   remove() {
@@ -178,6 +183,9 @@ export default class Page {
     this.element = null;
     this.subElements = {};
     this.components = {};
+    Object.values(this.components).forEach((component) => {
+      component.destroy();
+    });
   }
 
 }

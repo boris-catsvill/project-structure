@@ -84,8 +84,12 @@ export default class Page {
   }
 
   getComponents() {
-    this.subElements.sortableTable.append(this.components.sortableTable.element);
-    this.subElements.rangePicker.append(this.components.rangePicker.element);
+    Object.keys(this.components).forEach(component => {
+      const root = this.subElements[component];
+      const { element } = this.components[component];
+
+      root.append(element);
+    });
   }
 
   onRangeSelect = (event) => {
@@ -124,6 +128,9 @@ export default class Page {
     this.element = null;
     this.subElements = {};
     this.components = {};
+    Object.values(this.components).forEach((component) => {
+      component.destroy();
+    });
   }
 
 }

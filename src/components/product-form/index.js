@@ -37,24 +37,17 @@ export default class ProductForm {
   getCategoriesSelect() {
     const wrapper = document.createElement('div');
 
-    wrapper.innerHTML = `<select class="form-control" name="subcategory" id="subcategory">${this.getCategories()}</select>`;
+    wrapper.innerHTML = `<select class="form-control" name="subcategory" id="subcategory"></select>`;
 
     const categorySelect = wrapper.firstElementChild;
 
-    return categorySelect.outerHTML;
-  }
-
-  getCategories() {
-    const categoriesOptions = this.categories
-    .map((category) => {
+    this.categories.map((category) => {
       return category.subcategories.map((subcategory) => {
-        return `<option value=\"${subcategory.id}\">${category.title} &gt; ${subcategory.title}</option>`;
-      })
-      .join('');
-    })
-    .join('');
+        categorySelect.append(new Option(`${category.title} > ${subcategory.title}`, subcategory.id));
+      });
+    });
 
-    return categoriesOptions;
+    return categorySelect.outerHTML;
   }
 
   getTemplate() {
@@ -216,11 +209,13 @@ export default class ProductForm {
   }
 
   createImagesList() {
+    const { imageListContainer } = this.subElements;
+
     const items = this.formData.images.map(({ url, source }) => this.getImageItem(url, source));
 
     const sortableList = new SortableList({items});
 
-    this.subElements.imageListContainer.append(sortableList.element);
+    imageListContainer.append(sortableList.element);
   }
 
   getImageItem(url, source) {
@@ -270,6 +265,7 @@ export default class ProductForm {
   }
 
   uploadImage = () => {
+    const { imageListContainer, uploadImage } = this.subElements;
     const fileInput = document.createElement('input');
 
     fileInput.type = 'file';
@@ -283,8 +279,8 @@ export default class ProductForm {
 
         formData.append('image', file);
 
-        this.subElements.uploadImage.classList.add('is-loading');
-        this.subElements.uploadImage.disabled = true;
+        uploadImage.classList.add('is-loading');
+        ploadImage.disabled = true;
 
         const result = await fetchJson('https://api.imgur.com/3/image', {
           method: 'POST',
@@ -295,10 +291,10 @@ export default class ProductForm {
           referrer: ''
         });
 
-        this.subElements.imageListContainer.firstElementChild.append(this.getImageItem(result.data.link, file.name));
+        imageListContainer.firstElementChild.append(this.getImageItem(result.data.link, file.name));
 
-        this.subElements.uploadImage.classList.remove('is-loading');
-        this.subElements.uploadImage.disabled = false;
+        uploadImage.classList.remove('is-loading');
+        uploadImage.disabled = false;
 
         fileInput.remove();
       }
@@ -311,9 +307,11 @@ export default class ProductForm {
   };
 
   initEventListeners() {
-    this.subElements.productForm.addEventListener('submit', this.onSubmit);
+    const { productForm, uploadImage } = this.subElements;
+
+    productForm.addEventListener('submit', this.onSubmit);
     
-    this.subElements.uploadImage.addEventListener('click', this.uploadImage);
+    uploadImage.addEventListener('click', this.uploadImage);
   }
 
   remove() {

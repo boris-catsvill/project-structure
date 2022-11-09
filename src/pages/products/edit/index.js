@@ -66,14 +66,16 @@ export default class Page {
   }
 
   initEventListeners() {
-    this.components.productForm.element.addEventListener('product-updated', (event) => {
+    const  { productForm } = this.components;
+
+    productForm.element.addEventListener('product-updated', (event) => {
       this.showNotification({
         type: event.detail.status,
         text: event.detail.status === 'success' ? 'Product was updated' : 'Product update error',
       });
     });
 
-    this.components.productForm.element.addEventListener('product-saved', (event) => {
+    productForm.element.addEventListener('product-saved', (event) => {
       this.showNotification({
         type: event.detail.status,
         text: event.detail.status === 'success' ? 'Product was saved' : 'Product save error'
@@ -100,6 +102,9 @@ export default class Page {
     this.remove();
     this.element = null;
     this.components = {};
+    Object.values(this.components).forEach((component) => {
+      component.destroy();
+    });
   }
 
 }

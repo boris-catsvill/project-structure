@@ -5,7 +5,6 @@ import fetchJson from '../../utils/fetch-json.js';
 export default class Page {
   element;
   subElements = {};
-  components = {};
   data = [];
   url = new URL('api/rest/categories?_sort=weight&_refs=subcategory', process.env.BACKEND_URL);
 
@@ -49,6 +48,8 @@ export default class Page {
     const items = category.subcategories.map(({ id, title, count }) => this.getCategoriesItem(id, title, count));
 
     const sortableList = new SortableList({items});
+
+    this.components = { sortableList };
 
     const categoriesList = categoriesBody.querySelector('.subcategory-list');
     categoriesList.append(sortableList.element);
@@ -144,6 +145,8 @@ export default class Page {
       type: message.type
     });
 
+    this.components = { notification };
+
     notification.show();
   }
 
@@ -164,6 +167,9 @@ export default class Page {
     this.element = null;
     this.subElements = {};
     this.components = {};
+    Object.values(this.components).forEach((component) => {
+      component.destroy();
+    });
   }
 
 }

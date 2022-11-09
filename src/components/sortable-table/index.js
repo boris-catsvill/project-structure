@@ -22,9 +22,9 @@ export default class SortableTable {
     start = 1,
     end = start + step,
     range,
-    rowTemplate = (HTML, item) => `
+    rowTemplate = (html, item) => `
       <div class="sortable-table__row">
-        ${HTML}
+        ${html}
       </div>`
   } = {}) {
     this.headersConfig = headersConfig;
