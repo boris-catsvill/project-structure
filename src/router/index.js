@@ -59,7 +59,7 @@ export default class Router {
     if (this.page && this.page.destroy) {
       this.page.destroy();
     }
-
+    
     return await renderPage(path, match);
   }
 

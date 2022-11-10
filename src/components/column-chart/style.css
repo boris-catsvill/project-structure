@@ -86,3 +86,11 @@
   background-size: cover;
   display: block;
 }
+
+.has-hovered {
+  opacity: 1;
+}
+
+.is-hovered {
+  opacity: 1;
+}

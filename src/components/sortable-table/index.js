@@ -68,7 +68,8 @@ export default class SortableTable {
     isSortLocally = false,
     step = 20,
     start = 1,
-    end = start + step
+    end = start + step,
+    rowTemplate = (innerHTML, id) => `<div class="sortable-table__row">${innerHTML}</div>`
   } = {}) {
 
     this.headersConfig = headersConfig;
@@ -78,6 +79,7 @@ export default class SortableTable {
     this.step = step;
     this.start = start;
     this.end = end;
+    this.rowTemplate = rowTemplate;
 
     this.render();
   }
@@ -165,9 +167,8 @@ export default class SortableTable {
 
   getTableRows(data) {
     return data.map(item => `
-      <div class="sortable-table__row">
-        ${this.getTableRow(item, data)}
-      </div>`
+      ${this.rowTemplate(this.getTableRow(item, data), item)}
+    `
     ).join('');
   }
 

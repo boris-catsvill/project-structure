@@ -1,6 +1,7 @@
 import SortableList from '../sortable-list/index.js';
 import escapeHtml from '../../utils/escape-html.js';
 import fetchJson from '../../utils/fetch-json.js';
+import NotificationMessage from '../notification/index.js';
 
 export default class ProductForm {
   element;
@@ -203,13 +204,18 @@ export default class ProductForm {
   async save() {
     const product = this.getFormData();
     const result = await fetchJson(`${process.env.BACKEND_URL}api/rest/products`, {
-      method: 'PATCH',
+      method: this.productId ? 'PATCH' : 'PUT',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(product)
     });
 
+    new NotificationMessage(
+      this.productId ? 'Product updated!' : 'Product created!',
+      {duration: 5000, type: 'success'}
+    ).show()
+    
     this.dispatchEvent(result.id);
   }
 
