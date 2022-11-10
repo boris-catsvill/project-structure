@@ -3,9 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "homepage": "https://rafagabidulin.github.io/project-shop-admin/",
   "scripts": {
     "start": "npm run build && npm run static-server",
     "develop": "cross-env NODE_ENV=development webpack serve --config ./webpack/webpack.dev.js",
+    "deploy": "gh-pages -d build",
     "build": "npm run clean && cross-env NODE_ENV=production webpack --config ./webpack/webpack.prod.js",
     "eslint": "eslint \"src/**/*.js\"",
     "eslint:fix": "eslint --fix \"**/*.js\"",
@@ -49,5 +51,8 @@
     "webpack-cli": "^4.9.1",
     "webpack-dev-server": "^4.6.0",
     "webpack-merge": "^5.8.0"
+  },
+  "dependencies": {
+    "gh-pages": "^4.0.0"
   }
 }

@@ -1,4 +1,6 @@
-# Admin Dashboard
+# [Admin Dashboard](https://project-shop-admin-page.netlify.app/)
+
+[**DEMO**](https://project-shop-admin-page.netlify.app/)
 
 **Important!**
 
