@@ -25,6 +25,7 @@ export default class Page {
 
   async updateTableComponent (from, to) {
     const data = await fetchJson(`${process.env.BACKEND_URL}api/dashboard/bestsellers?_start=1&_end=20&from=${from.toISOString()}&to=${to.toISOString()}`);
+    console.log(data);
     this.components.sortableTable.addRows(data);
   }
 
@@ -51,26 +52,30 @@ export default class Page {
 
     const sortableTable = new SortableTable(header, {
       url: `api/dashboard/bestsellers?_start=1&_end=20&from=${from.toISOString()}&to=${to.toISOString()}`,
-      isSortLocally: true
+      isSortLocally: true,
+      rowTemplate: (innerHTML, item) => `<a href="/products/${item.id}" class="sortable-table__row">${innerHTML}</a>`
     });
 
     const ordersChart = new ColumnChart({
       data: ordersData,
       label: 'orders',
       value: ordersData.reduce((accum, item) => accum + item),
-      link: '#'
+      link: '/sales',
+      formatHeading: data => `$${new Intl.NumberFormat("en").format(data)}`
     });
 
     const salesChart = new ColumnChart({
       data: salesData,
       label: 'sales',
-      value: '$' + salesData.reduce((accum, item) => accum + item),
+      value: salesData.reduce((accum, item) => accum + item),
+      formatHeading: data => `$${new Intl.NumberFormat("en").format(data)}`
     });
 
     const customersChart = new ColumnChart({
       data: customersData,
       label: 'customers',
       value: customersData.reduce((accum, item) => accum + item),
+      formatHeading: data => `$${new Intl.NumberFormat("en").format(data)}`
     });
 
     this.components.sortableTable = sortableTable;
@@ -83,7 +88,7 @@ export default class Page {
   get template () {
     return `<div class="dashboard">
       <div class="content__top-panel">
-        <h2 class="page-title">Dashboard</h2>
+        <h2 class="page-title">Панель управления</h2>
         <!-- RangePicker component -->
         <div data-element="rangePicker"></div>
       </div>
@@ -94,7 +99,7 @@ export default class Page {
         <div data-element="customersChart" class="dashboard__chart_customers"></div>
       </div>
 
-      <h3 class="block-title">Best sellers</h3>
+      <h3 class="block-title">Лидеры продаж</h3>
 
       <div data-element="sortableTable">
         <!-- sortable-table component -->
