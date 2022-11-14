@@ -102,3 +102,26 @@
 .categories__sortable-list-item > span {
   color: var(--grey);
 }
+
+.notification {
+  border-radius: 10px;
+  opacity: 65%;
+  position: fixed;
+  background-color: var(--dark-blue);
+  border: 2px solid lawngreen;
+  width: 230px;
+  height: 50px;
+  top: 2%;
+  right: 5%;
+}
+
+.notification__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 10px;
+  font-size: 19px;
+  line-height: 20px;
+  color: var(--white);
+  position: relative;
+}

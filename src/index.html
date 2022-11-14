@@ -7,7 +7,7 @@
   <link rel="icon" href="/assets/favicon/favicon.png">
 </head>
 
-<body>
+<body class="">
 
 <main class="main">
   <div class="progress-bar">
@@ -41,8 +41,7 @@
     </ul>
     <ul class="sidebar__nav sidebar__nav_bottom">
       <li>
-      <!-- TODO: implement toggling  -->
-        <button type="button" class="sidebar__toggler">
+        <button type="button" class="sidebar__toggler" onclick="document.body.classList.toggle('is-collapsed-sidebar')">
           <i class="icon-toggle-sidebar"></i> <span>Toggle sidebar</span>
         </button>
       </li>
