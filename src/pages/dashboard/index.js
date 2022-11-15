@@ -1,6 +1,6 @@
-import RangePicker from 'src/components/range-picker/index.js';
-import SortableTable from 'src/components/sortable-table/index.js';
-import ColumnChart from 'src/components/column-chart/index.js';
+import RangePicker from '../../components/range-picker/index.js';
+import SortableTable from '../../components/sortable-table/index.js';
+import ColumnChart from '../../components/column-chart/index.js';
 import header from './bestsellers-header.js';
 
 //import fetchJson from './utils/fetch-json.js';
@@ -152,9 +152,6 @@ export default class Page {
     this.subElements = {};
     this.controller.abort();
     this.components = {};
-
-    for(const component of this.components){
-      component.destroy();
-    }
+    
   }
 }
