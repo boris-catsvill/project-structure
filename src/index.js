@@ -4,6 +4,11 @@ import tooltip from './components/tooltip/index.js';
 tooltip.initialize();
 
 const router = Router.instance();
+const sidebarToggler = document.body.querySelector('.sidebar__toggler');
+
+sidebarToggler.addEventListener('click', ()=> {
+  document.body.classList.toggle('is-collapsed-sidebar')
+})
 
 router
   .addRoute(/^$/, 'dashboard')
