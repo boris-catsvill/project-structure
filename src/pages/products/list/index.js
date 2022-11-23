@@ -1,5 +1,7 @@
-import SortableTable from '../../../components/sortable-table/index.js';
+import LinkedSortableTable from '../../../components/sortable-table/linked';
 import DoubleSlider from '../../../components/double-slider/index.js';
+import { headers } from './tableHeader';
+import { getSubElements } from '../../../utils/helpers';
 
 const BACKEND_URL = process.env.BACKEND_URL;
 
@@ -11,69 +13,7 @@ export default class Page {
   sliderEnd = 4000;
   productStatus = null;
   searchingString = "";
-
-  header = [
-    {
-      id: 'images',
-      title: 'Фото',
-      sortable: false,
-      template: (data = []) => {
-        return `
-          <div class="sortable-table__cell">
-            <img class="sortable-table-image" alt="Image" src="${data[0]?.url}">
-          </div>
-        `;
-      }
-    },
-    {
-      id: 'title',
-      title: 'Название',
-      sortable: true,
-      sortType: 'string'
-    },
-    {
-      id: "subcategory",
-      title: "Категория",
-      sortable: false,
-      template: data => {
-        return `
-          <div class="sortable-table__cell">
-            <span data-tooltip="
-              <div class='sortable-table-tooltip'>
-                <span class='sortable-table-tooltip__category'>${data.category.title}</span>
-                <b class='sortable-table-tooltip__subcategory'>
-                  ${data.title}
-                </b>
-              </div>
-            ">${data.title}</span>
-          </div>
-        `;
-      }
-    },
-    {
-      id: 'quantity',
-      title: 'Количество',
-      sortable: true,
-      sortType: 'number'
-    },
-    {
-      id: 'price',
-      title: 'Цена',
-      sortable: true,
-      sortType: 'number'
-    },
-    {
-      id: 'status',
-      title: 'Статус',
-      sortable: true,
-      sortType: 'number',
-      template: data => {
-        return `<div class="sortable-table__cell">
-          ${data > 0 ? 'Активен' : 'Неактивен'}
-        </div>`;
-      }
-    },
-  ];
+  section = 'products'
 
   get tempalte(){
     return ` <div class="products-list">
@@ -108,10 +48,7 @@ export default class Page {
     const element = document.createElement("div");
     element.innerHTML = this.tempalte;
     this.element = element.firstElementChild;
-    const subElements = this.element.querySelectorAll('[data-element]');
-    for (const item of subElements) {
-      this.subElements[item.dataset.element] = item;
-    }
+    this.subElements = getSubElements(this.element)
     this.initComponents();
     await this.renderComponents();
     return this.element;
@@ -142,7 +79,7 @@ export default class Page {
       _order: 'desc',
     };
     this.url.search = new URLSearchParams(params).toString()
-    const sortableTable = new SortableTable(this.header, {
+    const sortableTable = new LinkedSortableTable(headers, {
       url: this.url, isSortLocally: false, start: 0, step: 30
     });
 

@@ -16,7 +16,19 @@ router
   .setNotFoundPagePath('error404')
   .listen();
 
-document.querySelector(".sidebar__toggler").addEventListener("click", e=>{
-  e.preventDefault();
+document.querySelector(".sidebar__toggler").addEventListener("click", event =>{
+  event.preventDefault();
   document.body.classList.toggle("is-collapsed-sidebar");
+});
+document.addEventListener("route", event => {
+  let menuItem = document.querySelector(".sidebar__nav li.active");
+  if (menuItem) {
+    menuItem.classList.remove('active');
+  }
+
+  for (let li of document.querySelectorAll(".sidebar__nav a[data-page]")) {
+    if (event.detail.page && li.dataset.page === event.detail.page.section) {
+      li.closest("li").classList.add("active");
+    }
+  }
 });

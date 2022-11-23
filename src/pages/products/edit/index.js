@@ -3,9 +3,11 @@ import ProductForm from '../../../components/product-form/index.js';
 export default class Page {
   element;
   productForm;
+  section = 'products'
 
-  constructor(productId = ""){
-    this.productId = productId;
+  constructor(match = []){
+    if (match.length > 1)
+      this.productId = match[1];
   }
 
   async render() {

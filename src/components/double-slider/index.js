@@ -58,14 +58,14 @@ export default class DoubleSlider {
             </div>`;
   }
 
-  pointerDownEvent = e => {
-    e.preventDefault();
-    this.target = e.target;
+  pointerDownEvent = event => {
+    event.preventDefault();
+    this.target = event.target;
     const { left, right } = this.target.getBoundingClientRect();
     if (this.target === this.thumbLeft) {
-      this.shiftX = right - e.clientX;
+      this.shiftX = right - event.clientX;
     } else {
-      this.shiftX = left - e.clientX;
+      this.shiftX = left - event.clientX;
     }
     this.element.classList.add('range-slider_dragging');
     document.addEventListener('pointerup', this.pointerUpEvent);
@@ -82,16 +82,16 @@ export default class DoubleSlider {
     }));
   };
 
-  pointerMoveEvent = e => {
-    e.preventDefault();
+  pointerMoveEvent = event => {
+    event.preventDefault();
     const { left, right, width } = this.inner.getBoundingClientRect();
 
     if (this.target === this.thumbLeft) {
-      this.moveLeft(left, width, e.clientX);
+      this.moveLeft(left, width, event.clientX);
     }
 
     if (this.target === this.thumbRight) {
-      this.moveRight(right, width, e.clientX);
+      this.moveRight(right, width, event.clientX);
     }
   };
 

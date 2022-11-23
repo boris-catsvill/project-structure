@@ -1,51 +1,27 @@
 import SortableTable from "../../components/sortable-table/index.js"
 import RangePicker from "../../components/range-picker/index.js"
+import { headers } from './tableHeaders';
 
 const BACKEND_URL = process.env.BACKEND_URL;
 
 export default class Page {
   element;
-  header =  [
-    {
-      id: "id",
-      title: "ID",
-      sortable: true,
-      sortType: "number"
-    },
-    {
-      id: "user",
-      title: "Клиент",
-      sortable: true,
-      sortType: "string"
-    },
-    {
-      id: "createdAt",
-      title: "Дата",
-      sortable: true,
-      sortType: "date",
-      template: data => {
-        const date = new Date(Date.parse(data));
-        const options = {year: "numeric", month: "long", day: "numeric" }
-        return date.toLocaleDateString("ru-RU", options);
-      }
-    },
-    {
-      id: "totalCost",
-      title: "Стоимость",
-      sortable: true,
-      sortType: "number",
-    },
-    {
-      id: "delivery",
-      title: "Статус",
-      sortable: true,
-      sortType: "string",
-    },
-  ]
+
+  section = 'sales'
+
   render() {
     const wrapper = document.createElement("div");
     wrapper.innerHTML = this.template;
     this.element = wrapper;
+    this.initComponents();
+    this.initEventListner();
+    this.element.querySelector(".content__top-panel").append(this.rangePicker.element)
+    this.element.querySelector("[data-element='ordersContainer']").append(this.sortableTable.element)
+
+    return this.element;
+  }
+
+  initComponents(){
     const to = new Date();
     const from = new Date();
     from.setMonth(to.getMonth() - 1)
@@ -56,13 +32,8 @@ export default class Page {
     this.url.searchParams.set("createdAt_gte", from.toISOString());
     this.url.searchParams.set("createdAt_lte", to.toISOString());
 
-    this.sortableTable = new SortableTable(this.header, {
+    this.sortableTable = new SortableTable(headers, {
       url: this.url, isSortLocally: false, start: 0, step: 30}, false);
-    this.initEventListner();
-    this.element.querySelector(".content__top-panel").append(this.rangePicker.element)
-    this.element.querySelector("[data-element='ordersContainer']").append(this.sortableTable.element)
-
-    return this.element;
   }
 
   get template() {
@@ -77,8 +48,8 @@ export default class Page {
   }
 
   initEventListner() {
-    document.addEventListener("date-select", async () => {
-      const { from, to } = this.rangePicker.selected;
+    document.addEventListener("date-select", async (event) => {
+      const { from, to } = event.detail;
       const { id, order } = this.sortableTable.sorted;
       this.url.searchParams.set("createdAt_gte", from.toISOString());
       this.url.searchParams.set("createdAt_lte", to.toISOString());

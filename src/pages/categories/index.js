@@ -1,5 +1,7 @@
 import SortableList from '../../components/sortable-list';
 import fetchJson from '../../utils/fetch-json';
+import { getSubElements } from '../../utils/helpers';
+import NotificationMessage from '../../components/notification';
 
 const BACKEND_URL = process.env.BACKEND_URL;
 
@@ -7,15 +9,13 @@ export default class Page {
   element;
   subElements = {};
   data = [];
+  section = 'categories'
 
   async render() {
     const wrapper = document.createElement('div');
     wrapper.innerHTML = this.template;
     this.element = wrapper.firstChild;
-    const subElements = this.element.querySelectorAll('[data-element]');
-    for (const item of subElements) {
-      this.subElements[item.dataset.element] = item;
-    }
+    this.subElements = getSubElements(this.element)
     this.data = await this.getCategoryData();
     this.getCategories();
     this.initEventListeners();
@@ -99,11 +99,8 @@ export default class Page {
   }
 
   showNotification(){
-    const wrapper = document.createElement('div');
-    wrapper.innerHTML = `<div class="notification notification_success show">
-            <div class="notification__content">Category order saved</div></div>`
-    document.body.append(wrapper.firstElementChild)
-    setTimeout(() => wrapper.remove(), 5000)
+    const notification = new NotificationMessage('Категория сохранена', {duration: 10000, type: 'success'})
+    notification.show()
   }
 
   async getCategoryData() {
@@ -116,14 +113,14 @@ export default class Page {
 
   initEventListeners() {
     this.element.addEventListener('pointerdown', this.toggleCategory);
-    this.subElements.categoriesContainer.addEventListener('sortable-list-reorder', e => {
-      this.updateCategoryOrder(e.target);
+    this.subElements.categoriesContainer.addEventListener('sortable-list-reorder', event => {
+      this.updateCategoryOrder(event.target);
     });
   }
 
-  toggleCategory = e => {
-    if (e.target.closest('.category__header')) {
-      const element = e.target.closest('.category__header').parentNode;
+  toggleCategory = event => {
+    if (event.target.closest('.category__header')) {
+      const element = event.target.closest('.category')
       element.classList.toggle('category_open');
     }
   };
