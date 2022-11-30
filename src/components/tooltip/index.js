@@ -61,4 +61,5 @@ class Tooltip {
   }
 }
 
-export default Tooltip;
+const tooltip = new Tooltip();
+export default tooltip;

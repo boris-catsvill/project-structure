@@ -1,4 +1,4 @@
-import fetchJson from '../utils/fetch-json.js';
+import fetchJson from '../../utils/fetch-json.js';
 
 const BACKEND_URL = 'https://course-js.javascript.ru';
 
@@ -14,6 +14,7 @@ export default class ColumnChart {
   } = {}) {
     this.label = label;
     this.link = link;
+    this.formatHeading = formatHeading;
     this.value = formatHeading(value);
     this.data = data;
     this.chartHeight = 50;
@@ -29,7 +30,7 @@ export default class ColumnChart {
     return `
               <div class="column-chart" style="--chart-height: ${this.chartHeight}">
                 <div class="column-chart__title">
-                ${this.label}
+                Total ${this.label}
                 </div>
                 <div class="column-chart__container">
                   <div data-element="header" class="column-chart__header">${this.value}</div>
@@ -102,6 +103,10 @@ export default class ColumnChart {
     this.remove();
   }
 
+  getHeaderValue(data) {
+    return this.formatHeading(Object.values(data).reduce((accum, item) => (accum + item), 0));
+  }
+
   update(from = this.range.from, to = this.range.to) {
     if (from) this.url.searchParams.set('from', from);
     if (to) this.url.searchParams.set('to', to);
@@ -109,6 +114,7 @@ export default class ColumnChart {
     return fetchJson(this.url)
       .then(data => {
         this.data = data;
+        this.subElements.header.textContent = this.getHeaderValue(data);
         this.renderData();
         return data;
       })
