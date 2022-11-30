@@ -33,8 +33,12 @@ export default class ProductForm {
 
       if (file) {
         const formDataImages = new FormData();
+        const { uploadImage: uploadImageButton, imageListContainer } = this.subElements;
 
         formDataImages.append('image', file);
+
+        uploadImageButton.classList.add('is-loading');
+        uploadImageButton.disabled = true;
 
         const result = await fetchJson('https://api.imgur.com/3/image', {
           method: 'POST',
@@ -45,7 +49,10 @@ export default class ProductForm {
           referrer: ''
         });
 
-        this.subElements.imageListContainer.firstElementChild.append(this.getImageItem(result.data.link, file.name));
+        imageListContainer.firstElementChild.append(this.getImageItem(result.data.link, file.name));
+
+        uploadImageButton.classList.remove('is-loading');
+        uploadImageButton.disabled = false;
 
         elementInputFile.remove();
       }
@@ -197,12 +204,12 @@ export default class ProductForm {
         <input type="hidden" name="url" value="${escapeHtml(url)}">
         <input type="hidden" name="source" value="${escapeHtml(source)}">
         <span>
-          <img src="icon-grab.svg" data-grab-handle="" alt="grab">
+          <img src="/assets/icons/icon-grab.svg" data-grab-handle="" alt="grab">
           <img class="sortable-table__cell-img" alt="${escapeHtml(source)}" src="${escapeHtml(url)}">
           <span>${escapeHtml(source)}</span>
         </span>
         <button type="button">
-          <img src="icon-trash.svg" data-delete-handle="" alt="delete">
+          <img src="/assets/icons/icon-trash.svg" data-delete-handle="" alt="delete">
         </button>
       </li>
     `;
