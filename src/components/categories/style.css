@@ -1,0 +1,104 @@
+.category {
+  background: var(--white);
+  border: 1px solid var(--white);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14);
+  border-radius: 4px;
+  margin-bottom: 16px;
+}
+.category.category_add-first {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--grey-extra-light);
+  border: 1px solid var(--grey-light);
+  box-shadow: none;
+}
+.category.category_add-first p {
+  color: var(--grey);
+  margin: 0 0 12px;
+}
+.category.category_add-first .category__body,
+.category.category_add-first .category__header {
+  flex: 1 0 auto;
+}
+.category__header {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 16px 16px 40px;
+  position: relative;
+  cursor: pointer;
+}
+.category__header::before {
+  content: "";
+  width: 0;
+  height: 0;
+  border: 6px solid transparent;
+  border-left: 6px solid var(--grey);
+  position: absolute;
+  top: 50%;
+  left: 19px;
+  margin-top: -6px;
+  transition: 0.3s all ease;
+}
+.category.category_open .category__header::before {
+  left: 16px;
+  margin-top: -3px;
+  transform: rotate(90deg);
+}
+.category__header .link {
+  font-weight: normal;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--blue);
+  padding: 0;
+  margin: 0;
+  text-decoration: none;
+  outline: none;
+  display: inline-block;
+  transition: 0.2s all;
+}
+.category__header .link:hover {
+  text-decoration: underline;
+}
+.category__body {
+  height: 0;
+  overflow: hidden;
+  transition: all 0.05s ease-out;
+}
+.category.category_open {
+  background: var(--grey-extra-light);
+  border: 1px solid var(--grey-light);
+  box-shadow: none;
+}
+.category.category_open .category__body {
+  height: auto;
+}
+.subcategory-list {
+  padding: 0 16px 24px 40px;
+}
+.categories.categories_empty {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.categories form input {
+  margin-right: 12px;
+}
+.categories__sortable-list {
+  margin: 0;
+}
+.categories__sortable-list-item {
+  margin: 12px 0;
+  padding: 12px 16px;
+  min-height: 48px;
+}
+.categories__sortable-list-item > strong {
+  color: var(--dark-blue);
+}
+.categories__sortable-list-item > span {
+  color: var(--grey);
+}

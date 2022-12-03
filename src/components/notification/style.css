@@ -1,0 +1,93 @@
+/* Common styles */
+@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap');
+
+body {
+  font-family: 'Source Sans Pro', sans-serif;
+}
+
+:root {
+  --blue: #109cf1;
+  --dark-blue: #334d6e;
+  --light-blue: #cfebfc;
+  --middle-blue: #9fd7f9;
+  --yellow: #ffb946;
+  --red: #f7685b;
+  --green: #2ed47a;
+  --purple: #885af8;
+  --black: #192a3e;
+  --table-black: #323c47;
+  --table-grey: #707683;
+  --grey: #90a0b7;
+  --grey-light: #c2cfe0;
+  --grey-extra-light: #eff1f4;
+  --grey-skeleton: #f5f6f8;
+  --grey-middle: #e0e4eb;
+  --white: #ffffff;
+}
+
+/* NotificationMessage styles */
+.notification {
+  width: 200px;
+  margin: 10px 5px;
+  font-size: 14px;
+  box-shadow: 0 2px 4px 1px rgba(0, 0, 0, .5);
+  border-radius: 2px;
+  animation: calc(var(--value) * 0.1) ease-out calc(var(--value) * 0.9) fadeOut;
+  z-index: 1000;
+}
+
+/* Success */
+.notification.success {
+  background: #cdfccd;
+}
+
+.notification.success .timer {
+  background: #86aa86;
+}
+
+/* Error */
+.notification.error {
+  background: #ffe3e3;
+}
+
+.notification.error .timer {
+  background: #c28585;
+}
+
+.inner-wrapper {
+  padding: 5px;
+}
+
+.timer {
+  width: 100%;
+  height: 2px;
+  animation: progress var(--value) linear;
+}
+
+.notification-header {
+  text-transform: capitalize;
+  font-size: 12px;
+}
+
+.notification-body {
+  font-weight: bold;
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 0.8;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes progress {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0;
+  }
+}
+
