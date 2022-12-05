@@ -12,19 +12,10 @@ export default class Page {
   subElements;
 
   range;
-  rangePicker;
-
   orders;
-  columnChartOrders;
-
   sales;
-  columnChartSales;
-
   customers;
-  columnChartCustomers;
-
   bestSellers;
-  sortableTableBestSellers;
 
   constructor() {
     this.monthRangeDefault = 1;
@@ -143,8 +134,7 @@ export default class Page {
 
     this.components.sortableTable.url.searchParams.set('from', event.detail.from.toISOString());
     this.components.sortableTable.url.searchParams.set('to', event.detail.to.toISOString());
-    const data = await this.components.sortableTable.loadData(this.components.sortableTable.sorted.id, this.components.sortableTable.sorted.order);
-    this.components.sortableTable.update(data);
+    await this.components.sortableTable.loadData(this.components.sortableTable.sorted.id, this.components.sortableTable.sorted.order);
   }
 
   remove() {
