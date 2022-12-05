@@ -2,8 +2,6 @@ import SortableTable from "../../../components/sortable-table/index.js";
 import header from "./product-list-header";
 import DoubleSlider from "../../../components/double-slider/index.js";
 
-const BACKEND_URL = process.env.BACKEND_URL;
-
 export default class Page {
   element;
   subElements = {};
@@ -80,7 +78,7 @@ export default class Page {
 
   initComponents() {
 
-    this.url = new URL("api/rest/products", BACKEND_URL);
+    this.url = new URL("api/rest/products", process.env.BACKEND_URL);
     this.url.searchParams.set("_embed", "subcategory.category");
     this.url.searchParams.set("_sort", "title");
     this.url.searchParams.set("_order", "asc");
@@ -162,8 +160,6 @@ export default class Page {
     this.subElements.filterStatus.value = null;
 
     this.components.doubleSlider.reset(this.sliderStart, this.sliderEnd);
-    // this.components.SortableTable.reset();
-
   }
 
   getSubElements(element = this.element) {

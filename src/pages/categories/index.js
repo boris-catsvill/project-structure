@@ -1,7 +1,6 @@
 import SortableList from '../../components/sortable-list/index.js';
+import NotificationMessage from '../../components/notification';
 import fetchJson from '../../utils/fetch-json.js';
-
-const BACKEND_URL = process.env.BACKEND_URL;
 
 
 export default class Page {
@@ -42,7 +41,7 @@ export default class Page {
   }
 
   async getCategoryData(){
-    const url = new URL("api/rest/categories", BACKEND_URL)
+    const url = new URL("api/rest/categories", process.env.BACKEND_URL)
     url.searchParams.set("_sort", "weight");
     url.searchParams.set("_refs", "subcategory");
 
@@ -73,11 +72,11 @@ export default class Page {
       const subcategories = category.subcategories.map(subcategory => this.getSubcategory(subcategory));
       const sortableList = new SortableList({ items: subcategories });
 
-      subcategoryList.appendChild(sortableList.element);
-      categoryBody.appendChild(subcategoryList);
-      list.appendChild(categoryBody);
+      subcategoryList.append(sortableList.element);
+      categoryBody.append(subcategoryList);
+      list.append(categoryBody);
 
-      categoriesContainer.appendChild(list);
+      categoriesContainer.append(list);
     })
   }
 
@@ -96,31 +95,31 @@ export default class Page {
   async updateCategoryOrder(target) {
     const subcategories = [];
 
-    Array.from(target.childNodes).reduce((weight, check) => {
-      subcategories.push({id: check.dataset.id, weight: weight})
+    [...target.childNodes].reduce((weight, check) => {
+      subcategories.push({id: check.dataset.id, weight})
       return ++weight;
     }, 1);
 
-    await fetchJson(`${BACKEND_URL}api/rest/subcategories`, {
-      method: "PATCH",
-      body: JSON.stringify(subcategories),
-      headers: {
-          "Content-type": "application/json"
-      }
-  });
+    try {
 
-    const div = document.createElement("div");
-    div.innerHTML = `
-    <div class="notification notification_success show">
-      <div class="notification__content">Category order saved</div>
-    </div>
-    `
+      await fetchJson(`${process.env.BACKEND_URL}api/rest/subcategories`, {
+        method: "PATCH",
+        body: JSON.stringify(subcategories),
+        headers: {
+            "Content-type": "application/json"
+        }
+      });
 
-    document.body.appendChild(div.firstElementChild);
-    const notification = document.body.getElementsByClassName("notification");
+      const notification = new NotificationMessage('Category order saved', { type: 'success' });
+      notification.show();
 
+    } catch (error) {
 
-    setTimeout(() => notification[0].remove(), 2000);
+      const notification = new NotificationMessage(e.body, { type: 'error' });
+      notification.show();
+
+      throw new Error(error.message);
+    }
   }
 
   getSubElements(element = this.element) {

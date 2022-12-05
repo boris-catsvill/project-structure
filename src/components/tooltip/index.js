@@ -36,8 +36,8 @@ class Tooltip {
     const leftSpace = 5;
     const topSpace = 5;
 
-    let left = event.clientX + leftSpace;
-    let top = event.clientY + topSpace;
+    const left = event.clientX + leftSpace;
+    const top = event.clientY + topSpace;
     this.element.style.left = left +'px';
     this.element.style.top = top + 'px';
   }

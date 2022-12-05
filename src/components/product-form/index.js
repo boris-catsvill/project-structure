@@ -1,12 +1,10 @@
 import SortableList from '../sortable-list/index.js';
 import escapeHtml from '/src/utils/escape-html.js';
 import fetchJson from '/src/utils/fetch-json.js';
-
-const IMGUR_CLIENT_ID = '28aaa2e823b03b1';
-const BACKEND_URL = 'https://course-js.javascript.ru';
+import NotificationMessage from '../notification/index.js';
 
 export default class ProductForm {
-  url = new URL('/api/rest/products', BACKEND_URL);
+  url = new URL('/api/rest/products', process.env.BACKEND_URL);
   element;
   subElements = {};
   defaultData = {
@@ -21,8 +19,6 @@ export default class ProductForm {
   }
 
   constructor (productId) {
-    const pathChunks = document.URL.split("/");
-    productId = pathChunks[pathChunks.length-1] === "add" ? null : pathChunks[pathChunks.length-1];
     this.productId = productId;
   }
 
@@ -52,7 +48,7 @@ export default class ProductForm {
   renderDefaultForm() {
     const wrapper = document.createElement('div');
 
-    wrapper.innerHTML = this.getTemplate;
+    wrapper.innerHTML = this.Template;
 
     const element = wrapper.firstElementChild;
 
@@ -85,9 +81,10 @@ export default class ProductForm {
     const sortableList = new SortableList({items});
 
     imageListContainer.append(sortableList.element);
+    console.log(this.subElements);
   }
 
-  get getTemplate() {
+  get Template() {
     return `
       <div class="product-form">
     <form data-element="productForm" class="form-grid">
@@ -227,7 +224,7 @@ export default class ProductForm {
   }
 
   async loadCategoties() {
-    return fetchJson(`${BACKEND_URL}/api/rest/categories?_sort=weight&_refs=subcategory`);
+    return fetchJson(`${process.env.BACKEND_URL}api/rest/categories?_sort=weight&_refs=subcategory`);
   }
 
   onSubmit = event => {
@@ -249,19 +246,17 @@ export default class ProductForm {
       });
 
       this.dispatchEvent(result.id);
-    } catch(error) {
-      console.log("Something went wrong.. ", error);
-    }
 
-    const div = document.createElement("div");
-    div.innerHTML = `
-    <div class="notification notification_success show">
-      <div class="notification__content">Product saved</div>
-    </div>
-    `
-    document.body.appendChild(div.firstElementChild);
-    const notification = document.body.getElementsByClassName("notification");
-    setTimeout(() => notification[0].remove(), 2000);
+      const notification = new NotificationMessage('Product saved', { type: 'success' });
+      notification.show();
+
+    } catch(error) {
+
+      const notification = new NotificationMessage(e.body, { type: 'error' });
+      notification.show();
+
+      throw new Error(error.message);
+    }
   }
 
   getFormData() {
@@ -323,7 +318,7 @@ export default class ProductForm {
         const result = await fetchJson('https://api.imgur.com/3/image', {
           method: 'POST',
           headers: {
-            Authorization: `Client-ID ${IMGUR_CLIENT_ID}`,
+            Authorization: `Client-ID ${process.env.IMGUR_CLIENT_ID}`,
           },
           body: formData,
           referrer: ''

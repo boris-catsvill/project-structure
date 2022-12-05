@@ -139,7 +139,7 @@ export default class SortableList {
 
         let droppableBelow = elemBelow.closest('.sortable-list__item');
 
-        if (this.currentDroppable != droppableBelow) {
+        if (this.currentDroppable !== droppableBelow) {
           this.currentDroppable = droppableBelow;
 
           if (this.currentDroppable && this.currentDroppable.parentNode === this.placeHolder.parentNode ) {
@@ -160,8 +160,8 @@ export default class SortableList {
     }
 
     moveElement(pageX, pageY) {
-        let left = pageX - this.shiftX;
-        let top = pageY - this.shiftY;
+        const left = pageX - this.shiftX;
+        const top = pageY - this.shiftY;
         this.movingElement.style.left = left +'px';
         this.movingElement.style.top = top + 'px';
     }
@@ -176,7 +176,10 @@ export default class SortableList {
         this.remove();
         this.element = null;
         this.controller.abort();
-        this.shiftX = this.shiftY = null
-        this.currentDroppable = this.placeHolder = this.movingElement = null;
+        this.shiftX = null;
+        this.shiftY = null;
+        this.currentDroppable =  null;
+        this.placeHolder = null;
+        this.movingElement = null;
     }
 }
