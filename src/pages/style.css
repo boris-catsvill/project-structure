@@ -218,3 +218,14 @@
 .main.is-loading .progress-bar {
   display: block;
 }
+
+.products-list form.form-inline .form-group {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+}
+
+.products-list form.form-inline .form-label {
+  margin-bottom: 0;
+  margin-right: 16px;
+}
