@@ -1,12 +1,12 @@
-import RangePicker from '../../components/range-picker/index.js';
-import SortableTable from '../../components/sortable-table/index.js';
-import ColumnChart from '../../components/column-chart/index.js';
+import RangePicker from '../../components/range-picker/index';
+import SortableTable from '../../components/sortable-table/index';
+import ColumnChart from '../../components/column-chart/index';
 
-import header from './bestsellers-header.js';
+import header from './bestsellers-header';
 
-import fetchJson from '../../utils/fetch-json.js';
+import fetchJson from '../../utils/fetch-json';
 
-const BACKEND_URL = 'https://course-js.javascript.ru/';
+const BACKEND_URL = process.env.BACKEND_URL;
 
 export default class Page {
   element;

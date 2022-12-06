@@ -1,9 +1,9 @@
-import SortableList from '../../2-sortable-list/solution';
-import escapeHtml from './utils/escape-html.js';
-import fetchJson from './utils/fetch-json.js';
+import SortableList from '../../components/sortable-list';
+import escapeHtml from './utils/escape-html';
+import fetchJson from './utils/fetch-json';
 
-const IMGUR_CLIENT_ID = '28aaa2e823b03b1';
-const BACKEND_URL = 'https://course-js.javascript.ru';
+const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID;
+const BACKEND_URL = process.env.BACKEND_URL;
 
 export default class ProductForm {
   element;
@@ -213,7 +213,7 @@ export default class ProductForm {
   async save() {
     const product = this.getFormData();
 
-    const result = await fetchJson(`${BACKEND_URL}/api/rest/products`, {
+    const result = await fetchJson(`${BACKEND_URL}api/rest/products`, {
       method: this.productId ? 'PATCH' : 'PUT',
       headers: {
         'Content-Type': 'application/json'
@@ -276,11 +276,11 @@ export default class ProductForm {
   }
 
   loadProductData(productId) {
-    return fetchJson(`${BACKEND_URL}/api/rest/products?id=${productId}`);
+    return fetchJson(`${BACKEND_URL}api/rest/products?id=${productId}`);
   }
 
   loadCategoriesList() {
-    return fetchJson(`${BACKEND_URL}/api/rest/categories?_sort=weight&_refs=subcategory`);
+    return fetchJson(`${BACKEND_URL}api/rest/categories?_sort=weight&_refs=subcategory`);
   }
 
   createCategoriesSelect() {

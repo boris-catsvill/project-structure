@@ -1,6 +1,6 @@
-import fetchJson from './utils/fetch-json.js';
+import fetchJson from './utils/fetch-json';
 
-const BACKEND_URL = 'https://course-js.javascript.ru';
+const BACKEND_URL = process.env.BACKEND_URL;
 
 export default class SortableTable {
   element;
@@ -198,7 +198,7 @@ export default class SortableTable {
         <div data-element="loading" class="loading-line sortable-table__loading-line"></div>
 
         <div data-element="emptyPlaceholder" class="sortable-table__empty-placeholder">
-          No products
+          Товаров нет
         </div>
       </div>`;
   }
