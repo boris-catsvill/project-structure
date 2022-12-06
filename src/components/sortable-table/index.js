@@ -60,17 +60,20 @@ export default class SortableTable {
     }
   };
 
-  constructor(headersConfig = [], {
-    url = '',
-    sorted = {
-      id: headersConfig.find(item => item.sortable).id,
-      order: 'asc'
-    },
-    isSortLocally = false,
-    step = 30,
-    start = 0,
-    end = start + step
-  } = {}) {
+  constructor(
+    headersConfig = [],
+    {
+      url = '',
+      sorted = {
+        id: headersConfig.find(item => item.sortable).id,
+        order: 'asc'
+      },
+      isSortLocally = false,
+      step = 30,
+      start = 0,
+      end = start + step
+    } = {}
+  ) {
     this.headersConfig = headersConfig;
     this.url = new URL(url, BACKEND_URL);
     this.sorted = sorted;
@@ -83,7 +86,7 @@ export default class SortableTable {
   }
 
   async render() {
-    const {id, order} = this.sorted;
+    const { id, order } = this.sorted;
     const wrapper = document.createElement('div');
 
     wrapper.innerHTML = this.getTable();
@@ -93,7 +96,7 @@ export default class SortableTable {
     this.element = element;
     this.subElements = this.getSubElements(element);
 
-    if (this.isSortLocally === true) this.subElements.loading.remove()
+    if (this.isSortLocally === true) this.subElements.loading.remove();
 
     const data = await this.loadData(id, order, this.start, this.end);
 
@@ -139,7 +142,7 @@ export default class SortableTable {
     rows.innerHTML = this.getTableRows(data);
 
     this.subElements.body.innerHTML = rows.innerHTML;
-    this.subElements.loading.remove()
+    this.subElements.loading.remove();
     this.renderRows(data);
   }
 
@@ -149,7 +152,7 @@ export default class SortableTable {
     </div>`;
   }
 
-  getHeaderRow({id, title, sortable}) {
+  getHeaderRow({ id, title, sortable }) {
     const order = this.sorted.id === id ? this.sorted.order : 'asc';
 
     return `
@@ -178,33 +181,41 @@ export default class SortableTable {
   }
 
   getTableRows(data) {
-    if  (this.url.pathname === '/api/rest/orders') {
-      return data.map(item => `
+    if (this.url.pathname === '/api/rest/orders') {
+      return data
+        .map(
+          item => `
         <div class="sortable-table__row">
           ${this.getTableRow(item, data)}
         </div>`
-      ).join('');
+        )
+        .join('');
     }
-    return data.map(item => `
+    return data
+      .map(
+        item => `
       <a href="/products/${item.id}" class="sortable-table__row">
         ${this.getTableRow(item, data)}
       </a>`
-    ).join('');
+      )
+      .join('');
   }
 
   getTableRow(item) {
-    const cells = this.headersConfig.map(({id, template}) => {
+    const cells = this.headersConfig.map(({ id, template }) => {
       return {
         id,
         template
       };
     });
 
-    return cells.map(({id, template}) => {
-      return template
-        ? template(item[id])
-        : `<div class="sortable-table__cell">${item[id]}</div>`;
-    }).join('');
+    return cells
+      .map(({ id, template }) => {
+        return template
+          ? template(item[id])
+          : `<div class="sortable-table__cell">${item[id]}</div>`;
+      })
+      .join('');
   }
 
   getTable() {
@@ -254,19 +265,19 @@ export default class SortableTable {
     const arr = [...this.data];
     const column = this.headersConfig.find(item => item.id === id);
 
-    const {sortType, customSorting} = column;
+    const { sortType, customSorting } = column;
     const direction = order === 'asc' ? 1 : -1;
 
     return arr.sort((a, b) => {
       switch (sortType) {
-      case 'number':
-        return direction * (a[id] - b[id]);
-      case 'string':
-        return direction * a[id].localeCompare(b[id], 'ru');
-      case 'custom':
-        return direction * customSorting(a, b);
-      default:
-        return direction * (a[id] - b[id]);
+        case 'number':
+          return direction * (a[id] - b[id]);
+        case 'string':
+          return direction * a[id].localeCompare(b[id], 'ru');
+        // case 'custom':
+        //   return direction * customSorting(a, b);
+        default:
+          return direction * (a[id] - b[id]);
       }
     });
   }

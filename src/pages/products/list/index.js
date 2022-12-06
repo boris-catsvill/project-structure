@@ -1,9 +1,9 @@
-import SortableTable from "../../../components/sortable-table/index.js";
-import DoubleSlider from "../../../components/double-slider/index.js";
-import header from "../list/list-header.js"
-import fetchJson from "../../../utils/fetch-json.js";
+import SortableTable from '../../../components/sortable-table/index.js';
+import DoubleSlider from '../../../components/double-slider/index.js';
+import header from '../list/list-header.js';
+import fetchJson from '../../../utils/fetch-json.js';
 import select from '../../../utils/select.js';
-import style from './style.css'
+import style from './style.css';
 
 const BACKEND_URL = process.env.BACKEND_URL;
 
@@ -14,8 +14,7 @@ export default class Page {
 
   url = new URL('api/rest/products', BACKEND_URL);
 
-
-  getTeamplate () {
+  getTeamplate() {
     return `
       <div class="products-list">
         <div class="content__top-panel">
@@ -47,10 +46,10 @@ export default class Page {
 
         <div data-element="sortableTable" class="products-list__container"></div>
       </div>
-    `
+    `;
   }
 
-  initComponents () {
+  initComponents() {
     this.url.searchParams.set('_embed', 'subcategory.category');
 
     const sortableTable = new SortableTable(header, {
@@ -63,73 +62,76 @@ export default class Page {
 
     this.components = {
       sortableTable,
-      doubleSlider,
-    }
+      doubleSlider
+    };
 
-    this.components.sortableTable.subElements.emptyPlaceholder.innerHTML = this.createEmptyPlaceholder();
+    this.components.sortableTable.subElements.emptyPlaceholder.innerHTML =
+      this.createEmptyPlaceholder();
   }
 
-  createEmptyPlaceholder () {
+  createEmptyPlaceholder() {
     return `
       <p>No products found matching the selected criteria</p>
       <button type="button" class="button-primary-outline">Clear filters</button>
-    `
+    `;
   }
 
-  renderComponents () {
+  renderComponents() {
     for (const key of Object.keys(this.components)) {
-      this.subElements[key].append(this.components[key].element)
+      this.subElements[key].append(this.components[key].element);
     }
   }
 
-  setUrl () {
+  setUrl() {
     this.url.searchParams.set('_start', '0');
     this.url.searchParams.set('_end', '30');
     this.url.searchParams.set('_sort', `${this.components.sortableTable.sorted.id}`);
     this.url.searchParams.set('_order', `${this.components.sortableTable.sorted.order}`);
   }
 
-  initEventListeners () {
+  initEventListeners() {
     const innerSlider = this.components.doubleSlider.element.querySelector('[data-element=inner]');
 
-    this.components.sortableTable.subElements.emptyPlaceholder.querySelector('button').addEventListener('click', () => {
-      this.subElements.filterName.value = '';
+    this.components.sortableTable.subElements.emptyPlaceholder
+      .querySelector('button')
+      .addEventListener('click', () => {
+        this.subElements.filterName.value = '';
 
-      this.components.doubleSlider.element.firstElementChild.innerHTML = '$0';
-      this.components.doubleSlider.element.lastElementChild.innerHTML = '$4000';
-      innerSlider.firstElementChild.style = '0%';
-      innerSlider.querySelector('[data-element=thumbLeft]').style = '0%';
-      innerSlider.querySelector('[data-element=thumbRight]').style = '0%';
+        this.components.doubleSlider.element.firstElementChild.innerHTML = '$0';
+        this.components.doubleSlider.element.lastElementChild.innerHTML = '$4000';
+        innerSlider.firstElementChild.style = '0%';
+        innerSlider.querySelector('[data-element=thumbLeft]').style = '0%';
+        innerSlider.querySelector('[data-element=thumbRight]').style = '0%';
 
-      this.subElements.filterStatus.value = '';
+        this.subElements.filterStatus.value = '';
 
-      this.updateByClear();
-    })
+        this.updateByClear();
+      });
 
-    this.subElements.filterName.addEventListener('input', (event) => {
+    this.subElements.filterName.addEventListener('input', event => {
       const value = event.target.value;
-    
-      this.timerId = clearInterval( this.timerId)
+
+      this.timerId = clearInterval(this.timerId);
       this.timerId = setTimeout(this.updateByName, 500, value);
     });
 
-    this.components.doubleSlider.element.addEventListener('range-select', (event) => {
+    this.components.doubleSlider.element.addEventListener('range-select', event => {
       const from = event.target.firstElementChild.textContent.slice(1);
       const to = event.target.lastElementChild.textContent.slice(1);
 
-      this.updateBySlider(from, to)
+      this.updateBySlider(from, to);
     });
 
-    this.subElements.filterStatus.addEventListener('change', (event) => {
+    this.subElements.filterStatus.addEventListener('change', event => {
       const selectValue = event.target.value;
 
-      this.updateBySelect(selectValue)
+      this.updateBySelect(selectValue);
     });
 
     this.components.sortableTable.url = this.url;
   }
 
-  async updateByClear () {
+  async updateByClear() {
     this.url.searchParams.delete('status');
     this.url.searchParams.delete('title_like');
     this.url.searchParams.set('price_gte', '0');
@@ -137,36 +139,36 @@ export default class Page {
 
     const data = await fetchJson(this.url);
 
-    this.components.sortableTable.updateClear(data)
+    this.components.sortableTable.updateClear(data);
   }
 
-  updateByName = async (value) => {
+  updateByName = async value => {
     this.url.searchParams.set('title_like', value);
     this.setUrl();
     const data = await fetchJson(this.url);
 
-    this.components.sortableTable.updateClear(data)
-  }
+    this.components.sortableTable.updateClear(data);
+  };
 
-  async updateBySlider (from, to) {
+  async updateBySlider(from, to) {
     this.setUrl();
     this.url.searchParams.set('price_gte', from);
     this.url.searchParams.set('price_lte', to);
 
     const data = await fetchJson(this.url);
 
-    this.components.sortableTable.updateClear(data)
+    this.components.sortableTable.updateClear(data);
   }
 
-  async updateBySelect (value) {
+  async updateBySelect(value) {
     if (value) {
       this.setUrl();
       this.url.searchParams.set('status', value);
     } else {
       this.url.searchParams.delete('status');
-    }  
+    }
     const data = await fetchJson(this.url);
-    this.components.sortableTable.updateClear(data)
+    this.components.sortableTable.updateClear(data);
   }
 
   render() {
@@ -186,7 +188,7 @@ export default class Page {
     return this.element;
   }
 
-  getSubElements () {
+  getSubElements() {
     const result = {};
     const elements = this.element.querySelectorAll('[data-element]');
 
