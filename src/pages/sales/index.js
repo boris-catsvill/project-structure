@@ -22,6 +22,7 @@ export default class Page {
         this.sales = {
             url: `api/rest/orders?createdAt_gte=${rangePicker.selected.from.toISOString()}&createdAt_lte=${rangePicker.selected.to.toISOString()}`,
             isSortLocally: false,
+            isDrilldown: false,
         };
         const sortableTable = new SortableTable(header, this.sales);
 

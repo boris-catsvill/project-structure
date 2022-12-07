@@ -8,6 +8,7 @@ export default class SortableTable {
     sorted = {},
     url = '',
     isSortLocally = false,
+    isDrilldown = true,
   } = {}) {
     this.headerConfig = headersConfig;
     this.data = data;
@@ -21,6 +22,7 @@ export default class SortableTable {
     }
     this.isLoading = false;
     this.scrollBorderY = 300;
+    this.isDrilldown = isDrilldown;
 
     this.render();
   }
@@ -60,17 +62,18 @@ export default class SortableTable {
   getColumnBody() {
     return this.data
       .map(item => {
-        return `<a href="/products/${item.id}" class="sortable-table__row">
-                  ${this.headerConfig
+        return `${this.isDrilldown ? `<a href="/products/${item.id}"` : `<div`}
+          class="sortable-table__row">
+          ${this.headerConfig
             .map(column => {
               if (column.template) {
                 return column.template(item[column.id]);
               } else {
-                return `<div class="sortable-table__cell">${item[column.id]}</div>`;
+                return `<div class="sortable-table__cell">${column.formatData ? column.formatData(item[column.id]) : item[column.id]}</div>`;
               }
             })
             .join("")
-          }</a>`
+          }${this.isDrilldown ? `</a>` : `</div>`}`
       })
       .join("");
   }

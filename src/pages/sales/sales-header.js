@@ -13,11 +13,13 @@ const header = [
         id: 'createdAt',
         title: 'Date',
         sortable: true,
+        formatData: data => new Date(data).toLocaleString('ru', { dateStyle: 'medium' }),
     },
     {
         id: 'totalCost',
         title: 'Price',
         sortable: true,
+        formatData: data => '$' + data,
     },
     {
         id: 'delivery',
