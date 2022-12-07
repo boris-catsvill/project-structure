@@ -10,7 +10,10 @@ export default class Page {
 
     element.innerHTML = `
       <div>
-        <h1>Edit page</h1>
+        <h1 class="page-title">
+        <a href="/products" class="link">Products</a>
+        / Edit
+        </h1>
       </div>`;
 
     this.element = element.firstElementChild;
