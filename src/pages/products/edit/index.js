@@ -1,4 +1,5 @@
 import ProductForm from "../../../components/product-form";
+import NotificationMessage from "../../../components/notification";
 
 export default class Page {
   element;
@@ -8,12 +9,24 @@ export default class Page {
   async render() {
     const element = document.createElement('div');
 
+    // element.innerHTML = `
+    //   <div>
+    //     <h1 class="page-title">
+    //     <a href="/products" class="link">Products</a>
+    //     / Edit
+    //     </h1>
+    //   </div>`;
+
     element.innerHTML = `
-      <div>
-        <h1 class="page-title">
-        <a href="/products" class="link">Products</a>
-        / Edit
-        </h1>
+      <div class="products-edit">
+        <div class="content__top-panel">
+          <h1 class="page-title">
+          <a href="/products" class="link">Products</a>
+          / Edit
+          </h1>
+        </div>
+        <div class="content-box">
+        </div>
       </div>`;
 
     this.element = element.firstElementChild;
@@ -33,7 +46,7 @@ export default class Page {
   async renderComponents() {
     const element = await this.components.productFrom.render();
 
-    this.element.append(element);
+    this.element.querySelector('.content-box').append(element);
   }
 
   destroy() {
