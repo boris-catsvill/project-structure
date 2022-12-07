@@ -9,14 +9,6 @@ export default class Page {
   async render() {
     const element = document.createElement('div');
 
-    // element.innerHTML = `
-    //   <div>
-    //     <h1 class="page-title">
-    //     <a href="/products" class="link">Products</a>
-    //     / Edit
-    //     </h1>
-    //   </div>`;
-
     element.innerHTML = `
       <div class="products-edit">
         <div class="content__top-panel">
@@ -34,6 +26,8 @@ export default class Page {
     this.initComponents();
     await this.renderComponents();
 
+    this.initEventListener();
+
     return this.element;
   }
 
@@ -49,7 +43,33 @@ export default class Page {
     this.element.querySelector('.content-box').append(element);
   }
 
+  initEventListener() {
+    this.element.querySelector('.product-form').addEventListener('product-updated', this.notificationProductUpdated);
+  }
+
+  notificationProductUpdated() {
+    const notification = new NotificationMessage('Product updated', {
+      duration: 2000,
+      type: 'success'
+    });
+
+    notification.element.style.position = 'absolute';
+    notification.element.style.right = '30%';
+    notification.element.style.bottom = '-120%';
+
+    notification.show();
+  }
+
+  remove() {
+    if (this.element) {
+      this.element.remove();
+    }
+  }
+
   destroy() {
+    this.remove();
+    this.element = null;
+    this.subElements = {};
     for (const component of Object.values(this.components)) {
       component.destroy();
     }
