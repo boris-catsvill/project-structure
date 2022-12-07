@@ -1,4 +1,4 @@
-import fetchJson from './utils/fetch-json.js';
+import fetchJson from '../../utils/fetch-json.js';
 
 const BACKEND_URL = process.env.BACKEND_URL;
 

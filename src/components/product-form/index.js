@@ -1,6 +1,6 @@
 import SortableList from '../../components/sortable-list';
-import escapeHtml from './utils/escape-html';
-import fetchJson from './utils/fetch-json';
+import escapeHtml from '../../utils/escape-html';
+import fetchJson from '../../utils/fetch-json';
 
 const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID;
 const BACKEND_URL = process.env.BACKEND_URL;
