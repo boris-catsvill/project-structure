@@ -53,9 +53,9 @@ export default class Page {
       type: 'success'
     });
 
-    notification.element.style.position = 'absolute';
-    notification.element.style.right = '30%';
-    notification.element.style.bottom = '-120%';
+    notification.element.style.position = 'fixed';
+    notification.element.style.right = '15%';
+    notification.element.style.bottom = '15%';
 
     notification.show();
   }
