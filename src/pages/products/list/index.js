@@ -1,6 +1,7 @@
 import SortableTable from '../../../components/sortable-table/index.js';
 import Doubleslider from '../../../components/double-slider/index.js';
 import header from './products-header.js';
+import throttle from '../../../utils/throttle.js';
 
 export default class Page {
   element;
@@ -93,7 +94,7 @@ export default class Page {
   initEventListener() {
     this.subElements.sliderContainer.addEventListener('range-select', this.onRangeSelect);
     this.subElements.filterStatus.addEventListener('change', this.onStatusSelect);
-    this.subElements.filterName.addEventListener('input', this.onNameSelect);
+    this.subElements.filterName.addEventListener('input', throttle(600, this.onNameSelect));
   }
 
   onRangeSelect = async (event) => {
