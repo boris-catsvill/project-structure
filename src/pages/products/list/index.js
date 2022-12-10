@@ -46,7 +46,7 @@ export default class Page {
               <form class="form-inline">
                 <div class="form-group">
                   <label class="form-label">Sort by:</label>
-                  <input type="text" data-elem="filterName" class="form-control" placeholder="Name product">
+                  <input type="text" data-element="filterName" class="form-control" placeholder="Name product">
                 </div>
                 <div class="form-group" data-element="sliderContainer">
                   <label class="form-label">Price:</label>
@@ -54,7 +54,7 @@ export default class Page {
                 </div>
                 <div class="form-group">
                   <label class="form-label">Status:</label>
-                  <select class="form-control" data-elem="filterStatus">
+                  <select class="form-control" data-element="filterStatus">
                     <option value="" selected="">Any</option>
                     <option value="1">Active</option>
                     <option value="0">Inactive</option>
@@ -91,7 +91,40 @@ export default class Page {
   }
 
   initEventListener() {
-    //this.element.querySelector('.product-form').addEventListener('product-updated', this.notificationProductUpdated);
+    this.subElements.sliderContainer.addEventListener('range-select', this.onRangeSelect);
+    this.subElements.filterStatus.addEventListener('change', this.onStatusSelect);
+    this.subElements.filterName.addEventListener('input', this.onNameSelect);
+  }
+
+  onRangeSelect = async (event) => {
+    this.resetSortableTableParams();
+    this.components.sortableTable.url.searchParams.set('price_gte', event.detail.from);
+    this.components.sortableTable.url.searchParams.set('price_lte', event.detail.to);
+    await this.components.sortableTable.loadData(this.components.sortableTable.sorted.id, this.components.sortableTable.sorted.order);
+  }
+
+  onStatusSelect = async (event) => {
+    this.resetSortableTableParams();
+    if (event.target.value === '') {
+      this.components.sortableTable.url.searchParams.delete('status');
+    } else {
+      this.components.sortableTable.url.searchParams.set('status', event.target.value);
+    }
+    await this.components.sortableTable.loadData(this.components.sortableTable.sorted.id, this.components.sortableTable.sorted.order);
+  }
+
+  onNameSelect = async (event) => {
+    this.resetSortableTableParams();
+    if (event.target.value === '') {
+      this.components.sortableTable.url.searchParams.delete('title_like');
+    } else {
+      this.components.sortableTable.url.searchParams.set('title_like', event.target.value);
+    }
+    await this.components.sortableTable.loadData(this.components.sortableTable.sorted.id, this.components.sortableTable.sorted.order);
+  }
+
+  resetSortableTableParams() {
+    this.components.sortableTable.params = { start: 0, end: this.components.sortableTable.loadRange }
   }
 
   destroy() {
