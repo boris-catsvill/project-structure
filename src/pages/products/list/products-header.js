@@ -18,6 +18,13 @@ const header = [
         sortType: 'string'
     },
     {
+        id: 'subcategory',
+        sub_id: 'title',
+        title: 'Subcategory',
+        sortable: true,
+        sortType: 'string'
+    },
+    {
         id: 'quantity',
         title: 'Quantity',
         sortable: true,

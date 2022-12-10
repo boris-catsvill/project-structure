@@ -80,7 +80,7 @@ export default class Page {
     });
 
     this.products = {
-      url: `api/rest/products`,
+      url: `api/rest/products?_embed=subcategory.category`,
     };
     this.components.sortableTable = new SortableTable(header, this.products);
   }

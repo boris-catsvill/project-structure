@@ -66,10 +66,13 @@ export default class SortableTable {
           class="sortable-table__row">
           ${this.headerConfig
             .map(column => {
+              let value = item[column.id];
+              if (column.sub_id) { value = value[column.sub_id]; }
+              if (column.formatData) { value = column.formatData(value); }
               if (column.template) {
-                return column.template(item[column.id]);
+                return column.template(value);
               } else {
-                return `<div class="sortable-table__cell">${column.formatData ? column.formatData(item[column.id]) : item[column.id]}</div>`;
+                return `<div class="sortable-table__cell">${value}</div>`;
               }
             })
             .join("")
