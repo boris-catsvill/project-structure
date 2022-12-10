@@ -5,6 +5,8 @@ export default class Page {
   element;
   subElements = {};
   components = {};
+  productId = window.location.pathname.toString().slice(10);
+  isNewProduct = this.productId === 'add';
 
   async render() {
     const element = document.createElement('div');
@@ -14,7 +16,7 @@ export default class Page {
         <div class="content__top-panel">
           <h1 class="page-title">
           <a href="/products" class="link">Products</a>
-          / Edit
+          / ${this.isNewProduct ? 'Add' : 'Edit'}
           </h1>
         </div>
         <div class="content-box">
@@ -32,9 +34,11 @@ export default class Page {
   }
 
   initComponents() {
-    const productId = window.location.pathname.toString().slice(10);
-
-    this.components.productFrom = new ProductForm(productId);
+    if (this.isNewProduct) {
+      this.components.productFrom = new ProductForm();
+    } else {
+      this.components.productFrom = new ProductForm(this.productId);
+    }
   }
 
   async renderComponents() {
@@ -44,11 +48,15 @@ export default class Page {
   }
 
   initEventListener() {
-    this.element.querySelector('.product-form').addEventListener('product-updated', this.notificationProductUpdated);
+    if (this.isNewProduct) {
+      this.element.querySelector('.product-form').addEventListener('product-saved', this.notificationProductCreated);
+    } else {
+      this.element.querySelector('.product-form').addEventListener('product-updated', this.notificationProductUpdated);
+    }
   }
 
-  notificationProductUpdated() {
-    const notification = new NotificationMessage('Product updated', {
+  notificationProduct(message) {
+    const notification = new NotificationMessage(message, {
       duration: 2000,
       type: 'success'
     });
@@ -58,6 +66,14 @@ export default class Page {
     notification.element.style.bottom = '15%';
 
     notification.show();
+  }
+
+  notificationProductUpdated = () => {
+    this.notificationProduct('Product updated');
+  }
+
+  notificationProductCreated = () => {
+    this.notificationProduct('Product saved');
   }
 
   remove() {
