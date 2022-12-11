@@ -2,7 +2,7 @@ import SortableList from "../../components/sortable-list";
 import NotificationMessage from "../../components/notification";
 import fetchJson from '../../utils/fetch-json.js';
 
-const BACKEND_URL = 'https://course-js.javascript.ru';
+const BACKEND_URL = process.env.BACKEND_URL;
 
 export default class Page {
     element;
