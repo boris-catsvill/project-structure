@@ -1,4 +1,5 @@
 import SortableList from "../../components/sortable-list";
+import NotificationMessage from "../../components/notification";
 import fetchJson from '../../utils/fetch-json.js';
 
 const BACKEND_URL = 'https://course-js.javascript.ru';
@@ -11,6 +12,7 @@ export default class Page {
 
     constructor() {
         this.urlCategory = new URL('api/rest/categories?_sort=weight&_refs=subcategory', BACKEND_URL);
+        this.urlSubcategory = new URL('api/rest/subcategories', BACKEND_URL);
     }
 
     async render() {
@@ -40,6 +42,7 @@ export default class Page {
 
     initEventListener() {
         this.subElements.categoriesContainer.addEventListener('pointerup', this.onPointerUp);
+        this.subElements.categoriesContainer.addEventListener('sortable-list-reorder', this.onSortableListReordered);
     }
 
     onPointerUp(event) {
@@ -48,6 +51,52 @@ export default class Page {
         if (!header) return;
 
         header.parentElement.classList.toggle("category_open");
+    }
+
+    onSortableListReordered = async (event) => {
+        console.log('got it', event.target);
+
+        const category = this.getDataCategorySubcategories(event.target);
+
+        try {
+            await fetchJson(this.urlSubcategory, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(category),
+            });
+
+            this.notificationCategoryOrderedSaved();
+        } catch (error) {
+            console.error('something went wrong', error);
+        }
+    }
+
+    getDataCategorySubcategories(targetElement) {
+        const data = [];
+        let weightCount = 1;
+        for (const subcategoryElement of targetElement.children) {
+            const subcategory = {
+                "id": subcategoryElement.dataset.id,
+                "weight": weightCount++
+            }
+            data.push(subcategory);
+        }
+        return data;
+    }
+
+    notificationCategoryOrderedSaved() {
+        const notification = new NotificationMessage('Category order saved', {
+            duration: 2000,
+            type: 'success'
+        });
+
+        notification.element.style.position = 'fixed';
+        notification.element.style.right = '15%';
+        notification.element.style.bottom = '15%';
+
+        notification.show();
     }
 
     getSubElements() {
