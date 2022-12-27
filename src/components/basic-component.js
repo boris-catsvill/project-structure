@@ -5,7 +5,7 @@ export default class BasicComponent {
 
   /**
    * Корневой DOM элемент компонента
-   * @type {?HTMLDivElement}
+   * @type {?HTMLElement}
    */
   element;
 

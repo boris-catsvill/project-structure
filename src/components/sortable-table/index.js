@@ -1,9 +1,10 @@
 import fetchJson from '../../utils/fetch-json.js';
 import escapeHtml from '../../utils/escape-html.js';
+import BasicComponent from '../basic-component';
 
 const BACKEND_URL = 'https://course-js.javascript.ru';
 
-export default class SortableTable {
+export default class SortableTable extends BasicComponent {
   /** @type {Object<string, function>} */
   static sortMethods = {
     string: (a, b) => a.localeCompare(b, ['ru-RU', 'en-US'], { caseFirst: 'upper' }),
@@ -18,9 +19,6 @@ export default class SortableTable {
 
   /** @type {number} С какой позиции запрашивать данные с сервера */
   offset = 0;
-
-  /** @type {Object<string, HTMLElement>} */
-  subElements = {};
 
   data = [];
   isLoadingData = false;
@@ -39,11 +37,11 @@ export default class SortableTable {
       this.offset += SortableTable.limit;
 
       try {
-        const data = await this.loadData(false);
+        const data = await this.fetchData(false);
 
         if (data.length > 0) {
           this.data.push(...data);
-          this.render();
+          this.update();
         } else if (this.offset > 0) {
           this.isEndReached = true; // BackEnd никак не сообщает о достижении конца списка, будем считать пустой за конец данных
         }
@@ -59,26 +57,30 @@ export default class SortableTable {
     isSortLocally = false,
     sorted = {}
   } = {}) {
+    super();
     this.headersConfig = headersConfig;
     this.isSortLocally = isSortLocally;
     this.url = new URL(url, BACKEND_URL);
     this.sorted = sorted;
+  }
 
-    this.render();
-    this.loadData();
-
+  initEventListeners() {
     window.addEventListener('scroll', this.scrollHandler, { passive: true });
+  }
+
+  removeEventListeners() {
+    window.removeEventListener('scroll', this.scrollHandler);
   }
 
   /**
    * @param {string} id Column ID
    * @param {'asc'|'desc'} order Sort direction
    */
-  sort(id, order) {
+  async sort(id, order) {
     if (this.isSortLocally) {
       this.sortOnClient(id, order);
     } else {
-      this.sortOnServer(id, order);
+      await this.sortOnServer(id, order);
     }
   }
 
@@ -96,7 +98,7 @@ export default class SortableTable {
     this.sorted.id = id;
     this.sorted.order = order;
 
-    this.render();
+    this.update();
   }
 
   /**
@@ -109,10 +111,10 @@ export default class SortableTable {
     this.offset = 0;
     this.isEndReached = false;
 
-    this.data = await this.loadData(false);
+    this.data = await this.fetchData(false);
     this.sorted.id = id;
     this.sorted.order = order;
-    this.render();
+    this.update();
   }
 
   /**
@@ -128,12 +130,7 @@ export default class SortableTable {
     return config;
   }
 
-  render() {
-    /* Init elements */
-    if (!this.element) {
-      this.init();
-    }
-
+  update() {
     /* Show/hide order arrow */
     this.subElements.sortArrow.remove();
 
@@ -147,15 +144,29 @@ export default class SortableTable {
     this.subElements.body.innerHTML = this.data
       .map(row => this.getRowTemplate(row))
       .join('\n');
+    this.subElements.loading.hidden = this.data.length > 0;
   }
 
-  init() {
-    this.element = document.createElement('div');
+  async render() {
     this.element.classList.add('sortable-table');
 
-    const header = this.subElements.header = document.createElement('div');
+    const header = document.createElement('div');
     header.classList.add('sortable-table__header', 'sortable-table__row');
 
+    const body = document.createElement('div');
+    body.className = 'sortable-table__body';
+
+    const loading = document.createElement('div');
+    loading.classList.add('loading-line', 'sortable-table__loading-line');
+
+    const sortArrow = document.createElement('span');
+    sortArrow.classList.add('sortable-table__sort-arrow');
+    sortArrow.innerHTML = '<span class="sort-arrow"></span>';
+
+    this.subElements = { header, body, loading, sortArrow };
+    this.element.append(header, body, loading);
+
+    /* Столбцы */
     header.append(...this.headersConfig.map(({ id, title, sortable }) => {
       const div = document.createElement('div');
       div.className = 'sortable-table__cell';
@@ -178,39 +189,19 @@ export default class SortableTable {
       return div;
     }));
 
-    const body = this.subElements.body = document.createElement('div');
-    body.className = 'sortable-table__body';
-    this.element.append(header, body);
+    this.fetchData();
 
-    const sortArrow = this.subElements.sortArrow = document.createElement('span');
-    sortArrow.classList.add('sortable-table__sort-arrow');
-    sortArrow.innerHTML = '<span class="sort-arrow"></span>';
+    return super.render();
   }
 
   getRowTemplate(row) {
-    const defaultTemplate = (data) => `<div class="sortable-table__cell">${escapeHtml(String(data))}</div>`;
+    const defaultTemplate = (data) => `<div class='sortable-table__cell'>${escapeHtml(String(data))}</div>`;
 
     const cells = this.headersConfig
       .map(({ id, template }) => template ? template(row[id]) : defaultTemplate(row[id]))
       .join('\n');
 
-    return `<a href="/products/${row.id}" class="sortable-table__row">${cells}</a>`;
-  }
-
-  remove() {
-    if (this.element) {
-      this.element.remove();
-    }
-  }
-
-  destroy() {
-    if (this.element) {
-      this.remove();
-      this.element = null;
-      this.subElements = {};
-    }
-
-    window.removeEventListener('scroll', this.scrollHandler);
+    return `<a href='/products/${row.id}' class='sortable-table__row'>${cells}</a>`;
   }
 
   /**
@@ -218,7 +209,7 @@ export default class SortableTable {
    * @param {boolean} updateTable Автоматически обновить данные таблицы (перезапись)
    * @return {Promise<Array>}
    */
-  async loadData(updateTable = true) {
+  async fetchData(updateTable = true) {
     this.url.searchParams.set('_start', String(this.offset));
     this.url.searchParams.set('_end', String(this.offset + SortableTable.limit)); // Все БД используют offset & limit, никаких end
 
@@ -226,7 +217,7 @@ export default class SortableTable {
 
     if (updateTable) {
       this.data = data;
-      this.render();
+      this.update();
     }
 
     return data;

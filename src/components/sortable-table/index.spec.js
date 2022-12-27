@@ -59,6 +59,7 @@ describe('async-code-fetch-api-part-1/sortable-table-v3', () => {
         order: 'asc'
       }
     });
+    sortableTable.render();
 
     document.body.append(sortableTable.element);
   });
@@ -75,7 +76,7 @@ describe('async-code-fetch-api-part-1/sortable-table-v3', () => {
     expect(sortableTable.element).toBeInTheDocument();
   });
 
-  it('should call "loadData" method', () => {
+  it('should call "fetchData" method', () => {
     fetchMock.mockResponseOnce();
 
     expect(fetchMock.mock.calls.length).toEqual(1);
@@ -84,7 +85,7 @@ describe('async-code-fetch-api-part-1/sortable-table-v3', () => {
   it('should render loaded data correctly', async() => {
     fetchMock.mockResponseOnce(JSON.stringify(products));
 
-    await sortableTable.loadData(); // Fix: render() не возвращает Promise, это делает loadData()
+    await sortableTable.fetchData();
 
     const { body } = sortableTable.subElements;
 
@@ -106,6 +107,7 @@ describe('async-code-fetch-api-part-1/sortable-table-v3', () => {
         order: 'asc'
       }
     });
+    sortableTable.render();
 
     fetchMock.mockResponseOnce(JSON.stringify(bestsellers));
 
