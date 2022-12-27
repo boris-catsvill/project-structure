@@ -1,7 +1,7 @@
 import escapeHtml from '../../utils/escape-html.js';
 import fetchJson from '../../utils/fetch-json.js';
+import { deleteImage, uploadImage } from '../../utils/imgur-api';
 
-const IMGUR_CLIENT_ID = '28aaa2e823b03b1';
 const BACKEND_URL = 'https://course-js.javascript.ru';
 
 export default class ProductForm {
@@ -46,7 +46,7 @@ export default class ProductForm {
           this.subElements.imageListContainer.innerHTML = this.getImageListTemplate();
 
           if (image && image.deletehash) {
-            ProductForm.imgurDelete(image.deletehash);
+            deleteImage(image.deletehash);
           }
         }
       }
@@ -59,7 +59,7 @@ export default class ProductForm {
 
     this.subElements.fileInput.addEventListener('change', async (event) => {
       const file = event.target.files[0];
-      const result = await ProductForm.imgurUpload(file);
+      const result = await uploadImage(file);
 
       if (result.success) {
         this.images.push({
@@ -248,33 +248,5 @@ export default class ProductForm {
           </li>`)
       .join('\n');
     return `<ul class="sortable-list">${inner}</ul>`;
-  }
-
-  /**
-   * @param {File} file
-   * @return {Promise<Object>}
-   */
-  static async imgurUpload(file) {
-    const formData = new FormData();
-    formData.append('image', file);
-
-    return await fetchJson('https://api.imgur.com/3/upload', {
-      method: 'POST',
-      headers: { 'Authorization': 'Client-ID ' + IMGUR_CLIENT_ID },
-      body: formData,
-      referrer: ''
-    });
-  }
-
-  /**
-   * @param {string} deleteHash
-   * @return {Promise<Object>}
-   */
-  static async imgurDelete(deleteHash) {
-    return await fetchJson('https://api.imgur.com/3/image/' + encodeURI(deleteHash), {
-      method: 'DELETE',
-      headers: { 'Authorization': 'Client-ID ' + IMGUR_CLIENT_ID },
-      referrer: ''
-    });
   }
 }
