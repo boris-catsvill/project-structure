@@ -2,7 +2,7 @@
 // status >= 400 is an error
 // network error / json error are errors
 
-export default async function(url, params) {
+export default async function(url, params = {}) {
   let response;
 
   try {

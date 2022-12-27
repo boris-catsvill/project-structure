@@ -17,7 +17,7 @@ export default class BasicPage {
 
   /**
    * Список компонентов на странице
-   * @type {Map<String, Object>}
+   * @type {Map<String, Component>}
    */
   components = new Map();
 
