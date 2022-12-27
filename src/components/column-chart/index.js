@@ -64,11 +64,10 @@ export default class ColumnChart extends BasicComponent {
   }
 
   getTemplate() {
-    const linkTemplate = this.link ? `<a href='${this.link}' class='column-chart__link'>View all</a>` : '';
+    const linkTemplate = this.link ? `<a href='${this.link}' class='column-chart__link'>Подробнее</a>` : '';
 
     return `<div class='column-chart__title'>
-        Total ${this.label}
-        ${linkTemplate}
+        ${this.label} ${linkTemplate}
       </div>
       <div class='column-chart__container'>
         <div data-element='header' class='column-chart__header'><!-- {value} --></div>

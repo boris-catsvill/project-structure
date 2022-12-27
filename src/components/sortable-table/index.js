@@ -55,17 +55,21 @@ export default class SortableTable extends BasicComponent {
   constructor(headersConfig, {
     url = '',
     isSortLocally = false,
+    enableLoading = true,
     sorted = {}
   } = {}) {
     super();
     this.headersConfig = headersConfig;
     this.isSortLocally = isSortLocally;
+    this.enableLoading = enableLoading;
     this.url = new URL(url, BACKEND_URL);
     this.sorted = sorted;
   }
 
   initEventListeners() {
-    window.addEventListener('scroll', this.scrollHandler, { passive: true });
+    if (this.enableLoading) {
+      window.addEventListener('scroll', this.scrollHandler, { passive: true });
+    }
   }
 
   removeEventListeners() {
@@ -136,6 +140,11 @@ export default class SortableTable extends BasicComponent {
 
     if (this.sorted && this.sorted.id && this.sorted.order) {
       const cell = this.subElements['header_' + this.sorted.id];
+
+      if (!cell) {
+        throw new Error('Unknown column: ' + this.sorted.id);
+      }
+
       cell.dataset.order = this.sorted.order;
       cell.append(this.subElements.sortArrow);
     }
@@ -144,7 +153,7 @@ export default class SortableTable extends BasicComponent {
     this.subElements.body.innerHTML = this.data
       .map(row => this.getRowTemplate(row))
       .join('\n');
-    this.subElements.loading.hidden = this.data.length > 0;
+    this.subElements.loading.style.display = this.data.length > 0 ? 'none' : '';
   }
 
   async render() {
@@ -212,6 +221,11 @@ export default class SortableTable extends BasicComponent {
   async fetchData(updateTable = true) {
     this.url.searchParams.set('_start', String(this.offset));
     this.url.searchParams.set('_end', String(this.offset + SortableTable.limit)); // Все БД используют offset & limit, никаких end
+
+    if (updateTable) { // Для loading state
+      this.data = [];
+      this.update();
+    }
 
     const data = await fetchJson(this.url);
 

@@ -17,9 +17,9 @@ export default class BasicPage {
 
   /**
    * Список компонентов на странице
-   * @type {Map<String, Component>}
+   * @type {Object<String, BasicComponent>}
    */
-  components = new Map();
+  components = {};
 
   constructor() {
     this.element = document.createElement('div');
@@ -30,11 +30,9 @@ export default class BasicPage {
   }
 
   async renderComponents() {
-    const elements = await Promise.all(
-      [...this.components.values()].map(c => c.render())
+    return await Promise.all(
+      [...Object.values(this.components)].map(c => c.render())
     );
-
-    this.element.append(...elements);
   }
 
   /**
@@ -42,18 +40,47 @@ export default class BasicPage {
    * @return {Promise<HTMLDivElement>}
    */
   async render() {
+    this.element.innerHTML = this.getTemplate();
+    this.element = this.element.firstElementChild;
+    this.subElements = BasicPage.findSubElements(this.element);
+
     this.initComponents();
     await this.renderComponents();
 
+    // Вставка компонентов на страницу
+    for (const [name, component] of Object.entries(this.components)) {
+      this.subElements[name].append(component.element);
+    }
+
     return this.element;
+  }
+
+  /**
+   * Возвращает шаблон страницы
+   * @return {string}
+   */
+  getTemplate() {
+    return '';
   }
 
   /**
    * Выгружает страницу и все компоненты на ней
    */
   destroy() {
-    for (const component of this.components.values()) {
+    for (const component of Object.values(this.components)) {
       component.destroy();
     }
+  }
+
+  /**
+   * Ищет элементы компонента по атрибуту <b>data-element</b>
+   * @param {HTMLElement} root Корневой элемент
+   * @return {Object<String,HTMLElement>}
+   */
+  static findSubElements(root) {
+    return Object.fromEntries(
+      [...root.querySelectorAll('[data-element]')]
+        .map(el => [el.dataset.element, el])
+    );
   }
 }
