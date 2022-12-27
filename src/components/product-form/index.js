@@ -1,38 +1,32 @@
+import BasicComponent from '../basic-component';
 import escapeHtml from '../../utils/escape-html.js';
 import fetchJson from '../../utils/fetch-json.js';
 import { deleteImage, uploadImage } from '../../utils/imgur-api';
 
 const BACKEND_URL = 'https://course-js.javascript.ru';
 
-export default class ProductForm {
-  /** @type {Object<String, HTMLElement>} */
-  subElements = {};
-  /** @type {Object[]} */
+export default class ProductForm extends BasicComponent {
+  /**
+   * Список загруженных изображений
+   * @type {Object[]}
+   */
   images = [];
 
   /**
    * @param {?string} productId
    */
   constructor(productId) {
+    super();
     this.productId = productId;
-
-    this.element = document.createElement('div');
-    this.element.className = 'product-form';
-    this.element.innerHTML = this.getTemplate();
-
-    this.element.querySelectorAll('[data-element]').forEach(el => {
-      this.subElements[el.dataset.element] = el;
-    });
-
-    this.initListeners();
   }
 
-  initListeners() {
+  initEventListeners() {
     this.subElements.productForm.addEventListener('submit', event => {
       event.preventDefault();
       this.save();
     });
 
+    /* Обработчик кнопки удаления изображения */
     this.subElements.imageListContainer.addEventListener('click', event => {
       const buttonDelete = event.target.closest('[data-delete-handle]');
 
@@ -52,6 +46,7 @@ export default class ProductForm {
       }
     });
 
+    /* Обработчик загрузки файла */
     this.subElements.buttonUpload.addEventListener('click', event => {
       event.preventDefault();
       this.subElements.fileInput.click();
@@ -72,34 +67,27 @@ export default class ProductForm {
     });
   }
 
-  /**
-   * @return {Promise<HTMLDivElement>} Компонент
-   */
   async render() {
-    const promises = [this.loadCategories()];
+    this.element.className = 'product-form';
+    this.element.innerHTML = this.getTemplate();
+
+    this.subElements = BasicComponent.findSubElements(this.element);
+
+    const promises = [this.fetchCategories()];
     if (this.productId) {
-      promises.push(this.loadProduct());
+      promises.push(this.fetchProduct());
     }
 
     await Promise.all(promises);
 
-    return this.element;
+    return super.render();
   }
 
-  remove() {
-    if (this.element) {
-      this.element.remove();
-    }
-  }
-
-  destroy() {
-    if (this.element) {
-      this.remove();
-      this.element = null;
-    }
-  }
-
-  async loadCategories() {
+  /**
+   * Загружает список категорий с сервера
+   * @return {Promise<?>}
+   */
+  async fetchCategories() {
     const url = new URL('api/rest/categories', BACKEND_URL);
     url.searchParams.set('_sort', 'weight');
     url.searchParams.set('_refs', 'subcategory');
@@ -130,7 +118,7 @@ export default class ProductForm {
     return json;
   }
 
-  async loadProduct() {
+  async fetchProduct() {
     const url = new URL('api/rest/products', BACKEND_URL);
     url.searchParams.set('id', this.productId);
 
@@ -212,11 +200,11 @@ export default class ProductForm {
       </div>
       <div class="form-group form-group__half_left form-group__two-col">
         <fieldset>
-          <label class="form-label">Цена ($)</label>
+          <label class="form-label">Цена</label>
           <input type="number" name="price" id="price" class="form-control" required />
         </fieldset>
         <fieldset>
-          <label class="form-label">Скидка ($)</label>
+          <label class="form-label">Скидка</label>
           <input type="number" name="discount" id="discount" class="form-control" value="0" required />
         </fieldset>
       </div>
