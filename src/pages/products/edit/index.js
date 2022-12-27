@@ -1,21 +1,12 @@
+import BasicPage from '../../basic-page';
+
 /**
  * Product edit page
  */
-export default class Page {
-  element;
-  subElements = {};
-  components = {};
+export default class extends BasicPage {
 
   async render() {
-    const element = document.createElement('div');
-
-    element.innerHTML = `
-      <div>
-        <h1>Edit page</h1>
-      </div>`;
-
-    this.element = element.firstElementChild;
-
-    return this.element;
+    this.element.innerHTML = `<h1>Edit page</h1>`;
+    return super.render();
   }
 }

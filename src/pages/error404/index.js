@@ -1,18 +1,12 @@
-export default class {
-  element;
+import BasicPage from '../basic-page';
 
-  async render () {
-    const element = document.createElement('div');
+export default class extends BasicPage {
 
-    element.innerHTML = `
-      <div class="error-404">
-        <h1 class="page-title">Страница не найдена</h1>
-        <p>Извините, страница не существует</p>
-      </div>
-    `;
+  async render() {
+    this.element.className = 'error-404';
+    this.element.innerHTML = `<h1 class='page-title'>Страница не найдена</h1>
+        <p>Извините, страница не существует</p>`;
 
-    this.element = element.firstElementChild
-
-    return this.element;
+    return super.render();
   }
 }
