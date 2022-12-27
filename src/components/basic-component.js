@@ -24,6 +24,7 @@ export default class BasicComponent {
    * @return {Promise<HTMLDivElement>}
    */
   async render() {
+    this.initEventListeners();
     this.update();
     return this.element;
   }
@@ -32,6 +33,20 @@ export default class BasicComponent {
    * Обновляет состояние DOM элементов в соответствии с хранимыми в компоненте данными
    */
   update() {
+    // NO-OP
+  }
+
+  /**
+   * Инициализирует обработчики событий
+   */
+  initEventListeners() {
+    // NO-OP
+  }
+
+  /**
+   * Удаляет обработчики событий
+   */
+  removeEventListeners() {
     // NO-OP
   }
 
@@ -47,6 +62,7 @@ export default class BasicComponent {
    */
   destroy() {
     if (this.element) {
+      this.removeEventListeners();
       this.remove();
       this.element = null;
       this.subElements = {};

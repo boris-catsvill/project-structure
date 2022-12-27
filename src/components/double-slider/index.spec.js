@@ -24,6 +24,7 @@ describe('events-practice/double-slider', () => {
         to: 150
       }
     });
+    doubleSlider.render();
 
     document.body.append(doubleSlider.element);
   });
@@ -42,8 +43,9 @@ describe('events-practice/double-slider', () => {
     doubleSlider = new DoubleSlider({
       min: 400,
       max: 600,
-      formatValue: value => '$' + value,
+      formatValue: value => '$' + value
     });
+    doubleSlider.render();
 
     const leftBoundary = doubleSlider.element.querySelector('span[data-element="from"]');
     const rightBoundary = doubleSlider.element.querySelector('span[data-element="to"]');
@@ -60,8 +62,9 @@ describe('events-practice/double-slider', () => {
         from: 400,
         to: 600
       },
-      formatValue: value => '$' + value,
+      formatValue: value => '$' + value
     });
+    doubleSlider.render();
 
     const leftBoundary = doubleSlider.element.querySelector('span[data-element="from"]');
     const rightBoundary = doubleSlider.element.querySelector('span[data-element="to"]');
@@ -170,6 +173,7 @@ describe('events-practice/double-slider', () => {
       max: 200,
       formatValue: value => 'USD' + value
     });
+    doubleSlider.render();
 
     const leftBoundary = doubleSlider.element.querySelector('span[data-element="from"]');
     const rightBoundary = doubleSlider.element.querySelector('span[data-element="to"]');

@@ -1,6 +1,6 @@
-export default class DoubleSlider {
-  element;
-  subElements = {};
+import BasicComponent from '../basic-component';
+
+export default class DoubleSlider extends BasicComponent {
 
   onThumbPointerMove = event => {
     event.preventDefault();
@@ -65,41 +65,33 @@ export default class DoubleSlider {
       to: max
     }
   } = {}) {
+    super();
     this.min = min;
     this.max = max;
     this.formatValue = formatValue;
     this.selected = selected;
-
-    this.render();
   }
 
   get template() {
     const { from, to } = this.selected;
 
-    return `<div class="range-slider">
-      <span data-element="from">${this.formatValue(from)}</span>
+    return `<span data-element="from">${this.formatValue(from)}</span>
       <div data-element="inner" class="range-slider__inner">
         <span data-element="progress" class="range-slider__progress"></span>
         <span data-element="thumbLeft" class="range-slider__thumb-left"></span>
         <span data-element="thumbRight" class="range-slider__thumb-right"></span>
       </div>
-      <span data-element="to">${this.formatValue(to)}</span>
-    </div>`;
+      <span data-element="to">${this.formatValue(to)}</span>`;
   }
 
-  render() {
-    const element = document.createElement('div');
+  async render() {
+    this.element.className = 'range-slider';
+    this.element.innerHTML = this.template;
+    this.element.ondragstart = () => false; // TODO: addEventListener()
 
-    element.innerHTML = this.template;
+    this.subElements = BasicComponent.findSubElements(this.element);
 
-    this.element = element.firstElementChild;
-    this.element.ondragstart = () => false;
-
-    this.subElements = this.getSubElements(element);
-
-    this.initEventListeners();
-
-    this.update();
+    return super.render();
   }
 
   initEventListeners() {
@@ -109,29 +101,10 @@ export default class DoubleSlider {
     thumbRight.addEventListener('pointerdown', event => this.onThumbPointerDown(event));
   }
 
-  getSubElements(element) {
-    const result = {};
-    const elements = element.querySelectorAll('[data-element]');
-
-    for (const subElement of elements) {
-      const name = subElement.dataset.element;
-
-      result[name] = subElement;
-    }
-
-    return result;
-  }
-
-  remove() {
-    this.element.remove();
-  }
-
-  destroy() {
-    this.remove();
+  removeEventListeners() {
     document.removeEventListener('pointermove', this.onThumbPointerMove);
     document.removeEventListener('pointerup', this.onThumbPointerUp);
   }
-
 
   getLeftShift(rangeTotal) {
     return Math.floor((this.selected.from - this.min) / rangeTotal * 100);
