@@ -1,7 +1,7 @@
-import ProductForm from "../../../components/product-form";
-
+/**
+ * Product list page
+ */
 export default class Page {
-  element;
   subElements = {};
   components = {};
 
@@ -22,15 +22,13 @@ export default class Page {
   }
 
   initComponents() {
-    const productId = '101-planset-lenovo-yt3-x90l-64-gb-3g-lte-cernyj';
-
-    this.components.productFrom = new ProductForm(productId);
   }
 
   async renderComponents() {
-    const element = await this.components.productFrom.render();
-
-    this.element.append(element);
+    for (const component of Object.values(this.components)) {
+      await component.render();
+      this.element.append(component.element);
+    }
   }
 
   destroy() {

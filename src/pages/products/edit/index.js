@@ -1,3 +1,6 @@
+/**
+ * Product edit page
+ */
 export default class Page {
   element;
   subElements = {};
