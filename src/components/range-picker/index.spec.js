@@ -15,6 +15,7 @@ describe('forms-fetch-api-part-2/range-picker', () => {
       from: new Date(2019, 9, 2),
       to: new Date(2019, 10, 5)
     });
+    rangePicker.render();
 
     document.body.append(rangePicker.element);
   });
@@ -79,6 +80,7 @@ describe('forms-fetch-api-part-2/range-picker', () => {
       from: new Date(2019, 9, 12),
       to: new Date(2019, 10, 25)
     });
+    rangePicker.render();
 
     const input = rangePicker.element.querySelector('.rangepicker__input');
 
@@ -99,6 +101,7 @@ describe('forms-fetch-api-part-2/range-picker', () => {
     const totalDays = getDaysBetweenDates(from, to);
     const RANGE_BORDERS_COUNT = 2;
     const rangePicker = new RangePicker({from, to});
+    rangePicker.render();
     const input = rangePicker.element.querySelector('.rangepicker__input');
 
     input.dispatchEvent(new MouseEvent('click', {

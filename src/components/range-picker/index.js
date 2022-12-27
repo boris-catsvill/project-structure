@@ -1,6 +1,6 @@
-export default class RangePicker {
-  element = null;
-  subElements = {};
+import BasicComponent from '../basic-component';
+
+export default class RangePicker extends BasicComponent {
   selectingFrom = true;
   selected = {
     from: new Date(),
@@ -21,44 +21,28 @@ export default class RangePicker {
   };
 
   constructor({ from = new Date(), to = new Date() } = {}) {
+    super();
     this.showDateFrom = new Date(from);
     this.selected = { from, to };
-
-    this.render();
   }
 
   get template() {
     const from = RangePicker.formatDate(this.selected.from);
     const to = RangePicker.formatDate(this.selected.to);
 
-    return `<div class="rangepicker">
-      <div class="rangepicker__input" data-element="input">
+    return `<div class="rangepicker__input" data-element="input">
         <span data-element="from">${from}</span> -
         <span data-element="to">${to}</span>
       </div>
-      <div class="rangepicker__selector" data-element="selector"></div>
-    </div>`;
+      <div class="rangepicker__selector" data-element="selector"></div>`;
   }
 
-  render() {
-    const element = document.createElement('div');
+  async render() {
+    this.element.className = 'rangepicker';
+    this.element.innerHTML = this.template;
+    this.subElements = BasicComponent.findSubElements(this.element);
 
-    element.innerHTML = this.template;
-
-    this.element = element.firstElementChild;
-    this.subElements = this.getSubElements(element);
-
-    this.initEventListeners();
-  }
-
-  getSubElements(element) {
-    const subElements = {};
-
-    for (const subElement of element.querySelectorAll('[data-element]')) {
-      subElements[subElement.dataset.element] = subElement;
-    }
-
-    return subElements;
+    return super.render();
   }
 
   initEventListeners() {
@@ -67,6 +51,11 @@ export default class RangePicker {
     document.addEventListener('click', this.onDocumentClick, true);
     input.addEventListener('click', () => this.toggle());
     selector.addEventListener('click', event => this.onSelectorClick(event));
+  }
+
+  removeEventListeners() {
+    // Warning! To remove listener  MUST be passes the same event phase
+    document.removeEventListener('click', this.onDocumentClick, true);
   }
 
   toggle() {
@@ -245,22 +234,12 @@ export default class RangePicker {
     }));
   }
 
-  remove() {
-    this.element.remove();
-    // TODO: Warning! To remove listener  MUST be passes the same event phase
-    document.removeEventListener('click', this.onDocumentClick, true);
-  }
-
   destroy() {
-    this.remove();
-    this.element = null;
-    this.subElements = {};
+    super.destroy();
     this.selectingFrom = true;
     this.selected = {
       from: new Date(),
       to: new Date()
     };
-
-    return this;
   }
 }
