@@ -210,7 +210,7 @@ export default class SortableTable extends BasicComponent {
       .map(({ id, template }) => template ? template(row[id]) : defaultTemplate(row[id]))
       .join('\n');
 
-    return `<a href='/products/${row.id}' class='sortable-table__row'>${cells}</a>`;
+    return `<div class='sortable-table__row'>${cells}</div>`;
   }
 
   /**

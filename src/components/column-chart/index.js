@@ -87,7 +87,7 @@ export default class ColumnChart extends BasicComponent {
       'column-chart': true,
       'column-chart_loading': !this.data?.length
     }).join(' ');
-    this.subElements.header.innerHTML = this.headingFormatter(this.value);
+    this.subElements.header.textContent = this.headingFormatter(this.value);
     this.subElements.body.innerHTML = this.getChartsTemplate();
   }
 
