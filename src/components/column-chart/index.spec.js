@@ -1,6 +1,6 @@
 import ColumnChart from './index.js';
 
-import ordersData from "./__mocks__/orders-data.js";
+import ordersData from './__mocks__/orders-data.js';
 
 describe('async-code-fetch-api-part-1/column-chart', () => {
   let columnChart;
@@ -13,6 +13,7 @@ describe('async-code-fetch-api-part-1/column-chart', () => {
       link: '',
       value: 0
     });
+    columnChart.render();
 
     document.body.append(columnChart.element);
   });
@@ -30,7 +31,7 @@ describe('async-code-fetch-api-part-1/column-chart', () => {
   it('should load data correctly', async () => {
     const from = new Date();
     const to = new Date();
-    const data = await columnChart.update(from, to);
+    const data = await columnChart.setRange(from, to);
 
     expect(data).toEqual(ordersData);
   });
@@ -41,7 +42,7 @@ describe('async-code-fetch-api-part-1/column-chart', () => {
 
     const from = new Date();
     const to = new Date();
-    await columnChart.update(from, to);
+    await columnChart.setRange(from, to);
 
     expect(body.children.length).toEqual(expectedData.length);
   });
@@ -50,6 +51,7 @@ describe('async-code-fetch-api-part-1/column-chart', () => {
     const label = 'New label';
 
     columnChart = new ColumnChart({ label });
+    columnChart.render();
 
     const title = columnChart.element.querySelector('.column-chart__title');
 
@@ -60,6 +62,7 @@ describe('async-code-fetch-api-part-1/column-chart', () => {
     const link = 'https://google.com';
 
     columnChart = new ColumnChart({ link });
+    columnChart.render();
 
     document.body.append(columnChart.element);
 
@@ -70,6 +73,7 @@ describe('async-code-fetch-api-part-1/column-chart', () => {
 
   it('should have property "chartHeight"', () => {
     columnChart = new ColumnChart();
+    columnChart.render();
 
     expect(columnChart.chartHeight).toEqual(50);
   });
@@ -83,7 +87,7 @@ describe('async-code-fetch-api-part-1/column-chart', () => {
 
     fetchMock.once(JSON.stringify(data));
 
-    await columnChart.update(new Date('2020-04-06'), new Date('2020-05-06'));
+    await columnChart.setRange(new Date('2020-04-06'), new Date('2020-05-06'));
 
     const { body } = columnChart.subElements;
 
@@ -92,6 +96,7 @@ describe('async-code-fetch-api-part-1/column-chart', () => {
 
   it('should have loading indication if data wasn\'t passed ', () => {
     columnChart = new ColumnChart();
+    columnChart.render();
     document.body.append(columnChart);
 
     expect(columnChart.element).toHaveClass('column-chart_loading');
