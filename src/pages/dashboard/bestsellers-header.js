@@ -7,7 +7,7 @@ const header = [
     title: 'Фото',
     sortable: false,
     template: data => {
-      return `<img class='sortable-table-image' alt='Image' src='${escapeHtml(data[0].url)}'>`;
+      return `<img class='sortable-table-image' alt='Image' src='${escapeHtml(data[0]?.url)}'>`;
     }
   },
   {
