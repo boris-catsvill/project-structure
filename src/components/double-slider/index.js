@@ -87,7 +87,7 @@ export default class DoubleSlider extends BasicComponent {
   async render() {
     this.element.className = 'range-slider';
     this.element.innerHTML = this.template;
-    this.element.ondragstart = () => false; // TODO: addEventListener()
+    this.element.addEventListener('dragstart', ev => ev.preventDefault());
 
     this.subElements = BasicComponent.findSubElements(this.element);
 
