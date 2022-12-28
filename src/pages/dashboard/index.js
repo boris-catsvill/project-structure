@@ -3,6 +3,7 @@ import RangePicker from '../../components/range-picker';
 import ColumnChart from '../../components/column-chart';
 import SortableTable from '../../components/sortable-table';
 import header from './bestsellers-header';
+import { currencyFormat } from '../../utils/formatters';
 
 /**
  * Dashboard page
@@ -27,7 +28,7 @@ export default class extends BasicPage {
       url: 'api/dashboard/sales',
       range: { from, to },
       label: 'Продажи',
-      formatHeading: value => new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'USD' }).format(value)
+      formatHeading: value => currencyFormat(value)
     });
 
     const customersChart = new ColumnChart({

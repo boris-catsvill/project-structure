@@ -1,21 +1,23 @@
+import escapeHtml from '../../utils/escape-html';
+import { currencyFormat } from '../../utils/formatters';
+
 const header = [
   {
     id: 'images',
     title: 'Фото',
     sortable: false,
     template: data => {
-      return `
-          <div class="sortable-table__cell">
-            <img class="sortable-table-image" alt="Image" src="${data[0].url}">
-          </div>
-        `;
+      return `<img class='sortable-table-image' alt='Image' src='${escapeHtml(data[0].url)}'>`;
     }
   },
   {
     id: 'title',
     title: 'Название',
     sortable: true,
-    sortType: 'string'
+    sortType: 'string',
+    template: (data, row) => {
+      return `<a href='/products/${escapeHtml(encodeURI(row.id))}'>${escapeHtml(data)}</a>`;
+    }
   },
   {
     id: 'quantity',
@@ -27,7 +29,8 @@ const header = [
     id: 'price',
     title: 'Цена',
     sortable: true,
-    sortType: 'number'
+    sortType: 'number',
+    template: data => escapeHtml(currencyFormat(data))
   },
   {
     id: 'sales',

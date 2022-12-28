@@ -14,6 +14,8 @@ export default class SortableTable extends BasicComponent {
   /** @type {Object<string, number>} */
   static sortOrders = { asc: 1, desc: -1 };
 
+  static defaultTemplate = data => escapeHtml(String(data));
+
   /** @type {number} Кол-во запрашиваемых записей с сервера */
   static limit = 30;
 
@@ -33,21 +35,15 @@ export default class SortableTable extends BasicComponent {
     const bottomOffset = 100;
 
     if (windowHeight > bottom - bottomOffset && !this.isEndReached && !this.isLoadingData) {
-      this.isLoadingData = true;
       this.offset += SortableTable.limit;
 
-      try {
-        const data = await this.fetchData(false);
+      const data = await this.fetchData(false);
 
-        if (data.length > 0) {
-          this.data.push(...data);
-          this.update();
-        } else if (this.offset > 0) {
-          this.isEndReached = true; // BackEnd никак не сообщает о достижении конца списка, будем считать пустой за конец данных
-        }
-
-      } finally {
-        this.isLoadingData = false;
+      if (data.length > 0) {
+        this.data.push(...data);
+        this.update();
+      } else if (this.offset > 0) {
+        this.isEndReached = true; // BackEnd никак не сообщает о достижении конца списка, будем считать пустой за конец данных
       }
     }
   };
@@ -110,14 +106,11 @@ export default class SortableTable extends BasicComponent {
    * @param {'asc'|'desc'} order Sort direction
    */
   async sortOnServer(id, order) {
-    this.url.searchParams.set('_sort', id);
-    this.url.searchParams.set('_order', order);
-    this.offset = 0;
-    this.isEndReached = false;
-
-    this.data = await this.fetchData(false);
     this.sorted.id = id;
     this.sorted.order = order;
+    this.offset = 0;
+    this.data = await this.fetchData(true);
+
     this.update();
   }
 
@@ -153,7 +146,7 @@ export default class SortableTable extends BasicComponent {
     this.subElements.body.innerHTML = this.data
       .map(row => this.getRowTemplate(row))
       .join('\n');
-    this.subElements.loading.style.display = this.data.length > 0 ? 'none' : '';
+    this.subElements.loading.style.display = this.isLoadingData ? '' : 'none';
   }
 
   async render() {
@@ -204,10 +197,9 @@ export default class SortableTable extends BasicComponent {
   }
 
   getRowTemplate(row) {
-    const defaultTemplate = (data) => `<div class='sortable-table__cell'>${escapeHtml(String(data))}</div>`;
-
     const cells = this.headersConfig
-      .map(({ id, template }) => template ? template(row[id]) : defaultTemplate(row[id]))
+      .map(({ id, template }) => template ? template(row[id], row) : SortableTable.defaultTemplate(row[id]))
+      .map(row => `<div class='sortable-table__cell'>${row}</div>`)
       .join('\n');
 
     return `<div class='sortable-table__row'>${cells}</div>`;
@@ -221,13 +213,19 @@ export default class SortableTable extends BasicComponent {
   async fetchData(updateTable = true) {
     this.url.searchParams.set('_start', String(this.offset));
     this.url.searchParams.set('_end', String(this.offset + SortableTable.limit)); // Все БД используют offset & limit, никаких end
+    this.url.searchParams.set('_sort', this.sorted?.id || '');
+    this.url.searchParams.set('_order', this.sorted?.order || '');
+
+    this.isLoadingData = true;
 
     if (updateTable) { // Для loading state
       this.data = [];
+      this.isEndReached = false;
       this.update();
     }
 
     const data = await fetchJson(this.url);
+    this.isLoadingData = false;
 
     if (updateTable) {
       this.data = data;

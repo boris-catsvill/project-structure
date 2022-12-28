@@ -2,14 +2,7 @@ import BasicPage from '../basic-page';
 import RangePicker from '../../components/range-picker';
 import SortableTable from '../../components/sortable-table';
 import escapeHtml from '../../utils/escape-html';
-
-const dateFormat = value => {
-  const date = new Date(value);
-  return date.toLocaleDateString('ru-RU', { year: 'numeric', month: 'short', day: 'numeric' }) +
-    ' ' + date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
-};
-
-const currencyFormat = value => new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'USD' }).format(value);
+import { currencyFormat, dateFormat } from '../../utils/formatters';
 
 /**
  * Sales page
@@ -28,11 +21,11 @@ export default class extends BasicPage {
       { id: 'user', title: 'Клиент', sortable: true, sortType: 'string' },
       {
         id: 'createdAt', title: 'Дата', sortable: true, sortType: 'string',
-        template: (value) => `<div class='sortable-table__cell'>${escapeHtml(dateFormat(value))}</div>`
+        template: (value) => escapeHtml(dateFormat(value))
       },
       {
         id: 'totalCost', title: 'Стоимость', sortable: true, sortType: 'number',
-        template: (value) => `<div class='sortable-table__cell'>${escapeHtml(currencyFormat(value))}</div>`
+        template: (value) => escapeHtml(currencyFormat(value))
       },
       { id: 'delivery', title: 'Статус', sortable: true, sortType: 'string' }
     ];
