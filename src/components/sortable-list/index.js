@@ -42,8 +42,9 @@ export default class SortableList {
     this.dragStop();
   };
 
-  constructor({ items = [] } = {}) {
+  constructor({ items = [], allowDelete = true } = {}) {
     this.items = items;
+    this.allowDelete = allowDelete;
 
     this.render();
   }
@@ -81,7 +82,7 @@ export default class SortableList {
         this.dragStart(element, event);
       }
 
-      if (event.target.closest('[data-delete-handle]')) {
+      if (this.allowDelete && event.target.closest('[data-delete-handle]')) {
         event.preventDefault();
 
         element.remove();

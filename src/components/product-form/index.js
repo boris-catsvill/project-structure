@@ -2,15 +2,11 @@ import BasicComponent from '../basic-component';
 import escapeHtml from '../../utils/escape-html.js';
 import fetchJson from '../../utils/fetch-json.js';
 import { deleteImage, uploadImage } from '../../utils/imgur-api';
+import SortableList from '../sortable-list';
 
 const BACKEND_URL = 'https://course-js.javascript.ru';
 
 export default class ProductForm extends BasicComponent {
-  /**
-   * Список загруженных изображений
-   * @type {Object[]}
-   */
-  images = [];
 
   /**
    * @param {?string} productId
@@ -35,12 +31,10 @@ export default class ProductForm extends BasicComponent {
 
         const item = event.target.closest('.products-edit__imagelist-item');
         if (item) {
-          const image = this.images.find(obj => obj.url === item.dataset.url);
-          this.images = this.images.filter(obj => obj.url !== item.dataset.url);
-          this.subElements.imageListContainer.innerHTML = this.getImageListTemplate();
+          item.remove();
 
-          if (image && image.deletehash) {
-            deleteImage(image.deletehash);
+          if (item.dataset.deletehash) {
+            deleteImage(item.dataset.deletehash);
           }
         }
       }
@@ -57,12 +51,11 @@ export default class ProductForm extends BasicComponent {
       const result = await uploadImage(file);
 
       if (result.success) {
-        this.images.push({
+        this.sortableImages.element.append(ProductForm.createImageElement({
           source: file.name,
           url: result.data.link,
           deletehash: result.data.deletehash
-        });
-        this.subElements.imageListContainer.innerHTML = this.getImageListTemplate();
+        }));
       }
     });
   }
@@ -72,6 +65,12 @@ export default class ProductForm extends BasicComponent {
     this.element.innerHTML = this.getTemplate();
 
     this.subElements = BasicComponent.findSubElements(this.element);
+
+    this.sortableImages = new SortableList({
+      items: [],
+      allowDelete: false
+    });
+    this.subElements.imageListContainer.append(this.sortableImages.element);
 
     const promises = [this.fetchCategories()];
     if (this.productId) {
@@ -134,8 +133,8 @@ export default class ProductForm extends BasicComponent {
     }
 
     // Загруженные изображения
-    this.images = model.images;
-    this.subElements.imageListContainer.innerHTML = this.getImageListTemplate();
+    this.sortableImages.element.innerHTML = '';
+    this.sortableImages.element.append(...model.images.map(image => ProductForm.createImageElement(image)));
   }
 
   async save() {
@@ -151,9 +150,10 @@ export default class ProductForm extends BasicComponent {
     );
 
     // Избавляемся от лишних атрибутов, которые не нужны бэку
-    model.images = this.images.map(({ url, source }) => {
-      return { url, source };
-    });
+    model.images = [...this.sortableImages.element.querySelectorAll('.products-edit__imagelist-item')]
+      .map(({ dataset }) => {
+        return { url: dataset.url, source: dataset.source };
+      });
 
     let eventName;
     let methodName;
@@ -163,7 +163,7 @@ export default class ProductForm extends BasicComponent {
       methodName = 'PATCH';
     } else {
       eventName = 'product-saved';
-      methodName = 'POST';
+      methodName = 'PUT';
     }
 
     const url = new URL('api/rest/products', BACKEND_URL);
@@ -173,7 +173,12 @@ export default class ProductForm extends BasicComponent {
       body: JSON.stringify(model)
     });
 
-    this.element.dispatchEvent(new CustomEvent(eventName, { detail: result }));
+    this.element.dispatchEvent(new CustomEvent(eventName, { detail: result, bubbles: true }));
+  }
+
+  destroy() {
+    this.sortableImages.destroy();
+    super.destroy();
   }
 
   getTemplate() {
@@ -225,16 +230,19 @@ export default class ProductForm extends BasicComponent {
     </form>`;
   }
 
-  getImageListTemplate() {
-    const inner = this.images.map(({ source, url }) => `<li class="products-edit__imagelist-item sortable-list__item" data-url="${escapeHtml(url)}">
-          <span>
-            <img src="icon-grab.svg" data-grab-handle="" alt="grab">
-            <img class="sortable-table__cell-img" alt="Image" src="${escapeHtml(url)}" />
+  static createImageElement({ url, source, deletehash = '' }) {
+    const el = document.createElement('li');
+    el.classList.add('products-edit__imagelist-item', 'sortable-list__item');
+    el.dataset.url = url;
+    el.dataset.source = source;
+    el.dataset.deletehash = deletehash;
+
+    el.innerHTML = `<span>
+            <img src='/assets/icons/icon-grab.svg' data-grab-handle='' alt='grab'>
+            <img class='sortable-table__cell-img' alt='Image' src='${escapeHtml(url)}' />
             <span>${escapeHtml(source)}</span>
           </span>
-          <button type="button" data-delete-handle><img src="icon-trash.svg" alt="delete"></button>
-          </li>`)
-      .join('\n');
-    return `<ul class="sortable-list">${inner}</ul>`;
+          <button type='button' data-delete-handle><img src='/assets/icons/icon-trash.svg' alt='delete'></button>`;
+    return el;
   }
 }
