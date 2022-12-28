@@ -3,8 +3,7 @@ import escapeHtml from '../../utils/escape-html.js';
 import fetchJson from '../../utils/fetch-json.js';
 import { deleteImage, uploadImage } from '../../utils/imgur-api';
 import SortableList from '../sortable-list';
-
-const BACKEND_URL = 'https://course-js.javascript.ru';
+import { BACKEND_URL } from '../../constants';
 
 export default class ProductForm extends BasicComponent {
 

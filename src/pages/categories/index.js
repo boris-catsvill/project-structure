@@ -3,8 +3,7 @@ import Category from '../../components/categories';
 import fetchJson from '../../utils/fetch-json';
 import escapeHtml from '../../utils/escape-html';
 import NotificationMessage from '../../components/notification';
-
-const BACKEND_URL = 'https://course-js.javascript.ru';
+import { BACKEND_URL } from '../../constants';
 
 /**
  * Categories page

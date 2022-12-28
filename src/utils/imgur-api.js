@@ -1,7 +1,7 @@
 import fetchJson from './fetch-json';
+import { IMGUR_CLIENT_ID } from '../constants';
 
 const API_URL = 'https://api.imgur.com/3';
-const CLIENT_ID = '28aaa2e823b03b1';
 
 /**
  * Загружает изображение на сервер
@@ -34,7 +34,7 @@ async function apiCall(method, uri, params = {}) {
   return await fetchJson(API_URL + uri, Object.assign({
     method: method,
     headers: {
-      'Authorization': 'Client-ID ' + CLIENT_ID,
+      'Authorization': 'Client-ID ' + IMGUR_CLIENT_ID,
       'Accept': 'application/json'
     },
     referrer: ''

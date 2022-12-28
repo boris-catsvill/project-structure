@@ -1,8 +1,7 @@
 import fetchJson from '../../utils/fetch-json.js';
 import escapeHtml from '../../utils/escape-html.js';
 import BasicComponent from '../basic-component';
-
-const BACKEND_URL = 'https://course-js.javascript.ru';
+import { BACKEND_URL } from '../../constants';
 
 export default class SortableTable extends BasicComponent {
   /** @type {Object<string, function>} */

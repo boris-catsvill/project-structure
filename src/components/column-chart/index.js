@@ -1,7 +1,6 @@
 import fetchJson from '../../utils/fetch-json.js';
 import BasicComponent from '../basic-component';
-
-const BACKEND_URL = 'https://course-js.javascript.ru';
+import { BACKEND_URL } from '../../constants';
 
 export default class ColumnChart extends BasicComponent {
   chartHeight = 50;
