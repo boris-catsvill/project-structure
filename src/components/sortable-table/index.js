@@ -221,7 +221,11 @@ export default class SortableTable {
 
   async populate() {
     const windowRelativeBottom = document.documentElement.getBoundingClientRect().bottom;
-    if (windowRelativeBottom < document.documentElement.clientHeight + this.scrollBorderY && !this.isLoading && !this.isSortLocally) {
+    if (
+      windowRelativeBottom < document.documentElement.clientHeight + this.scrollBorderY &&
+      !this.isLoading &&
+      !this.isSortLocally
+    ) {
       this.isLoading = true;
       this.params.start += this.loadRange;
       this.params.end += this.loadRange;
@@ -230,13 +234,14 @@ export default class SortableTable {
       if (this.params.id) this.url.searchParams.set('_sort', this.params.id);
       if (this.params.order) this.url.searchParams.set('_order', this.params.order);
 
-      await fetchJson(this.url)
-        .then(data => {
-          this.data = this.data.concat(data);
-          this.renderData();
-          this.isLoading = false;
-        })
-        .catch(error => console.error('Something went wrong: ' + error));
+      try {
+        const data = await fetchJson(this.url);
+        this.data = [...this.data, ...data];
+        this.renderData();
+        this.isLoading = false;
+      } catch (error) {
+        console.error('Something went wrong: ' + error);
+      }
     }
   }
 }

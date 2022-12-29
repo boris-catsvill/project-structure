@@ -65,12 +65,22 @@ export default class ProductForm {
     this.productId = productId;
     this.isNewProduct = !productId;
 
+    this.initUrlCategory();
+    this.initUrlProduct();
+    this.initUrlProductGet();
+  }
+
+  initUrlCategory() {
     this.urlCategory = new URL('api/rest/categories', BACKEND_URL);
     this.urlCategory.searchParams.set('_sort', 'weight');
     this.urlCategory.searchParams.set('_refs', 'subcategory');
+  }
 
+  initUrlProduct() {
     this.urlProduct = new URL('api/rest/products', BACKEND_URL);
+  }
 
+  initUrlProductGet() {
     this.urlProductGet = new URL('api/rest/products', BACKEND_URL);
     this.urlProductGet.searchParams.set('id', this.productId);
   }

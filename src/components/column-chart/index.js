@@ -29,7 +29,7 @@ export default class ColumnChart {
   getTemplate() {
     return `
               <div class="column-chart" style="--chart-height: ${this.chartHeight}">
-                <div class="column-chart__title">
+                <div data-element="title" class="column-chart__title">
                 Total ${this.label}
                 </div>
                 <div class="column-chart__container">
@@ -61,7 +61,7 @@ export default class ColumnChart {
       elementLink.href = this.link;
       elementLink.classList.add('column-chart__link');
       elementLink.textContent = 'View all';
-      this.element.querySelector('.column-chart__title').append(elementLink);
+      this.subElements.title.append(elementLink);
     }
   }
 

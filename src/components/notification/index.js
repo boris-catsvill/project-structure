@@ -1,4 +1,6 @@
 export default class NotificationMessage {
+    static currentElement;
+
     constructor(
         textMessage = '',
         {
@@ -13,8 +15,6 @@ export default class NotificationMessage {
 
         this.render();
     }
-
-    static currentElement;
 
     getTemplate() {
         return `
@@ -58,7 +58,6 @@ export default class NotificationMessage {
 
     destroy() {
         this.remove();
-        // NOTE: удаляем обработчики событий, если они есть
         this.element = null;
         this.subElements = {};
     }

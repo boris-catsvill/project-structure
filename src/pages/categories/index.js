@@ -54,8 +54,6 @@ export default class Page {
     }
 
     onSortableListReordered = async (event) => {
-        console.log('got it', event.target);
-
         const category = this.getDataCategorySubcategories(event.target);
 
         try {
