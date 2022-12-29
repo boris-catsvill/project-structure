@@ -89,7 +89,7 @@ export default class DoubleSlider extends BasicComponent {
     this.element.innerHTML = this.template;
     this.element.addEventListener('dragstart', ev => ev.preventDefault());
 
-    this.subElements = BasicComponent.findSubElements(this.element);
+    this.subElements = DoubleSlider.findSubElements(this.element);
 
     return super.render();
   }

@@ -24,7 +24,7 @@ export default class Category extends BasicComponent {
     this.element.dataset.id = this.id;
     this.element.innerHTML = this.getTemplate();
 
-    this.subElements = BasicComponent.findSubElements(this.element);
+    this.subElements = Category.findSubElements(this.element);
 
     this.subElements.header.addEventListener('click', event => {
       event.preventDefault();

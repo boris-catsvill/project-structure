@@ -63,7 +63,7 @@ export default class ProductForm extends BasicComponent {
     this.element.className = 'product-form';
     this.element.innerHTML = this.getTemplate();
 
-    this.subElements = BasicComponent.findSubElements(this.element);
+    this.subElements = ProductForm.findSubElements(this.element);
 
     this.sortableImages = new SortableList({
       items: [],

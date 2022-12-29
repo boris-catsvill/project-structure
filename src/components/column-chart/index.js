@@ -82,7 +82,7 @@ export default class ColumnChart extends BasicComponent {
 
   update() {
     this.element.style.setProperty('--chart-height', this.chartHeight.toString());
-    this.element.className = BasicComponent.filterClassList({
+    this.element.className = ColumnChart.filterClassList({
       'column-chart': true,
       'column-chart_loading': !this.data?.length
     }).join(' ');
@@ -92,7 +92,7 @@ export default class ColumnChart extends BasicComponent {
 
   async render() {
     this.element.innerHTML = this.getTemplate();
-    this.subElements = BasicComponent.findSubElements(this.element);
+    this.subElements = ColumnChart.findSubElements(this.element);
 
     // noinspection ES6MissingAwait
     this.fetchData();

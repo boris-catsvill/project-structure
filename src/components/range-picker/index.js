@@ -40,7 +40,7 @@ export default class RangePicker extends BasicComponent {
   async render() {
     this.element.className = 'rangepicker';
     this.element.innerHTML = this.template;
-    this.subElements = BasicComponent.findSubElements(this.element);
+    this.subElements = RangePicker.findSubElements(this.element);
 
     return super.render();
   }
