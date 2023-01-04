@@ -1,6 +1,8 @@
 import Router from './router/index.js';
-import tooltip from './components/tooltip/index.js';
+//import tooltip from './components/tooltip/index.js';
+import Tooltip from './components/tooltip/index.js';
 
+const tooltip = new Tooltip;
 tooltip.initialize();
 
 const router = Router.instance();
