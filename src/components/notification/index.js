@@ -15,15 +15,17 @@ export default class NotificationMessage {
         this.render();
     }
     
-    getTemplate() {
-        return `<div class="notification ${this.type}" 
+    getTemplate() { //show notification_
+        return `<div class="notification ${this.type}"
             style="--value:${this._timeDur}s">
+            <div class="notification__content"> 
           <div class="timer"></div>
           <div class="inner-wrapper">
             <div class="notification-header">Notification</div>
             <div class="notification-body">
                 ${this.message}
             </div>
+          </div>
           </div>
         </div>
         `;
@@ -41,7 +43,7 @@ export default class NotificationMessage {
         if(NotificationMessage.lastNotif) {
             NotificationMessage.lastNotif.remove( );
         }
-
+        //this.element.classList.add("show")
         parentElement.append(this.element);        
         
         this.timerId = setTimeout( ()=> {

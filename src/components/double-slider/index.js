@@ -75,7 +75,7 @@ export default class DoubleSlider {
   
     get template() {
       const { from, to } = this.selected;
-  
+      
       return `<div class="range-slider">
         <span data-element="from">${this.formatValue(from)}</span>
         <div data-element="inner" class="range-slider__inner">
