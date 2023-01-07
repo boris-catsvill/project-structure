@@ -1,4 +1,3 @@
-//import ProductForm from "../../../components/product-form";
 import SortableTable from '../../../components/sortable-table/index.js';
 import DoubleSlider from '../../../components/double-slider/index.js';
 import header from './products-header.js';
@@ -26,13 +25,10 @@ export default class Page {
     }, 1000 );
   }
 
-  toggleSidebar(event) {
-    const sidePanel = event.target.closest('.sidebar__toggler');
-    if (sidePanel) {
-      document.body.classList.toggle("is-collapsed-sidebar");
-    }    
-  }
+  constructor( match = [] ){
 
+  }
+  
   async render() {
     const element = document.createElement('div');
 
@@ -81,7 +77,6 @@ export default class Page {
   }
 
   async initComponents() {
-    /**/
     this.components.sliderContainer = new DoubleSlider({
       min: 0,
       max: 4000,
@@ -91,6 +86,7 @@ export default class Page {
     const sortableTable = new SortableTable(header, {
       url: `api/rest/products`,
       isSortLocally: false,
+      step : 30,
       rowRef : { object:`products`, field :'id' }
     }, {'_embed': 'subcategory.category'});
     this.components.sortableTable = sortableTable; 
@@ -157,8 +153,6 @@ export default class Page {
 
   initEventListeners () {
     const { signal } = this.evntSignal;    
-    const sidePanel = document.querySelector('.sidebar__toggler');
-    sidePanel.addEventListener('click', (event) => this.toggleSidebar(event) , { signal });
       
     this.filters.filterName.addEventListener("input", this.onFilterUpdate , { signal });
     this.subElements.sliderContainer.addEventListener("range-select", this.onFilterUpdate , { signal });

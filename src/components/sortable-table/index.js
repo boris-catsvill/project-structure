@@ -4,15 +4,13 @@ import fetchJson from '../../utils/fetch-json.js';
 
 export default class SortableTable {
   initStep = 20;
-  initStart = 1;
+  initStart = 0;
 
   element;
   subElements = {};
   data = [];
   loading = false;
   queryParams = {};
-  step = 20;
-  start = 1;
   end = this.start + this.step;
 
   onWindowScroll = async() => {
@@ -72,7 +70,7 @@ export default class SortableTable {
     rowRef = {},
     isSortLocally = false,
     step = 20,
-    start = 1,
+    start = 0,
     end = start + step
   } = {},
   queryParams = {}) {
@@ -82,6 +80,7 @@ export default class SortableTable {
     this.sorted = sorted;
     this.isSortLocally = isSortLocally;
     this.step = step;
+    this.initStep = step;
     this.start = start;
     this.end = end;
     this.rowRef = rowRef; //{ object:`...`, field :'...' }

@@ -11,13 +11,6 @@ export default class Page{
   // events
   evntSignal = new AbortController();
 
-  toggleSidebar(event) {
-    const sidePanel = event.target.closest('.sidebar__toggler');
-    if (sidePanel) {
-      document.body.classList.toggle("is-collapsed-sidebar");
-    }    
-  }
-
   onSubcatReorder = (event) => {
     const restData = event.detail.map((item) => {
       return { id: item.id, weight: item.order };
@@ -29,7 +22,7 @@ export default class Page{
     notification.show();
   }
 
-  constructor( url = '/api/rest/categories', queryParams = { } ) {
+  constructor(  match = [], url = '/api/rest/categories', queryParams = { } ) {
     this.url = new URL(url, process.env.BACKEND_URL);
     this.queryParams = queryParams;
   }
@@ -115,9 +108,6 @@ export default class Page{
 
   initEventListeners () {
     const { signal } = this.evntSignal;
-
-    const sidePanel = document.querySelector('.sidebar__toggler');
-    sidePanel.addEventListener('click', (event) => this.toggleSidebar(event) , { signal });
   
     this.components.categoriesContainer.element.addEventListener(
       'subcategory-reorder',(event) =>this.onSubcatReorder(event), { signal });

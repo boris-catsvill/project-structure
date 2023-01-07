@@ -72,9 +72,9 @@ export default class ProductForm {
     this.productId = productId;
   }
 
-  template() {
+  template() { //
     return `
-      <div class="product-form">
+    <div class="product-form">
       <form data-element="productForm" class="form-grid">
         <div class="form-group form-group__half_left">
           <fieldset>
@@ -153,9 +153,9 @@ export default class ProductForm {
             ${this.productId ? 'Сохранить' : 'Добавить'} товар
           </button>
         </div>
-      </form>
+      </form>    
     </div>
-    `;
+    `; //
   }
 
   async render() {
@@ -203,7 +203,7 @@ export default class ProductForm {
   async save() {
     const product = this.getFormData();
 
-    const result = await fetchJson(`${process.env.BACKEND_URL}/api/rest/products`, {
+    const result = await fetchJson(`${process.env.BACKEND_URL}api/rest/products`, {
       method: this.productId ? 'PATCH' : 'PUT',
       headers: {
         'Content-Type': 'application/json'
@@ -223,7 +223,7 @@ export default class ProductForm {
     const values = {};
 
     for (const field of fields) {
-      const value = getValue(field);
+      const value = getValue(field).value;
 
       values[field] = formatToNumber.includes(field)
         ? parseInt(value)
@@ -247,8 +247,8 @@ export default class ProductForm {
 
   dispatchEvent(id) {
     const event = this.productId
-      ? new CustomEvent('product-updated', { detail: id })
-      : new CustomEvent('product-saved');
+      ? new CustomEvent('product-updated', { bubbles: true, detail: id })
+      : new CustomEvent('product-saved', { bubbles: true, detail: id });
 
     this.element.dispatchEvent(event);
   }
@@ -266,11 +266,11 @@ export default class ProductForm {
   }
 
   loadProductData(productId) {
-    return fetchJson(`${process.env.BACKEND_URL}/api/rest/products?id=${productId}`);
+    return fetchJson(`${process.env.BACKEND_URL}api/rest/products?id=${productId}`);
   }
 
   loadCategoriesList() {
-    return fetchJson(`${process.env.BACKEND_URL}/api/rest/categories?_sort=weight&_refs=subcategory`);
+    return fetchJson(`${process.env.BACKEND_URL}api/rest/categories?_sort=weight&_refs=subcategory`);
   }
 
   createCategoriesSelect() {
@@ -319,12 +319,12 @@ export default class ProductForm {
     wrapper.innerHTML = `
       <li class="products-edit__imagelist-item sortable-list__item">
         <span>
-          <img src="icon-grab.svg" data-grab-handle alt="grab">
+          <img src="/assets/icons/icon-grab.svg" data-grab-handle alt="grab">
           <img class="sortable-table__cell-img" alt="${escapeHtml(name)}" src="${escapeHtml(url)}">
           <span>${escapeHtml(name)}</span>
         </span>
         <button type="button">
-          <img src="icon-trash.svg" alt="delete" data-delete-handle>
+          <img src="/assets/icons/icon-trash.svg" alt="delete" data-delete-handle>
         </button>
       </li>`;
 
@@ -345,6 +345,8 @@ export default class ProductForm {
   }
 
   remove() {
-    this.element.remove();
+    if (this.element){
+      this.element.remove();
+    }    
   }
 }

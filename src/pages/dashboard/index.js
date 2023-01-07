@@ -13,11 +13,8 @@ export default class Page {
   // events
   evntSignal = new AbortController();
 
-  toggleSidebar(event) {
-    const sidePanel = event.target.closest('.sidebar__toggler');
-    if (sidePanel) {
-      document.body.classList.toggle("is-collapsed-sidebar");
-    }    
+  constructor( match = [] ){
+
   }
 
   async updateTableComponent (from, to) {
@@ -130,10 +127,6 @@ export default class Page {
       this.updateChartsComponents(from, to);
       this.updateTableComponent(from, to);
     });
-    
-    const { signal } = this.evntSignal;
-    const sidePanel = document.querySelector('.sidebar__toggler');
-    sidePanel.addEventListener('click', (event) => this.toggleSidebar(event) , { signal });
   }
   
   remove () {
