@@ -151,20 +151,18 @@ export default class RangePicker {
 
       if (this.selected.from) {
         let elem = this.element.querySelector(`[data-value="${this.selected.from.toISOString()}"]`);
-        // eslint-disable-next-line no-unused-expressions
         elem && elem.closest(".rangepicker__cell").classList.add("rangepicker__selected-from");
       }
       if (this.selected.to) {
         let elem = this.element.querySelector(`[data-value="${this.selected.to.toISOString()}"]`);
-        // eslint-disable-next-line no-unused-expressions
         elem && elem.closest(".rangepicker__cell").classList.add("rangepicker__selected-to");
       }
     }
   }
 
   weekDayNames(locale) {
-    var baseDate = new Date(Date.UTC(2023, 0, 2)); // any Monday
-    var weekDays = [];
+    const baseDate = new Date(Date.UTC(2023, 0, 2)); // any Monday
+    const weekDays = [];
     for(i = 0; i < 7; i++)
     {       
         weekDays.push(baseDate.toLocaleDateString(locale, { weekday: 'short' }));
