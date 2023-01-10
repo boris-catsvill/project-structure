@@ -1,14 +1,14 @@
-export default class RangePicker {
-  element = null;
-  subElements = {};
+import BasicComponent from '../basic-component';
+
+export default class RangePicker extends BasicComponent {
   selectingFrom = true;
   selected = {
     from: new Date(),
     to: new Date()
   };
 
-  static formatDate (date) {
-    return date.toLocaleString('ru', {dateStyle: 'short'})
+  static formatDate(date) {
+    return date.toLocaleString('ru', { dateStyle: 'short' });
   }
 
   onDocumentClick = event => {
@@ -20,55 +20,42 @@ export default class RangePicker {
     }
   };
 
-  constructor({from = new Date(), to = new Date()} = {}) {
+  constructor({ from = new Date(), to = new Date() } = {}) {
+    super();
     this.showDateFrom = new Date(from);
-    this.selected = {from, to};
-
-    this.render();
+    this.selected = { from, to };
   }
 
-  get template () {
+  get template() {
     const from = RangePicker.formatDate(this.selected.from);
     const to = RangePicker.formatDate(this.selected.to);
 
-    return `<div class="rangepicker">
-      <div class="rangepicker__input" data-elem="input">
-        <span data-elem="from">${from}</span> -
-        <span data-elem="to">${to}</span>
+    return `<div class="rangepicker__input" data-element="input">
+        <span data-element="from">${from}</span> -
+        <span data-element="to">${to}</span>
       </div>
-      <div class="rangepicker__selector" data-elem="selector"></div>
-    </div>`;
+      <div class="rangepicker__selector" data-element="selector"></div>`;
   }
 
-  render() {
-    const element = document.createElement('div');
+  async render() {
+    this.element.className = 'rangepicker';
+    this.element.innerHTML = this.template;
+    this.subElements = RangePicker.findSubElements(this.element);
 
-    element.innerHTML = this.template;
-
-    this.element = element.firstElementChild;
-    this.subElements = this.getSubElements(element);
-
-    this.initEventListeners();
-
-    return Promise.resolve(this.element);
+    return super.render();
   }
 
-  getSubElements (element) {
-    const subElements = {};
-
-    for (const subElement of element.querySelectorAll('[data-elem]')) {
-      subElements[subElement.dataset.elem] = subElement;
-    }
-
-    return subElements;
-  }
-
-  initEventListeners () {
-    const {input, selector} = this.subElements;
+  initEventListeners() {
+    const { input, selector } = this.subElements;
 
     document.addEventListener('click', this.onDocumentClick, true);
     input.addEventListener('click', () => this.toggle());
     selector.addEventListener('click', event => this.onSelectorClick(event));
+  }
+
+  removeEventListeners() {
+    // Warning! To remove listener  MUST be passes the same event phase
+    document.removeEventListener('click', this.onDocumentClick, true);
   }
 
   toggle() {
@@ -76,7 +63,7 @@ export default class RangePicker {
     this.renderDateRangePicker();
   }
 
-  onSelectorClick({target}) {
+  onSelectorClick({ target }) {
     if (target.classList.contains('rangepicker__cell')) {
       this.onRangePickerCellClick(target);
     }
@@ -110,12 +97,12 @@ export default class RangePicker {
     this.renderHighlight();
   }
 
-  prev () {
+  prev() {
     this.showDateFrom.setMonth(this.showDateFrom.getMonth() - 1);
     this.renderDateRangePicker();
   }
 
-  next () {
+  next() {
     this.showDateFrom.setMonth(this.showDateFrom.getMonth() + 1);
     this.renderDateRangePicker();
   }
@@ -165,7 +152,7 @@ export default class RangePicker {
     date.setDate(1);
 
     // text-transform: capitalize
-    const monthStr = date.toLocaleString('ru', {month: 'long'});
+    const monthStr = date.toLocaleString('ru', { month: 'long' });
 
     let table = `<div class="rangepicker__calendar">
       <div class="rangepicker__month-indicator">
@@ -215,7 +202,7 @@ export default class RangePicker {
       if (this.selectingFrom) {
         this.selected = {
           from: dateValue,
-          to:   null
+          to: null
         };
         this.selectingFrom = false;
         this.renderHighlight();
@@ -235,34 +222,24 @@ export default class RangePicker {
         this.dispatchEvent();
         this.close();
         this.subElements.from.innerHTML = RangePicker.formatDate(this.selected.from);
-        this.subElements.to.innerHTML = RangePicker.formatDate(this.selected.to)
+        this.subElements.to.innerHTML = RangePicker.formatDate(this.selected.to);
       }
     }
   }
 
-  dispatchEvent () {
+  dispatchEvent() {
     this.element.dispatchEvent(new CustomEvent('date-select', {
       bubbles: true,
-      detail:  this.selected
+      detail: this.selected
     }));
   }
 
-  remove () {
-    this.element.remove();
-    // TODO: Warning! To remove listener  MUST be passes the same event phase
-    document.removeEventListener('click', this.onDocumentClick, true);
-  }
-
   destroy() {
-    this.remove();
-    this.element = null;
-    this.subElements = {};
+    super.destroy();
     this.selectingFrom = true;
     this.selected = {
       from: new Date(),
       to: new Date()
     };
-
-    return this;
   }
 }

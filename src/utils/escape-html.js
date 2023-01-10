@@ -1,4 +1,4 @@
-export default string => string
+export default (string = '') => string
   .replace(/&/g, '&amp;')
   .replace(/"/g, '&quot;')
   .replace(/'/g, '&#39;')

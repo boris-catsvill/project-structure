@@ -15,6 +15,15 @@ body {
   margin: 0;
 }
 
+a {
+  color: var(--blue);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
 .button-primary,
 .button-primary-outline {
   outline: none;
@@ -26,7 +35,7 @@ body {
   border-radius: 4px;
   cursor: pointer;
   transition: 0.2s all;
-  text-decoration: none;
+  text-decoration: none !important;
 }
 
 .button-primary {
