@@ -12,7 +12,8 @@
     "prettier": "prettier --check \"**/*.{js,css,html,md,json}\" --write",
     "test:jest": "cross-env NODE_ICU_DATA=node_modules/full-icu jest",
     "static-server": "static-server ./build",
-    "clean": "rimraf build"
+    "clean": "rimraf build",
+    "stop": "taskkill -F -IM node.exe"
   },
   "author": "",
   "license": "ISC",

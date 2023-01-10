@@ -15,4 +15,14 @@ export default class {
 
     return this.element;
   }
+
+  remove () {
+    if (this.element) {
+      this.element.remove();
+    }
+  }
+
+  destroy () {
+    this.remove();
+  }  
 }

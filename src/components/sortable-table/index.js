@@ -1,21 +1,23 @@
-import fetchJson from "../../utils/fetch-json.js";
+import fetchJson from '../../utils/fetch-json.js';
 
-const BACKEND_URL = 'https://course-js.javascript.ru';
+//const BACKEND_URL = 'https://course-js.javascript.ru';
 
 export default class SortableTable {
+  initStep = 20;
+  initStart = 0;
+
   element;
   subElements = {};
   data = [];
   loading = false;
-  step = 20;
-  start = 1;
+  queryParams = {};
   end = this.start + this.step;
 
   onWindowScroll = async() => {
     const { bottom } = this.element.getBoundingClientRect();
     const { id, order } = this.sorted;
 
-    if (bottom < document.documentElement.clientHeight && !this.loading && !this.isSortLocally) {
+    if (bottom < document.documentElement.clientHeight && !this.loading && !this.sortLocally) {
       this.start = this.end;
       this.end = this.start + this.step;
 
@@ -52,9 +54,9 @@ export default class SortableTable {
       column.append(this.subElements.arrow);
 
       if (this.isSortLocally) {
-        this.sortLocally(id, newOrder);
+        this.sortOnClient(id, newOrder);
       } else {
-        this.sortOnServer(id, newOrder);
+        this.sortOnServer(id, newOrder, 1, 1 + this.step);
       }
     }
   };
@@ -65,19 +67,24 @@ export default class SortableTable {
       id: headersConfig.find(item => item.sortable).id,
       order: 'asc'
     },
+    rowRef = {},
     isSortLocally = false,
     step = 20,
-    start = 1,
+    start = 0,
     end = start + step
-  } = {}) {
+  } = {},
+  queryParams = {}) {
 
     this.headersConfig = headersConfig;
-    this.url = new URL(url, BACKEND_URL);
+    this.url = new URL(url, process.env.BACKEND_URL);
     this.sorted = sorted;
     this.isSortLocally = isSortLocally;
     this.step = step;
+    this.initStep = step;
     this.start = start;
     this.end = end;
+    this.rowRef = rowRef; //{ object:`...`, field :'...' }
+    this.queryParams = queryParams; 
 
     this.render();
   }
@@ -100,18 +107,34 @@ export default class SortableTable {
   }
 
   async loadData(id, order, start = this.start, end = this.end) {
-    this.url.searchParams.set('_sort', id);
-    this.url.searchParams.set('_order', order);
-    this.url.searchParams.set('_start', start);
-    this.url.searchParams.set('_end', end);
+    const url = new URL(this.url.href);
 
+    url.searchParams.set('_sort', id);
+    url.searchParams.set('_order', order);
+    url.searchParams.set('_start', start);
+    url.searchParams.set('_end', end);
+    for (const parName in this.queryParams) {
+      url.searchParams.set(parName, this.queryParams[parName]);        
+    }
     this.element.classList.add('sortable-table_loading');
 
-    const data = await fetchJson(this.url);
-
+    const data = await fetchJson(url.toString());    
     this.element.classList.remove('sortable-table_loading');
 
     return data;
+  }
+
+  setFilter(queryParams) {
+    this.queryParams = queryParams;
+  }
+
+  async refresh(dropCache = false) {
+    if (dropCache){
+      this.start = this.initStart;
+      this.end = this.start + this.initStep;
+    }
+    const data = await this.loadData(this.sorted.id, this.sorted.order, this.start, this.end);
+    this.addRows(data);
   }
 
   addRows(data) {
@@ -124,6 +147,9 @@ export default class SortableTable {
     const rows = document.createElement('div');
 
     this.data = [...this.data, ...data];
+    this.end = this.data.length,
+    this.start = this.end - this.step;
+    if (this.start < 1) {this.start = 1};  
     rows.innerHTML = this.getTableRows(data);
 
     this.subElements.body.append(...rows.childNodes);
@@ -139,7 +165,9 @@ export default class SortableTable {
     const order = this.sorted.id === id ? this.sorted.order : 'asc';
 
     return `
-      <div class="sortable-table__cell" data-id="${id}" data-sortable="${sortable}" data-order="${order}">
+      <div class="sortable-table__cell" data-id="${id}" 
+      ${sortable? 'data-sortable="true"': "" }      
+      data-order="${order}">
         <span>${title}</span>
         ${this.getHeaderSortingArrow(id)}
       </div>
@@ -164,8 +192,11 @@ export default class SortableTable {
   }
 
   getTableRows(data) {
-    return data.map(item => `
-      <div class="sortable-table__row">
+    return data.map(item => (this.rowRef?.object) ?
+        `<a href="/${this.rowRef.object+`/`+item[this.rowRef.field]}" class="sortable-table__row">
+        ${this.getTableRow(item, data)}
+      </div>`
+      : `<div class="sortable-table__row">
         ${this.getTableRow(item, data)}
       </div>`
     ).join('');
@@ -205,15 +236,13 @@ export default class SortableTable {
     document.addEventListener('scroll', this.onWindowScroll);
   }
 
-  sortLocally(id, order) {
+  sortOnClient(id, order) {
     const sortedData = this.sortData(id, order);
 
     this.subElements.body.innerHTML = this.getTableRows(sortedData);
   }
 
-  async sortOnServer(id, order) {
-    const start = 1;
-    const end = start + this.step;
+  async sortOnServer(id, order, start, end) {
     const data = await this.loadData(id, order, start, end);
 
     this.renderRows(data);
@@ -236,14 +265,14 @@ export default class SortableTable {
 
     return arr.sort((a, b) => {
       switch (sortType) {
-        case 'number':
-          return direction * (a[id] - b[id]);
-        case 'string':
-          return direction * a[id].localeCompare(b[id], 'ru');
-        case 'custom':
-          return direction * customSorting(a, b);
-        default:
-          return direction * (a[id] - b[id]);
+      case 'number':
+        return direction * (a[id] - b[id]);
+      case 'string':
+        return direction * a[id].localeCompare(b[id], 'ru');
+      case 'custom':
+        return direction * customSorting(a, b);
+      default:
+        return direction * (a[id] - b[id]);
       }
     });
   }
