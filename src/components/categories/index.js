@@ -14,7 +14,7 @@ export default class Category {
     return false; 
   }
 
-  constructor({ item, id = 'Some_id', title = 'Some title' } = {}) {
+  constructor({ item, id = 'catId', title = 'Category title' } = {}) {
     this.item = item;
     this.id = id;
     this.title = title;
@@ -36,17 +36,20 @@ export default class Category {
   }
 
   getSubelements() {
-    const body = this.element.querySelector(".category_body");
-    const header = this.element.querySelector(".category_header");
+    const elements = element.querySelectorAll('[data-element]');
 
-    return { header, body};
+    return [...elements].reduce((accum, subElement) => {
+      accum[subElement.dataset.element] = subElement;
+
+      return accum;
+    }, {});
   }
 
   getTemplate() {
     return `
       <div class="category category_open" data-id="${this.id}">
-      <header class="category_header"> ${this.title} </header>
-      <div class="category_body"> ${this.title} </div>
+      <header data-element="header" class="category_header"> ${this.title} </header>
+      <div data-element="body" class="category_body"> ${this.title} </div>
       </div>`
   }
 

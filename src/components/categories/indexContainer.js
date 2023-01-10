@@ -22,10 +22,10 @@ export default class CategoriesContainer {
   }
 
   onSubcatReorder = (event) => {
-    let ord = 1;
-    const itemOrder = Array.from(event.target.querySelectorAll("[data-id]")).map(t=>({
-        id: t.dataset.id,
-        order: ord++
+    const elements = event.target.querySelectorAll("[data-id]");    
+    const itemOrder = [...elements].map((elem, ord) =>({
+        id: elem.dataset.id,
+        order: ord
     }));
     this.element.dispatchEvent(new CustomEvent("subcategory-reorder", {
         bubbles: true,
@@ -34,7 +34,7 @@ export default class CategoriesContainer {
     return false;
   }
 
-  constructor(list = [{ id : 'Some_id', title : 'Some title', itemList: [] }]) {
+  constructor(list = [{ id : 'containerId', title : 'Container title', itemList: [] }]) {
     this.list = list;
     this.render();
     this.initEventListeners();
@@ -45,34 +45,45 @@ export default class CategoriesContainer {
     const { signal } = this.evntSignal;
 
     const renderArray = this.list.map((catItem) => {
-      let element = null;
-      element = document.createElement('div');
+      const element = document.createElement('div');
       
       element.innerHTML = this.getTemplate(catItem.id, catItem.title);
       const header = element.querySelector(".category__header");
-      const body = element.querySelector(".subcategory-list"); //category__body
+      const body = element.querySelector(".subcategory-list");
       header.addEventListener("pointerdown", (event) =>this.onPointerDown(event), { signal });
         
       element.addEventListener('sortable-list-reorder',
         (event) =>this.onSubcatReorder(event), { signal });
 
       if (catItem.itemList){
-        const catSection = catItem.itemList.map((item)=> {
-          const wrapper = document.createElement('div');
-          wrapper.innerHTML = this.getItemTemplate(
-            item.id, item.title, `<b>${item.count}</b> products`);
-
-          return wrapper.firstElementChild;
-        });
-        const sortableList = new SortableList({ items: catSection });
-        body.append(sortableList.element);
+        this.addListElements(catItem.itemList, body)    
+        this.element.append(element);
       }
-      this.element.append(element);
     });    
+
+    this.subElements = this.getSubelements()
   }
 
+  addListElements(itemList, parent) {
+    const catSection = itemList.map((item)=> {
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = this.getItemTemplate(
+        item.id, item.title, `<b>${item.count}</b> products`);
+
+      return wrapper.firstElementChild;
+    });
+    const sortableList = new SortableList({ items: catSection });
+    parent.append(sortableList.element);
+  }
+  
   getSubelements() {
-    return {};
+    const headers = this.element.querySelectorAll(".category__header");   
+
+    return [...headers].reduce((accum, subElement) => {
+      accum["category_"+subElement.dataset.id] = subElement;
+
+      return accum;
+    }, {});
   }
 
   getTemplate(id, title) {
@@ -91,17 +102,13 @@ export default class CategoriesContainer {
          data-id="${id}">
         <strong>${escapeHtml(name)}</strong>
         <span>${number_str}</span>
-      </li>`; //sortable-list__item
+      </li>`;
   }
 
   initEventListeners() {
     if (!this.evntSignal) {
       this.evntSignal = new AbortController();
     }
-    /*
-    this.components.categoriesContainer.element.addEventListener(
-        'sortable-list-reorder',(event) =>this.onSubcatReorder(event), { signal });
-    */
   }
 
   remove() {

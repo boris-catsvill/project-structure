@@ -9,10 +9,6 @@ export default class Page{
 
   // events
   evntSignal = new AbortController();
-
-  constructor( match = [] ){
-
-  }
   
   async updateTableComponent (from, to) {
     const  dateParams = {
@@ -27,7 +23,8 @@ export default class Page{
 
   async initComponents () {
     const to = new Date();
-    const from = new Date(to.getTime() - (30 * 24 * 60 * 60 * 1000));
+    const from = new Date(to);
+    from.setMonth(from.getMonth() - 1);
 
     const rangePicker = new RangePicker({ from, to });
 

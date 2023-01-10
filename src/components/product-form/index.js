@@ -2,9 +2,6 @@ import SortableList from '../sortable-list/index.js';
 import escapeHtml from '../../utils/escape-html.js';
 import fetchJson from '../../utils/fetch-json.js';
 
-//const IMGUR_CLIENT_ID = '28aaa2e823b03b1';
-//const BACKEND_URL = 'https://course-js.javascript.ru';
-
 export default class ProductForm {
   element;
   subElements = {};
@@ -246,10 +243,8 @@ export default class ProductForm {
   }
 
   dispatchEvent(id) {
-    const event = this.productId
-      ? new CustomEvent('product-updated', { bubbles: true, detail: id })
-      : new CustomEvent('product-saved', { bubbles: true, detail: id });
-
+    const type = this.productId ? 'product-updated' : 'product-saved';
+    const event = CustomEvent(type, { bubbles: true, detail: id })
     this.element.dispatchEvent(event);
   }
 

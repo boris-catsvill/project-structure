@@ -162,6 +162,17 @@ export default class RangePicker {
     }
   }
 
+  weekDayNames(locale) {
+    var baseDate = new Date(Date.UTC(2023, 0, 2)); // any Monday
+    var weekDays = [];
+    for(i = 0; i < 7; i++)
+    {       
+        weekDays.push(baseDate.toLocaleDateString(locale, { weekday: 'short' }));
+        baseDate.setDate(baseDate.getDate() + 1);       
+    }
+    return weekDays;
+  }
+
   renderCalendar(calDate = new Date()) {
     let date = new Date(calDate);
     date.setDate(1);
@@ -184,13 +195,9 @@ export default class RangePicker {
         <time datetime="${monthName}">${monthName}</time>
       </div>
       <div class="rangepicker__day-of-week">
-        <div>Пн</div>
-        <div>Вт</div>
-        <div>Ср</div>
-        <div>Чт</div>
-        <div>Пт</div>
-        <div>Сб</div>
-        <div>Вс</div>
+      ${ this.weekDayNames("ru").map(
+          (dayName)=>'<div>'+dayName+'</div>').join('')
+      }
       </div>
       <div class="rangepicker__date-grid">
         <button type="button" class="rangepicker__cell" 
@@ -199,8 +206,6 @@ export default class RangePicker {
       </div>
     </div>`;
   }
-
-
 
   getSubelements() {
     const result = {};
@@ -226,7 +231,7 @@ export default class RangePicker {
 
   getTemplateSelector() {
     const startDt = new Date(this.baseDate);
-    let endDt = new Date(this.baseDate);
+    const endDt = new Date(this.baseDate);
     endDt.setMonth(endDt.getMonth() + 1);
 
     return `<div class="rangepicker__selector-arrow"></div>

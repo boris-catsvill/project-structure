@@ -1,7 +1,5 @@
 import fetchJson from '../../utils/fetch-json.js';
 
-//const BACKEND_URL = 'https://course-js.javascript.ru';
-
 export default class ColumnChart {
   element;
   subElements = {};
@@ -35,30 +33,32 @@ export default class ColumnChart {
     this.element = element.firstElementChild;
     this.subElements = this.getSubElements(this.element);
 
-    this.loadData(from, to);
+    this.update(from, to)
   }
 
   getHeaderValue(data) {
-    return this.formatHeading(Object.values(data).reduce((accum, item) => (accum + item), 0));
+    return this.formatHeading(
+      Object.values(data).reduce((accum, item) => (accum + item), 0)
+    );
   }
 
   async loadData(from, to) {
-    this.element.classList.add('column-chart_loading');
-    this.subElements.header.textContent = '';
-    this.subElements.body.innerHTML = '';
-
     this.url.searchParams.set('from', from.toISOString());
     this.url.searchParams.set('to', to.toISOString());
 
-    const data = await fetchJson(this.url);
+    return await fetchJson(this.url);
+  }
 
-    this.setNewRange(from, to);
-
+  applyData(data) {
     if (data && Object.values(data).length) {
       this.subElements.header.textContent = this.getHeaderValue(data);
       this.subElements.body.innerHTML = this.getColumnBody(data);
 
       this.element.classList.remove('column-chart_loading');
+    } else {
+      this.element.classList.add('column-chart_loading');
+      this.subElements.header.textContent = '';
+      this.subElements.body.innerHTML = '';      
     }
   }
 
@@ -113,7 +113,9 @@ export default class ColumnChart {
   }
 
   async update(from, to) {
-    return await this.loadData(from, to);
+    this.applyData()
+    const data = await this.loadData(from, to);
+    this.applyData(data);
   }
 
   destroy() {

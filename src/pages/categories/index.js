@@ -24,6 +24,7 @@ export default class Page{
 
   constructor(  match = [], url = '/api/rest/categories', queryParams = { } ) {
     this.url = new URL(url, process.env.BACKEND_URL);
+    this.urlDataUpdate = new URL('/api/rest/subcategories', process.env.BACKEND_URL);
     this.queryParams = queryParams;
   }
 
@@ -52,7 +53,7 @@ export default class Page{
     this.components.categoriesContainer = new Categories(catArray);
   }
   
-  async loadData() {
+  loadData() {
     const url = new URL(this.url.href);
     url.searchParams.set('_sort', 'weight');
     url.searchParams.set('_refs', 'subcategory');
@@ -65,7 +66,8 @@ export default class Page{
   }
 
   async submitChanges(restData) {
-    const url = new URL('/api/rest/subcategories', process.env.BACKEND_URL);
+    const url = this.urlDataUpdate;
+
     await fetchJson(url, {
       method: "PATCH",
       headers: {
