@@ -7,7 +7,7 @@ export default class RangePicker {
     to: new Date()
   };
 
-  static formatDate (date) {
+  static formatDate(date) {
     return date.toLocaleString('ru', {dateStyle: 'short'})
   }
 
@@ -27,7 +27,7 @@ export default class RangePicker {
     this.render();
   }
 
-  get template () {
+  get template() {
     const from = RangePicker.formatDate(this.selected.from);
     const to = RangePicker.formatDate(this.selected.to);
 
@@ -53,7 +53,7 @@ export default class RangePicker {
     return Promise.resolve(this.element);
   }
 
-  getSubElements (element) {
+  getSubElements(element) {
     const subElements = {};
 
     for (const subElement of element.querySelectorAll('[data-elem]')) {
@@ -63,7 +63,7 @@ export default class RangePicker {
     return subElements;
   }
 
-  initEventListeners () {
+  initEventListeners() {
     const {input, selector} = this.subElements;
 
     document.addEventListener('click', this.onDocumentClick, true);
@@ -110,12 +110,12 @@ export default class RangePicker {
     this.renderHighlight();
   }
 
-  prev () {
+  prev() {
     this.showDateFrom.setMonth(this.showDateFrom.getMonth() - 1);
     this.renderDateRangePicker();
   }
 
-  next () {
+  next() {
     this.showDateFrom.setMonth(this.showDateFrom.getMonth() + 1);
     this.renderDateRangePicker();
   }
@@ -158,13 +158,12 @@ export default class RangePicker {
   renderCalendar(showDate) {
     const date = new Date(showDate);
     const getGridStartIndex = dayIndex => {
-      const index = dayIndex === 0 ? 6 : (dayIndex - 1); // make Sunday (0) the last day
+      const index = dayIndex === 0 ? 6 : (dayIndex - 1);
       return index + 1;
     };
 
     date.setDate(1);
 
-    // text-transform: capitalize
     const monthStr = date.toLocaleString('ru', {month: 'long'});
 
     let table = `<div class="rangepicker__calendar">
@@ -177,8 +176,6 @@ export default class RangePicker {
       <div class="rangepicker__date-grid">
     `;
 
-    // first day of month starts after a space
-    // * * * 1 2 3 4
     table += `
       <button type="button"
         class="rangepicker__cell"
@@ -200,7 +197,6 @@ export default class RangePicker {
       date.setDate(date.getDate() + 1);
     }
 
-    // close the table
     table += '</div></div>';
 
     return table;
@@ -240,16 +236,15 @@ export default class RangePicker {
     }
   }
 
-  dispatchEvent () {
+  dispatchEvent() {
     this.element.dispatchEvent(new CustomEvent('date-select', {
       bubbles: true,
       detail:  this.selected
     }));
   }
 
-  remove () {
+  remove() {
     this.element.remove();
-    // TODO: Warning! To remove listener  MUST be passes the same event phase
     document.removeEventListener('click', this.onDocumentClick, true);
   }
 

@@ -1,14 +1,14 @@
 import fetchJson from "../../utils/fetch-json.js";
 
-const BACKEND_URL = 'https://course-js.javascript.ru';
+const BACKEND_URL = process.env.BACKEND_URL;
 
 export default class SortableTable {
   element;
   subElements = {};
   data = [];
   loading = false;
-  step = 20;
-  start = 1;
+  step = 30;
+  start = 0;
   end = this.start + this.step;
 
   onWindowScroll = async() => {
@@ -66,8 +66,8 @@ export default class SortableTable {
       order: 'asc'
     },
     isSortLocally = false,
-    step = 20,
-    start = 1,
+    step = 30,
+    start = 0,
     end = start + step
   } = {}) {
 
@@ -130,9 +130,11 @@ export default class SortableTable {
   }
 
   getTableHeader() {
-    return `<div data-element="header" class="sortable-table__header sortable-table__row">
-      ${this.headersConfig.map(item => this.getHeaderRow(item)).join('')}
-    </div>`;
+    return `
+      <div data-element="header" class="sortable-table__header sortable-table__row">
+        ${this.headersConfig.map(item => this.getHeaderRow(item)).join('')}
+      </div>
+    `;
   }
 
   getHeaderRow({id, title, sortable}) {
@@ -160,15 +162,26 @@ export default class SortableTable {
     return `
       <div data-element="body" class="sortable-table__body">
         ${this.getTableRows(data)}
-      </div>`;
+      </div>
+    `;
   }
 
   getTableRows(data) {
-    return data.map(item => `
-      <div class="sortable-table__row">
-        ${this.getTableRow(item, data)}
-      </div>`
-    ).join('');
+    return data.map(item => {
+      if (window.location.pathname === '/sales') {
+        return `
+          <div class="sortable-table__row">
+            ${this.getTableRow(item, data)}
+          </div>
+        `;
+      } else {
+        return `
+          <a href="/products/${item.id}" class="sortable-table__row">
+            ${this.getTableRow(item, data)}
+          </a>
+        `;
+      }
+    }).join('');
   }
 
   getTableRow(item) {
@@ -197,11 +210,13 @@ export default class SortableTable {
         <div data-element="emptyPlaceholder" class="sortable-table__empty-placeholder">
           No products
         </div>
-      </div>`;
+      </div>
+    `;
   }
 
   initEventListeners() {
     this.subElements.header.addEventListener('pointerdown', this.onSortClick);
+
     document.addEventListener('scroll', this.onWindowScroll);
   }
 

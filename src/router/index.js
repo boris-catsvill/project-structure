@@ -26,6 +26,7 @@ export default class Router {
     if (!this._instance) {
       this._instance = new Router();
     }
+
     return this._instance;
   }
 
