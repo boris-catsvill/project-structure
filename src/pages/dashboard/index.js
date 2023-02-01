@@ -20,11 +20,13 @@ export default class Page {
     const customersData = fetchJson(CUSTOMERS);
 
     const data = await Promise.all([ordersData, salesData, customersData]);
+
     return data.map(item => Object.values(item));
   }
 
   async updateTableComponent (from, to) {
     const data = await fetchJson(`${process.env.BACKEND_URL}api/dashboard/bestsellers?_start=1&_end=20&from=${from.toISOString()}&to=${to.toISOString()}`);
+    
     this.components.sortableTable.addRows(data);
   }
 
@@ -41,7 +43,8 @@ export default class Page {
 
   async initComponents () {
     const to = new Date();
-    const from = new Date(to.getTime() - (30 * 24 * 60 * 60 * 1000));
+    const from = new Date(to.getTime() - (30 * 30 * 60 * 60 * 1000));
+
     const [ordersData, salesData, customersData] = await this.getDataForColumnCharts(from, to);
 
     const rangePicker = new RangePicker({
@@ -73,45 +76,40 @@ export default class Page {
       value: customersData.reduce((accum, item) => accum + item),
     });
 
-    this.components.sortableTable = sortableTable;
-    this.components.ordersChart = ordersChart;
-    this.components.salesChart = salesChart;
-    this.components.customersChart = customersChart;
-    this.components.rangePicker = rangePicker;
+    this.components = {
+      sortableTable,
+      ordersChart,
+      salesChart,
+      customersChart,
+      rangePicker
+    }
   }
 
-  get template () {
-    return `<div class="dashboard">
-      <div class="content__top-panel">
-        <h2 class="page-title">Dashboard</h2>
-        <!-- RangePicker component -->
-        <div data-element="rangePicker"></div>
-      </div>
-      <div data-element="chartsRoot" class="dashboard__charts">
-        <!-- column-chart components -->
-        <div data-element="ordersChart" class="dashboard__chart_orders"></div>
-        <div data-element="salesChart" class="dashboard__chart_sales"></div>
-        <div data-element="customersChart" class="dashboard__chart_customers"></div>
-      </div>
-
-      <h3 class="block-title">Best sellers</h3>
-
-      <div data-element="sortableTable">
-        <!-- sortable-table component -->
-      </div>
-    </div>`;
+  getTemplate () {
+    return `
+      <div class="dashboard">
+        <div class="content__top-panel">
+          <h2 class="page-title">Панель управления</h2>
+          <div data-element="rangePicker"></div>
+        </div>
+        <div data-element="chartsRoot" class="dashboard__charts">
+          <div data-element="ordersChart" class="dashboard__chart_orders"></div>
+          <div data-element="salesChart" class="dashboard__chart_sales"></div>
+          <div data-element="customersChart" class="dashboard__chart_customers"></div>
+        </div>
+        <h3 class="block-title">Лидеры продаж</h3>
+      </div>`;
   }
 
   async render () {
-    const element = document.createElement('div');
+    const wrapper = document.createElement('div');
 
-    element.innerHTML = this.template;
+    wrapper.innerHTML = this.getTemplate();
 
-    this.element = element.firstElementChild;
+    this.element = wrapper.firstElementChild;
     this.subElements = this.getSubElements(this.element);
 
     await this.initComponents();
-
     this.renderComponents();
     this.initEventListeners();
 
@@ -120,11 +118,15 @@ export default class Page {
 
   renderComponents () {
     Object.keys(this.components).forEach(component => {
-      const root = this.subElements[component];
-      const { element } = this.components[component];
+			const root = this.subElements[component];
+			const { element } = this.components[component];
 
-      root.append(element);
-    });
+			if (component === 'sortableTable') {
+				this.element.append(element);
+			} else {
+				root.append(element);
+			}
+		});
   }
 
   getSubElements ($element) {
@@ -140,6 +142,7 @@ export default class Page {
   initEventListeners () {
     this.components.rangePicker.element.addEventListener('date-select', event => {
       const { from, to } = event.detail;
+
       this.updateChartsComponents(from, to);
       this.updateTableComponent(from, to);
     });
