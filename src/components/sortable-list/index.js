@@ -1,191 +1,105 @@
 export default class SortableList {
-  element;
+    element;
+    current;
+    placeholder;
+    shiftX = 10;
+    shiftY = 10;
+    xPosition = 0;
 
-  onDocumentPointerMove = ({clientX, clientY}) => {
-    this.moveDraggingAt(clientX, clientY);
-
-    const {firstElementChild, children} = this.element;
-    const {top: firstElementTop} = firstElementChild.getBoundingClientRect();
-    const {bottom} = this.element.getBoundingClientRect();
-
-    if (clientY < firstElementTop) {
-      this.movePlaceholderAt(0);
-    } else if (clientY > bottom) {
-      this.movePlaceholderAt(children.length);
-    } else {
-      for (let i = 0; i < children.length; i++) {
-        const li = children[i];
-
-        // ignore to prevent bugs when dragging between elements
-        if (li !== this.draggingElem) {
-          const {top, bottom} = li.getBoundingClientRect();
-          const {offsetHeight: height} = li;
-
-          if (clientY > top && clientY < bottom) {
-            // inside the element (y-axis)
-            if (clientY < top + height / 2) {
-              // upper half of the element
-              this.movePlaceholderAt(i);
-              break;
-            } else {
-              // lower half of the element
-              this.movePlaceholderAt(i + 1);
-              break;
-            }
-          }
+    onPointerDown = event => {
+        let elem = event.target.closest('[data-delete-handle]');
+        if (elem) {
+            this.delete(elem);
+            return;
         }
-      }
-    }
 
-    this.scrollIfCloseToWindowEdge(clientY);
-  };
+        elem = event.target.closest('[data-grab-handle]');
+        if (elem) {
 
-  onDocumentPointerUp = () => {
-    this.dragStop();
-  };
+            this.xPosition = event.clientX;
 
-  constructor({items = []} = {}) {
-    this.items = items;
+            this.placeholder = document.createElement('div');
+            this.placeholder.classList.add('sortable-list__placeholder');
 
-    this.render();
-  }
+            this.current = elem.closest('.sortable-list__item');
 
-  render() {
-    this.element = document.createElement('ul');
-    this.element.className = 'sortable-list';
+            const rect = this.current.getBoundingClientRect();
+            this.placeholder.style.height = rect.height + 'px';
 
-    this.addItems();
-    this.initEventListeners();
-  }
+            this.shiftX = event.clientX - rect.left;
+            this.shiftY = event.clientY - rect.top;
 
-  initEventListeners() {
-    this.element.addEventListener('pointerdown', event => this.onPointerDown(event));
-  }
+            this.current.before(this.placeholder);
 
-  addItems() {
-    // item is a DOM element
-    for (let item of this.items) {
-      item.classList.add('sortable-list__item');
-    }
+            this.current.ondragstart = () => false;
+            this.current.classList.add('sortable-list__item_dragging');
+            this.current.style.width = rect.width + 'px';
 
-    this.element.append(...this.items);
-  }
-
-  onPointerDown(event) {
-    if (event.which !== 1) { // must be left-button
-      return false;
-    }
-
-    const itemElem = event.target.closest('.sortable-list__item');
-
-    if (itemElem) {
-      if (event.target.closest('[data-grab-handle]')) {
-        event.preventDefault();
-
-        this.dragStart(itemElem, event);
-      }
-
-      if (event.target.closest('[data-delete-handle]')) {
-        event.preventDefault();
-
-        itemElem.remove();
-      }
-    }
-  }
-
-  dragStart(itemElem, {clientX, clientY}) {
-    this.elementInitialIndex = [...this.element.children].indexOf(itemElem);
-
-    this.pointerInitialShift = {
-      x: clientX - itemElem.getBoundingClientRect().x,
-      y: clientY - itemElem.getBoundingClientRect().y
-    };
-
-    this.draggingElem = itemElem;
-
-    this.placeholderElem = document.createElement('li');
-    this.placeholderElem.className = 'sortable-list__placeholder';
-
-    // itemElem will get position:fixed
-    // so its width will be auto-set to fit the parent container
-    itemElem.style.width = `${itemElem.offsetWidth}px`;
-    itemElem.style.height = `${itemElem.offsetHeight}px`;
-
-    this.placeholderElem.style.width = itemElem.style.width;
-    this.placeholderElem.style.height = itemElem.style.height;
-
-    itemElem.classList.add('sortable-list__item_dragging');
-
-    itemElem.after(this.placeholderElem);
-
-    // move to the end, to be over other list elements
-    this.element.append(itemElem);
-
-    this.moveDraggingAt(clientX, clientY);
-
-    document.addEventListener('pointermove', this.onDocumentPointerMove);
-    document.addEventListener('pointerup', this.onDocumentPointerUp);
-  }
-
-  moveDraggingAt(clientX, clientY) {
-    this.draggingElem.style.left = clientX - this.pointerInitialShift.x + 'px';
-    this.draggingElem.style.top = clientY - this.pointerInitialShift.y + 'px';
-  }
-
-  scrollIfCloseToWindowEdge(clientY) {
-    const scrollingValue = 10;
-    const threshold = 20;
-
-    if (clientY < threshold) {
-      window.scrollBy(0, -scrollingValue);
-    } else if (clientY > document.documentElement.clientHeight - threshold) {
-      window.scrollBy(0, scrollingValue);
-    }
-  }
-
-  movePlaceholderAt(index) {
-    const currentElement = this.element.children[index];
-
-    if (currentElement !== this.placeholderElem) {
-      this.element.insertBefore(this.placeholderElem, currentElement);
-    }
-  }
-
-  dragStop() {
-    const placeholderIndex = [...this.element.children].indexOf(this.placeholderElem);
-
-    // drop element back
-    this.placeholderElem.replaceWith(this.draggingElem);
-    this.draggingElem.classList.remove('sortable-list__item_dragging');
-
-    this.draggingElem.style.left = '';
-    this.draggingElem.style.top = '';
-    this.draggingElem.style.width = '';
-    this.draggingElem.style.height = '';
-
-    document.removeEventListener('pointermove', this.onDocumentPointerMove);
-    document.removeEventListener('pointerup', this.onDocumentPointerUp);
-
-    this.draggingElem = null;
-
-    if (placeholderIndex !== this.elementInitialIndex) {
-      this.element.dispatchEvent(new CustomEvent('sortable-list-reorder', {
-        bubbles: true,
-        details: {
-          from: this.elementInitialIndex,
-          to: placeholderIndex
+            document.addEventListener('pointermove', this.onPointerMove);
+            document.addEventListener('pointerup', this.onPointerUp, { once: true });
         }
-      }));
     }
-  }
 
-  remove() {
-    this.element.remove();
-    document.removeEventListener('pointermove', this.onDocumentPointerMove);
-    document.removeEventListener('pointerup', this.onDocumentPointerUp);
-  }
+    onPointerMove = event => {  
+        if (event.clientY <= 0) return;
 
-  destroy() {
-    this.remove();
-  }
+        this.current.style.left = this.xPosition + 1 + 'px';
+        this.current.style.top = event.clientY + 1 + 'px';
+ 
+        const elem = document.elementFromPoint(this.xPosition, event.clientY).closest('.sortable-list__item');
+        
+        this.current.style.left = event.clientX - this.shiftX + 'px';
+        this.current.style.top = event.clientY - this.shiftY + 'px';
+
+        if (!elem) return;
+
+        const rect = elem.getBoundingClientRect();
+        if (event.clientY - rect.y > rect.height/2) {
+            elem.after(this.placeholder);
+        } else {
+            elem.before(this.placeholder);
+        }  
+
+    }
+
+    onPointerUp = event => {
+        document.removeEventListener('pointermove', this.onPointerMove);
+        this.current.classList.remove('sortable-list__item_dragging');
+
+        this.placeholder.before(this.current);
+        this.current.style = "";
+        this.current = null;
+        this.placeholder.remove();
+        this.placeholder = null;
+    }
+
+    constructor({items}) {
+        this.items = items;
+        this.render();
+
+        this.element.addEventListener('pointerdown', this.onPointerDown);
+    }
+
+    render() {
+        const ul = document.createElement('ul');
+        ul.classList.add('sortable-list');
+        this.items.forEach(li => {
+            li.classList.add('sortable-list__item');
+            ul.append(li)            
+        });
+        this.element = ul;
+    }
+
+    delete(elem) {
+        const li = elem.closest('.sortable-list__item')
+        li.remove();
+    }
+
+    remove() {
+        this.element.remove();
+    }
+
+    destroy() {
+        this.remove();
+    }
 }
