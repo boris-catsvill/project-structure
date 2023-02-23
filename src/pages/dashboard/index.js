@@ -1,7 +1,6 @@
 import RangePicker from '../../components/range-picker/index.js';
 import SortableTable from '../../components/sortable-table/index.js';
 import ColumnChart from '../../components/column-chart/index.js';
-import NotificationMessage from '../../components/notification/index.js';
 import header from './bestsellers-header.js';
 
 export default class Page {

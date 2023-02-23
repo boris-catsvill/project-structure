@@ -27,7 +27,12 @@ export default class SortableTable {
       sorted = {
         id: headerConfig.find(item => item.sortable).id,
         order: 'asc'
-      }
+      },
+      namesForApiRange = {
+        from: 'from',
+        to: 'to'
+      },
+      linkRow = { hrefTemplate: item => `/product/${item}`, field: 'id' }
     }
   ) {
     this.headerConfig = headerConfig;
@@ -36,6 +41,8 @@ export default class SortableTable {
     this.isSortLocally = isSortLocally;
     this.url = url;
     this.range = range;
+    this.namesForApiRange = namesForApiRange;
+    this.linkRow = linkRow;
 
     this.render();
   }
@@ -122,10 +129,10 @@ export default class SortableTable {
     query.searchParams.set('_start', this.data.length);
     query.searchParams.set('_end', Number(this.data.length + this.LOAD_COUNT));
     if (range.from) {
-      query.searchParams.set('from', range.from.toISOString());
+      query.searchParams.set(this.namesForApiRange.from, range.from.toISOString());
     }
     if (range.to) {
-      query.searchParams.set('to', range.to.toISOString());
+      query.searchParams.set(this.namesForApiRange.to, range.to.toISOString());
     }
 
     let data = [];
@@ -229,16 +236,23 @@ export default class SortableTable {
 
   getBodyRowTemplate(row = {}) {
     if (this.isConfigNotEmpty() && row) {
-      return `<a href="/products/${row.id}" class="sortable-table__row">
+      const content = this.headerConfig
+        .map(headerColumn => {
+          return headerColumn.template
+            ? `<div class="sortable-table__cell">${headerColumn.template(
+                row[headerColumn.id]
+              )}</div>`
+            : `<div class="sortable-table__cell">${row[headerColumn.id] || ''}</div>`;
+        })
+        .join('');
 
-     ${this.headerConfig
-       .map(headerColumn => {
-         return headerColumn.template
-           ? headerColumn.template(row[headerColumn.id])
-           : `<div class="sortable-table__cell">${row[headerColumn.id] || ''}</div>`;
-       })
-       .join('')}
-    </a>`;
+      if (this.linkRow) {
+        return `<a href="${this.linkRow.hrefTemplate(
+          row[this.linkRow.field]
+        )}" class="sortable-table__row">${content}</a>`;
+      } else {
+        return `<div class="sortable-table__row">${content}</div>`;
+      }
     }
     return '';
   }
