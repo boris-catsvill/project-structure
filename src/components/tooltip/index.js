@@ -1,4 +1,4 @@
-class Tooltip {
+export class Tooltip {
   static #onlyInstance = null;
   message = "";
   element = null;
@@ -64,4 +64,6 @@ class Tooltip {
   }
 }
 
-export default Tooltip;
+const tooltip = new Tooltip();
+
+export default tooltip;

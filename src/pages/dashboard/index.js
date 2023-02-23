@@ -3,9 +3,8 @@ import SortableTable from '../../components/sortable-table/index.js';
 import ColumnChart from '../../components/column-chart/index.js';
 import header from "./bestsellers-header.js";
 
-import fetchJson from "../../utils/fetch-json.js";
-
-const BACKEND_URL = "https://course-js.javascript.ru/";
+//import fetchJson from "../../utils/fetch-json.js";
+//const BACKEND_URL = "https://course-js.javascript.ru/";
 
 export default class Page {
 
@@ -15,9 +14,10 @@ export default class Page {
       this.ordersChart.update(from, to);
       this.salesChart.update(from, to);
       this.customersChart.update(from, to);
+      this.sortableTable.setRange(from, to);
     }
 
-  constructor() {
+  async initComponents() {
     const getRange = () => {
       const now = new Date();
       const to = new Date();
@@ -55,32 +55,30 @@ export default class Page {
       },
       label: "customers",
     });
-
-
-    const url = 'api/dashboard/bestsellers'; 
-
     this.sortableTable = new SortableTable(header, {
-      url: url,
+      url: 'api/dashboard/bestsellers',
       sorted: { id:'title', order: 'asc'},
       isSortLocally:true,
       step: 30,
       start: 0,
+      range: {from, to},
     });
   }
 
-  render() {
+  async render() {
     const wrapper = document.createElement("div");
     wrapper.innerHTML = this.getTemplate();
     this.element = wrapper.firstElementChild;
 
     this.subElements = this.getSubElements();
 
+    await this.initComponents()
+
     this.subElements.rangePicker.append(this.rangePicker.element);
     this.subElements.ordersChart.append(this.ordersChart.element);
     this.subElements.salesChart.append(this.salesChart.element);
     this.subElements.customersChart.append(this.customersChart.element);
     this.subElements.sortableTable.append(this.sortableTable.element);
-
 
     this.initEventListeners();
 

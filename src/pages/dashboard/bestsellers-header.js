@@ -18,6 +18,12 @@ const header = [
     sortType: 'string'
   },
   {
+    id: 'subcategory',
+    title: 'Category',
+    sortable: true,
+    sortType: 'string',
+  },
+  {
     id: 'quantity',
     title: 'Quantity',
     sortable: true,
@@ -30,15 +36,10 @@ const header = [
     sortType: 'number'
   },
   {
-    id: 'status',
-    title: 'Status',
+    id: 'sales',
+    title: 'Sales',
     sortable: true,
-    sortType: 'number',
-    template: data => {
-      return `<div class="sortable-table__cell">
-          ${data > 0 ? 'Active' : 'Inactive'}
-        </div>`;
-    }
+    sortType: 'number'
   },
 ];
 

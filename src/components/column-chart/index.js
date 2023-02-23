@@ -18,9 +18,11 @@ export default class ColumnChart {
     this.label = label;
     this.link = link;
     this.formatHeading = formatHeading;
-    this.transformData();
+    
     this.render();
     this.subElements = this.getSubElements();
+
+    this.update(range.from, range.to);
   }
 
   render() {
