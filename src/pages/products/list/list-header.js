@@ -37,10 +37,11 @@ const header = [
     formatValue: data => `$${data}`,
   },
   {
-    id: 'sales',
-    title: 'Sales',
+    id: 'status',
+    title: 'Status',
     sortable: true,
-    sortType: 'number'
+    sortType: 'number',
+    formatValue: data => `${data > 0 ? 'Активен' : 'Неактивен'}`,
   },
 ];
 

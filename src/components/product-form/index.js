@@ -142,7 +142,7 @@ export default class ProductForm {
           <span>${source}</span>
         </span>
         <button type="button">
-          <img src="icon-trash.svg" data-delete-handle="" alt="delete">
+          <img src="icon_trash.svg" data-delete-handle="" alt="delete">
         </button>
       </li>  
     `
@@ -227,7 +227,7 @@ export default class ProductForm {
     const url = new URL(BACKEND_URL);
     url.pathname = '/api/rest/products';
     url.searchParams.set('id', this.productId);
-    const product = (this.productId) ? this.loadData(url) : Promise.resolve(this.defaultFormData); 
+    const product = (this.productId) ? this.loadData(url) : [Promise.resolve(this.defaultFormData)]; 
     return product
     
   }

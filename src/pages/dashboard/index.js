@@ -14,7 +14,7 @@ export default class Page {
       this.ordersChart.update(from, to);
       this.salesChart.update(from, to);
       this.customersChart.update(from, to);
-      this.sortableTable.setRange(from, to);
+      this.sortableTable.setRange({from, to});
     }
 
   async initComponents() {
@@ -62,6 +62,7 @@ export default class Page {
       step: 30,
       start: 0,
       range: {from, to},
+      linked: '/product/',
     });
   }
 
@@ -78,7 +79,7 @@ export default class Page {
     this.subElements.ordersChart.append(this.ordersChart.element);
     this.subElements.salesChart.append(this.salesChart.element);
     this.subElements.customersChart.append(this.customersChart.element);
-    this.subElements.sortableTable.append(this.sortableTable.element);
+    this.subElements.productsContainer.append(this.sortableTable.element);
 
     this.initEventListeners();
 
@@ -102,8 +103,7 @@ export default class Page {
        
             <h3 class="block-title">Best sellers</h3>
 
-            <div data-element="sortableTable">
-                <!-- sortable-table component -->
+            <div data-element="productsContainer" class="products-list__container full-height flex-column">
             </div>
         </div>
         `;
@@ -134,6 +134,7 @@ export default class Page {
     this.ordersChart.destroy();
     this.salesChart.destroy();
     this.customersChart.destroy();
+    this.sortableTable.destroy();
     this.remove();
   }
 }
