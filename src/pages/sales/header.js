@@ -39,24 +39,3 @@ const header = [
 ];
 
 export default header;
-
-{
-  /* <div class="sortable-table__cell" data-name="id" data-sortable="">
-          <span>ID</span>
-        </div>
-        <div class="sortable-table__cell" data-name="user" data-sortable="">
-          <span>Клиент</span>
-        </div>
-        <div class="sortable-table__cell" data-name="createdAt" data-sortable="">
-          <span>Дата</span>
-          <span class="sortable-table__sort-arrow">
-            <span class="sortable-table__sort-arrow_desc"></span>
-          </span>
-        </div>
-        <div class="sortable-table__cell" data-name="totalCost" data-sortable="">
-          <span>Стоимость</span>
-        </div>
-        <div class="sortable-table__cell" data-name="delivery" data-sortable="">
-          <span>Статус</span>
-        </div> */
-}

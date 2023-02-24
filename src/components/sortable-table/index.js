@@ -3,7 +3,7 @@ const BACKEND_URL = 'https://course-js.javascript.ru';
 
 export default class SortableTable {
   element = null;
-  subElements = [];
+  subElements = {};
 
   LOAD_COUNT = 30;
   SCROLL_START_LOAD_SHIFT = 100;
@@ -21,7 +21,6 @@ export default class SortableTable {
     headerConfig = [],
     {
       url = '',
-      range = { to: new Date(), from: new Date() },
       isSortLocally = !Boolean(url),
       data = [],
       sorted = {
@@ -32,7 +31,8 @@ export default class SortableTable {
         from: 'from',
         to: 'to'
       },
-      linkRow = { hrefTemplate: item => `/product/${item}`, field: 'id' }
+      linkRow = { hrefTemplate: item => `/products/${item}`, field: 'id' },
+      range
     }
   ) {
     this.headerConfig = headerConfig;
@@ -55,7 +55,11 @@ export default class SortableTable {
     this.getSubElements();
     this.addEvents();
 
-    await this.loadData();
+    try {
+      await this.loadData();
+    } catch (error) {
+      console.log('render loadData Error' + error);
+    }
   }
 
   getSubElements() {
@@ -128,27 +132,27 @@ export default class SortableTable {
     query.searchParams.set('_embed', 'subcategory.category');
     query.searchParams.set('_start', this.data.length);
     query.searchParams.set('_end', Number(this.data.length + this.LOAD_COUNT));
-    if (range.from) {
+    if (range && range.from) {
       query.searchParams.set(this.namesForApiRange.from, range.from.toISOString());
     }
-    if (range.to) {
+    if (range && range.to) {
       query.searchParams.set(this.namesForApiRange.to, range.to.toISOString());
     }
 
-    let data = [];
     try {
-      data = await fetchJson(query);
-      if (data) {
+      const result = await fetchJson(query);
+      if (result) {
         if (!this.isScrolled) {
           this.data = [];
         }
-        this.data.push(...data);
+        this.data.push(...result);
         this.updateData();
-        return data;
       }
     } catch (error) {
       throw `Error of data loading. ${error.message}`;
     }
+
+    return this.data;
   }
 
   async sortOnServer(id = this.sorted.id, order = this.sorted.order) {
@@ -280,8 +284,8 @@ export default class SortableTable {
     this.hideLoading();
     if (this.isDataLoaded()) {
       this.hidePlaceholder();
-      this.subElements.body.innerHTML = this.getBodyInnerTemplate();
       this.subElements.header.innerHTML = this.getHeaderInnerTemplate();
+      this.subElements.body.innerHTML = this.getBodyInnerTemplate();
     } else {
       this.showPlaceholder();
     }
