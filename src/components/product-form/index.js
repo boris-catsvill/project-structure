@@ -312,7 +312,7 @@ export default class ProductForm {
           value="${escapeHtml(photo.source) || ''}"
         />
         <span>
-          <img src="icon-grab.svg" data-grab-handle alt="grab" />
+          <img src="/assets/icons/icon-grab.svg" data-grab-handle alt="grab" />
           <img
             class="sortable-table__cell-img"
             alt="Image"
@@ -321,7 +321,7 @@ export default class ProductForm {
           <span>${photo.source || ''}</span>
         </span>
         <button type="button">
-          <img src="icon-trash.svg" data-delete-handle alt="delete" />
+          <img src="/assets/icons/icon-trash.svg" data-delete-handle alt="delete" />
         </button>
       `;
     return result;

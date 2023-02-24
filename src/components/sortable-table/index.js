@@ -125,6 +125,7 @@ export default class SortableTable {
 
   async loadData(range = this.range) {
     this.showLoading();
+    this.range = range;
 
     const query = new URL(this.url, BACKEND_URL);
     query.searchParams.set('_sort', this.sorted.id);
@@ -132,27 +133,36 @@ export default class SortableTable {
     query.searchParams.set('_embed', 'subcategory.category');
     query.searchParams.set('_start', this.data.length);
     query.searchParams.set('_end', Number(this.data.length + this.LOAD_COUNT));
+
     if (range && range.from) {
-      query.searchParams.set(this.namesForApiRange.from, range.from.toISOString());
+      const value = this.getRangeValue(range.from.toISOString());
+      query.searchParams.set(this.namesForApiRange.from, value);
     }
     if (range && range.to) {
-      query.searchParams.set(this.namesForApiRange.to, range.to.toISOString());
+      const value = this.getRangeValue(range.to.toISOString());
+      query.searchParams.set(this.namesForApiRange.to, value);
     }
 
     try {
       const result = await fetchJson(query);
       if (result) {
-        if (!this.isScrolled) {
-          this.data = [];
-        }
+        if (!this.isScrolled) this.data = [];
         this.data.push(...result);
-        this.updateData();
       }
     } catch (error) {
       throw `Error of data loading. ${error.message}`;
     }
 
+    this.updateData();
+
     return this.data;
+  }
+
+  getRangeValue(value) {
+    let result = value;
+    if (value instanceof Date) result = result.toISOString();
+
+    return result;
   }
 
   async sortOnServer(id = this.sorted.id, order = this.sorted.order) {
