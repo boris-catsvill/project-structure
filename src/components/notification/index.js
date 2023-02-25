@@ -28,10 +28,6 @@ export default class NotificationMessage {
 
     destroy() {
         this.remove();
-
-        //--ВОПРОС--//
-        //При установки данного значения, падает тест "should have ability to be destroyed"
-        //this.element = {};
     }
 
     remove() {

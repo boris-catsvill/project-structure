@@ -14,7 +14,7 @@ export default class Page {
       this.ordersChart.update(from, to);
       this.salesChart.update(from, to);
       this.customersChart.update(from, to);
-      this.sortableTable.setRange({from, to});
+      this.sortableTable.setFilter({from : from.toISOString(), to: to.toISOString()});
     }
 
   async initComponents() {
@@ -61,7 +61,7 @@ export default class Page {
       isSortLocally:true,
       step: 30,
       start: 0,
-      range: {from, to},
+      filter: {from : from.toISOString(), to: to.toISOString()},
       linked: '/product/',
     });
   }

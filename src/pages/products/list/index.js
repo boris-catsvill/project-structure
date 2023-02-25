@@ -3,6 +3,26 @@ import DoubleSlider from '../../../components/double-slider/index.js';
 import header from './list-header';
 
 export default class Page {
+  filterName = '';
+  filterStatus = '';
+  filterRangeFrom = 0;
+  filterRangeTo = 4000;
+
+  onFormNameChange = (event) => {
+    this.filterName = event.target.value;
+    this.setFilter();
+  }
+
+  onFormStatusChange = (event) => {
+    this.filterStatus = event.target.value;
+    this.setFilter();
+  }
+
+  onFormRangeChange = (event) => {
+    this.filterRangeFrom = event.detail.from;
+    this.filterRangeTo = event.detail.to;
+    this.setFilter();
+  }
 
   async render() {
     const wrapper = document.createElement('div');
@@ -11,12 +31,26 @@ export default class Page {
 
     this.subElements = this.getSubElements();
 
+    this.formElements = this.getFormElements();
+
     await this.initComponents();
 
     this.subElements.productsContainer.append(this.sortableTable.element);
     this.subElements.doubleSlider.append(this.doubleSlider.element);
 
+    this.initEventListeners();
+
     return this.element;
+  }
+
+  initEventListeners() {
+
+    Object.values(this.formElements).forEach(value => {
+      if (value.dataset.elem === 'filterName') value.addEventListener('input', this.onFormNameChange);
+      if (value.dataset.elem === 'filterStatus') value.addEventListener('change', this.onFormStatusChange);
+      if (value.dataset.elem === 'sliderContainer') value.addEventListener('range-select', this.onFormRangeChange); 
+    })
+    
   }
 
   getTemplate() {
@@ -53,6 +87,17 @@ export default class Page {
     `
   }
 
+  getFormElements() {
+    const result = {};
+    const elements = this.element.querySelectorAll("[data-elem]");
+
+    for (const subElement of elements) {
+      const name = subElement.dataset.elem;
+      result[name] = subElement;
+    }
+    return result;
+  }
+
   getSubElements() {
     const result = {};
     const elements = this.element.querySelectorAll("[data-element]");
@@ -77,11 +122,25 @@ export default class Page {
     this.doubleSlider = new DoubleSlider({min:0, max:4000});
   }
 
+  async setFilter() {
+    const filter = {};
+    if (this.filterName !== '') filter.title_like = this.filterName;
+    if (this.filterStatus !== '') filter.status = this.filterStatus;
+    filter.price_gte = this.filterRangeFrom;
+    filter.price_lte = this.filterRangeTo;
+    this.sortableTable.setFilter(filter);
+  }
+
   remove() {
     this.element.remove();
   }
 
   destroy() {
+    Object.values(this.formElements).forEach(value => {
+      if (value.dataset.elem === 'filterName') value.removeEventListener('input', this.onFormNameChange);
+      if (value.dataset.elem === 'filterStatus') value.removeEventListener('change', this.onFormStatusChange);
+      if (value.dataset.elem === 'sliderContainer') value.removeEventListener('range-select', this.onFormRangeChange); 
+    })
     this.doubleSlider.destroy();
     this.sortableTable.destroy();
     this.remove();

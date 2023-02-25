@@ -3,6 +3,8 @@ import fetchJson from '../../utils/fetch-json.js';
 const BACKEND_URL = 'https://course-js.javascript.ru';
 
 export default class SortableTable {
+  filter = [];
+
   onClick = (event) => {    
     const headerElement = event.target.closest(".sortable-table__cell");
 
@@ -22,14 +24,7 @@ export default class SortableTable {
       this.start = this.end + 1;
       this.end = this.start + this.step - 1;
 
-      this.loading = true;
-
-      const data = await this.getData(this.start, this.end);
-
-      this.update(data);
-
-      this.loading = false;
-
+      await this.loadData();
     }
   }
 
@@ -40,7 +35,7 @@ export default class SortableTable {
     step = 30,
     start = 0,
     sorted = {id: headersConfig.find(items => items.sortable).id, order:'asc'},
-    range = {},
+    filter = {},
     linked = null,
   } = {}) {
     this.headersConfig = headersConfig;
@@ -52,7 +47,7 @@ export default class SortableTable {
     this.fieldValue = sorted.id;
     this.orderValue = sorted.order;
     this.url  = url,
-    this.range = range;
+    this.filter = [...Object.entries(filter)];
     this.linked = linked;
     this.render();
   }
@@ -63,8 +58,7 @@ export default class SortableTable {
     this.element = wraper.firstElementChild;
     this.subElements = this.getSubElements();
 
-    const data = await this.getData();
-    this.update(data);
+    await this.loadData();
 
     this.subElements.header.addEventListener("pointerdown", this.onClick);
     window.addEventListener('scroll', this.onScroll);
@@ -212,14 +206,13 @@ export default class SortableTable {
 
   async sortOnServer () {
     this.data = [];
-    const data = await this.getData();
-    this.update(data);
+    await this.loadData();
   }
 
   async getData(start = 0, end = this.step - 1) {
     const sort = this.fieldValue;
     const order = this.orderValue;
-    const range = Object.entries(this.range);
+    const filter = this.filter;
 
     const url = new URL(BACKEND_URL);
     url.pathname = this.url;
@@ -230,27 +223,28 @@ export default class SortableTable {
 
     url.searchParams.set('_embed', 'subcategory.category');
 
-    range.forEach((value) => {
-      const [key, date] = value;
-      if (date) url.searchParams.set(key, date.toISOString());
+    filter.forEach((value) => {
+      const [key, data] = value;
+      if (data) url.searchParams.set(key, data);
     })
 
     this.element.classList.add('sortable-table_loading');
-    const data = fetchJson(url);
+    const data = await fetchJson(url);
     this.element.classList.remove('sortable-table_loading');
     return data;
   }
 
-  async setRange(range={}){
-    this.range = range;
-
-    this.loading = true;
+  async setFilter(filter = {}) {
+    this.filter = [...this.filter, ...Object.entries(filter)];
     this.data = [];
-    const data = await this.getData();
-
     this.subElements.body.innerHTML ='';
-    this.update(data);
+    await this.loadData();
+  }
 
+  async loadData() {
+    this.loading = true;
+    const data = await this.getData();
+    this.update(data);
     this.loading = false;
   }
 

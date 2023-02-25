@@ -1,6 +1,7 @@
 import SortableList from '../sortable-list/index.js';
 import escapeHtml from '../../utils/escape-html.js';
 import fetchJson from  '../../utils/fetch-json.js'; 
+import NotificationMessage from '../notification/index.js';
 
 const IMGUR_CLIENT_ID = '28aaa2e823b03b1';
 const BACKEND_URL = 'https://course-js.javascript.ru';
@@ -297,6 +298,17 @@ export default class ProductForm {
     )
 
     this.element.dispatchEvent(event);
+
+    this.showNotificationMessage('success', 'Товар сохранен');
+  }
+
+  showNotificationMessage(type, message) {
+    const notification = new NotificationMessage(message, {
+      duration: 5000,
+      type: type
+    });
+
+    notification.show(this.element);
   }
 
   remove() {
