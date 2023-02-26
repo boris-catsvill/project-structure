@@ -35,8 +35,13 @@ export default class SortableList {
             this.current.classList.add('sortable-list__item_dragging');
             this.current.style.width = rect.width + 'px';
 
+            this.current.style.left = event.clientX - this.shiftX +'px';
+            this.current.style.top = event.clientY - this.shiftY + 'px';
+
             document.addEventListener('pointermove', this.onPointerMove);
             document.addEventListener('pointerup', this.onPointerUp, { once: true });
+
+            console.log(window.pageYOffset);
         }
     }
 

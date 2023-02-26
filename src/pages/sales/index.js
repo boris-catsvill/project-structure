@@ -5,7 +5,7 @@ import header from './sales-header.js';
 export default class Page {
   onDateSelect = event => {
     const { from, to } = event.detail;
-    this.sortableTable.setFilter({createdAt_gte:from, createdAt_lte:to});
+    this.sortableTable.setFilter({createdAt_gte:from.toISOString(), createdAt_lte:to.toISOString()});
   };
 
   async initComponents() {
@@ -27,7 +27,7 @@ export default class Page {
       isSortLocally: false,
       step: 30,
       start: 0,
-      filter: { createdAt_gte:from, createdAt_lte:to }
+      filter: { createdAt_gte:from.toISOString(), createdAt_lte:to.toISOString() }
     });
   }
 

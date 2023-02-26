@@ -138,12 +138,12 @@ export default class ProductForm {
         <input type="hidden" name="url" value="${url}">
         <input type="hidden" name="source" value="${source}">
         <span>
-          <img src="icon-grab.svg" data-grab-handle="" alt="grab">
+          <img src="../../assets/icons/icon-grab.svg" data-grab-handle="" alt="grab">
           <img class="sortable-table__cell-img" alt="Image" src="${url}">
           <span>${source}</span>
         </span>
         <button type="button">
-          <img src="icon_trash.svg" data-delete-handle="" alt="delete">
+          <img src="../../assets/icons/icon-trash.svg" data-delete-handle="" alt="delete">
         </button>
       </li>  
     `
