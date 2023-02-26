@@ -1,6 +1,7 @@
 import SortableList from '../sortable-list/index.js';
 import fetchJson from "../../utils/fetch-json.js";
-const BACKEND_URL = 'https://course-js.javascript.ru';
+
+const BACKEND_URL = `${process.env.BACKEND_URL}`
 
 export default class Categories {
 
@@ -25,9 +26,6 @@ export default class Categories {
         this.element = wrapper.firstElementChild;
 
         this.subElements = this.getSubElements();
-        //this.subElements.sortableList.innerHTML = this.getTemplateList();
-
-        //console.log(this.subElements);
 
         this.fillSubCategories();
         this.initEventListeners();
