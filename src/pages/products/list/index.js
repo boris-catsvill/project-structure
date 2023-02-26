@@ -1,41 +1,148 @@
-import ProductForm from "../../../components/product-form";
+import SortableTable from '../../../components/sortable-table/index.js';
+import DoubleSlider from '../../../components/double-slider/index.js';
+import header from './list-header';
 
 export default class Page {
-  element;
-  subElements = {};
-  components = {};
+  filterName = '';
+  filterStatus = '';
+  filterRangeFrom = 0;
+  filterRangeTo = 4000;
+
+  onFormNameChange = (event) => {
+    this.filterName = event.target.value;
+    this.setFilter();
+  }
+
+  onFormStatusChange = (event) => {
+    this.filterStatus = event.target.value;
+    this.setFilter();
+  }
+
+  onFormRangeChange = (event) => {
+    this.filterRangeFrom = event.detail.from;
+    this.filterRangeTo = event.detail.to;
+    this.setFilter();
+  }
 
   async render() {
-    const element = document.createElement('div');
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = this.getTemplate();
+    this.element = wrapper.firstElementChild;
 
-    element.innerHTML = `
-      <div>
-        <h1>List page</h1>
-      </div>`;
+    this.subElements = this.getSubElements();
 
-    this.element = element.firstElementChild;
+    this.formElements = this.getFormElements();
 
-    this.initComponents();
-    await this.renderComponents();
+    await this.initComponents();
+
+    this.subElements.productsContainer.append(this.sortableTable.element);
+    this.subElements.doubleSlider.append(this.doubleSlider.element);
+
+    this.initEventListeners();
 
     return this.element;
   }
 
-  initComponents() {
-    const productId = '101-planset-lenovo-yt3-x90l-64-gb-3g-lte-cernyj';
+  initEventListeners() {
 
-    this.components.productFrom = new ProductForm(productId);
+    Object.values(this.formElements).forEach(value => {
+      if (value.dataset.elem === 'filterName') value.addEventListener('input', this.onFormNameChange);
+      if (value.dataset.elem === 'filterStatus') value.addEventListener('change', this.onFormStatusChange);
+      if (value.dataset.elem === 'sliderContainer') value.addEventListener('range-select', this.onFormRangeChange); 
+    })
+    
   }
 
-  async renderComponents() {
-    const element = await this.components.productFrom.render();
+  getTemplate() {
+    return `
+    <div class='products-list'>
+      <div class="content__top-panel">
+        <h1 class="page-title">Товары</h1>
+        <a href="/products/add" class="button-primary">Добавить товар</a>
+      </div>
 
-    this.element.append(element);
+      <div class="content-box content-box_small">
+        <form class="form-inline">
+          <div class="form-group">
+            <label class="form-label">Фильтровать по:</label>
+            <input type="text" data-elem="filterName" class="form-control" placeholder="Название товара">
+          </div>
+          <div class="form-group" data-elem="sliderContainer" data-element="doubleSlider">
+            <label class="form-label">Цена:</label>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Статус:</label>
+            <select class="form-control" data-elem="filterStatus">
+              <option value="" selected="">Любой</option>
+              <option value="1">Активный</option>
+              <option value="0">Неактивный</option>
+            </select>
+          </div>
+        </form>
+      </div>
+      
+      <div data-element="productsContainer" class="products-list__container">
+      </div>
+    </div>
+    `
+  }
+
+  getFormElements() {
+    const result = {};
+    const elements = this.element.querySelectorAll("[data-elem]");
+
+    for (const subElement of elements) {
+      const name = subElement.dataset.elem;
+      result[name] = subElement;
+    }
+    return result;
+  }
+
+  getSubElements() {
+    const result = {};
+    const elements = this.element.querySelectorAll("[data-element]");
+
+    for (const subElement of elements) {
+      const name = subElement.dataset.element;
+      result[name] = subElement;
+    }
+    return result;
+  }
+
+  async initComponents() {
+    this.sortableTable = new SortableTable(header, {
+      url: 'api/rest/products',
+      sorted: { id:'title', order: 'asc'},
+      isSortLocally:false,
+      step: 30,
+      start: 0,
+      linked: '/product/',
+    });
+
+    this.doubleSlider = new DoubleSlider({min:0, max:4000});
+  }
+
+  async setFilter() {
+    const filter = {};
+    if (this.filterName !== '') filter.title_like = this.filterName;
+    if (this.filterStatus !== '') filter.status = this.filterStatus;
+    filter.price_gte = this.filterRangeFrom;
+    filter.price_lte = this.filterRangeTo;
+    this.sortableTable.setFilter(filter);
+  }
+
+  remove() {
+    this.element.remove();
   }
 
   destroy() {
-    for (const component of Object.values(this.components)) {
-      component.destroy();
-    }
+    Object.values(this.formElements).forEach(value => {
+      if (value.dataset.elem === 'filterName') value.removeEventListener('input', this.onFormNameChange);
+      if (value.dataset.elem === 'filterStatus') value.removeEventListener('change', this.onFormStatusChange);
+      if (value.dataset.elem === 'sliderContainer') value.removeEventListener('range-select', this.onFormRangeChange); 
+    })
+    this.doubleSlider.destroy();
+    this.sortableTable.destroy();
+    this.remove();
   }
 }
