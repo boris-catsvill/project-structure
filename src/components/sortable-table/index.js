@@ -1,5 +1,5 @@
 import fetchJson from '../../utils/fetch-json.js';
-const BACKEND_URL = 'https://course-js.javascript.ru';
+const BACKEND_URL = process.env.BACKEND_URL;
 
 export default class SortableTable {
   element = null;
@@ -244,8 +244,8 @@ export default class SortableTable {
       ${this.getBodyInnerTemplate()}
     </div>`;
   }
-  getBodyInnerTemplate() {
-    return this.isDataLoaded() ? this.data.map(item => this.getBodyRowTemplate(item)).join('') : '';
+  getBodyInnerTemplate(data = this.data) {
+    return this.isDataLoaded() ? data.map(item => this.getBodyRowTemplate(item)).join('') : '';
   }
 
   getBodyRowTemplate(row = {}) {
@@ -272,7 +272,7 @@ export default class SortableTable {
   }
 
   getLoadingTemplate() {
-    return `<div data-element="loading" class="loading-line sortable-table__loading-line"></div>`;
+    return `<div data-element="loading" class="sortable-table sortable-table__loading-line"></div>`;
   }
 
   getPlaceholderTemplate() {
@@ -322,14 +322,12 @@ export default class SortableTable {
 
   showLoading() {
     this.isLoading = true;
-    // this.subElements.loading.classList.add("");
-    // what class?
+    this.subElements.loading.classList.remove('sortable-table__loading-line');
   }
 
   hideLoading() {
     this.isLoading = false;
-    // this.subElements.loading.classList.remove("");
-    // what class?
+    this.subElements.loading.classList.add('sortable-table__loading-line');
   }
 
   remove() {

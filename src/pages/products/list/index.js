@@ -1,3 +1,4 @@
+import FilterTable from '../../../components/filter-table/index.js';
 import SortableTable from '../../../components/sortable-table/index.js';
 import header from './header.js';
 
@@ -5,6 +6,7 @@ export default class Page {
   element = {};
   subElements = {};
   components = {};
+  filter = {};
   controller = new AbortController();
 
   async render() {
@@ -15,15 +17,30 @@ export default class Page {
     this.getSubElements();
     this.initComponents();
     this.appendComponents();
+    this.initListeners();
 
     return this.element;
   }
 
   initComponents() {
-    this.components['productsContainer'] = new SortableTable(header, {
+    // this.components['productsContainer'] = new SortableTable(header, {
+    //   url: 'api/rest/products'
+    // });
+    this.components['productsContainer'] = new FilterTable(header, {
       url: 'api/rest/products'
     });
   }
+
+  initListeners() {
+    this.subElements.filterName.addEventListener('change', this.handleFilterNameChange, {
+      signal: this.controller.signal
+    });
+  }
+
+  handleFilterNameChange = ({ target }) => {
+    this.filter['byName'] = target.value;
+    this.components['productsContainer'].applyFilter(this.filter);
+  };
 
   appendComponents() {
     for (const [name, instance] of Object.entries(this.components)) {
@@ -44,11 +61,28 @@ export default class Page {
       <h1 class="page-title">Товары</h1>
       <a href="/products/add" class="button-primary">Добавить товар</a>
     </div>
+    <div class="content-box content-box_small">
+        <form class="form-inline">
+          <div class="form-group">
+            <label class="form-label">Сортировать по:</label>
+            <input type="text" data-element="filterName" class="form-control" placeholder="Название товара">
+          </div>
+          <div class="form-group" data-elem="sliderContainer">
+            <label class="form-label">Цена:</label>
+              <!-- RANGE SLIDER-->
+            </div>
+          <div class="form-group">
+            <label class="form-label">Статус:</label>
+            <select class="form-control" data-element="filterStatus">
+              <option value="" selected="">Любой</option>
+              <option value="1">Активный</option>
+              <option value="0">Неактивный</option>
+            </select>
+          </div>
+        </form>
+      </div>
 
     <div data-element="productsContainer" class="products-list__container"></div>
-    <div data-element="loading" class="loading-line sortable-table__loading-line"></div>
-    <div data-element="emptyPlaceholder" class="sortable-table__empty-placeholder"><div>
-    <p>Не найдено товаров удовлетворяющих выбранному критерию</p>
     <button type="button" class="button-primary-outline">Очистить фильтры</button>
     </div>`;
   }
