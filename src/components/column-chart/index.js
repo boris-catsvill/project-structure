@@ -1,6 +1,6 @@
 import fetchJson from '../../utils/fetch-json.js';
 
-const BACKEND_URL = 'https://course-js.javascript.ru';
+const BACKEND_URL = process.env.BACKEND_URL;
 
 export default class ColumnChart {
   chartHeight = 50;
@@ -23,6 +23,8 @@ export default class ColumnChart {
     this.value = value;
     this.range = range;
     this.formatHeading = formatHeading;
+
+    console.log(BACKEND_URL);
 
     this.render();
     this.loadData();
@@ -92,17 +94,14 @@ export default class ColumnChart {
   async loadData() {
     this.element.classList.add('column-chart_loading');
 
-    const query = [BACKEND_URL + '/' + this.url + '/?'];
+    const query = new URL(this.url, BACKEND_URL);
+
     for (const [k, v] of Object.entries(this.range)) {
-      query.push(`${k}=${v}&`);
+      query.searchParams.set(k, v);
     }
 
-    const data = await fetchJson(query.join(''));
+    const data = await fetchJson(query);
     this.updateData(data);
-
-    // fetchJson(query.join("")).then((data) => {
-    //   this.updateData(data);
-    // });
 
     return data;
   }
@@ -121,9 +120,8 @@ export default class ColumnChart {
     if (isNewRange) {
       this.range = { from, to };
       return await this.loadData();
-    } else {
-      return this.data;
     }
+    return this.data;
   }
 
   updateData(data) {
@@ -131,7 +129,7 @@ export default class ColumnChart {
     if (loaded && loaded.length > 0) {
       this.data = data;
       this.columns = this.getColumnProps(loaded);
-      this.value = loaded.reduce((a, v) => ((a += +v), a), 0);
+      this.value = loaded.reduce((a, v) => ((a += parseInt(v)), a), 0);
 
       this.updateVisual();
     }
