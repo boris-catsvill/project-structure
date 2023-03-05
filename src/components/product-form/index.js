@@ -2,8 +2,8 @@ import SortableList from '../sortable-list/index.js';
 import fetchJson from '../../utils/fetch-json.js';
 import escapeHtml from '../../utils/escape-html.js';
 
-const IMGUR_CLIENT_ID = '28aaa2e823b03b1';
-const BACKEND_URL = 'https://course-js.javascript.ru';
+const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID;
+const BACKEND_URL = process.env.BACKEND_URL;
 
 export default class ProductForm {
   CAT_API_URL = 'api/rest/categories';
@@ -53,8 +53,8 @@ export default class ProductForm {
 
     const product = this.getProductFormData();
     try {
-      const query = new URL(this.PRODUCT_API_URL, BACKEND_URL);
-      const result = await fetchJson(query, {
+      const queryUrl = new URL(this.PRODUCT_API_URL, BACKEND_URL);
+      const result = await fetchJson(queryUrl, {
         method: this.productId ? 'PATCH' : 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(product)
