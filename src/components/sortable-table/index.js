@@ -1,270 +1,349 @@
-import fetchJson from "../../utils/fetch-json.js";
-
-const BACKEND_URL = 'https://course-js.javascript.ru';
+import fetchJson from '../../utils/fetch-json.js';
+const BACKEND_URL = process.env.BACKEND_URL;
 
 export default class SortableTable {
-  element;
+  element = null;
   subElements = {};
-  data = [];
-  loading = false;
-  step = 20;
-  start = 1;
-  end = this.start + this.step;
 
-  onWindowScroll = async() => {
-    const { bottom } = this.element.getBoundingClientRect();
-    const { id, order } = this.sorted;
+  LOAD_COUNT = 30;
+  SCROLL_START_LOAD_SHIFT = 100;
+  isScrolled = false;
+  isLoading = false;
+  controller = new AbortController();
 
-    if (bottom < document.documentElement.clientHeight && !this.loading && !this.isSortLocally) {
-      this.start = this.end;
-      this.end = this.start + this.step;
-
-      this.loading = true;
-
-      const data = await this.loadData(id, order, this.start, this.end);
-      this.update(data);
-
-      this.loading = false;
-    }
+  orderSwitch = {
+    asc: 'desc',
+    desc: 'asc',
+    undefined: 'asc'
   };
 
-  onSortClick = event => {
-    const column = event.target.closest('[data-sortable="true"]');
-    const toggleOrder = order => {
-      const orders = {
-        asc: 'desc',
-        desc: 'asc'
-      };
-
-      return orders[order];
-    };
-
-    if (column) {
-      const { id, order } = column.dataset;
-      const newOrder = toggleOrder(order);
-
-      this.sorted = {
-        id,
-        order: newOrder
-      };
-
-      column.dataset.order = newOrder;
-      column.append(this.subElements.arrow);
-
-      if (this.isSortLocally) {
-        this.sortLocally(id, newOrder);
-      } else {
-        this.sortOnServer(id, newOrder);
-      }
+  constructor(
+    headerConfig = [],
+    {
+      url = '',
+      isSortLocally = !Boolean(url),
+      data = [],
+      sorted = {
+        id: headerConfig.find(item => item.sortable).id,
+        order: 'asc'
+      },
+      namesForApiRange = {
+        from: 'from',
+        to: 'to'
+      },
+      linkRow = { hrefTemplate: item => `/products/${item}`, field: 'id' },
+      range
     }
-  };
-
-  constructor(headersConfig = [], {
-    url = '',
-    sorted = {
-      id: headersConfig.find(item => item.sortable).id,
-      order: 'asc'
-    },
-    isSortLocally = false,
-    step = 20,
-    start = 1,
-    end = start + step
-  } = {}) {
-
-    this.headersConfig = headersConfig;
-    this.url = new URL(url, BACKEND_URL);
+  ) {
+    this.headerConfig = headerConfig;
+    this.data = data;
     this.sorted = sorted;
     this.isSortLocally = isSortLocally;
-    this.step = step;
-    this.start = start;
-    this.end = end;
+    this.url = url;
+    this.range = range;
+    this.namesForApiRange = namesForApiRange;
+    this.linkRow = linkRow;
 
     this.render();
   }
 
   async render() {
-    const {id, order} = this.sorted;
-    const wrapper = document.createElement('div');
+    const wrap = document.createElement('div');
+    wrap.innerHTML = this.getTemplate();
+    this.element = wrap.firstElementChild;
 
-    wrapper.innerHTML = this.getTable();
+    this.getSubElements();
+    this.addEvents();
 
-    const element = wrapper.firstElementChild;
-
-    this.element = element;
-    this.subElements = this.getSubElements(element);
-
-    const data = await this.loadData(id, order, this.start, this.end);
-
-    this.renderRows(data);
-    this.initEventListeners();
-  }
-
-  async loadData(id, order, start = this.start, end = this.end) {
-    this.url.searchParams.set('_sort', id);
-    this.url.searchParams.set('_order', order);
-    this.url.searchParams.set('_start', start);
-    this.url.searchParams.set('_end', end);
-
-    this.element.classList.add('sortable-table_loading');
-
-    const data = await fetchJson(this.url);
-
-    this.element.classList.remove('sortable-table_loading');
-
-    return data;
-  }
-
-  addRows(data) {
-    this.data = data;
-
-    this.subElements.body.innerHTML = this.getTableRows(data);
-  }
-
-  update(data) {
-    const rows = document.createElement('div');
-
-    this.data = [...this.data, ...data];
-    rows.innerHTML = this.getTableRows(data);
-
-    this.subElements.body.append(...rows.childNodes);
-  }
-
-  getTableHeader() {
-    return `<div data-element="header" class="sortable-table__header sortable-table__row">
-      ${this.headersConfig.map(item => this.getHeaderRow(item)).join('')}
-    </div>`;
-  }
-
-  getHeaderRow({id, title, sortable}) {
-    const order = this.sorted.id === id ? this.sorted.order : 'asc';
-
-    return `
-      <div class="sortable-table__cell" data-id="${id}" data-sortable="${sortable}" data-order="${order}">
-        <span>${title}</span>
-        ${this.getHeaderSortingArrow(id)}
-      </div>
-    `;
-  }
-
-  getHeaderSortingArrow(id) {
-    const isOrderExist = this.sorted.id === id ? this.sorted.order : '';
-
-    return isOrderExist
-      ? `<span data-element="arrow" class="sortable-table__sort-arrow">
-          <span class="sort-arrow"></span>
-        </span>`
-      : '';
-  }
-
-  getTableBody(data) {
-    return `
-      <div data-element="body" class="sortable-table__body">
-        ${this.getTableRows(data)}
-      </div>`;
-  }
-
-  getTableRows(data) {
-    return data.map(item => `
-      <div class="sortable-table__row">
-        ${this.getTableRow(item, data)}
-      </div>`
-    ).join('');
-  }
-
-  getTableRow(item) {
-    const cells = this.headersConfig.map(({id, template}) => {
-      return {
-        id,
-        template
-      };
-    });
-
-    return cells.map(({id, template}) => {
-      return template
-        ? template(item[id])
-        : `<div class="sortable-table__cell">${item[id]}</div>`;
-    }).join('');
-  }
-
-  getTable() {
-    return `
-      <div class="sortable-table">
-        ${this.getTableHeader()}
-        ${this.getTableBody(this.data)}
-
-        <div data-element="loading" class="loading-line sortable-table__loading-line"></div>
-
-        <div data-element="emptyPlaceholder" class="sortable-table__empty-placeholder">
-          No products
-        </div>
-      </div>`;
-  }
-
-  initEventListeners() {
-    this.subElements.header.addEventListener('pointerdown', this.onSortClick);
-    document.addEventListener('scroll', this.onWindowScroll);
-  }
-
-  sortLocally(id, order) {
-    const sortedData = this.sortData(id, order);
-
-    this.subElements.body.innerHTML = this.getTableRows(sortedData);
-  }
-
-  async sortOnServer(id, order) {
-    const start = 1;
-    const end = start + this.step;
-    const data = await this.loadData(id, order, start, end);
-
-    this.renderRows(data);
-  }
-
-  renderRows(data) {
-    if (data.length) {
-      this.element.classList.remove('sortable-table_empty');
-      this.addRows(data);
-    } else {
-      this.element.classList.add('sortable-table_empty');
+    try {
+      await this.loadData();
+    } catch (error) {
+      console.log('render loadData Error', error, this.data);
     }
   }
 
-  sortData(id, order) {
-    const arr = [...this.data];
-    const column = this.headersConfig.find(item => item.id === id);
-    const {sortType, customSorting} = column;
-    const direction = order === 'asc' ? 1 : -1;
+  getSubElements() {
+    for (const item of this.element.querySelectorAll('div[data-element]')) {
+      this.subElements[item.dataset.element] = item;
+    }
+  }
 
-    return arr.sort((a, b) => {
-      switch (sortType) {
-        case 'number':
-          return direction * (a[id] - b[id]);
-        case 'string':
-          return direction * a[id].localeCompare(b[id], 'ru');
-        case 'custom':
-          return direction * customSorting(a, b);
-        default:
-          return direction * (a[id] - b[id]);
-      }
+  addEvents() {
+    this.addSortEvent();
+    this.addScrollEvent();
+  }
+
+  sortCallback = event => {
+    const target = event.target.closest('[data-sortable=true]');
+
+    this.isScrolled = false;
+    if (!this.isSortLocally) {
+      this.data = [];
+    }
+
+    if (target) {
+      this.sorted = {
+        id: target.dataset.id,
+        order: this.orderSwitch[this.sorted.order]
+      };
+      this.sort();
+    }
+  };
+
+  addSortEvent() {
+    this.subElements.header.addEventListener('pointerdown', this.sortCallback, {
+      signal: this.controller.signal
     });
   }
 
-  getSubElements(element) {
-    const elements = element.querySelectorAll('[data-element]');
+  scrollCallback = async () => {
+    const { bottom } = document.documentElement.getBoundingClientRect();
+    if (
+      !this.isLoading &&
+      !this.isSortLocally &&
+      bottom - window.innerHeight < this.SCROLL_START_LOAD_SHIFT
+    ) {
+      this.isScrolled = true;
+      this.isLoading = true;
+      await this.loadData();
+    }
+  };
 
-    return [...elements].reduce((accum, subElement) => {
-      accum[subElement.dataset.element] = subElement;
+  addScrollEvent() {
+    window.addEventListener('scroll', this.scrollCallback, {
+      signal: this.controller.signal
+    });
+  }
 
-      return accum;
-    }, {});
+  sort(id = this.sorted.id, order = this.sorted.order) {
+    if (this.isSortLocally) {
+      this.sortOnClient(id, order);
+    } else {
+      this.sortOnServer(id, order);
+    }
+  }
+
+  async loadData(range = this.range) {
+    this.showLoading();
+    this.range = range;
+
+    const query = new URL(this.url, BACKEND_URL);
+    query.searchParams.set('_sort', this.sorted.id);
+    query.searchParams.set('_order', this.sorted.order);
+    query.searchParams.set('_embed', 'subcategory.category');
+    query.searchParams.set('_start', this.data.length);
+    query.searchParams.set('_end', Number(this.data.length + this.LOAD_COUNT));
+
+    if (range && range.from) {
+      const value = this.getRangeValue(range.from.toISOString());
+      query.searchParams.set(this.namesForApiRange.from, value);
+    }
+    if (range && range.to) {
+      const value = this.getRangeValue(range.to.toISOString());
+      query.searchParams.set(this.namesForApiRange.to, value);
+    }
+
+    try {
+      const result = await fetchJson(query);
+      if (result) {
+        if (!this.isScrolled) this.data = [];
+        this.data.push(...result);
+        this.dispatchEventDataLoaded();
+      }
+    } catch (error) {
+      throw `Error of data loading. ${error.message}`;
+    }
+
+    this.updateData();
+
+    return this.data;
+  }
+
+  dispatchEventDataLoaded() {
+    const dataLoadedEvent = new CustomEvent('table-data-loaded', {
+      bubbles: true,
+      detail: this.data
+    });
+    this.element.dispatchEvent(dataLoadedEvent);
+  }
+
+  getRangeValue(value) {
+    let result = value;
+    if (value instanceof Date) result = result.toISOString();
+
+    return result;
+  }
+
+  async sortOnServer(id = this.sorted.id, order = this.sorted.order) {
+    this.sorted.order = order;
+    this.sorted.id = id;
+
+    if (id && this.url) {
+      return await this.loadData();
+    }
+  }
+
+  sortOnClient(id = this.sorted.id, order = this.sorted.order) {
+    let sortFns;
+    const switchSortType = this.headerConfig.filter(item => item.id === id)[0].sortType;
+
+    switch (switchSortType) {
+      case 'string':
+        sortFns = (a, b) => {
+          return order === 'asc'
+            ? a[id].localeCompare(b[id].toUpperCase(), ['ru', 'en'])
+            : b[id].localeCompare(a[id].toUpperCase(), ['ru', 'en']);
+        };
+        break;
+      case 'number':
+        sortFns = (a, b) => {
+          return order === 'asc' ? a[id] - b[id] : b[id] - a[id];
+        };
+        break;
+      default:
+        throw new Error('Sort order error.');
+    }
+    this.data.sort(sortFns);
+
+    this.updateData();
+  }
+
+  getTemplate() {
+    return `<div class="sortable-table">
+          ${this.getHeaderTemplate()}
+          ${this.getBodyTemplate()}
+          ${this.getLoadingTemplate()}
+          ${this.getPlaceholderTemplate()}
+        </div>`;
+  }
+
+  getHeaderTemplate() {
+    return this.isConfigNotEmpty()
+      ? `<div
+        data-element="header"
+        class="sortable-table__header sortable-table__row"
+      >
+        ${this.getHeaderInnerTemplate()}
+      </div>`
+      : '';
+  }
+
+  getHeaderInnerTemplate() {
+    return this.isConfigNotEmpty()
+      ? this.headerConfig.map(item => this.getHeaderCellTemplate(item)).join('')
+      : '';
+  }
+
+  getHeaderCellTemplate(cell) {
+    return `<div
+    class="sortable-table__cell"
+    data-id="${cell.id}"
+    data-sortable="${cell.sortable}"
+    data-order="${this.sorted.id === cell.id ? this.sorted.order : ''}"
+  >
+    <span>${cell.title}</span>
+    ${this.getSortArrowTemplate(cell.id)}
+  </div>`;
+  }
+
+  getBodyTemplate() {
+    return `<div data-element="body" class="sortable-table__body">
+      ${this.getBodyInnerTemplate()}
+    </div>`;
+  }
+  getBodyInnerTemplate(data = this.data) {
+    return this.isDataLoaded() ? data.map(item => this.getBodyRowTemplate(item)).join('') : '';
+  }
+
+  getBodyRowTemplate(row = {}) {
+    if (this.isConfigNotEmpty() && row) {
+      const content = this.headerConfig
+        .map(headerColumn => {
+          return headerColumn.template
+            ? `<div class="sortable-table__cell">${headerColumn.template(
+                row[headerColumn.id]
+              )}</div>`
+            : `<div class="sortable-table__cell">${row[headerColumn.id] || ''}</div>`;
+        })
+        .join('');
+
+      if (this.linkRow) {
+        return `<a href="${this.linkRow.hrefTemplate(
+          row[this.linkRow.field]
+        )}" class="sortable-table__row">${content}</a>`;
+      } else {
+        return `<div class="sortable-table__row">${content}</div>`;
+      }
+    }
+    return '';
+  }
+
+  getLoadingTemplate() {
+    return `<div data-element="loading" class="loading-line sortable-table__loading-line"></div>`;
+  }
+
+  getPlaceholderTemplate(html = '<p>Нет данных.</p>') {
+    return `<div data-element="emptyPlaceholder" class="sortable-table__empty-placeholder">
+     ${html}
+    </div>`;
+  }
+
+  getSortArrowTemplate(id) {
+    return id === this.sorted.id
+      ? `<span data-element="arrow" class="sortable-table__sort-arrow"><span class="sort-arrow"></span></span>`
+      : '';
+  }
+
+  updateData() {
+    this.hideLoading();
+    if (this.isDataLoaded()) {
+      this.hidePlaceholder();
+      this.subElements.header.innerHTML = this.getHeaderInnerTemplate();
+      this.subElements.body.innerHTML = this.getBodyInnerTemplate();
+    } else {
+      this.showPlaceholder();
+    }
+  }
+
+  isConfigNotEmpty() {
+    return this.headerConfig && this.headerConfig.length > 0;
+  }
+
+  isDataLoaded() {
+    if (this.data && this.data.length > 0) {
+      return this.data;
+    }
+    return false;
+  }
+
+  showPlaceholder(button = '') {
+    this.element.classList.add('sortable-table_empty');
+    if (button) this.subElements.emptyPlaceholder.append(button);
+  }
+
+  hidePlaceholder(button = '') {
+    this.element.classList.remove('sortable-table_empty');
+  }
+
+  showLoading() {
+    this.isLoading = true;
+    this.subElements.loading.classList.remove('sortable-table__loading-line');
+  }
+
+  hideLoading() {
+    this.isLoading = false;
+    this.subElements.loading.classList.add('sortable-table__loading-line');
   }
 
   remove() {
-    this.element.remove();
-    document.removeEventListener('scroll', this.onWindowScroll);
+    if (this.element) {
+      this.element.remove();
+    }
   }
 
   destroy() {
+    this.controller.abort();
     this.remove();
-    this.subElements = {};
+    this.element = null;
   }
 }
