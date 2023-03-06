@@ -1,6 +1,8 @@
 import SortableTable from '../sortable-table/index.js';
 
 export default class FilterTable extends SortableTable {
+  clearButton;
+
   constructor(
     headerConfig = [],
     {
@@ -94,5 +96,10 @@ export default class FilterTable extends SortableTable {
     }
 
     return filterArray;
+  }
+
+  destroy() {
+    this.clearButton();
+    super.destroy();
   }
 }
