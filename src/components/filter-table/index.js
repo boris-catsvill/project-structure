@@ -19,11 +19,8 @@ export default class FilterTable extends SortableTable {
       },
       linkRow = { hrefTemplate: item => `/products/${item}`, field: 'id' },
       range,
-      filter = {
-        byName: '',
-        byPrice: null,
-        byStatus: null
-      }
+      filter = {},
+      filters = []
     }
   ) {
     super(headerConfig, {
@@ -37,13 +34,11 @@ export default class FilterTable extends SortableTable {
     });
 
     this.filter = filter;
+    this.filters = filters;
     this.createClearButton();
-
-    this.render();
   }
 
   updateData() {
-    console.dir(this.subElements);
     this.hideLoading();
     if (this.isDataLoaded()) {
       const filtered = this.filterData();
@@ -78,22 +73,16 @@ export default class FilterTable extends SortableTable {
     this.updateData();
   }
 
-  filterData(filterData = this.data) {
-    let filterArray = [...filterData];
+  filterData(data = this.data) {
+    let filterArray = [...data];
 
-    console.log('filterData', this.filter);
-
-    if (this.filter.byName) {
-      filterArray = filterArray.filter(
-        item => item['title'] && item['title'].includes(this.filter.byName)
-      );
-    }
-    // if (this.filter.byPrice && this.filter.byPrice.from && this.filter.byPrice.to) {
-    //   filterArray = filterData.filter(item => item['title'].includes(this.filter.byName));
-    // }
-    if (typeof this.filter.byStatus === 'number') {
-      filterArray = filterArray.filter(item => item['status'] === this.filter.byStatus);
-    }
+    this.filters.forEach(filterItem => {
+      if (filterItem.testFns(this.filter[filterItem.id])) {
+        filterArray = filterArray.filter(item =>
+          filterItem.filterFns(item, this.filter[filterItem.id])
+        );
+      }
+    });
 
     return filterArray;
   }

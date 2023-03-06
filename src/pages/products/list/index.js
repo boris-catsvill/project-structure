@@ -1,7 +1,7 @@
 import FilterTable from '../../../components/filter-table/index.js';
-import SortableTable from '../../../components/sortable-table/index.js';
 import header from './header.js';
-
+import filters from './filters.js';
+import DoubleSlider from '../../../components/double-slider/index.js';
 export default class Page {
   element = {};
   subElements = {};
@@ -24,7 +24,8 @@ export default class Page {
 
   initComponents() {
     this.components['productsContainer'] = new FilterTable(header, {
-      url: 'api/rest/products'
+      url: 'api/rest/products',
+      filters: filters
     });
   }
 
@@ -38,9 +39,19 @@ export default class Page {
     document.addEventListener('clear-filters', this.handleClearFilters, {
       signal: this.controller.signal
     });
+    document.addEventListener('range-select', this.handlePriceRangeSelected, {
+      signal: this.controller.signal
+    });
+    this.components['productsContainer'].element.addEventListener(
+      'table-data-loaded',
+      this.handleTableLoaded,
+      {
+        signal: this.controller.signal
+      }
+    );
   }
 
-  handleClearFilters = event => {
+  handleClearFilters = () => {
     this.subElements.filterName.value = '';
     this.subElements.filterStatus.value = '';
     this.filter = {};
@@ -48,15 +59,37 @@ export default class Page {
   };
 
   handleFilterNameInput = ({ target }) => {
-    this.filter['byName'] = target.value;
+    this.filter['title'] = target.value;
     this.components['productsContainer'].applyFilter(this.filter);
   };
 
   handleFilterStatusChange = ({ target }) => {
     target.value === ''
-      ? delete this.filter['byStatus']
-      : (this.filter['byStatus'] = parseInt(target.value));
+      ? delete this.filter['status']
+      : (this.filter['status'] = parseInt(target.value));
     this.components['productsContainer'].applyFilter(this.filter);
+  };
+  handlePriceRangeSelected = ({ detail }) => {
+    this.filter['price'] = detail;
+    this.components['productsContainer'].applyFilter(this.filter);
+  };
+
+  handleTableLoaded = ({ detail }) => {
+    const priceRange = detail.reduce(
+      (accum, item) => {
+        if (!accum.min) accum.min = item.price;
+        if (!accum.max) accum.max = item.price;
+        accum.min = accum.min > item.price ? item.price : accum.min;
+        accum.max = accum.max < item.price ? item.price : accum.max;
+        return accum;
+      },
+      { min: null, max: null }
+    );
+    if (this.components['sliderContainer'] && this.components['sliderContainer'].destroy)
+      this.components['sliderContainer'].destroy();
+
+    this.components['sliderContainer'] = new DoubleSlider(priceRange);
+    this.subElements['sliderContainer'].append(this.components['sliderContainer'].element);
   };
 
   appendComponents() {
@@ -84,10 +117,10 @@ export default class Page {
             <label class="form-label">Сортировать по:</label>
             <input type="text" data-element="filterName" class="form-control" placeholder="Название товара">
           </div>
-          <div class="form-group" data-elem="sliderContainer">
+          <div class="form-group">
             <label class="form-label">Цена:</label>
-              <!-- RANGE SLIDER-->
-            </div>
+              <div data-element="sliderContainer"></div>
+          </div>
           <div class="form-group">
             <label class="form-label">Статус:</label>
             <select class="form-control" data-element="filterStatus">
