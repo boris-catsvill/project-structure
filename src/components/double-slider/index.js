@@ -9,15 +9,15 @@ export default class DoubleSlider {
   constructor({
     min = 0,
     max = 100,
-    formatValue = (data) => `$${data}`,
+    formatValue = data => `$${data}`,
     selected = {
       from: min,
-      to: max,
+      to: max
     },
-    step = 0,
+    step = 0
   } = {}) {
     this.values = selected;
-    this.selected = selected;
+    // this.selected = selected;
     this.min = min;
     this.max = max;
     this.step = step > 0 ? step : 0;
@@ -29,26 +29,18 @@ export default class DoubleSlider {
 
   render() {
     this.range = this.max - this.min;
-    this._left = Number(
-      ((this.values.from / (this.max + this.min)) * 100).toFixed(this.step)
-    );
-    this._right = Number(
-      ((this.values.to / (this.max + this.min)) * 100).toFixed(this.step)
-    );
+    this._left = Number(((this.values.from / (this.max + this.min)) * 100).toFixed(this.step));
+    this._right = Number(((this.values.to / (this.max + this.min)) * 100).toFixed(this.step));
 
-    const wrap = document.createElement("div");
+    const wrap = document.createElement('div');
     wrap.innerHTML = this.getTemplate();
     this.element = wrap.firstElementChild;
 
-    for (const item of this.element.querySelectorAll(
-      '[class^="range-slider"]'
-    )) {
-      this.subElements[
-        item.className.replace("range-slider__", "").replace("thumb-", "")
-      ] = item;
+    for (const item of this.element.querySelectorAll('[class^="range-slider"]')) {
+      this.subElements[item.className.replace('range-slider__', '').replace('thumb-', '')] = item;
     }
     let i = 0;
-    for (const item of this.element.querySelectorAll("span")) {
+    for (const item of this.element.querySelectorAll('span')) {
       if (!item.className) {
         this.subElements[i++] = item;
       }
@@ -71,7 +63,7 @@ export default class DoubleSlider {
     </div>`;
   }
 
-  move = (event) => {
+  move = event => {
     if (this.clickTarget === this.subElements.right) {
       this.right = this.pixelToPersent(event.clientX - this.baseCoords.x);
     }
@@ -84,36 +76,32 @@ export default class DoubleSlider {
     return Number(pixel / this.mousePersentStep).toFixed(this.step);
   }
 
-  pointerDown = (event) => {
+  pointerDown = event => {
     this.baseCoords = this.subElements.inner.getBoundingClientRect();
     if (!this.baseCoords.x) {
       this.baseCoords.x = this.baseCoords.top;
     }
 
     this.mousePersentStep = this.baseCoords.width / DoubleSlider.MAX_PERCENT;
-    this.clickTarget = event.target.closest("span");
+    this.clickTarget = event.target.closest('span');
 
-    document.addEventListener("pointermove", this.move);
+    document.addEventListener('pointermove', this.move);
   };
 
   init() {
-    this.subElements.left.addEventListener("pointerdown", this.pointerDown);
-    this.subElements.right.addEventListener("pointerdown", this.pointerDown);
-    document.addEventListener("pointerup", () => {
+    this.subElements.left.addEventListener('pointerdown', this.pointerDown);
+    this.subElements.right.addEventListener('pointerdown', this.pointerDown);
+    document.addEventListener('pointerup', () => {
       this.clickTarget = {};
-      document.removeEventListener("mousemove", this.move);
+      document.removeEventListener('mousemove', this.move);
     });
   }
 
   updateVisual() {
-    this.subElements.left.style.left = this.left + "%";
-    this.subElements.right.style.right = `${
-      DoubleSlider.MAX_PERCENT - this.right
-    }%`;
-    this.subElements.progress.style.left = this.left + "%";
-    this.subElements.progress.style.right = `${
-      DoubleSlider.MAX_PERCENT - this.right
-    }%`;
+    this.subElements.left.style.left = this.left + '%';
+    this.subElements.right.style.right = `${DoubleSlider.MAX_PERCENT - this.right}%`;
+    this.subElements.progress.style.left = this.left + '%';
+    this.subElements.progress.style.right = `${DoubleSlider.MAX_PERCENT - this.right}%`;
 
     this.subElements[0].textContent = this.formatValue(this.values.from);
     this.subElements[1].textContent = this.formatValue(this.values.to);
@@ -131,17 +119,13 @@ export default class DoubleSlider {
 
   getFromValue() {
     return Number(
-      (this.min + (this.range * this.left) / DoubleSlider.MAX_PERCENT).toFixed(
-        this.step
-      )
+      (this.min + (this.range * this.left) / DoubleSlider.MAX_PERCENT).toFixed(this.step)
     );
   }
 
   getToValue() {
     return Number(
-      (this.min + (this.range * this.right) / DoubleSlider.MAX_PERCENT).toFixed(
-        this.step
-      )
+      (this.min + (this.range * this.right) / DoubleSlider.MAX_PERCENT).toFixed(this.step)
     );
   }
 
@@ -181,7 +165,7 @@ export default class DoubleSlider {
 
   dispatchValues() {
     this.element.dispatchEvent(
-      new CustomEvent("range-select", { detail: this.values, bubbles: true })
+      new CustomEvent('range-select', { detail: this.values, bubbles: true })
     );
   }
 
@@ -189,6 +173,13 @@ export default class DoubleSlider {
     if (this.element) {
       this.element.remove();
     }
+  }
+
+  reset() {
+    this.left = DoubleSlider.MIN_PERCENT;
+    this.right = DoubleSlider.MAX_PERCENT;
+    this.updateValues();
+    this.updateVisual();
   }
 
   destroy() {

@@ -54,6 +54,8 @@ export default class Page {
   handleClearFilters = () => {
     this.subElements.filterName.value = '';
     this.subElements.filterStatus.value = '';
+    if (this.components['sliderContainer'] && this.components['sliderContainer'].reset)
+      this.components['sliderContainer'].reset();
     this.filter = {};
     this.components['productsContainer'].applyFilter(this.filter);
   };
