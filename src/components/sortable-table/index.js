@@ -200,14 +200,12 @@ export default class SortableTable {
   }
 
   getTemplate() {
-    return `<div data-element="productsContainer" class="products-list__container">
-        <div class="sortable-table">
+    return `<div class="sortable-table">
           ${this.getHeaderTemplate()}
           ${this.getBodyTemplate()}
           ${this.getLoadingTemplate()}
           ${this.getPlaceholderTemplate()}
-        </div>
-      </div>`;
+        </div>`;
   }
 
   getHeaderTemplate() {
@@ -272,15 +270,12 @@ export default class SortableTable {
   }
 
   getLoadingTemplate() {
-    return `<div data-element="loading" class="sortable-table sortable-table__loading-line"></div>`;
+    return `<div data-element="loading" class="loading-line sortable-table__loading-line"></div>`;
   }
 
-  getPlaceholderTemplate() {
+  getPlaceholderTemplate(html = '<p>Нет данных.</p>') {
     return `<div data-element="emptyPlaceholder" class="sortable-table__empty-placeholder">
-    <div>
-      <p>No products satisfies your filter criteria</p>
-      <button type="button" class="button-primary-outline">Reset all filters</button>
-    </div>
+     ${html}
     </div>`;
   }
 
@@ -312,12 +307,13 @@ export default class SortableTable {
     return false;
   }
 
-  showPlaceholder() {
-    this.subElements.emptyPlaceholder.classList.remove('sortable-table__empty-placeholder');
+  showPlaceholder(button = '') {
+    this.element.classList.add('sortable-table_empty');
+    if (button) this.subElements.emptyPlaceholder.append(button);
   }
 
-  hidePlaceholder() {
-    this.subElements.emptyPlaceholder.classList.add('sortable-table__empty-placeholder');
+  hidePlaceholder(button = '') {
+    this.element.classList.remove('sortable-table_empty');
   }
 
   showLoading() {

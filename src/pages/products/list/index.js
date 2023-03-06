@@ -23,22 +23,39 @@ export default class Page {
   }
 
   initComponents() {
-    // this.components['productsContainer'] = new SortableTable(header, {
-    //   url: 'api/rest/products'
-    // });
     this.components['productsContainer'] = new FilterTable(header, {
       url: 'api/rest/products'
     });
   }
 
   initListeners() {
-    this.subElements.filterName.addEventListener('change', this.handleFilterNameChange, {
+    this.subElements.filterName.addEventListener('input', this.handleFilterNameInput, {
+      signal: this.controller.signal
+    });
+    this.subElements.filterStatus.addEventListener('change', this.handleFilterStatusChange, {
+      signal: this.controller.signal
+    });
+    document.addEventListener('clear-filters', this.handleClearFilters, {
       signal: this.controller.signal
     });
   }
 
-  handleFilterNameChange = ({ target }) => {
+  handleClearFilters = event => {
+    this.subElements.filterName.value = '';
+    this.subElements.filterStatus.value = '';
+    this.filter = {};
+    this.components['productsContainer'].applyFilter(this.filter);
+  };
+
+  handleFilterNameInput = ({ target }) => {
     this.filter['byName'] = target.value;
+    this.components['productsContainer'].applyFilter(this.filter);
+  };
+
+  handleFilterStatusChange = ({ target }) => {
+    target.value === ''
+      ? delete this.filter['byStatus']
+      : (this.filter['byStatus'] = parseInt(target.value));
     this.components['productsContainer'].applyFilter(this.filter);
   };
 
@@ -83,7 +100,6 @@ export default class Page {
       </div>
 
     <div data-element="productsContainer" class="products-list__container"></div>
-    <button type="button" class="button-primary-outline">Очистить фильтры</button>
     </div>`;
   }
   remove() {

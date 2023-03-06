@@ -20,7 +20,7 @@ export default class FilterTable extends SortableTable {
       filter = {
         byName: '',
         byPrice: null,
-        byStatus: ''
+        byStatus: null
       }
     }
   ) {
@@ -35,21 +35,41 @@ export default class FilterTable extends SortableTable {
     });
 
     this.filter = filter;
+    this.createClearButton();
 
     this.render();
   }
 
   updateData() {
+    console.dir(this.subElements);
     this.hideLoading();
     if (this.isDataLoaded()) {
       const filtered = this.filterData();
-      this.hidePlaceholder();
+      if (filtered.length > 0) {
+        this.hidePlaceholder();
+      } else {
+        this.showPlaceholder(this.clearButton);
+      }
       this.subElements.header.innerHTML = this.getHeaderInnerTemplate();
       this.subElements.body.innerHTML = this.getBodyInnerTemplate(filtered);
     } else {
       this.showPlaceholder();
     }
   }
+  //
+
+  createClearButton() {
+    const wrap = document.createElement('div');
+    wrap.innerHTML =
+      '<button type="button" class="button-primary-outline">Очистить фильтры</button>';
+    this.clearButton = wrap.firstElementChild;
+    this.clearButton.addEventListener('click', this.clearFilters);
+  }
+
+  clearFilters = () => {
+    const clearEvent = new CustomEvent('clear-filters');
+    document.dispatchEvent(clearEvent);
+  };
 
   applyFilter(filter = this.filter) {
     this.filter = filter;
@@ -59,14 +79,19 @@ export default class FilterTable extends SortableTable {
   filterData(filterData = this.data) {
     let filterArray = [...filterData];
 
+    console.log('filterData', this.filter);
+
     if (this.filter.byName) {
-      filterArray = filterData.filter(
+      filterArray = filterArray.filter(
         item => item['title'] && item['title'].includes(this.filter.byName)
       );
     }
     // if (this.filter.byPrice && this.filter.byPrice.from && this.filter.byPrice.to) {
     //   filterArray = filterData.filter(item => item['title'].includes(this.filter.byName));
     // }
+    if (typeof this.filter.byStatus === 'number') {
+      filterArray = filterArray.filter(item => item['status'] === this.filter.byStatus);
+    }
 
     return filterArray;
   }
