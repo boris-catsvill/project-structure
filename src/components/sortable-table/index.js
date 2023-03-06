@@ -58,7 +58,7 @@ export default class SortableTable {
     try {
       await this.loadData();
     } catch (error) {
-      console.log('render loadData Error' + error);
+      console.log('render loadData Error', error, this.data);
     }
   }
 
@@ -148,6 +148,7 @@ export default class SortableTable {
       if (result) {
         if (!this.isScrolled) this.data = [];
         this.data.push(...result);
+        this.dispatchEventDataLoaded();
       }
     } catch (error) {
       throw `Error of data loading. ${error.message}`;
@@ -156,6 +157,14 @@ export default class SortableTable {
     this.updateData();
 
     return this.data;
+  }
+
+  dispatchEventDataLoaded() {
+    const dataLoadedEvent = new CustomEvent('table-data-loaded', {
+      bubbles: true,
+      detail: this.data
+    });
+    this.element.dispatchEvent(dataLoadedEvent);
   }
 
   getRangeValue(value) {
