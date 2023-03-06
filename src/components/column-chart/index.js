@@ -11,7 +11,7 @@ export default class ColumnChart {
 
   constructor({
     url = '',
-    range = {},
+    range = { from: null, to: null },
     label = '',
     link = '',
     value = 0,
@@ -112,8 +112,8 @@ export default class ColumnChart {
 
   async update(from = null, to = null) {
     const isNewRange =
-      !this.range?.from ||
-      !this.range?.to ||
+      !this.range.from ||
+      !this.range.to ||
       this.range.from.getTime() !== from.getTime() ||
       this.range.to.getTime() !== to.getTime();
 
