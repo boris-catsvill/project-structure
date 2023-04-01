@@ -1,7 +1,7 @@
 import SortableList from '../sortable-list/index.js';
 import escapeHtml from '../../utils/escape-html.js';
 import fetchJson from '../../utils/fetch-json.js';
-
+import NotificationMessage from '../../components/notification/index.js';
 const IMGUR_CLIENT_ID = '28aaa2e823b03b1';
 const BACKEND_URL = 'https://course-js.javascript.ru';
 
@@ -36,7 +36,7 @@ export default class ProductForm {
 
         uploadImage.classList.remove('is-loading');
         uploadImage.disabled = false;
-
+        console.log(result);
         imageListContainer.firstElementChild.append(
           this.fillImagesList(result.data.link, file.name)
         );
@@ -62,11 +62,12 @@ export default class ProductForm {
         },
         body: JSON.stringify(data)
       });
-
+      this.notification('Товар сохранен', 'success');
       this.dispatchEvent(result);
       console.log('форма отправлена');
     } catch (error) {
       console.error('ошибка отправки формы', error);
+      this.notification('Произошла ошибка', 'error');
     }
   };
 
@@ -86,7 +87,6 @@ export default class ProductForm {
     this.fillThisForm();
     this.createImageList();
     this.initEventListeners();
-
     return this.element;
   }
 
@@ -94,7 +94,6 @@ export default class ProductForm {
     const wrapper = document.createElement('div');
     wrapper.innerHTML = this.product ? this.getTemplate() : this.getEmptyTemplate();
     this.element = wrapper.firstElementChild;
-
     this.subElements = this.getSubElements();
   }
 
@@ -133,7 +132,7 @@ export default class ProductForm {
 
   async getProduct(productId) {
     const url = new URL('/api/rest/products', BACKEND_URL);
-    url.searchParams.set('id', productId);
+    url.searchParams.set('id', encodeURIComponent(productId));
     try {
       const response = await fetchJson(url);
       return response[0];
@@ -198,11 +197,11 @@ export default class ProductForm {
   }
 
   getTemplate() {
-    return ` <div class="product-form">
+    return `<div class="product-form">
     <form data-element="productForm" class="form-grid">
     <div class="form-group form-group__half_left">
         <fieldset>
-          <label class="form-label">Название товара</label>
+          <label class="form-label">Название товар</label>
           <input required="" type="text" name="title" class="form-control" placeholder="Название товара">
         </fieldset>
       </div>
@@ -212,13 +211,9 @@ export default class ProductForm {
       </div>
       <div class="form-group form-group__wide" data-element="sortable-list-container">
         <label class="form-label">Фото</label>
-
         <div data-element="imageListContainer"></div>
-
-
           </div>
         <button type="button" name="uploadImage" class="button-primary-outline" data-element="uploadImage"><span>Загрузить</span></button>
-      </div>
       <div class="form-group form-group__half_left">
         <label class="form-label">Категория</label>
           ${this.createCategories()}
@@ -261,12 +256,10 @@ export default class ProductForm {
 
   createImageList() {
     const { images } = this.product;
-
     const items = images.map(({ url, source }) => this.fillImagesList(url, source));
-    console.log(items);
+
     const sortableList = new SortableList({ items });
 
-    console.log(sortableList.element);
     this.subElements.imageListContainer.append(sortableList.element);
   }
 
@@ -295,6 +288,10 @@ export default class ProductForm {
       }
     });
   }
+  notification(message, type) {
+    const notification = new NotificationMessage(message, { duration: 3000, type: type });
+    notification.show();
+  }
   dispatchEvent(result) {
     const event = this.productId
       ? new CustomEvent('product-updated', { detail: result })
@@ -311,6 +308,7 @@ export default class ProductForm {
       this.element.remove();
     }
   }
+
   destroy() {
     this.remove();
     this.subElements = null;

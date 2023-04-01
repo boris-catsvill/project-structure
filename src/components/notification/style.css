@@ -25,32 +25,67 @@ body {
   --white: #ffffff;
 }
 
-/* NotificationMessage styles */
 .notification {
   width: 200px;
   margin: 10px 5px;
   font-size: 14px;
-  box-shadow: 0 2px 4px 1px rgba(0, 0, 0, .5);
+  box-shadow: 0 2px 4px 1px rgba(0, 0, 0, 0.5);
   border-radius: 2px;
   animation: calc(var(--value) * 0.1) ease-out calc(var(--value) * 0.9) fadeOut;
   z-index: 1000;
+  position: fixed;
+  right: 75px;
+  bottom: 75px;
 }
 
+.notification.show {
+  display: block;
+  -webkit-animation: fadeIn 0.3s linear;
+  animation: fadeIn 0.3s linear;
+}
+
+.notification__content {
+  padding: 16px 24px 16px 64px;
+  font-size: 16px;
+  line-height: 20px;
+  color: var(--white);
+  position: relative;
+}
+
+.notification.notification_success .notification__content:after,
+.notification.notification_error .notification__content:after {
+  content: '';
+  position: absolute;
+  left: 24px;
+  top: 50%;
+  width: 24px;
+  height: 24px;
+  transform: translate(0, -50%);
+  background-size: 24px 24px;
+}
+
+.notification__content a {
+  color: var(--middle-blue);
+  text-decoration: none;
+}
+
+/* NotificationMessage styles */
+
 /* Success */
-.notification.success {
+.notification_success {
   background: #cdfccd;
 }
 
-.notification.success .timer {
+.notification_success .timer {
   background: #86aa86;
 }
 
 /* Error */
-.notification.error {
+.notification_error {
   background: #ffe3e3;
 }
 
-.notification.error .timer {
+.notification_error .timer {
   background: #c28585;
 }
 
@@ -90,4 +125,3 @@ body {
     width: 0;
   }
 }
-
