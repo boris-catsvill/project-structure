@@ -1,7 +1,8 @@
 import SortableList from '../sortable-list/index.js';
 import escapeHtml from '../../utils/escape-html.js';
 import fetchJson from '../../utils/fetch-json.js';
-import NotificationMessage from '../../components/notification/index.js';
+import iconGrab from '../../assets/icons/icon-grab.svg';
+import iconTrash from '../../assets/icons/icon-trash.svg';
 const IMGUR_CLIENT_ID = '28aaa2e823b03b1';
 const BACKEND_URL = 'https://course-js.javascript.ru';
 
@@ -36,7 +37,6 @@ export default class ProductForm {
 
         uploadImage.classList.remove('is-loading');
         uploadImage.disabled = false;
-        console.log(result);
         imageListContainer.firstElementChild.append(
           this.fillImagesList(result.data.link, file.name)
         );
@@ -62,12 +62,12 @@ export default class ProductForm {
         },
         body: JSON.stringify(data)
       });
-      this.notification('Товар сохранен', 'success');
+
       this.dispatchEvent(result);
       console.log('форма отправлена');
     } catch (error) {
       console.error('ошибка отправки формы', error);
-      this.notification('Произошла ошибка', 'error');
+      this.element.dispatchEvent(new CustomEvent('error', { detail: error }));
     }
   };
 
@@ -270,12 +270,12 @@ export default class ProductForm {
       <input type="hidden" name="url" value="${escapeHtml(url)}">
       <input type="hidden" name="source" value="${escapeHtml(source)}">
       <span>
-    <img src="icon-grab.svg" data-grab-handle alt="grab">
+    <img src="${iconGrab}" data-grab-handle alt="grab">
     <img class="sortable-table__cell-img" alt="Image" src="${escapeHtml(url)}">
     <span>${escapeHtml(source)}</span>
   </span>
       <button type="button">
-        <img src="icon-trash.svg" data-delete-handle alt="delete">
+        <img src="${iconTrash}" data-delete-handle alt="delete">
       </button></li>`;
     return wrapper.firstElementChild;
   }
@@ -288,10 +288,7 @@ export default class ProductForm {
       }
     });
   }
-  notification(message, type) {
-    const notification = new NotificationMessage(message, { duration: 3000, type: type });
-    notification.show();
-  }
+
   dispatchEvent(result) {
     const event = this.productId
       ? new CustomEvent('product-updated', { detail: result })
