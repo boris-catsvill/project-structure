@@ -48,7 +48,7 @@ export default class Page {
         to
       },
       label: 'Заказы',
-      link: '/sales'
+      link: '/products'
     });
 
     const salesChart = new ColumnChart({
@@ -105,6 +105,7 @@ export default class Page {
   async updateBestSellers(from, to) {
     const response = await this.loadData(from, to);
     this.components.sortableTable.update(response);
+    this.components.sortableTable.removeEventListener();
   }
 
   loadData(from, to) {

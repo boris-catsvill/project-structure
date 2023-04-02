@@ -264,14 +264,16 @@ export default class SortableTable {
       return accum;
     }, {});
   }
-
+  removeEventListener = () => {
+    document.removeEventListener('scroll', this.onWindowScroll);
+  };
   remove() {
     this.element.remove();
   }
 
   destroy() {
+    this.removeEventListener();
     this.remove();
     this.subElements = {};
-    window.removeEventListener('scroll', this.onWindowScroll);
   }
 }
