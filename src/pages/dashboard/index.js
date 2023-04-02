@@ -48,7 +48,7 @@ export default class Page {
         to
       },
       label: 'Заказы',
-      link: '/products'
+      link: '/sales'
     });
 
     const salesChart = new ColumnChart({
