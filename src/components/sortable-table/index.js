@@ -7,7 +7,7 @@ export default class SortableTable {
   subElements = {};
   data = [];
   loading = false;
-  step = 20;
+  step = 29;
   start = 1;
   end = this.start + this.step;
 
@@ -69,7 +69,7 @@ export default class SortableTable {
         order: 'asc'
       },
       isSortLocally = false,
-      step = 20,
+      step = 29,
       start = 1,
       end = start + step
     } = {}
@@ -142,7 +142,9 @@ export default class SortableTable {
     const order = this.sorted.id === id ? this.sorted.order : 'asc';
 
     return `
-      <div class="sortable-table__cell" data-id="${id}" data-sortable="${sortable}" data-order="${order}">
+      <div class="sortable-table__cell" data-id="${id}" ${
+      sortable ? 'data-sortable="true"' : ''
+    }" data-order="${order}">
         <span>${title}</span>
         ${this.getHeaderSortingArrow(id)}
       </div>
@@ -170,9 +172,9 @@ export default class SortableTable {
     return data
       .map(
         item => `
-      <div class="sortable-table__row">
+      <a href='/products/${item.id}' class="sortable-table__row">
         ${this.getTableRow(item)}
-      </div>`
+      </a>`
       )
       .join('');
   }
@@ -207,7 +209,7 @@ export default class SortableTable {
 
   initEventListeners() {
     this.subElements.header.addEventListener('pointerdown', this.onSortClick);
-    window.addEventListener('scroll', this.onWindowScroll);
+    document.addEventListener('scroll', this.onWindowScroll);
   }
 
   sortOnClient(id, order) {

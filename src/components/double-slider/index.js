@@ -3,7 +3,7 @@ export default class DoubleSlider {
   subElements = {};
   activeThumb;
 
-  startMooving = (event) => {
+  startMooving = event => {
     this.activeThumb = event.target;
     event.preventDefault();
 
@@ -11,23 +11,21 @@ export default class DoubleSlider {
 
     if (this.activeThumb === this.subElements.leftThumb) {
       this.shiftX = right - event.clientX;
-      console.log(left, right, event.clientX);
     } else {
       this.shiftX = left - event.clientX;
-      console.log(left, right, event.clientX);
     }
-    this.element.classList.add("range-slider_dragging");
-    document.addEventListener("pointermove", this.onPointerMove);
-    document.addEventListener("pointerup", this.onPointerUp);
+    this.element.classList.add('range-slider_dragging');
+    document.addEventListener('pointermove', this.onPointerMove);
+    document.addEventListener('pointerup', this.onPointerUp);
   };
 
-  onPointerMove = (event) => {
+  onPointerMove = event => {
     event.preventDefault();
 
     const {
       left: leftBorder,
       right: rightBorder,
-      width,
+      width
     } = this.subElements.slider.getBoundingClientRect();
 
     if (this.activeThumb === this.subElements.leftThumb) {
@@ -40,11 +38,8 @@ export default class DoubleSlider {
       if (newLeft + right > 100) {
         newLeft = 100 - rightBorder;
       }
-      this.activeThumb.style.left = this.subElements.progressBar.style.left =
-        newLeft + "%";
-      this.subElements.from.innerHTML = this.formatValue(
-        this.getPercent().from
-      );
+      this.activeThumb.style.left = this.subElements.progressBar.style.left = newLeft + '%';
+      this.subElements.from.innerHTML = this.formatValue(this.getPercent().from);
     }
 
     if (this.activeThumb === this.subElements.rightThumb) {
@@ -60,30 +55,24 @@ export default class DoubleSlider {
       if (left + newRight > 100) {
         newRight = 100 - left;
       }
-      this.activeThumb.style.right = this.subElements.progressBar.style.right =
-        newRight + "%";
+      this.activeThumb.style.right = this.subElements.progressBar.style.right = newRight + '%';
       this.subElements.to.innerHTML = this.formatValue(this.getPercent().to);
     }
   };
 
   onPointerUp = () => {
-    this.element.classList.remove("range-slider_dragging");
-    this.element.removeEventListener("pointermove", this.onPointerMove);
-    this.element.removeEventListener("pointerup", this.onPointerUp);
+    this.element.classList.remove('range-slider_dragging');
+    this.element.removeEventListener('pointermove', this.onPointerMove);
+    this.element.removeEventListener('pointerup', this.onPointerUp);
     this.element.dispatchEvent(
-      new CustomEvent("range-select", {
+      new CustomEvent('range-select', {
         detail: this.getPercent(),
-        bubbles: true,
+        bubbles: true
       })
     );
   };
 
-  constructor({
-    min = 100,
-    max = 200,
-    formatValue = (value) => "$" + value,
-    selected = {},
-  } = {}) {
+  constructor({ min = 100, max = 200, formatValue = value => '$' + value, selected = {} } = {}) {
     this.formatValue = formatValue;
     this.min = min;
     this.max = max;
@@ -93,7 +82,7 @@ export default class DoubleSlider {
     this.render();
   }
   render() {
-    const wrapper = document.createElement("div");
+    const wrapper = document.createElement('div');
     wrapper.innerHTML = this.getTemplate;
     this.element = wrapper.firstElementChild;
     this.subElements = this.getSubElements(this.element);
@@ -127,8 +116,8 @@ export default class DoubleSlider {
     const diff = this.max - this.min;
     const rangeTotal = diff > 0 ? diff : 1;
 
-    const left = this.getLeftShift(rangeTotal) + "%";
-    const right = this.getRightShift(rangeTotal) + "%";
+    const left = this.getLeftShift(rangeTotal) + '%';
+    const right = this.getRightShift(rangeTotal) + '%';
 
     this.subElements.progress.style.left = left;
     this.subElements.progress.style.right = right;
@@ -139,7 +128,7 @@ export default class DoubleSlider {
 
   getSubElements(element) {
     const result = {};
-    const elements = element.querySelectorAll("[data-element]");
+    const elements = element.querySelectorAll('[data-element]');
     for (const elem of elements) {
       const name = elem.dataset.element;
       result[name] = elem;
@@ -149,21 +138,15 @@ export default class DoubleSlider {
   }
 
   initEventListeners() {
-    this.subElements.leftThumb.addEventListener(
-      "pointerdown",
-      this.startMooving
-    );
-    this.subElements.rightThumb.addEventListener(
-      "pointerdown",
-      this.startMooving
-    );
+    this.subElements.leftThumb.addEventListener('pointerdown', this.startMooving);
+    this.subElements.rightThumb.addEventListener('pointerdown', this.startMooving);
   }
   update() {
     const diff = this.max - this.min;
     const rangeTotal = diff > 0 ? diff : 1;
 
-    const left = this.getLeftShift(rangeTotal) + "%";
-    const right = this.getRightShift(rangeTotal) + "%";
+    const left = this.getLeftShift(rangeTotal) + '%';
+    const right = this.getRightShift(rangeTotal) + '%';
 
     this.subElements.progressBar.style.left = left;
     this.subElements.progressBar.style.right = right;
@@ -188,7 +171,7 @@ export default class DoubleSlider {
     this.remove();
     this.element = null;
     this.subElements = null;
-    document.removeEventListener("pointermove", this.onPointerMove);
-    document.removeEventListener("pointerup", this.onPointerUp);
+    document.removeEventListener('pointermove', this.onPointerMove);
+    document.removeEventListener('pointerup', this.onPointerUp);
   }
 }

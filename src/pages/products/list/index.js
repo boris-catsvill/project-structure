@@ -1,6 +1,5 @@
 import SortableTable from '../../../components/sortable-table';
 import headerConfig from '../bestsellers-header.js';
-import ProductForm from '../../../components/product-form';
 
 export default class Page {
   element;
@@ -77,8 +76,15 @@ export default class Page {
     }));
     this.subElements.productsContainer.append(products.element);
   }
+  initEventListeners() {
+    const { filterStatus } = this.subElements;
+    filterStatus.addEventListener('change', this.onFilterStatusChange);
+  }
+  // onFilterStatusChange = event => {
+  //   const filterStatus = event.target.value;
+  //   this.components.products.sortOnServer('status', filterStatus, 'string');
+  // };
 
-  initEventListeners() {}
   remove() {
     if (this.element) {
       this.element.remove();

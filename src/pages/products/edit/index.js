@@ -58,14 +58,17 @@ export default class Page {
     });
   }
 
+  removeEVentListenersH() {}
   remove() {
     if (this.element) {
       this.element.remove();
     }
   }
+
   destroy() {
     this.remove();
     this.element = null;
     this.form = null;
+    this.removeEVentListeners();
   }
 }

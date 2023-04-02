@@ -1,4 +1,4 @@
-export default class SortableList {
+export default class SortCategories {
   onPointerMove = ({ clientX, clientY }) => {
     this.moveDraggingAt(clientX, clientY);
 
@@ -42,27 +42,9 @@ export default class SortableList {
     this.dragStop();
   };
 
-  constructor({ items = [] } = {}) {
-    this.items = items;
-
-    this.render();
-  }
-
-  render() {
-    this.element = document.createElement('ul');
-    this.element.className = 'sortable-list';
-
-    this.addItems();
+  constructor(items) {
+    this.element = items;
     this.initEventListeners();
-  }
-
-  addItems() {
-    // item is a DOM element
-    for (const item of this.items) {
-      item.classList.add('sortable-list__item');
-    }
-
-    this.element.append(...this.items);
   }
 
   initEventListeners() {
@@ -89,7 +71,7 @@ export default class SortableList {
   }
 
   createPlaceholderElement(width, height) {
-    const element = document.createElement('li');
+    const element = document.createElement('div');
 
     element.className = 'sortable-list__placeholder';
     element.style.width = `${width}px`;
@@ -160,18 +142,19 @@ export default class SortableList {
     this.removeDocumentEventListeners();
 
     if (placeholderIndex !== this.elementInitialIndex) {
-      this.dispatchEvent('sortable-list-reorder', {
-        from: this.elementInitialIndex,
-        to: placeholderIndex
-      });
+      const elements = this.element.querySelectorAll('.sortable-list__item');
+      const result = [...elements].map((item, index) => {
+        return { id: item.dataset.id, weight: index + 1 };
+      }, {});
+      this.dispatchEvent('sortable-list-reorder', result);
     }
   }
 
-  dispatchEvent(type, details) {
+  dispatchEvent(type, detail) {
     this.element.dispatchEvent(
       new CustomEvent(type, {
         bubbles: true,
-        details
+        detail
       })
     );
   }
