@@ -4,9 +4,9 @@ import escapeHtml from '../../utils/escape-html.js';
 export default class CategoriesContainer {
   element;
   subElements = {};
-  evntSignal = new AbortController();
+  eventController = new AbortController();
 
-  constructor(list = [{ id: 'containerId', title: 'Container title', itemList: [] }]) {
+  constructor(list = [{ id: '', title: '', itemList: [] }]) {
     this.list = list;
     this.render();
   }
@@ -20,14 +20,13 @@ export default class CategoriesContainer {
     if (categBlock) {
       categBlock.classList.toggle('category_open');
     }
-    return false;
   };
 
   onSubcatReorder = event => {
     const elements = event.target.querySelectorAll('[data-id]');
-    const itemOrder = [...elements].map((elem, ord) => ({
-      id: elem.dataset.id,
-      order: ord
+    const itemOrder = [...elements].map((element, order) => ({
+      id: element.dataset.id,
+      order: order
     }));
     this.element.dispatchEvent(
       new CustomEvent('subcategory-reorder', {
@@ -39,17 +38,21 @@ export default class CategoriesContainer {
   };
 
   render() {
+    this.renderComponent();
+    this.subElements = this.getSubelements();
+    this.initEventListeners();
+  }
+
+  renderComponent() {
     this.element = document.createElement('div');
-    this.list.map(catItem => {
+    for (const catItem of this.list) {
       const wrapper = document.createElement('div');
       wrapper.innerHTML = this.getTemplate(catItem.id, catItem.title);
       const element = wrapper.firstElementChild;
       const body = element.querySelector('.subcategory-list');
       this.addListElements(catItem.itemList, body);
       this.element.append(element);
-    });
-    this.subElements = this.getSubelements();
-    this.initEventListeners();
+    }
   }
 
   addListElements(itemList, parent) {
@@ -94,15 +97,12 @@ export default class CategoriesContainer {
   }
 
   initEventListeners() {
-    const { signal } = this.evntSignal;
+    const { signal } = this.eventController;
     const header = this.element.querySelector('.category__header');
     header.addEventListener('pointerdown', event => this.onPointerDown(event), { signal });
     this.element.addEventListener('sortable-list-reorder', event => this.onSubcatReorder(event), {
       signal
     });
-    if (!this.evntSignal) {
-      this.evntSignal = new AbortController();
-    }
   }
 
   remove() {
@@ -112,8 +112,8 @@ export default class CategoriesContainer {
   }
 
   destroy() {
-    if (this.evntSignal) {
-      this.evntSignal.abort();
+    if (this.eventController) {
+      this.eventController.abort();
     }
     this.remove();
     this.element = null;

@@ -11,11 +11,13 @@ export default class Page {
   components = {};
 
   async updateComponents(from, to) {
-    const data = await fetchJson(
-      `${
-        process.env.BACKEND_URL
-      }api/dashboard/bestsellers?_start=1&_end=20&from=${from.toISOString()}&to=${to.toISOString()}`
-    );
+    this.urlSortableTable = new URL(new URL('api/dashboard/bestsellers', process.env.BACKEND_URL));
+    this.urlSortableTable.searchParams.set('_start', 1);
+    this.urlSortableTable.searchParams.set('_end', 20);
+    this.urlSortableTable.searchParams.set('from', from.toISOString());
+    this.urlSortableTable.searchParams.set('to', from.toISOString());
+
+    const data = await fetchJson(this.urlSortableTable);
     this.components.sortableTable.update(data);
     this.components.ordersChart.update(from, to);
     this.components.salesChart.update(from, to);

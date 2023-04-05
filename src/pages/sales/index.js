@@ -7,14 +7,14 @@ export default class Page {
   subElements = {};
   components = {};
 
-  async updateComponent(from, to) {
+  updateComponent(from, to) {
     const dateParams = {
       createdAt_gte: from.toISOString(),
       createdAt_lte: to.toISOString()
     };
 
     this.components.sortableTable.setFilter(dateParams);
-    await this.components.sortableTable.refresh(true);
+    this.components.sortableTable.refresh(true);
   }
 
   async initComponents() {

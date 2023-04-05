@@ -29,10 +29,10 @@ export default class Page {
     return this.element;
   }
 
-  async initComponents() {
-    const productId = this.match[1] ? this.match[1] : false;
+  initComponents() {
+    const [, productId] = this.match;
     this.components.productForm = new ProductForm(productId);
-    await this.components.productForm.render();
+    this.components.productForm.render();
   }
 
   get template() {
@@ -50,9 +50,9 @@ export default class Page {
   }
 
   getSubElements(element) {
-    const result = {};
-    result.productForm = element.querySelector('.content-box');
-    return result;
+    return {
+      productForm: element.querySelector('.content-box')
+    };
   }
 
   renderComponents() {

@@ -22,9 +22,9 @@ export default class Page {
       return;
     }
 
-    this.timerId = setTimeout(() => {
+    setTimeout(() => {
       this.updateTableComponent();
-    }, 1000);
+    });
   };
 
   async render() {
@@ -48,7 +48,7 @@ export default class Page {
       price_lte: to
     };
     for (const [filterKey, filterVal] of Object.entries(this.filters)) {
-      let fldName = filterKey.slice(6).toLowerCase();
+      const fldName = filterKey.toLowerCase();
       switch (fldName) {
         case 'name':
           if (filterVal.value) {
@@ -68,7 +68,7 @@ export default class Page {
     this.inUpdate = false;
   }
 
-  async initComponents() {
+  initComponents() {
     const sliderContainer = new DoubleSlider({
       min: 0,
       max: 4000,

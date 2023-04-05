@@ -53,12 +53,12 @@ export default class Page {
     for (const parName in this.queryParams) {
       url.searchParams.set(parName, this.queryParams[parName]);
     }
-    return fetchJson(url.toString());
+    return fetchJson(url);
   }
 
-  async submitChanges(restData) {
+  submitChanges(restData) {
     const url = this.urlDataUpdate;
-    await fetchJson(url, {
+    fetchJson(url, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json'

@@ -19,10 +19,10 @@ const header = [
     template: data => {
       const date = new Date(Date.parse(data));
       const srtFormst = date.toLocaleString(
-        'ru', //"en"
+        'ru',
         {
           year: 'numeric',
-          month: 'short', //"long"
+          month: 'short',
           day: 'numeric'
         }
       );
