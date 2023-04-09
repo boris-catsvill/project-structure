@@ -65,7 +65,6 @@ export default class Router {
   }
 
   navigate (path) {
-    console.log(path);
     history.pushState(null, null, path);
     this.route();
   }

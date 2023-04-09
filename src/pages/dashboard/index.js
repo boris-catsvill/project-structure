@@ -7,7 +7,7 @@ import PageComponent from '../page';
 export default class Page extends PageComponent {
   get template() {
     return `
-      <div class='dashboard'>
+      <div class='dashboard full-height flex-column'>
         <div class='content__top-panel'>
           <h2 class='page-title'>Панель управления</h2>
           <div data-element='rangePicker'></div>

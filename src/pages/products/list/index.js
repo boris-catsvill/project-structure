@@ -150,7 +150,7 @@ export default class Page extends PageComponent {
         this.components.productsContainer.data.length === 0
       );
     } catch (error) {
-      console.log(error);
+      console.error(error);
 
       const notification = new NotificationMessage(error.message, {
         duration: 2000,
