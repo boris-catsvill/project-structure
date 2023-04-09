@@ -1,7 +1,9 @@
 import Router from './router/index.js';
 import tooltip from './components/tooltip/index.js';
+import { default as initEventListeners } from './eventListeners';
 
 tooltip.initialize();
+initEventListeners();
 
 const router = Router.instance();
 

@@ -1,78 +1,87 @@
 class Tooltip {
-  static instance;
+    static instance;
+    element;
+    elements;
 
-  element;
-
-  onMouseOver = event => {
-    const element = event.target.closest('[data-tooltip]');
-
-    if (element) {
-      this.render(element.dataset.tooltip);
-      this.moveTooltip(event);
-
-      document.addEventListener('pointermove', this.onMouseMove);
-    }
-  };
-
-  onMouseMove = event => {
-    this.moveTooltip(event);
-  };
-
-  onMouseOut = () => {
-    this.removeTooltip();
-  };
-
-  removeTooltip() {
-    if (this.element) {
-      this.element.remove();
-      this.element = null;
-
-      document.removeEventListener('pointermove', this.onMouseMove);
-    }
-  }
-
-  constructor() {
-    if (Tooltip.instance) {
-      return Tooltip.instance;
+    handlePointerOver = event => {
+        this.over(event);
     }
 
-    Tooltip.instance = this;
-  }
+    handlePointerMove = event => {
+        this.move(event);
+    };
 
-  initEventListeners() {
-    document.addEventListener('pointerover', this.onMouseOver);
-    document.addEventListener('pointerout', this.onMouseOut);
-  }
+    constructor() {
+        if (Tooltip.instance) {
+            return Tooltip.instance;
+        }
 
-  initialize () {
-    this.initEventListeners();
-  }
+        Tooltip.instance = this;
+    }
 
-  render(html) {
-    this.element = document.createElement('div');
-    this.element.className = 'tooltip';
-    this.element.innerHTML = html;
+    initialize() {
+        this.render();
+        this.initEventListeners();
+    }
 
-    document.body.append(this.element);
-  }
+    render() {
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = `<div class="tooltip"></div>`;
+        this.element = wrapper.firstElementChild;
+        this.elements = new Map();
+    }
 
-  moveTooltip(event) {
-    const left = event.clientX + 10;
-    const top = event.clientY + 10;
+    initEventListeners() {
+        document.addEventListener('pointerover', this.handlePointerOver);
+    }
 
-    // TODO: Add logic for window borders
+    over(event) {
+        const target = event.target;
 
-    this.element.style.left = left + 'px';
-    this.element.style.top = top + 'px';
-  }
+        if (!target.dataset.tooltip) return;
 
-  destroy() {
-    document.removeEventListener('pointerover', this.onMouseOver);
-    document.removeEventListener('pointerout', this.onMouseOut);
-    this.removeTooltip();
-  }
+        if (!this.elements.has(target)) {
+            this.elements.set(target, target.dataset.tooltip);
+        }
+
+        this.element.innerHTML = this.elements.get(target);
+
+        document.body.append(this.element);
+
+        target.addEventListener('pointermove', this.handlePointerMove);
+
+        target.addEventListener('pointerout', () => {
+            this.element.remove();
+            target.removeEventListener('pointermove', this.handlePointerMove);
+        });
+    }
+
+    move(event) {
+        const shift = 10;
+        const clientY = event.clientY + shift;
+        const clientX = event.clientX + shift;
+
+        this.element.style.top = `${clientY}px`;
+        this.element.style.left = `${clientX}px`;
+    }
+
+    remove() {
+        if (this.element) {
+            this.element.remove();
+        }
+    }
+
+    destroy() {
+        this.remove();
+
+        this.element = null;
+        this.elements = null;
+
+        document.removeEventListener('pointerover', this.handlePointerOver);
+
+        Tooltip.instance = null;
+    }
 }
 
 const tooltip = new Tooltip();
-
 export default tooltip;

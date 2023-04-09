@@ -421,7 +421,7 @@ body {
     border: 1px solid var(--blue);
     border-radius: 4px;
     cursor: pointer;
-    transition: 0.2s all;
+    transition: 0.2s opacity;
     text-decoration: none;
 }
 
@@ -450,11 +450,11 @@ body {
     border-color: var(--light-blue);
 }
 
-button.fit-content {
+.button-primary-outline.fit-content {
     width: fit-content;
 }
 
-button.is-loading::before {
+.button-primary-outline.is-loading::before {
     content: "";
     display: grid;
     width: 24px;
@@ -478,7 +478,7 @@ button.is-loading::before {
     background-size: cover;
 }
 
-button.is-loading {
+.button-primary-outline.is-loading {
     pointer-events: none;
     cursor: default;
     opacity: 0.5;
@@ -487,7 +487,7 @@ button.is-loading {
     position: relative;
 }
 
-button.is-loading > span {
+.button-primary-outline.is-loading > span {
     display: none;
 }
 
