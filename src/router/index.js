@@ -50,7 +50,8 @@ export default class Router {
 
     document.dispatchEvent(new CustomEvent('route', {
       detail: {
-        page: this.page
+        page: this.page,
+        match
       }
     }));
   }
@@ -64,6 +65,7 @@ export default class Router {
   }
 
   navigate (path) {
+    console.log(path);
     history.pushState(null, null, path);
     this.route();
   }
