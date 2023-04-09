@@ -1,4 +1,6 @@
 import fetchJson from '../../utils/fetch-json.js';
+import NotificationMessage from '../notification';
+import { logPlugin } from '@babel/preset-env/lib/debug';
 
 export default class SortableTable {
     element;
@@ -22,7 +24,7 @@ export default class SortableTable {
         sorted = { id: 'title', order: 'asc' },
         isStaticRows = false,
     } = {}) {
-        this.url = new URL(url);
+        this.url = url;
         this.isSortLocally = isSortLocally;
         this.headerConfig = headerConfig;
         this.data = data;
@@ -126,17 +128,22 @@ export default class SortableTable {
     }
 
     async handleInfinityScroll() {
-        if (this.status === 'loading') return;
+        if (this.status === 'loading' || this.data.length < this.rowsPerPage) return;
 
         if (this.element.getBoundingClientRect().bottom < document.documentElement.clientHeight) {
-            this.page += 1;
-            this.status = 'loading';
-            this.element.classList.add('sortable-table_loading');
+            try {
+                this.status = 'loading';
+                this.page += 1;
+                this.element.classList.add('sortable-table_loading');
 
-            const data = await this.loadData();
-            await this.renderRows(data);
+                const data = await this.loadData();
+                await this.renderRows(data);
 
-            this.data = [ ...this.data, ...data ];
+                this.data = [ ...this.data, ...data ];
+            } catch (error) {
+                this.handleErrorLoadData(error);
+            }
+
             this.status = 'pending';
             this.element.classList.remove('sortable-table_loading');
         }
@@ -167,6 +174,8 @@ export default class SortableTable {
     }
 
     async loadData(sorted = this.sorted) {
+        const url = new URL(this.url);
+
         for (const [ key, value ] of Object.entries(sorted)) {
             let computedKey = key;
             let computedValue = value;
@@ -186,16 +195,16 @@ export default class SortableTable {
                     break;
             }
 
-            this.url.searchParams.set(computedKey, String(computedValue));
+            url.searchParams.set(computedKey, String(computedValue));
         }
 
         const start = this.page === 1 ? 0 : (this.page - 1) * this.rowsPerPage;
         const end = this.page === 1 ? this.rowsPerPage : this.page * this.rowsPerPage;
 
-        this.url.searchParams.set('_start', String(start));
-        this.url.searchParams.set('_end', String(end));
+        url.searchParams.set('_start', String(start));
+        url.searchParams.set('_end', String(end));
 
-        return await fetchJson(this.url);
+        return await fetchJson(url);
     }
 
     sortOnClient(id, order) {
@@ -238,13 +247,27 @@ export default class SortableTable {
 
     async update(sorted = this.sorted) {
         if (this.url) {
-            this.element.classList.add('sortable-table_loading');
-            this.page = 1;
-            this.data = await this.loadData(sorted);
+            try {
+                this.element.classList.add('sortable-table_loading');
+                this.page = 1;
+                this.data = await this.loadData(sorted);
+            } catch (error) {
+                this.handleErrorLoadData(error);
+            }
+
             this.element.classList.remove('sortable-table_loading');
         }
 
         this.subElements.body.innerHTML = this.getRowTemplate();
+    }
+
+    handleErrorLoadData(error) {
+        const notification = new NotificationMessage(error.message, {
+            duration: 2000,
+            type: 'error'
+        });
+
+        notification.show();
     }
 
     remove() {

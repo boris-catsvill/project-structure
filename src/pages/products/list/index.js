@@ -142,22 +142,11 @@ export default class Page extends PageComponent {
   }
 
   async update() {
-    try {
-      await this.components.productsContainer.update(this.sorted);
+    await this.components.productsContainer.update(this.sorted);
 
-      this.components.productsContainer.element.classList.toggle(
-        'sortable-table_empty',
-        this.components.productsContainer.data.length === 0
-      );
-    } catch (error) {
-      console.error(error);
-
-      const notification = new NotificationMessage(error.message, {
-        duration: 2000,
-        type: 'error'
-      });
-
-      notification.show();
-    }
+    this.components.productsContainer.element.classList.toggle(
+      'sortable-table_empty',
+      this.components.productsContainer.data.length === 0
+    );
   }
 }
