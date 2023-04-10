@@ -1,6 +1,6 @@
-import fetchJson from "../../utils/fetch-json.js";
+import fetchJson from '../../utils/fetch-json.js';
 
-const BACKEND_URL = 'https://course-js.javascript.ru';
+const BACKEND_URL = process.env.BACKEND_URL;
 
 export default class SortableTable {
   element;
@@ -11,7 +11,7 @@ export default class SortableTable {
   start = 1;
   end = this.start + this.step;
 
-  onWindowScroll = async() => {
+  onWindowScroll = async () => {
     const { bottom } = this.element.getBoundingClientRect();
     const { id, order } = this.sorted;
 
@@ -59,18 +59,36 @@ export default class SortableTable {
     }
   };
 
-  constructor(headersConfig = [], {
-    url = '',
-    sorted = {
-      id: headersConfig.find(item => item.sortable).id,
-      order: 'asc'
-    },
-    isSortLocally = false,
-    step = 20,
-    start = 1,
-    end = start + step
-  } = {}) {
+  getPlainRow = item => {
+    return `
+    <div class="sortable-table__row">
+      ${this.getTableRow(item)}
+    </div>`;
+  };
 
+  getHrefRow = item => {
+    return `
+    <a href="/products/${item.id}" class="sortable-table__row">
+      ${this.getTableRow(item)}
+    </a>
+    `;
+  };
+
+  constructor(
+    headersConfig = [],
+    {
+      url = '',
+      sorted = {
+        id: headersConfig.find(item => item.sortable).id,
+        order: 'asc'
+      },
+      isSortLocally = false,
+      step = 20,
+      start = 1,
+      end = start + step,
+      linksEnabled = false
+    } = {}
+  ) {
     this.headersConfig = headersConfig;
     this.url = new URL(url, BACKEND_URL);
     this.sorted = sorted;
@@ -78,12 +96,13 @@ export default class SortableTable {
     this.step = step;
     this.start = start;
     this.end = end;
+    this.linksEnabled = linksEnabled;
 
     this.render();
   }
 
   async render() {
-    const {id, order} = this.sorted;
+    const { id, order } = this.sorted;
     const wrapper = document.createElement('div');
 
     wrapper.innerHTML = this.getTable();
@@ -135,7 +154,7 @@ export default class SortableTable {
     </div>`;
   }
 
-  getHeaderRow({id, title, sortable}) {
+  getHeaderRow({ id, title, sortable }) {
     const order = this.sorted.id === id ? this.sorted.order : 'asc';
 
     return `
@@ -164,26 +183,25 @@ export default class SortableTable {
   }
 
   getTableRows(data) {
-    return data.map(item => `
-      <div class="sortable-table__row">
-        ${this.getTableRow(item, data)}
-      </div>`
-    ).join('');
+    const getRow = this.linksEnabled ? this.getHrefRow : this.getPlainRow;
+    return data.map(getRow).join('');
   }
 
   getTableRow(item) {
-    const cells = this.headersConfig.map(({id, template}) => {
+    const cells = this.headersConfig.map(({ id, template }) => {
       return {
         id,
         template
       };
     });
 
-    return cells.map(({id, template}) => {
-      return template
-        ? template(item[id])
-        : `<div class="sortable-table__cell">${item[id]}</div>`;
-    }).join('');
+    return cells
+      .map(({ id, template }) => {
+        return template
+          ? template(item[id])
+          : `<div class="sortable-table__cell">${item[id]}</div>`;
+      })
+      .join('');
   }
 
   getTable() {
@@ -231,7 +249,7 @@ export default class SortableTable {
   sortData(id, order) {
     const arr = [...this.data];
     const column = this.headersConfig.find(item => item.id === id);
-    const {sortType, customSorting} = column;
+    const { sortType, customSorting } = column;
     const direction = order === 'asc' ? 1 : -1;
 
     return arr.sort((a, b) => {
