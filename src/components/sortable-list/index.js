@@ -40,6 +40,9 @@ export default class SortableList {
 
   onPointerUp = () => {
     this.dragStop();
+    this.element.dispatchEvent(
+      new CustomEvent('list-updated', { detail: { list: this.element }, bubbles: true })
+    );
   };
 
   constructor({ items = [] } = {}) {
@@ -90,7 +93,7 @@ export default class SortableList {
   }
 
   createPlaceholderElement(width, height) {
-    const element = document.createElement('li');
+    const element = document.createElement('div');
 
     element.className = 'sortable-list__placeholder';
     element.style.width = `${width}px`;
