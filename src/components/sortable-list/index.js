@@ -167,11 +167,11 @@ export default class SortableList {
     }
   }
 
-  dispatchEvent(type, details) {
+  dispatchEvent(type, detail) {
     this.element.dispatchEvent(
       new CustomEvent(type, {
         bubbles: true,
-        details
+        detail
       })
     );
   }

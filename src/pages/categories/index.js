@@ -52,13 +52,12 @@ export default class Page {
 
   initEventListeners() {
     this.element.addEventListener('pointerdown', this.onPointerDown);
-    this.element.addEventListener('sortable-list-reorder', this.sendReorderedData);
+    this.element.addEventListener('subcategories-reorder', this.sendReorderedData);
   }
 
   sendReorderedData = async event => {
     const url = new URL('api/rest/subcategories', BACKEND_URL);
     const { detail } = event;
-    console.log(event);
     try {
       const result = await fetchJson(url, {
         method: 'PATCH',

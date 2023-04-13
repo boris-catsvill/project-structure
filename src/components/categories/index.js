@@ -6,7 +6,7 @@ export default class Category {
 
   constructor(category = []) {
     this.category = category;
-    this.subCategories = category.subcategories;
+    this.subcategories = category.subcategories;
     this.render();
   }
 
@@ -16,6 +16,7 @@ export default class Category {
     this.element = wrapper.firstElementChild;
     this.subElements = this.getSubElements();
     this.renderSubcategories();
+    this.initEventListeners();
   }
 
   getSubElements() {
@@ -40,7 +41,7 @@ export default class Category {
   }
 
   renderSubcategories() {
-    const elements = this.subCategories.map(subcategory => {
+    const elements = this.subcategories.map(subcategory => {
       const element = document.createElement('li');
       element.classList.add('categories__sortable-list-item');
       element.setAttribute('data-id', subcategory.id);
@@ -59,6 +60,19 @@ export default class Category {
     });
 
     this.subElements.subcategories.append(sortableList.element);
+  }
+  initEventListeners() {
+    this.element.addEventListener('sortable-list-reorder', () => {
+      const items = this.subElements.subcategories.querySelectorAll('.sortable-list__item');
+      const sortIndexes = [...items].map(subcategory => subcategory.dataset.id);
+      this.subcategories.sort((a, b) => sortIndexes.indexOf(a.id) - sortIndexes.indexOf(b.id));
+      this.element.dispatchEvent(
+        new CustomEvent('subcategories-reorder', {
+          bubbles: true,
+          detail: this.subcategories
+        })
+      );
+    });
   }
 
   remove() {
