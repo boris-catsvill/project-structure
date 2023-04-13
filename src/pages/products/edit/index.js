@@ -1,4 +1,5 @@
 import ProductForm from "../../../components/product-form";
+import NotificationMessage from "../../../components/notification";
 
 export default class Page {
   element;
@@ -30,20 +31,41 @@ export default class Page {
 			return this.element;
   }
 	
-	get product() {
+	get productFromUrl() {
 		const pathArray = window.location.pathname.split('/');
-		return pathArray.slice(-1);
+		const product = pathArray.slice(-1)[0];
 		
+		if (product === "add" ) return null;
+		
+		return product;		
 	}
 	
 	initComponents() {
-		console.log("this.productId ", this.product);
-    this.components.productFrom = new ProductForm(this.product);
+		console.log("this.product: ", this.productFromUrl);
+    this.components.productFrom = new ProductForm(this.productFromUrl);
   }
 
   async renderComponents() {
     const element = await this.components.productFrom.render();
 
+		
+		element.addEventListener('product-saved', (event) => {
+			const notification = new NotificationMessage('Товар добавлен', {
+				duration: 2000,
+				type: 'success'
+			});
+			notification.show(element);
+		});
+		
+		element.addEventListener('product-updated', (event) => {
+			const notification = new NotificationMessage('Товар сохранен', {
+				duration: 2000,
+				type: 'success'
+			});
+			notification.show(element);
+		});
+		
+		
     this.element.append(element);
   }
 

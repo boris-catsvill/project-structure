@@ -169,7 +169,7 @@ export default class ProductForm {
   /**
 	 * отрисовка формы
 	 */
-  async render () {
+  async render() {
 		
     // получаем результаты fetch для категорий и данных формы продукта
     const categoriesPromise = this.loadCategories();
@@ -178,7 +178,7 @@ export default class ProductForm {
 		
     const [categoriesData, productResponse] = await Promise.all([categoriesPromise, productPromise]);
     const [productData] = productResponse;
-
+		
     this.formData = productData;
     this.categories = categoriesData;
 		
@@ -213,14 +213,14 @@ export default class ProductForm {
   }
 	
   
-  setForm() {
-  
+  setForm() {		
     const { productForm } = this.subElements;
+		console.log("this.subElements ", productForm.querySelector("#title"));
     const excludedFields = ['images'];
     const fields = Object.keys(this.defaultFormData).filter(item => !excludedFields.includes(item));
 		
-		
     fields.forEach(item => {
+			console.log("item: " , item);
       const element = productForm.querySelector(`#${item}`);
 
       element.value = this.formData[item] || this.defaultFormData[item];
@@ -237,8 +237,7 @@ export default class ProductForm {
 	
 	
   createImagesList () {
-		console.log("this.formData: ", this.formData);
-    return this.formData.images.map(item => {
+    return this.formData?.images.map(item => {
       return this.getImageItem(item.url, item.source).outerHTML;
     }).join('');
   }

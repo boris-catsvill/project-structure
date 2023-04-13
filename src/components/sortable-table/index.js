@@ -126,7 +126,6 @@ export default class SortableTable {
   
   
   render() {
-		console.log("render");
     const wrapper = document.createElement('div');
 
     wrapper.innerHTML = this.buildTable();
@@ -157,7 +156,6 @@ export default class SortableTable {
    */
   async loadData() {
 		
-		console.log("this.start 1", this.start);
 		
     this.url.searchParams.set("_embed", "subcategory.category");
     this.url.searchParams.set("_sort", this.sorted.id);
@@ -183,11 +181,10 @@ export default class SortableTable {
     
     // paginator
     this.start = this.start + this.step;
-		console.log("this.start 2", this.start);
 		const	data = await fetchJson(this.url);
 			     
 		if (!data.length) {
-			throw new Error("Oops.. Data is empty");
+			this.element.innerHTML = "<h2>К сожалению товар отсутвует. Попробуйте поиск позже =)</h2>"
 		}	  
     
     this.data = data;
@@ -207,7 +204,6 @@ export default class SortableTable {
     const callback = (entries, observer) => {
       entries.forEach(async element => {
         if (element.isIntersecting) {
-					console.log("element.isIntersecting");
           await this.update();
           observer.unobserve(element.target);	
         }
@@ -221,18 +217,14 @@ export default class SortableTable {
   
   
   async update() {
-		
-	console.log("update");
-		
+				
 	 // fetch this.data
 	 const data = await this.loadData();
 
 	 this.subElements.body.innerHTML = this.subElements.body.innerHTML + this.getTableRows(data);
 	 
 	 this.lastRow = this.subElements.body.lastElementChild;
-	 
-	 console.log("this.lastRow: ", this.lastRow);
-	 
+	 	 
 	 const observer = this.tableObserver();
 	 observer.observe(this.lastRow);
 	
@@ -247,9 +239,6 @@ export default class SortableTable {
 	 */
 	async updateFromFilter({ from, to, filterName: titleLike, filterStatus: status } = {}) {
 		
-		console.log("args: ", arguments);		
-		console.log("updateFromFilter");
-				
 		this.priceFrom = from;
 		this.priceTo = to;
 		this.titleLike = titleLike;

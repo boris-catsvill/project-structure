@@ -1,4 +1,7 @@
 .notification {
+	position: absolute;
+	bottom: -50vh;
+	right: 20vw;
   width: 200px;
   margin: 10px 5px;
   font-size: 14px;
