@@ -1,6 +1,7 @@
 import fetchJson from '../../utils/fetch-json.js';
 import SortableList from '../sortable-list/index.js';
 import ImageUploader from '../image-uploader/index.js';
+import NotificationMessage from '../notification/index.js';
 
 const BACKEND_URL = process.env.BACKEND_URL;
 
@@ -53,14 +54,20 @@ export default class ProductForm {
       options.method = 'PUT';
     }
 
-    const response = await fetchJson(this.url);
-    this.element.dispatchEvent(
-      new CustomEvent(eventType, {
-        detail: {
-          product: response
-        }
-      })
-    );
+    try {
+      const response = await fetchJson(this.url);
+      this.element.dispatchEvent(
+        new CustomEvent(eventType, {
+          detail: {
+            product: response
+          }
+        })
+      );
+      new NotificationMessage('Product saved').show();
+    } catch (error) {
+      new NotificationMessage('Failed to save product', { type: 'error' }).show();
+      console.log(error);
+    }
   }
 
   async loadCategories() {

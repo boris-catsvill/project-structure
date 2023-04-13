@@ -1,5 +1,6 @@
 import fetchJson from '../../utils/fetch-json';
 import SortableList from '../sortable-list';
+import NotificationMessage from '../notification';
 
 const BACKEND_URL = process.env.BACKEND_URL;
 
@@ -23,8 +24,13 @@ export default class Categories {
         weight: weight++
       };
     });
-    await this.sendData(subcategories);
-    // Add notification
+    try {
+      await this.sendData(subcategories);
+      new NotificationMessage('Category order saved').show();
+    } catch (error) {
+      new NotificationMessage('Failed to save category order', { type: 'error' }).show();
+      console.error(error);
+    }
   };
 
   async render() {

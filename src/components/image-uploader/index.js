@@ -1,3 +1,5 @@
+import NotificationMessage from '../notification';
+
 const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID;
 
 export default class ImageUploader {
@@ -22,7 +24,7 @@ export default class ImageUploader {
       });
       this.element.dispatchEvent(newEvent);
     } catch (error) {
-      alert('Ошибка загрузки изображения');
+      new NotificationMessage('Failed to upload an image', { type: 'error' }).show();
       console.error(error);
     }
     this.element.classList.remove('is-loading');
