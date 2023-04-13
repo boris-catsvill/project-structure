@@ -1,162 +1,64 @@
-export default class SortCategories {
-  onPointerMove = ({ clientX, clientY }) => {
-    this.moveDraggingAt(clientX, clientY);
+import SortableList from '../sortable-list';
 
-    const prevElem = this.placeholderElement.previousElementSibling;
-    const nextElem = this.placeholderElement.nextElementSibling;
+export default class Category {
+  element;
+  subElements;
 
-    const { firstElementChild, lastElementChild } = this.element;
-    const { top: firstElementTop } = firstElementChild.getBoundingClientRect();
-    const { bottom } = this.element.getBoundingClientRect();
-
-    if (clientY < firstElementTop) {
-      return firstElementChild.before(this.placeholderElement);
-    }
-
-    if (clientY > bottom) {
-      return lastElementChild.after(this.placeholderElement);
-    }
-
-    if (prevElem) {
-      const { top, height } = prevElem.getBoundingClientRect();
-      const middlePrevElem = top + height / 2;
-
-      if (clientY < middlePrevElem) {
-        return prevElem.before(this.placeholderElement);
-      }
-    }
-
-    if (nextElem) {
-      const { top, height } = nextElem.getBoundingClientRect();
-      const middleNextElem = top + height / 2;
-
-      if (clientY > middleNextElem) {
-        return nextElem.after(this.placeholderElement);
-      }
-    }
-
-    this.scrollIfCloseToWindowEdge(clientY);
-  };
-
-  onPointerUp = () => {
-    this.dragStop();
-  };
-
-  constructor(items) {
-    this.element = items;
-    this.initEventListeners();
+  constructor(category = []) {
+    this.category = category;
+    this.subCategories = category.subcategories;
+    this.render();
   }
 
-  initEventListeners() {
-    this.element.addEventListener('pointerdown', event => {
-      this.onPointerDown(event);
+  render() {
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = this.getCategoryTemplate();
+    this.element = wrapper.firstElementChild;
+    this.subElements = this.getSubElements();
+    this.renderSubcategories();
+  }
+
+  getSubElements() {
+    const elements = this.element.querySelectorAll('[data-element]');
+    return [...elements].reduce((acc, elem) => {
+      acc[elem.dataset.element] = elem;
+      return acc;
+    }, {});
+  }
+
+  getCategoryTemplate() {
+    return `
+      <div class="category category_open" data-id="${this.category.id}">
+        <header class="category__header">
+          ${this.category.title}
+        </header>
+        <div class="category__body">
+          <div data-element="subcategories" class="subcategory-list"></div>
+        </div>
+      </div>
+    `;
+  }
+
+  renderSubcategories() {
+    const elements = this.subCategories.map(subcategory => {
+      const element = document.createElement('li');
+      element.classList.add('categories__sortable-list-item');
+      element.setAttribute('data-id', subcategory.id);
+      element.setAttribute('data-grab-handle', '');
+
+      element.innerHTML = `
+        <strong>${subcategory.title}</strong>
+        <span><b>${subcategory.count}</b> products</span>
+      `;
+
+      return element;
     });
-  }
 
-  onPointerDown(event) {
-    const element = event.target.closest('.sortable-list__item');
+    const sortableList = new SortableList({
+      items: elements
+    });
 
-    if (element) {
-      if (event.target.closest('[data-grab-handle]')) {
-        event.preventDefault();
-
-        this.dragStart(element, event);
-      }
-
-      if (event.target.closest('[data-delete-handle]')) {
-        event.preventDefault();
-        element.remove();
-      }
-    }
-  }
-
-  createPlaceholderElement(width, height) {
-    const element = document.createElement('div');
-
-    element.className = 'sortable-list__placeholder';
-    element.style.width = `${width}px`;
-    element.style.height = `${height}px`;
-
-    return element;
-  }
-
-  dragStart(element, { clientX, clientY }) {
-    this.draggingElem = element;
-    this.elementInitialIndex = [...this.element.children].indexOf(element);
-
-    const { x, y } = element.getBoundingClientRect();
-    const { offsetWidth, offsetHeight } = element;
-
-    this.pointerShift = {
-      x: clientX - x,
-      y: clientY - y
-    };
-
-    this.draggingElem.style.width = `${offsetWidth}px`;
-    this.draggingElem.style.height = `${offsetHeight}px`;
-    this.draggingElem.classList.add('sortable-list__item_dragging');
-
-    this.placeholderElement = this.createPlaceholderElement(offsetWidth, offsetHeight);
-
-    this.draggingElem.after(this.placeholderElement);
-    // move to the end, to be over other list elements
-    this.element.append(this.draggingElem);
-    this.moveDraggingAt(clientX, clientY);
-    this.addDocumentEventListeners();
-  }
-
-  addDocumentEventListeners() {
-    document.addEventListener('pointermove', this.onPointerMove);
-    document.addEventListener('pointerup', this.onPointerUp);
-  }
-
-  removeDocumentEventListeners() {
-    document.removeEventListener('pointermove', this.onPointerMove);
-    document.removeEventListener('pointerup', this.onPointerUp);
-  }
-
-  moveDraggingAt(clientX, clientY) {
-    this.draggingElem.style.left = `${clientX - this.pointerShift.x}px`;
-    this.draggingElem.style.top = `${clientY - this.pointerShift.y}px`;
-  }
-
-  scrollIfCloseToWindowEdge(clientY) {
-    const scrollingValue = 10;
-    const threshold = 20;
-
-    if (clientY < threshold) {
-      window.scrollBy(0, -scrollingValue);
-    } else if (clientY > document.documentElement.clientHeight - threshold) {
-      window.scrollBy(0, scrollingValue);
-    }
-  }
-
-  dragStop() {
-    const placeholderIndex = [...this.element.children].indexOf(this.placeholderElement);
-
-    this.draggingElem.style.cssText = '';
-    this.draggingElem.classList.remove('sortable-list__item_dragging');
-    this.placeholderElement.replaceWith(this.draggingElem);
-    this.draggingElem = null;
-
-    this.removeDocumentEventListeners();
-
-    if (placeholderIndex !== this.elementInitialIndex) {
-      const elements = this.element.querySelectorAll('.sortable-list__item');
-      const result = [...elements].map((item, index) => {
-        return { id: item.dataset.id, weight: index + 1 };
-      }, {});
-      this.dispatchEvent('sortable-list-reorder', result);
-    }
-  }
-
-  dispatchEvent(type, detail) {
-    this.element.dispatchEvent(
-      new CustomEvent(type, {
-        bubbles: true,
-        detail
-      })
-    );
+    this.subElements.subcategories.append(sortableList.element);
   }
 
   remove() {
@@ -167,7 +69,6 @@ export default class SortCategories {
 
   destroy() {
     this.remove();
-    this.removeDocumentEventListeners();
     this.element = null;
   }
 }

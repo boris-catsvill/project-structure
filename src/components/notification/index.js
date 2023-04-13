@@ -37,12 +37,13 @@ export default class NotificationMessage {
 
     targetElement.append(this.element);
     NotificationMessage.previousCall = this;
-    setTimeout(() => {
-      this.destroy();
+    this.timerId = setTimeout(() => {
+      this.remove();
     }, this.duration);
   }
 
   remove() {
+    clearTimeout(this.timerId);
     if (this.element) {
       this.element.remove();
     }
@@ -51,8 +52,7 @@ export default class NotificationMessage {
   destroy() {
     this.remove();
     this.element = null;
-    if (NotificationMessage.previousCall === this) {
-      NotificationMessage.previousCall = null;
-    }
+
+    NotificationMessage.previousCall = null;
   }
 }

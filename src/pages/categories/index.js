@@ -1,7 +1,7 @@
-import SortCategories from '../../components/categories/index.js';
+import Category from '../../components/categories/index.js';
 import fetchJson from '../../utils/fetch-json.js';
 import NotificationMessage from '../../components/notification/index.js';
-const BACKEND_URL = 'https://course-js.javascript.ru/';
+const BACKEND_URL = process.env.BACKEND_URL;
 
 export default class Page {
   subElements = {};
@@ -45,48 +45,20 @@ export default class Page {
 
   renderCategories(categories) {
     const { categoriesContainer } = this.subElements;
-    categoriesContainer.innerHTML = categories
-      .map(category => {
-        return `<div class="category category_open" data-id="${category.id}">
-      <header class="category__header">
-      ${category.title}
-      </header>
-      <div class="category__body">
-        <div class="subcategory-list">
-        <ul class="sortable-list">
-        ${this.getSubCategories(category.subcategories)}
-        </ul>
-      </div>
-      </div>
-     </div>`;
-      })
-      .join('');
-  }
-  getSubCategories(category) {
-    return category
-      .map(item => {
-        return `
-
-      <li class="categories__sortable-list-item sortable-list__item" data-grab-handle="" data-id="${item.id}">
-      <strong>${item.title}</strong>
-      <span><b>${item.count}</b> products</span>
-      </li>
-      `;
-      })
-      .join('');
+    categories.map(category => {
+      categoriesContainer.append(new Category(category).element);
+    });
   }
 
   initEventListeners() {
     this.element.addEventListener('pointerdown', this.onPointerDown);
-    const sortableList = this.element.querySelectorAll('.sortable-list');
-    [...sortableList].forEach(item => {
-      new SortCategories(item);
-    });
     this.element.addEventListener('sortable-list-reorder', this.sendReorderedData);
   }
+
   sendReorderedData = async event => {
     const url = new URL('api/rest/subcategories', BACKEND_URL);
     const { detail } = event;
+    console.log(event);
     try {
       const result = await fetchJson(url, {
         method: 'PATCH',
@@ -125,28 +97,4 @@ export default class Page {
     this.element = null;
     this.subElements = null;
   }
-}
-{
-  /* <div class="notification notification_success show" style="--value:
-    19s">
-    <div class="timer"></div>
-    <div class="inner-wrapper">
-      <div class="notification-header">success</div>
-      <div class="notification-body">
-        Товар обновлен
-      </div>
-    </div>
-  </div> */
-}
-{
-  /* <div class="notification notification_ show" style="--value:
-    10s">
-    <div class="timer"></div>
-    <div class="inner-wrapper">
-      <div class="notification-header"></div>
-      <div class="notification-body">
-        Порядок категорий сохранен
-      </div>
-    </div>
-  </div> */
 }

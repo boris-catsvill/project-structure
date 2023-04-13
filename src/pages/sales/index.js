@@ -2,7 +2,7 @@ import RangePicker from '../../components/range-picker/index.js';
 import SortableTable from '../../components/sortable-table/index.js';
 import header from './sales-config.js';
 import fetchJson from '../../utils/fetch-json.js';
-const BACKEND_URL = 'https://course-js.javascript.ru/';
+const BACKEND_URL = process.env.BACKEND_URL;
 
 export default class Page {
   render() {

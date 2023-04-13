@@ -2,7 +2,7 @@ import SortableTable from '../../../components/sortable-table';
 import headerConfig from '../bestsellers-header.js';
 import DoubleSlider from '../../../components/double-slider';
 import fetchJson from '../../../utils/fetch-json.js';
-const BACKEND_URL = 'https://course-js.javascript.ru/';
+const BACKEND_URL = process.env.BACKEND_URL;
 
 export default class Page {
   element;

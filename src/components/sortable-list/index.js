@@ -89,7 +89,7 @@ export default class SortableList {
   }
 
   createPlaceholderElement(width, height) {
-    const element = document.createElement('li');
+    const element = document.createElement('div');
 
     element.className = 'sortable-list__placeholder';
     element.style.width = `${width}px`;

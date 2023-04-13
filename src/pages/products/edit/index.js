@@ -28,7 +28,7 @@ export default class Page {
   }
 
   async editProduct() {
-    const productForm = new ProductForm(this.url);
+    const productForm = await new ProductForm(this.url);
     const form = await productForm.render();
     const contentBox = this.element.querySelector('.content-box');
     contentBox.innerHTML = '';
