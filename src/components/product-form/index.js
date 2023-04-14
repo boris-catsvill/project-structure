@@ -235,7 +235,7 @@ export default class ProductForm {
 	
 	
   createImagesList () {
-    return this.formData?.images.map(item => {
+    return this.formData.images.map(item => {
       return this.getImageItem(item.url, item.source).outerHTML;
     }).join('');
   }

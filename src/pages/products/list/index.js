@@ -70,7 +70,7 @@ export default class Page {
       const root = this.subElements[component];
       const { element } =  this.components[component];
 
-      root?.append(element);
+      root.append(element);
     });
   }
 	
