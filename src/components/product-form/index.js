@@ -215,12 +215,10 @@ export default class ProductForm {
   
   setForm() {		
     const { productForm } = this.subElements;
-		console.log("this.subElements ", productForm.querySelector("#title"));
     const excludedFields = ['images'];
     const fields = Object.keys(this.defaultFormData).filter(item => !excludedFields.includes(item));
 		
     fields.forEach(item => {
-			console.log("item: " , item);
       const element = productForm.querySelector(`#${item}`);
 
       element.value = this.formData[item] || this.defaultFormData[item];

@@ -28,12 +28,14 @@ export default class SortableTable {
       id: headersConfig.find(item => item.sortable).id,
       order: 'asc'
     },
-    isSortLocally = false
+    isSortLocally = false,
+		isEditable = true
   } = {}) {
     this.headersConfig = headersConfig;
     this.sorted = sorted;
     this.url = new URL(url, BACKEND_URL);
     this.isSortLocally = isSortLocally;
+		this.isEditable = isEditable;
     
     this.render();
     
@@ -89,13 +91,15 @@ export default class SortableTable {
   }
   
     
-  getTableRows(data = []) {
-        
+  getTableRows(data = []) {        
     return data.map(item =>{
-      return `
-        <a href="/products/${item.id}" class="sortable-table__row">
+      return this.isEditable 
+			? `<a href="/products/${item.id}" class="sortable-table__row">
           ${this.getTableRow(item)}
-        </a>`;
+        </a>`
+			:	`<div class="sortable-table__row">
+					${this.getTableRow(item)}
+				</div>`;
     }).join('');
   }
   
@@ -161,11 +165,9 @@ export default class SortableTable {
    * 
    * @returns data from server array
    */
-  async loadData() {
-		
-		
-    this.url.searchParams.set("_embed", "subcategory.category");
-    this.url.searchParams.set("_sort", this.sorted.id);
+  async loadData() {	
+
+		this.url.searchParams.set("_sort", this.sorted.id);
     this.url.searchParams.set("_order", this.sorted.order);
     this.url.searchParams.set("_start", this.start);
     this.url.searchParams.set("_end", this.start + this.step);
@@ -231,8 +233,11 @@ export default class SortableTable {
 	 
 	 this.lastRow = this.subElements.body.lastElementChild;
 	 	 
-	 const observer = this.tableObserver();
-	 observer.observe(this.lastRow);
+	 if ( this.lastRow ) {
+		const observer = this.tableObserver();
+	 	observer.observe(this.lastRow);
+	 }
+	 
 	
 	 return data;
   }
@@ -244,7 +249,6 @@ export default class SortableTable {
 	 * @returns 
 	 */
 	async updateFromFilter({ from, to, filterName: titleLike, filterStatus: status } = {}) {
-		console.log("update from filter");
 		this.priceFrom = from;
 		this.priceTo = to;
 		this.titleLike = titleLike;

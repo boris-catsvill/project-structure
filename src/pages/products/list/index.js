@@ -48,7 +48,7 @@ export default class Page {
   async initComponents() {
 
     const sortableTable = new SortableTable(header, {
-      url: "api/rest/products",
+      url: "api/rest/products?_embed=subcategory.category",
       isSortLocally: false
     });
 		
