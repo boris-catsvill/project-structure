@@ -7,8 +7,8 @@ export default class SortableTable {
   subElements = {};
   data = [];
   loading = false;
-  step = 29;
-  start = 1;
+  step = 30;
+  start = 0;
   end = this.start + this.step;
 
   onWindowScroll = async () => {
@@ -69,8 +69,8 @@ export default class SortableTable {
         order: 'asc'
       },
       isSortLocally = false,
-      step = 29,
-      start = 1,
+      step = 30,
+      start = 0,
       end = start + step
     } = {}
   ) {

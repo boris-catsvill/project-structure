@@ -48,8 +48,8 @@ export default class ColumnChart {
   }
 
   async update(from, to) {
-    const fromDate = from.toISOString().split('T')[0];
-    const toDate = to.toISOString().split('T')[0];
+    const [fromDate] = from.toISOString().split('T');
+    const [toDate] = to.toISOString().split('T');
 
     if (this.cash.get(fromDate) === toDate && this.data.length) {
       return;

@@ -1,5 +1,5 @@
 export default class NotificationMessage {
-  static previousCall;
+  static previousInstance;
   element;
   constructor(message = '', { duration = 0, type = '' } = {}) {
     this.text = message;
@@ -31,12 +31,12 @@ export default class NotificationMessage {
   }
 
   show(targetElement = document.body) {
-    if (NotificationMessage.previousCall) {
-      NotificationMessage.previousCall.element.remove();
+    if (NotificationMessage.previousInstance) {
+      NotificationMessage.previousInstance.element.remove();
     }
 
     targetElement.append(this.element);
-    NotificationMessage.previousCall = this;
+    NotificationMessage.previousInstance = this;
     this.timerId = setTimeout(() => {
       this.remove();
     }, this.duration);
@@ -53,6 +53,6 @@ export default class NotificationMessage {
     this.remove();
     this.element = null;
 
-    NotificationMessage.previousCall = null;
+    NotificationMessage.previousInstance = null;
   }
 }

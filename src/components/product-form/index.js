@@ -51,11 +51,11 @@ export default class ProductForm {
 
   sendFormBtnClick = async event => {
     event.preventDefault();
-    const url = new URL('/api/rest/products', BACKEND_URL);
+
     const method = this.productId ? 'PATCH' : 'PUT';
     const data = this.getFormData();
     try {
-      const result = await fetchJson(url, {
+      const result = await fetchJson(this.url, {
         method,
         headers: {
           'Content-Type': 'application/json'
@@ -73,6 +73,7 @@ export default class ProductForm {
 
   constructor(productId) {
     this.productId = productId;
+    this.url = new URL('/api/rest/products', BACKEND_URL);
   }
 
   async render() {
@@ -131,7 +132,7 @@ export default class ProductForm {
   }
 
   async getProduct(productId) {
-    const url = new URL('/api/rest/products', BACKEND_URL);
+    const url = this.url;
     url.searchParams.set('id', encodeURIComponent(productId));
     try {
       const response = await fetchJson(url);

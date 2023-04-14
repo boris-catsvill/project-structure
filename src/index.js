@@ -1,9 +1,7 @@
 import Router from './router/index.js';
-import Tooltip from './components/tooltip/index.js';
-import ClosePanel from './components/close-panel';
+import App from './components/app/index.js';
 
-new Tooltip().initialize();
-new ClosePanel().initialize();
+new App();
 const router = Router.instance();
 
 router
