@@ -119,7 +119,14 @@ export default class SortableTable {
       <div class="sortable-table">
         ${this.getTableHeader()}
         ${this.getTableBody()}
-
+				
+				<div data-element="loading" class="loading-line sortable-table__loading-line"></div>
+				<div data-element="emptyPlaceholder" class="sortable-table__empty-placeholder">
+					<div>
+						<p>Не найдено товаров удовлетворяющих выбранному критерию</p>
+						<button type="button" class="button-primary-outline">Очистить фильтры</button>
+					</div>
+				</div>	
       </div>`;
   }
   
@@ -171,6 +178,9 @@ export default class SortableTable {
 		
 		if (this.titleLike)
 			this.url.searchParams.set("title_like", this.titleLike);
+		else 
+			this.url.searchParams.delete("title_like");		
+		
 		
 		if (this.status) {
 			this.url.searchParams.set("status", this.status);	
@@ -182,10 +192,6 @@ export default class SortableTable {
     // paginator
     this.start = this.start + this.step;
 		const	data = await fetchJson(this.url);
-			     
-		if (!data.length) {
-			this.element.innerHTML = "<h2>К сожалению товар отсутвует. Попробуйте поиск позже =)</h2>"
-		}	  
     
     this.data = data;
     return data;
@@ -238,7 +244,7 @@ export default class SortableTable {
 	 * @returns 
 	 */
 	async updateFromFilter({ from, to, filterName: titleLike, filterStatus: status } = {}) {
-		
+		console.log("update from filter");
 		this.priceFrom = from;
 		this.priceTo = to;
 		this.titleLike = titleLike;
@@ -247,16 +253,24 @@ export default class SortableTable {
     
     // fetch this.data
     const data = await this.loadData();
-		
+			     
 		if (!data.length) {
-			this.subElements.body.innerHTML = `<h2>К сожалению по вашему запросу ничего не найдено..</h2>`
-		}
-		
-    this.subElements.body.innerHTML = this.getTableRows(data);
-    
+			this.element.classList.add('sortable-table_empty');
+			this.filterClearListener();
+		} else {
+			this.element.classList.remove('sortable-table_empty');
+		}	  
+						
+		this.subElements.body.innerHTML = this.getTableRows(data);
+
+	    
     this.lastRow = this.subElements.body.lastElementChild;
-    const observer = this.tableObserver();
-    observer.observe(this.lastRow);
+		
+		if (this.lastRow) {
+			const observer = this.tableObserver();
+			observer.observe(this.lastRow);
+		}
+   
 
   }
 	
@@ -399,7 +413,20 @@ export default class SortableTable {
     observer.observe(this.lastRow);	  
   }
   
+	
+	// clear btn when data is empty	
+	filterClearListener() {		
+		const { emptyPlaceholder } = this.subElements;
+		const btn = emptyPlaceholder.querySelector(".button-primary-outline");
+		btn.onclick = () =>  this.onClear();
+	}	
   
+	onClear() {
+		this.element.dispatchEvent(new CustomEvent('clear-filter', {
+      detail: null,
+      bubbles: true
+    }));
+	}
   
   remove() {
     if (this.element) {

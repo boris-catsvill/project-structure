@@ -159,6 +159,10 @@ export default class ProductFilter {
 		
 		return this.filterForm
 	}
+	
+	reset() {
+		
+	}
 
   remove() {
     this.element.remove();

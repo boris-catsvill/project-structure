@@ -1,9 +1,7 @@
 import ProductForm from "../../../components/product-form";
 import SortableTable from "../../../components/sortable-table";
 import ProductFilter from "../../../components/product-filter";
-import fetchJson from "../../../utils/fetch-json";
 import header from "./header-config";
-import debounce from "../../../utils/debounce";
 
 export default class Page {
   element;
@@ -34,20 +32,20 @@ export default class Page {
     this.element = element.firstElementChild;
 
     await this.initComponents();
+		
     this.renderComponents();
 		
 		this.initEventListeners();
 		
 		this.subElements = this.getSubElements(this.element);
-
+		
+		
+		
     return this.element;
 		
   }
 
   async initComponents() {
-    //const productId = '101-planset-lenovo-yt3-x90l-64-gb-3g-lte-cernyj';
-    const productId = '101-planset-lenovo-tab-p10-tb-x705l-32-gb-3g-lte-belyj';
-	
 
     const sortableTable = new SortableTable(header, {
       url: "api/rest/products",
@@ -61,7 +59,7 @@ export default class Page {
     this.components.sortableTable = sortableTable;   
     this.components.productFilter = productFilter;
 
-    this.components.productFrom = new ProductForm(productId);
+    this.components.productFrom = new ProductForm();
   }
 		
 	
@@ -107,6 +105,15 @@ export default class Page {
 			this.updateTableComponent(event.detail);
 			
 		});
+		
+		// clear filter
+		document.addEventListener('clear-filter', async event => {
+			this.components.productFilter = new ProductFilter();
+			this.subElements.productFilter.innerHTML = "";
+			this.subElements.productFilter.append(this.components.productFilter.element);
+			this.updateTableComponent();
+		});
+		
   }
 
 
@@ -114,6 +121,8 @@ export default class Page {
 	async updateTableComponent ({from, to, filterName, filterStatus} = {}) {
 		this.components.sortableTable.updateFromFilter({from, to, filterName, filterStatus});
   }
+	
+	
 
   destroy() {
     for (const component of Object.values(this.components)) {

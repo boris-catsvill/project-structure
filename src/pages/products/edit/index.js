@@ -41,7 +41,6 @@ export default class Page {
 	}
 	
 	initComponents() {
-		console.log("this.product: ", this.productFromUrl);
     this.components.productFrom = new ProductForm(this.productFromUrl);
   }
 
