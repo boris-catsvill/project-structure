@@ -17,7 +17,9 @@ For correct build via Webpack you must have:
 
 ## Preview
 
-[![preview](./preview.png)](https://project-structure/)
+### ✨ [Live Demo](https://silly-faun-a5d4a0.netlify.app/)
+
+[![preview](./preview.png)](https://silly-faun-a5d4a0.netlify.app/)
 
 ## Tech stack
 
