@@ -4,7 +4,6 @@ export default class Page {
   element;
   subElements = {};
   components = {};
-  loadingTarget = document.querySelector('.main');
 
   async render() {
     const element = document.createElement('div');
@@ -36,10 +35,8 @@ export default class Page {
   }
 
   async renderComponents() {
-    this.loadingTarget.classList.add('is-loading');
     const renderPromises = Object.values(this.components).map(component => component.render());
     await Promise.all(renderPromises);
-    this.loadingTarget.classList.remove('is-loading');
 
     Object.keys(this.components).map(componentName => {
       const root = this.subElements[componentName];
