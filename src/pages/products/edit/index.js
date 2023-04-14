@@ -5,7 +5,6 @@ export default class Page {
   form;
   constructor(match) {
     this.url = match[1];
-    this.render();
   }
   async render() {
     const element = document.createElement('div');
