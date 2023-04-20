@@ -18,7 +18,7 @@
   margin-top: -9px;
   height: 18px;
   width: 6px;
-  background: url("range-thumb-icon.svg") left center no-repeat;
+  background: url('range-thumb-icon.svg') left center no-repeat;
   background-size: cover;
   cursor: grab;
 }

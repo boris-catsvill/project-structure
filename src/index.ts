@@ -1,5 +1,11 @@
 import Router from './router/index.js';
 import tooltip from './components/tooltip/index.js';
+import sidebar from './components/sidebar';
+
+const content = document.getElementById('content');
+if (content) {
+  content.before(sidebar.element);
+}
 
 tooltip.initialize();
 

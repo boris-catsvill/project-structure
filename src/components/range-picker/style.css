@@ -32,7 +32,7 @@
   border: 1px solid var(--grey-light);
   border-radius: 4px;
   outline: none;
-  background: var(--white) url("calendar-icon.svg") 16px center no-repeat;
+  background: var(--white) url('calendar-icon.svg') 16px center no-repeat;
   background-size: 18px 18px;
 }
 
@@ -76,7 +76,7 @@
 }
 
 .rangepicker__selector-arrow:after {
-  content: "";
+  content: '';
   position: absolute;
   width: 12px;
   height: 12px;
@@ -123,7 +123,7 @@
   justify-content: center;
   cursor: pointer;
   transition: 0.3s all;
-  background: url("angle-arrow-icon.svg") left center no-repeat;
+  background: url('angle-arrow-icon.svg') left center no-repeat;
   background-size: 9px 13px;
 }
 
