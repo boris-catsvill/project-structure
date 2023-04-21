@@ -2,6 +2,7 @@ class Tooltip {
   static instance;
   element;
   tooltipOffset = [10, 10];
+  controller = new AbortController();
 
   addTooltipHandler = event => {
     const tooltipValue = event.target.dataset.tooltip;
@@ -9,7 +10,9 @@ class Tooltip {
 
     this.render(tooltipValue);
     this.put(event.clientX, event.clientY);
-    document.addEventListener('pointermove', this.moveTooltipHandler);
+    document.addEventListener('pointermove', this.moveTooltipHandler, {
+      signal: this.controller.signal
+    });
   };
 
   moveTooltipHandler = event => {
@@ -19,7 +22,16 @@ class Tooltip {
   removeTooltipHandler = () => {
     if (!this.element) return;
     this.element.remove();
-    document.removeEventListener('pointermove', this.moveTooltipHandler);
+    // Здесь надо удалить только один обработчик, поэтому использую removeEventListener,
+    // а не AbortController. По идее можно не указывать в аргументах signal
+    // но в доке https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/removeEventListener#matching_event_listeners_for_removal
+    // написано следующее:
+    // It's worth noting that some browser releases have been inconsistent on this,
+    // and unless you have specific reasons otherwise, it's probably wise to use
+    // the same values used for the call to addEventListener() when calling removeEventListener().
+    document.removeEventListener('pointermove', this.moveTooltipHandler, {
+      signal: this.controller.signal
+    });
   };
 
   constructor() {
@@ -28,8 +40,12 @@ class Tooltip {
   }
 
   initialize() {
-    document.addEventListener('pointerover', this.addTooltipHandler);
-    document.addEventListener('pointerout', this.removeTooltipHandler);
+    document.addEventListener('pointerover', this.addTooltipHandler, {
+      signal: this.controller.signal
+    });
+    document.addEventListener('pointerout', this.removeTooltipHandler, {
+      signal: this.controller.signal
+    });
   }
 
   render(value = '') {
@@ -40,9 +56,7 @@ class Tooltip {
   }
 
   destroy() {
-    document.removeEventListener('pointerover', this.addTooltipHandler);
-    document.removeEventListener('pointerout', this.removeTooltipHandler);
-    document.removeEventListener('pointermove', this.moveTooltipHandler);
+    this.controller.abort();
     this.element = null;
   }
 
