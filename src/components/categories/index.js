@@ -92,7 +92,7 @@ export default class Categories {
     this.element.addEventListener('list-updated', this.onListUpdate);
   }
 
-  async loadData() {
+  loadData() {
     return fetchJson(this.categoryURL);
   }
 
