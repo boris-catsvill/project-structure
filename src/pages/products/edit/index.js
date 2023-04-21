@@ -5,6 +5,10 @@ export default class Page {
   subElements = {};
   components = {};
 
+  constructor({ id = '' } = {}) {
+    this.id = id;
+  }
+
   async render() {
     const element = document.createElement('div');
 
@@ -28,9 +32,7 @@ export default class Page {
   }
 
   initComponents() {
-    const path = decodeURI(window.location.pathname);
-    const id = path.match(/\/products\/(.*)$/)[1];
-    const form = id === 'add' ? new ProductForm() : new ProductForm(id);
+    const form = this.id === 'add' ? new ProductForm() : new ProductForm(this.id);
     this.components = { form };
   }
 
