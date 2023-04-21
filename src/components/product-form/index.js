@@ -201,7 +201,9 @@ export default class ProductForm {
     for (const field of Object.keys(this.productDefaults)) {
       elements[field].value = product[field];
     }
-    if (!this.productId.length) elements.subcategory.selectedIndex = 0;
+    if (!this.productId.length) {
+      elements.subcategory.selectedIndex = 0;
+    }
     this.imageList = new SortableList({
       items: images.map(image => this.getImageListItem(image))
     });
@@ -261,7 +263,7 @@ export default class ProductForm {
     for (const category of categories) {
       for (const subcategory of category.subcategories) {
         options.push(
-          `<option value="${subcategory.id}">${category.title} > ${subcategory.title}</option>`
+          new Option(`${category.title} > ${subcategory.title}`, subcategory.id).outerHTML
         );
       }
     }
