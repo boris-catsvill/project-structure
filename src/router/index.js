@@ -2,14 +2,16 @@ import renderPage from './render-page.js';
 
 // performs routing on all links
 export default class Router {
+  routeHandler = route => {};
+
   constructor() {
     this.routes = [];
 
     this.initEventListeners();
   }
 
-  initEventListeners () {
-    document.addEventListener('click', (event) => {
+  initEventListeners() {
+    document.addEventListener('click', event => {
       const link = event.target.closest('a');
       if (!link) return;
 
@@ -30,8 +32,7 @@ export default class Router {
   }
 
   async route() {
-    let strippedPath = decodeURI(window.location.pathname)
-      .replace(/^\/|\/$/, '');
+    let strippedPath = decodeURI(window.location.pathname).replace(/^\/|\/$/, '');
 
     let match;
 
@@ -40,6 +41,7 @@ export default class Router {
 
       if (match) {
         this.page = await this.changePage(route.path, match);
+        this.routeHandler(route);
         break;
       }
     }
@@ -48,14 +50,21 @@ export default class Router {
       this.page = await this.changePage(this.notFoundPagePath);
     }
 
-    document.dispatchEvent(new CustomEvent('route', {
-      detail: {
-        page: this.page
-      }
-    }));
+    document.dispatchEvent(
+      new CustomEvent('route', {
+        detail: {
+          page: this.page
+        }
+      })
+    );
   }
 
-  async changePage (path, match) {
+  addRouteHandler(routeHandler) {
+    this.routeHandler = routeHandler;
+    return this;
+  }
+
+  async changePage(path, match) {
     if (this.page && this.page.destroy) {
       this.page.destroy();
     }
@@ -63,22 +72,22 @@ export default class Router {
     return await renderPage(path, match);
   }
 
-  navigate (path) {
+  navigate(path) {
     history.pushState(null, null, path);
     this.route();
   }
 
-  addRoute (pattern, path) {
-    this.routes.push({pattern, path});
+  addRoute(pattern, path) {
+    this.routes.push({ pattern, path });
     return this;
   }
 
-  setNotFoundPagePath (path) {
+  setNotFoundPagePath(path) {
     this.notFoundPagePath = path;
     return this;
   }
 
-  listen () {
+  listen() {
     window.addEventListener('popstate', () => this.route());
     this.route();
   }

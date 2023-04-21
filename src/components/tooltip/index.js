@@ -1,75 +1,69 @@
 class Tooltip {
   static instance;
-
   element;
+  tooltipOffset = [10, 10];
+  controller = new AbortController();
 
-  onMouseOver = event => {
-    const element = event.target.closest('[data-tooltip]');
+  addTooltipHandler = event => {
+    const tooltipValue = event.target.dataset.tooltip;
+    if (tooltipValue === undefined) return;
 
-    if (element) {
-      this.render(element.dataset.tooltip);
-      this.moveTooltip(event);
-
-      document.addEventListener('pointermove', this.onMouseMove);
-    }
+    this.render(tooltipValue);
+    this.put(event.clientX, event.clientY);
+    document.addEventListener('pointermove', this.moveTooltipHandler, {
+      signal: this.controller.signal
+    });
   };
 
-  onMouseMove = event => {
-    this.moveTooltip(event);
+  moveTooltipHandler = event => {
+    this.put(event.clientX, event.clientY);
   };
 
-  onMouseOut = () => {
-    this.removeTooltip();
+  removeTooltipHandler = () => {
+    if (!this.element) return;
+    this.element.remove();
+    // Здесь надо удалить только один обработчик, поэтому использую removeEventListener,
+    // а не AbortController. По идее можно не указывать в аргументах signal
+    // но в доке https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/removeEventListener#matching_event_listeners_for_removal
+    // написано следующее:
+    // It's worth noting that some browser releases have been inconsistent on this,
+    // and unless you have specific reasons otherwise, it's probably wise to use
+    // the same values used for the call to addEventListener() when calling removeEventListener().
+    document.removeEventListener('pointermove', this.moveTooltipHandler, {
+      signal: this.controller.signal
+    });
   };
-
-  removeTooltip() {
-    if (this.element) {
-      this.element.remove();
-      this.element = null;
-
-      document.removeEventListener('pointermove', this.onMouseMove);
-    }
-  }
 
   constructor() {
-    if (Tooltip.instance) {
-      return Tooltip.instance;
-    }
-
-    Tooltip.instance = this;
+    if (!Tooltip.instance) Tooltip.instance = this;
+    return Tooltip.instance;
   }
 
-  initEventListeners() {
-    document.addEventListener('pointerover', this.onMouseOver);
-    document.addEventListener('pointerout', this.onMouseOut);
+  initialize() {
+    document.addEventListener('pointerover', this.addTooltipHandler, {
+      signal: this.controller.signal
+    });
+    document.addEventListener('pointerout', this.removeTooltipHandler, {
+      signal: this.controller.signal
+    });
   }
 
-  initialize () {
-    this.initEventListeners();
-  }
-
-  render(html) {
-    this.element = document.createElement('div');
-    this.element.className = 'tooltip';
-    this.element.innerHTML = html;
-
+  render(value = '') {
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = `<div class="tooltip">${value}</div>`;
+    this.element = wrapper.firstElementChild;
     document.body.append(this.element);
   }
 
-  moveTooltip(event) {
-    const left = event.clientX + 10;
-    const top = event.clientY + 10;
-
-    // TODO: Add logic for window borders
-
-    this.element.style.left = left + 'px';
-    this.element.style.top = top + 'px';
+  destroy() {
+    this.controller.abort();
+    this.element = null;
   }
 
-  destroy() {
-    document.removeEventListener('pointerover', this.onMouseOver);
-    document.removeEventListener('pointerout', this.onMouseOut);
-    this.removeTooltip();
+  put(x, y) {
+    const [offsetX, offsetY] = this.tooltipOffset;
+    this.element.style.left = x + offsetX + 'px';
+    this.element.style.top = y + offsetY + 'px';
   }
 }
 
