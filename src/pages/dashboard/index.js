@@ -3,12 +3,13 @@ import SortableTable from '../../components/sortable-table/index.js';
 import ColumnChart from '../../components/column-chart/index.js';
 import header from './bestsellers-header.js';
 
-import fetchJson from '../../utils/fetch-json.js';
+import  fetchJson  from '../../utils/fetch-json.js';
 
 export default class Page {
   element;
   subElements = {};
   components = {};
+  toggleSidebar;
 
   async getDataForColumnCharts (from, to) {
     const ORDERS = `${process.env.BACKEND_URL}api/dashboard/orders?from=${from.toISOString()}&to=${to.toISOString()}`;
@@ -74,6 +75,7 @@ export default class Page {
     });
 
     this.components.sortableTable = sortableTable;
+    this.components.sortableTable = sortableTable;
     this.components.ordersChart = ordersChart;
     this.components.salesChart = salesChart;
     this.components.customersChart = customersChart;
@@ -81,6 +83,7 @@ export default class Page {
   }
 
   get template () {
+
     return `<div class="dashboard">
       <div class="content__top-panel">
         <h2 class="page-title">Dashboard</h2>
@@ -111,7 +114,6 @@ export default class Page {
     this.subElements = this.getSubElements(this.element);
 
     await this.initComponents();
-
     this.renderComponents();
     this.initEventListeners();
 
@@ -138,14 +140,28 @@ export default class Page {
   }
 
   initEventListeners () {
-    this.components.rangePicker.element.addEventListener('date-select', event => {
-      const { from, to } = event.detail;
-      this.updateChartsComponents(from, to);
-      this.updateTableComponent(from, to);
-    });
+    const toggleSidebar = document.querySelector('.sidebar__toggler');
+    this.toggleSidebar = toggleSidebar;
+    this.toggleSidebar.addEventListener('click', this.togglerSidebar);
+    this.components.rangePicker.element.addEventListener('date-select', this.updateRangePickerDate);
+    window.addEventListener('scroll', this.components.sortableTable.onWindowScroll);
+  }
+
+  updateRangePickerDate = (event) => {
+    const { from, to } = event.detail;
+    this.updateChartsComponents(from, to);
+    this.updateTableComponent(from, to);
+  }
+
+  togglerSidebar() {
+    document.body.classList.toggle("is-collapsed-sidebar")
   }
 
   destroy () {
+    window.removeEventListener('scroll',this.components.sortableTable.onWindowScroll);
+    this.components.rangePicker.element.removeEventListener('date-select', this.updateRangePickerDate);
+    this.toggleSidebar.removeEventListener('click', this.togglerSidebar);
+
     for (const component of Object.values(this.components)) {
       component.destroy();
     }

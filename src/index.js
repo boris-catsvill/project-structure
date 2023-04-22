@@ -1,10 +1,10 @@
 import Router from './router/index.js';
-import tooltip from './components/tooltip/index.js';
+import Tooltip from './components/tooltip/index.js';
 
-tooltip.initialize();
+Tooltip.initialize();
+
 
 const router = Router.instance();
-
 router
   .addRoute(/^$/, 'dashboard')
   .addRoute(/^products$/, 'products/list')

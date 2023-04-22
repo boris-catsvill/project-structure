@@ -14,7 +14,7 @@ For correct build via Webpack you must have:
 
 Проект - это фронтенд часть типичной "Панели управления" для магазина товаров,
 реализованная на чистом JavaScript.
-
+ode
 ## Preview
 
 [![preview](./preview.png)](https://project-structure/)
