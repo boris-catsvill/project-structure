@@ -11,7 +11,7 @@ export default class Router {
   initEventListeners () {
     document.addEventListener('click', (event) => {
       const link = event.target.closest('a');
-      if (!link) return;
+      if (!link) {return;}
 
       const href = link.getAttribute('href');
 
