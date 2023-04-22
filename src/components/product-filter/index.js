@@ -118,23 +118,29 @@ export default class ProductFilter {
 	
 	
 	// передача данных в родительский компонент
-	dispatchEvent(type) {		
-		if (type === "rangeSelected") {
-			this.element.dispatchEvent(new CustomEvent('price-select', {
+	dispatchEvent(type) {	
+		let event = '';
+		
+		switch (type) {
+			case "rangeSelected":
+				event = 'price-select';
+				break;
+			case "filterName":
+				event = 'filter-name';
+				break;
+			case "filterStatus":
+				event = 'filter-status';
+				break;	
+			default:
+				break;
+		}
+		
+		this.element.dispatchEvent(new CustomEvent(event, {
 				bubbles: true,
 				detail: this.filterForm
-			}));
-		} else if (type === "filterName") {
-			this.element.dispatchEvent(new CustomEvent('filter-name', {
-				bubbles: true,
-				detail: this.filterForm
-			}));
-		} else if (type === "filterStatus") {
-			this.element.dispatchEvent(new CustomEvent('filter-status', {
-				bubbles: true,
-				detail: this.filterForm
-			}));
-		}		
+			})
+		);
+			
   }
 	
 	filterFormHandler() {

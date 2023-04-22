@@ -7,12 +7,10 @@ export default class Page {
   components = {};
 	productId;
 	
-	
-	constructor() {
-		
-	
+	constructor(productId) {
+		this. productId = productId
 	}
-	
+
 
   async render() {
     const element = document.createElement('div');
@@ -30,18 +28,10 @@ export default class Page {
 	
 			return this.element;
   }
-	
-	get productFromUrl() {
-		const pathArray = window.location.pathname.split('/');
-		const product = pathArray.slice(-1)[0];
-		
-		if (product === "add" ) return null;
-		
-		return product;		
-	}
+
 	
 	initComponents() {
-    this.components.productFrom = new ProductForm(this.productFromUrl);
+    this.components.productFrom = new ProductForm(this.productId);
   }
 
   async renderComponents() {

@@ -5,13 +5,10 @@ export default class CategoryComponent {
   element; // DOM element
   subElements = {};
 
-  
   constructor (data) {
 		this.data = data
 		this.render();
   }
-  
-	
   
 
   /**

@@ -1,7 +1,6 @@
 import escapeHtml from '../../utils/escape-html.js';
 import fetchJson from '../../utils/fetch-json.js';
 
-const IMGUR_CLIENT_ID = '28aaa2e823b03b1';
 const BACKEND_URL = 'https://course-js.javascript.ru';
 
 export default class ProductForm {
@@ -56,7 +55,7 @@ export default class ProductForm {
         const result = await fetchJson('https://api.imgur.com/3/image', {
           method: 'POST',
           headers: {
-            Authorization: `Client-ID ${IMGUR_CLIENT_ID}`,
+            Authorization: `Client-ID ${process.env.IMGUR_CLIENT_ID}`,
           },
           body: formData,
           referrer: ''
@@ -264,7 +263,7 @@ export default class ProductForm {
   async loadProductData (productId) {
     const productUrl = new URL("/api/rest/products", BACKEND_URL);
     productUrl.searchParams.set("id", productId);
-    return fetchJson(productUrl);
+    return await fetchJson(productUrl);
   }
 	
   
@@ -281,16 +280,13 @@ export default class ProductForm {
 	
     const wrapper = document.createElement('div');
 		
-    //wrapper.innerHTML = `<select class="form-control" name="category"></select>`;
     wrapper.innerHTML = `<select class="form-control" id="subcategory" name="subcategory"></select>`;
     const selectElem = wrapper.firstElementChild;
-    
+    let index = 0
     for (const category of this.categories) {
       category.subcategories.forEach(item => {
-        const option = document.createElement("option");
-        option.value = item.id;
-        option.text = category.title + ` > ` + item.title;
-        selectElem.append(option);
+       selectElem[index] = new Option(category.title + ` > ` + item.title, item.id);
+			 index++;
       });
     }
   

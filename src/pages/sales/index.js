@@ -1,7 +1,8 @@
 import RangePicker from '../../components/range-picker/index.js';
 import SortableTable from '../../components/sortable-table/index.js';
-import ColumnChart from '../../components/column-chart/index.js';
 import header from './sales-header.js';
+import subtractMonths from '../../utils/subtract-months';
+
 
 import fetchJson from '../../utils/fetch-json.js';
 
@@ -14,10 +15,11 @@ export default class Page {
     const data = await fetchJson(`${process.env.BACKEND_URL}api/rest/orders?createdAt_gte=${from.toISOString()}&createdAt_lte=${to.toISOString()}`);
     this.components.sortableTable.addRows(data);
   }
+	
 
   async initComponents () {
     const to = new Date();
-    const from = new Date(to.getTime() - (30 * 24 * 60 * 60 * 1000));
+    const from = subtractMonths(new Date(), 1);
 
     const rangePicker = new RangePicker({
       from,

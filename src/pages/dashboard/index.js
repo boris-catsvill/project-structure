@@ -2,6 +2,7 @@ import RangePicker from '../../components/range-picker/index.js';
 import SortableTable from '../../components/sortable-table/index.js';
 import ColumnChart from '../../components/column-chart/index.js';
 import header from './bestsellers-header.js';
+import subtractMonths from '../../utils/subtract-months';
 
 import fetchJson from '../../utils/fetch-json.js';
 
@@ -38,10 +39,12 @@ export default class Page {
     this.components.salesChart.update({headerData: '$' + salesDataTotal, bodyData: salesData});
     this.components.customersChart.update({headerData: customersDataTotal, bodyData: customersData});
   }
+	
+
 
   async initComponents () {
     const to = new Date();
-    const from = new Date(to.getTime() - (30 * 24 * 60 * 60 * 1000));
+		const from = subtractMonths(new Date(), 1);
     const [ordersData, salesData, customersData] = await this.getDataForColumnCharts(from, to);
 
     const rangePicker = new RangePicker({

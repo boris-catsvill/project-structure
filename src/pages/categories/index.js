@@ -1,21 +1,13 @@
 import fetchJson from '../../utils/fetch-json.js';
 import CategoryComponent from '../../components/categories/index.js';
 
-const BACKEND_URL = 'https://course-js.javascript.ru';
-
 export default class Categories {
 	
 	categoriesData = [];
 	categoryComponent = {};
-	categoryComponents = [];
+	categoryComponents = [];	
 	
-  constructor() {    
-	
-  }
-	
-	
-	async initCategoryComponent() {
-		
+	async initCategoryComponent() {		
 		this.categoriesData = await this.loadCategories();
 		
 		for (const category of this.categoriesData) {
@@ -26,7 +18,7 @@ export default class Categories {
 	}
 	
   async loadCategories() {
-    const categoriesUrl = new URL("/api/rest/categories", BACKEND_URL);
+    const categoriesUrl = new URL("/api/rest/categories", process.env.BACKEND_URL);
     categoriesUrl.searchParams.set("_sort", "weight");
     categoriesUrl.searchParams.set("_refs", "subcategory");
     return await fetchJson(categoriesUrl);

@@ -20,8 +20,8 @@ class Tooltip {
 	
 	
 	// pointerover target div
-	onOverHandler = (e) => {
-	  const tooltipAttr = e.target.dataset.tooltip;
+	onOverHandler = (event) => {
+	  const tooltipAttr = event.target.dataset.tooltip;
 	  if (tooltipAttr) {
 	    this.tooltipName = tooltipAttr;
 	    this.render();
@@ -30,8 +30,8 @@ class Tooltip {
 	}
 	
 	// pointerout target div
-	onOutHandler = (e) => {
-	  const tooltipAttr = e.target.dataset.tooltip;
+	onOutHandler = (event) => {
+	  const tooltipAttr = event.target.dataset.tooltip;
 	  if (tooltipAttr) {
 	    this.tooltip = tooltipAttr;
 		 	this.remove();
@@ -39,10 +39,10 @@ class Tooltip {
 	  }
 	}
 
-	onMoveHandler = (e) => {
+	onMoveHandler = (event) => {
 	  const shift = 10;
-	  let left = shift + e.clientX + 'px';
-	  let top = shift + e.clientY + 'px';
+	  let left = shift + event.clientX + 'px';
+	  let top = shift + event.clientY + 'px';
 		
 	  this.element.style.left = left;
 	  this.element.style.top = top;

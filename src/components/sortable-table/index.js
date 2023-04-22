@@ -1,7 +1,5 @@
 import fetchJson from "../../utils/fetch-json.js";
 
-const BACKEND_URL = 'https://course-js.javascript.ru';
-
 /* eslint-disable no-mixed-spaces-and-tabs */
 export default class SortableTable {
   
@@ -33,7 +31,7 @@ export default class SortableTable {
   } = {}) {
     this.headersConfig = headersConfig;
     this.sorted = sorted;
-    this.url = new URL(url, BACKEND_URL);
+    this.url = new URL(url, process.env.BACKEND_URL);
     this.isSortLocally = isSortLocally;
 		this.isEditable = isEditable;
     
@@ -172,16 +170,20 @@ export default class SortableTable {
     this.url.searchParams.set("_start", this.start);
     this.url.searchParams.set("_end", this.start + this.step);
 		
-		if (this.priceFrom)
-    	this.url.searchParams.set("price_gte", this.priceFrom);
+		if (this.priceFrom) {
+			this.url.searchParams.set("price_gte", this.priceFrom);
+		}
 		
-		if (this.priceTo)	
-    	this.url.searchParams.set("price_lte", this.priceTo);
+		if (this.priceTo)	{
+			this.url.searchParams.set("price_lte", this.priceTo);
+		}
 		
-		if (this.titleLike)
+		if (this.titleLike){
 			this.url.searchParams.set("title_like", this.titleLike);
-		else 
+		}
+		else {
 			this.url.searchParams.delete("title_like");		
+		}
 		
 		
 		if (this.status) {
@@ -422,10 +424,10 @@ export default class SortableTable {
 	filterClearListener() {		
 		const { emptyPlaceholder } = this.subElements;
 		const btn = emptyPlaceholder.querySelector(".button-primary-outline");
-		btn.onclick = () =>  this.onClear();
+		btn.addEventListener('click', this.onClear) ;
 	}	
   
-	onClear() {
+	onClear = () => {
 		this.element.dispatchEvent(new CustomEvent('clear-filter', {
       detail: null,
       bubbles: true
