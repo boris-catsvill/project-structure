@@ -5,8 +5,8 @@ export default class Page {
   subElements = {};
   components = {};
 
-  constructor() {
-    this.id = window.location.pathname.split('/')[2];
+  constructor(match) {
+    this.id = match[1];
     this.initProductForm();
     this.initEventListeners()
   }
