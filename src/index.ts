@@ -4,7 +4,7 @@ import sidebar from './components/sidebar';
 
 const content = document.getElementById('content');
 if (content) {
-  content.before(sidebar.element);
+  content.before(sidebar.element!);
 }
 
 tooltip.initialize();

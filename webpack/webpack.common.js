@@ -15,7 +15,7 @@ const tsLoaders = require('./loaders/ts-loaders');
 module.exports = {
   target: 'web',
   entry: {
-    app: path.join(__dirname, '../src/index.ts'),
+    app: path.join(__dirname, '../src/index.js'),
     styles: path.join(__dirname, '../src/styles/all.css')
   },
   output: {

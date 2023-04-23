@@ -1,5 +1,11 @@
 import menuObject, { IMenuItem } from './menu';
-import { IComponent, IPage, PageType, SubElementsType } from '../../types/types';
+import {
+  HTMLDatasetElement,
+  IComponent,
+  IPage,
+  PageType,
+  SubElementsType
+} from '../../types/types';
 
 type MenuType = Array<IMenuItem>;
 
@@ -9,10 +15,6 @@ type SidebarArgs = {
   title?: string;
   menu?: MenuType;
 };
-
-interface HTMLDatasetElement extends HTMLElement {
-  dataset: { element: string };
-}
 
 class Sidebar implements IComponent {
   static instance: Sidebar | null;

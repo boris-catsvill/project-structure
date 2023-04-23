@@ -18,16 +18,26 @@ export interface IComponent extends IBaseElement {
 
 export interface IPage extends IBaseElement {
   type: PageType;
-  components?: ComponentsType;
+  components?: IComponents;
 
   initComponents?(): void;
 
   renderComponents?(): void;
 }
 
-export type SubElementsType = {
-  [element: string]: HTMLElement;
+export type SubElementsType<T extends keyof any = string> = {
+  [P in T]: HTMLElement;
 };
-export type ComponentsType = {
-  [element: string]: IComponent;
+export type ComponentsType<T extends keyof any = string> = {
+  [P in T]: IComponent | object;
 };
+
+export interface IComponents {
+  [element: string]: IComponent | object;
+}
+
+export interface HTMLDatasetElement<T = string> extends HTMLElement {
+  dataset: {
+    element: `${string & keyof T}`;
+  };
+}
