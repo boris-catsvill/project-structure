@@ -1,16 +1,17 @@
 export default class SortableList {
   element;
 
-  onDocumentPointerMove = ({clientX, clientY}) => {
+  onDocumentPointerMove = ({ clientX, clientY}) => {
     this.moveDraggingAt(clientX, clientY);
 
-    const {firstElementChild, children} = this.element;
-    const {top: firstElementTop} = firstElementChild.getBoundingClientRect();
-    const {bottom} = this.element.getBoundingClientRect();
+    const { firstElementChild, lastElementChild, children } = this.element;
+    const { top: firstElementTop } = firstElementChild.getBoundingClientRect();
+    const { bottom: lastElementBottom } = lastElementChild.getBoundingClientRect();
 
+    // handle simple cases first
     if (clientY < firstElementTop) {
       this.movePlaceholderAt(0);
-    } else if (clientY > bottom) {
+    } else if (clientY > lastElementBottom) {
       this.movePlaceholderAt(children.length);
     } else {
       for (let i = 0; i < children.length; i++) {
@@ -18,8 +19,8 @@ export default class SortableList {
 
         // ignore to prevent bugs when dragging between elements
         if (li !== this.draggingElem) {
-          const {top, bottom} = li.getBoundingClientRect();
-          const {offsetHeight: height} = li;
+          const { top, bottom } = li.getBoundingClientRect();
+          const { offsetHeight: height } = li;
 
           if (clientY > top && clientY < bottom) {
             // inside the element (y-axis)
@@ -44,7 +45,7 @@ export default class SortableList {
     this.dragStop();
   };
 
-  constructor({items = []} = {}) {
+  constructor({ items = [] } = {}) {
     this.items = items;
 
     this.render();
@@ -58,7 +59,7 @@ export default class SortableList {
     this.initEventListeners();
   }
 
-  initEventListeners() {
+  initEventListeners () {
     this.element.addEventListener('pointerdown', event => this.onPointerDown(event));
   }
 
@@ -71,7 +72,7 @@ export default class SortableList {
     this.element.append(...this.items);
   }
 
-  onPointerDown(event) {
+  onPointerDown (event) {
     if (event.which !== 1) { // must be left-button
       return false;
     }
@@ -108,8 +109,8 @@ export default class SortableList {
 
     // itemElem will get position:fixed
     // so its width will be auto-set to fit the parent container
-    itemElem.style.width = `${itemElem.offsetWidth}px`;
-    itemElem.style.height = `${itemElem.offsetHeight}px`;
+    itemElem.style.width = itemElem.offsetWidth + 'px';
+    itemElem.style.height = itemElem.offsetHeight + 'px';
 
     this.placeholderElem.style.width = itemElem.style.width;
     this.placeholderElem.style.height = itemElem.style.height;
@@ -171,7 +172,7 @@ export default class SortableList {
     if (placeholderIndex !== this.elementInitialIndex) {
       this.element.dispatchEvent(new CustomEvent('sortable-list-reorder', {
         bubbles: true,
-        details: {
+        detail: {
           from: this.elementInitialIndex,
           to: placeholderIndex
         }
@@ -179,13 +180,13 @@ export default class SortableList {
     }
   }
 
-  remove() {
+  remove () {
     this.element.remove();
     document.removeEventListener('pointermove', this.onDocumentPointerMove);
     document.removeEventListener('pointerup', this.onDocumentPointerUp);
   }
 
-  destroy() {
+  destroy () {
     this.remove();
   }
 }
