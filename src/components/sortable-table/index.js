@@ -25,17 +25,31 @@ export default class SortableTable {
     this.url = new URL(url, process.env.BACKEND_URL);
     this.isSortLocally = isSortLocally;
     this.loading = false;
-    this.empty = false;
+    this.empty = !data.length;
     this.render();
   }
 
-  set isLoading(loading) {
-    this.loading = loading;
-    if (loading) {
-      this.subElements.loading.style.display = 'block';
+  get isLoading() {
+    return this.loading;
+  }
+
+  set isLoading(isLoading) {
+    this.loading = isLoading;
+    const { body: bodyEl, loading: loadingEl } = this.subElements;
+
+    if (isLoading) {
+      //loadingEl.style.display = 'block';
+      //bodyEl.style.display = 'none';
+      this.element.classList.add('sortable-table_loading');
     } else {
-      this.subElements.loading.style.display = 'none';
+      //loadingEl.style.display = 'none';
+      //bodyEl.style.display = 'block';
+      this.element.classList.remove('sortable-table_loading');
     }
+  }
+
+  get isEmpty() {
+    return this.empty;
   }
 
   set isEmpty(empty) {
@@ -109,16 +123,16 @@ export default class SortableTable {
 
   addRows(data) {
     this.data = data;
-    this.isLoading = false;
     this.isEmpty = !data.length;
     this.subElements.body.innerHTML = this.getTableRows(data);
   }
 
   getHeaderRow({ id, title, sortable }) {
-    const order = this.sorted.id === id ? this.sorted.order : 'asc';
-
+    const dataId = `data-id='${id}'`;
+    const dataOrder = sortable ? `data-order='${this.sorted.order}'` : '';
+    const dataSortable = sortable ? 'data-sortable=true' : '';
     return `
-      <div class='sortable-table__cell' data-id='${id}' data-sortable='${sortable}' data-order='${order}'>
+      <div class='sortable-table__cell' ${dataId} ${dataSortable} ${dataOrder}>
         <span>${title}</span>
         ${this.getHeaderSortingArrow(id)}
       </div>
@@ -142,6 +156,12 @@ export default class SortableTable {
       </div>`;
   }
 
+  clearTable() {
+    if (this.isLoading) {
+      this.subElements.body.innerHTML = '';
+    }
+  }
+
   getTableRows(data) {
     return data
       .map(
@@ -154,20 +174,10 @@ export default class SortableTable {
   }
 
   getTableRow(item) {
-    const cells = this.headerConfig.map(({ id, template }) => {
-      return {
-        id,
-        template
-      };
-    });
+    const cellCallback = ({ id, template }) =>
+      `<div class='sortable-table__cell'>${template ? template(item[id]) : item[id]}</div>`;
 
-    return cells
-      .map(({ id, template }) => {
-        return template
-          ? template(item[id])
-          : `<div class='sortable-table__cell'>${item[id]}</div>`;
-      })
-      .join('');
+    return this.headerConfig.map(cellCallback).join('');
   }
 
   getLoading() {
@@ -196,8 +206,10 @@ export default class SortableTable {
     this.element = wrapper.firstElementChild;
     this.subElements = this.getSubElements(this.element);
 
-    /* const loadedData = await this.loadData(this.sorted);
-     this.addRows(loadedData);*/
+    if (!this.isSortLocally && this.isEmpty) {
+      const loadedData = await this.loadData(this.sorted);
+      this.addRows(loadedData);
+    }
 
     this.initEventListeners();
   }
@@ -226,13 +238,16 @@ export default class SortableTable {
   }
 
   async sortOnServer(id, order) {
+    this.subElements.body.innerHTML = '';
     this.sorted = {
       id,
       order,
       start: 0,
       end: this.offset
     };
+    this.isLoading = true;
     const sortedData = await this.loadData(this.sorted);
+    this.isLoading = false;
     this.addRows(sortedData);
   }
 

@@ -1,10 +1,10 @@
-import { IPage, PageType } from '../../types/types';
+import { IPage } from '../../types/types';
 import menu from '../../components/sidebar/menu';
 
 class Categories implements IPage {
   element: Element | null;
 
-  get type(): PageType {
+  get type(): string {
     return menu.categories.page;
   }
 

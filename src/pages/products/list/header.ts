@@ -1,16 +1,17 @@
-import { HeaderType, SortType } from '../../types/types';
+import { HeaderType, SortType } from '../../../types/types';
 
-interface BestsellersHeader {
-  images: BestsellersHeaderType;
-  title: BestsellersHeaderType;
-  quantity: BestsellersHeaderType;
-  price: BestsellersHeaderType;
-  status: BestsellersHeaderType;
+interface ProductHeader {
+  images: ProductsHeaderType;
+  title: ProductsHeaderType;
+  subcategory: ProductsHeaderType;
+  quantity: ProductsHeaderType;
+  price: ProductsHeaderType;
+  status: ProductsHeaderType;
 }
 
-type BestsellersHeaderType = HeaderType<BestsellersHeader>;
+type ProductsHeaderType = HeaderType<ProductHeader>;
 
-const header: BestsellersHeaderType[] = [
+const header: ProductsHeaderType[] = [
   {
     id: 'images',
     title: 'Image',
@@ -22,6 +23,12 @@ const header: BestsellersHeaderType[] = [
     title: 'Name',
     sortable: true,
     sortType: SortType.STRING
+  },
+  {
+    id: 'subcategory',
+    title: 'Category',
+    sortable: false,
+    template: data => data.title
   },
   {
     id: 'quantity',

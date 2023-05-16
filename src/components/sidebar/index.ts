@@ -1,11 +1,5 @@
 import menuObject, { IMenuItem } from './menu';
-import {
-  HTMLDatasetElement,
-  IComponent,
-  IPage,
-  PageType,
-  SubElementsType
-} from '../../types/types';
+import { HTMLDatasetElement, IComponent, IPage, SubElementsType } from '../../types/types';
 
 type MenuType = Array<IMenuItem>;
 
@@ -57,7 +51,7 @@ class Sidebar implements IComponent {
     this.setActiveMenuItem(pageType);
   };
 
-  setActiveMenuItem(page: PageType) {
+  setActiveMenuItem(page: string) {
     const activeItems: Element[] = Array.from(this.subElements.menu.querySelectorAll('.active'));
     [...activeItems].forEach(item => {
       item.classList.remove('active');

@@ -58,7 +58,7 @@ export class RangePicker {
 
   selectDate(element) {
     if (this.firstSelectedDate) {
-      this.setRange(element);
+      this.selectSecondData(element);
     } else {
       this.selectFirstData(element);
     }
@@ -77,27 +77,31 @@ export class RangePicker {
     dateSelectElement.classList.add(this.classNames.from);
   }
 
-  setRange(dateSelectElement) {
+  selectSecondData(dateSelectElement) {
     const { value: ISOString } = dateSelectElement.dataset;
     const firstSelectedDate = this.firstSelectedDate;
     const secondSelectedDate = new Date(Date.parse(ISOString));
     this.firstSelectedDate = null;
-
+    const range = {};
     if (firstSelectedDate.getTime() >= secondSelectedDate.getTime()) {
-      this.from = secondSelectedDate;
-      this.to = firstSelectedDate;
+      range.from = secondSelectedDate;
+      range.to = firstSelectedDate;
     } else {
-      this.from = firstSelectedDate;
-      this.to = secondSelectedDate;
+      range.from = firstSelectedDate;
+      range.to = secondSelectedDate;
     }
-    if (this.from && this.to) {
-      const { from, to } = this.subElements;
-      this.highlightRange();
-      from.innerHTML = RangePicker.formatDate(this.from);
-      to.innerHTML = RangePicker.formatDate(this.to);
-      this.dispatchSelectDate(this.from, this.to);
-      this.close();
-    }
+    this.setRange(range);
+  }
+
+  setRange({ from, to }) {
+    const { from: subElementFrom, to: subElementTo } = this.subElements;
+    this.from = from;
+    this.to = to;
+    this.highlightRange();
+    subElementFrom.innerHTML = RangePicker.formatDate(from);
+    subElementTo.innerHTML = RangePicker.formatDate(to);
+    this.dispatchSelectDate(from, to);
+    this.close();
   }
 
   highlightRange() {
@@ -140,6 +144,7 @@ export class RangePicker {
     selector
       .querySelector(`.${this.classNames.left}`)
       .addEventListener('click', this.shiftMonthLeft);
+
     selector
       .querySelector(`.${this.classNames.right}`)
       .addEventListener('click', this.shiftMonthRight);

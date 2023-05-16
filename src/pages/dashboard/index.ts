@@ -1,4 +1,4 @@
-import { ComponentsType, HTMLDatasetElement, IPage, SubElementsType } from '../../types/types';
+import { ComponentsType, INodeListOfSubElements, IPage, SubElementsType } from '../../types/types';
 import menu from '../../components/sidebar/menu';
 import { RangePicker } from '../../components/range-picker';
 import fetchJson from '../../utils/fetch-json';
@@ -13,7 +13,8 @@ enum Components {
   OrdersChart = 'ordersChart',
   SalesChart = 'salesChart',
   CustomersChart = 'customersChart',
-  SortableTable = 'sortableTable'
+  SortableTable = 'sortableTable',
+  ChartsRoot = 'chartRoot'
 }
 
 type ChartSettingType = {
@@ -29,9 +30,7 @@ type RangeType = {
   to: Date;
 };
 
-interface INodeListOfSubElements extends NodeListOf<HTMLDatasetElement<SubElementsType>> {}
-
-const BESTSELLER_PRODUCT_URL = 'api/dashboard/bestsellers?_start=1&_end=20';
+const BESTSELLER_PRODUCTS_URL = 'api/dashboard/bestsellers?_start=1&_end=20';
 
 class Dashboard implements IPage {
   element: Element;
@@ -72,7 +71,7 @@ class Dashboard implements IPage {
         <!-- RangePicker component -->
         <div data-element='${Components.RangePicker}'></div>
       </div>
-      <div data-element='chartsRoot' class='dashboard__charts'>
+      <div data-element='${Components.ChartsRoot}' class='dashboard__charts'>
         <!-- column-chart components -->
         <div data-element='${Components.OrdersChart}' class='dashboard__chart_orders'></div>
         <div data-element='${Components.SalesChart}' class='dashboard__chart_sales'></div>
@@ -108,7 +107,7 @@ class Dashboard implements IPage {
   }
 
   async loadData({ from, to }: RangeType) {
-    const sortableTableUrl = new URL(BESTSELLER_PRODUCT_URL, process.env.BACKEND_URL);
+    const sortableTableUrl = new URL(BESTSELLER_PRODUCTS_URL, process.env.BACKEND_URL);
     sortableTableUrl.searchParams.set('from', from.toISOString());
     sortableTableUrl.searchParams.set('to', to.toISOString());
 
@@ -136,7 +135,7 @@ class Dashboard implements IPage {
     this.components[Components.RangePicker] = new RangePicker(range);
     this.components[Components.SortableTable] = new SortableTable(header, {
       data: sortableTableData,
-      url: BESTSELLER_PRODUCT_URL,
+      url: BESTSELLER_PRODUCTS_URL,
       isSortLocally: true
     });
     this.initCharts(chartsData);
@@ -153,6 +152,8 @@ class Dashboard implements IPage {
   async updateComponents(range: RangeType) {
     // @ts-ignore
     this.components[Components.SortableTable].isLoading = true;
+    // @ts-ignore
+    this.components[Components.SortableTable].clearTable();
     this.chartsSettings.forEach(({ chart }, index) => {
       // @ts-ignore
       this.components[chart].isLoading = true;
@@ -161,6 +162,8 @@ class Dashboard implements IPage {
     const [sortableTableData, ...chartsData] = await this.loadData(range);
     // @ts-ignore
     this.components[Components.SortableTable].addRows(sortableTableData);
+    // @ts-ignore
+    this.components[Components.SortableTable].isLoading = false;
     this.updateCharts(chartsData);
   }
 
@@ -168,6 +171,8 @@ class Dashboard implements IPage {
     this.chartsSettings.forEach(({ chart }, index) => {
       // @ts-ignore
       this.components[chart].update(Object.values(chartsData[index]));
+      // @ts-ignore
+      this.components[chart].isLoading = false;
     });
   }
 

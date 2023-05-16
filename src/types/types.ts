@@ -1,5 +1,3 @@
-export type PageType = 'dashboard' | 'products' | 'categories' | 'sales';
-
 interface IBaseElement {
   element: Element | null;
 
@@ -17,7 +15,7 @@ export interface IComponent extends IBaseElement {
 }
 
 export interface IPage extends IBaseElement {
-  type: PageType;
+  type: string;
   components?: IComponents;
 
   initComponents?(): void;
@@ -32,6 +30,8 @@ export type ComponentsType<T extends keyof any = string> = {
   [P in T]: IComponent | object;
 };
 
+export interface INodeListOfSubElements extends NodeListOf<HTMLDatasetElement<SubElementsType>> {}
+
 export interface IComponents {
   [element: string]: IComponent | object;
 }
@@ -40,4 +40,17 @@ export interface HTMLDatasetElement<T = string> extends HTMLElement {
   dataset: {
     element: `${string & keyof T}`;
   };
+}
+
+export enum SortType {
+  STRING = 'string',
+  NUMBER = 'number'
+}
+
+export interface HeaderType<T> {
+  id: keyof T;
+  title: string;
+  sortable: boolean;
+  sortType?: SortType;
+  template?: (data: any) => string;
 }

@@ -1,14 +1,12 @@
-import { PageType } from '../../types/types';
-
 type PagePathType = `/${string}`;
 
 export interface IMenuItem {
-  page: PageType;
+  page: string;
   title: Capitalize<string>;
   href: PagePathType;
 }
 
-type MenuType = Record<PageType, IMenuItem>;
+type MenuType = Record<string, IMenuItem>;
 
 const menu: MenuType = {
   dashboard: { page: 'dashboard', title: 'Dashboard', href: '/' },

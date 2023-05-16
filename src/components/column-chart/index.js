@@ -50,10 +50,8 @@ export default class ColumnChart {
 
   update(data = []) {
     this.data = data;
-
     this.subElements.header.innerHTML = this.getHeader();
     this.subElements.body.innerHTML = this.getBody();
-    this.isLoading = false;
   }
 
   getHeader() {
