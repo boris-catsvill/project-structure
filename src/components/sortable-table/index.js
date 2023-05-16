@@ -38,20 +38,17 @@ export default class SortableTable {
     const { body: bodyEl, loading: loadingEl } = this.subElements;
 
     if (isLoading) {
-      //loadingEl.style.display = 'block';
-      //bodyEl.style.display = 'none';
       this.element.classList.add('sortable-table_loading');
     } else {
-      //loadingEl.style.display = 'none';
-      //bodyEl.style.display = 'block';
       this.element.classList.remove('sortable-table_loading');
     }
   }
 
   get isEmpty() {
-    return this.empty;
+    return !this.data.length;
   }
 
+  //TODO Need to refactor `isEmpty getter`
   set isEmpty(empty) {
     if (empty) {
       this.element.classList.add('sortable-table_empty');
@@ -65,7 +62,7 @@ export default class SortableTable {
     const { bottom } = this.element.getBoundingClientRect();
     const { id, order } = this.sorted;
 
-    if (bottom < document.documentElement.clientHeight && !this.loading && !this.isSortLocally) {
+    if (bottom < document.documentElement.clientHeight && !this.isLoading && !this.isSortLocally) {
       this.sorted.start = this.sorted.end;
       this.sorted.end = this.sorted.start + this.offset;
       this.isLoading = true;
@@ -157,9 +154,7 @@ export default class SortableTable {
   }
 
   clearTable() {
-    if (this.isLoading) {
-      this.subElements.body.innerHTML = '';
-    }
+    this.subElements.body.innerHTML = '';
   }
 
   getTableRows(data) {
@@ -188,6 +183,11 @@ export default class SortableTable {
     return `<div data-element='emptyPlaceholder' class='sortable-table__empty-placeholder'><div>No data</div></div>`;
   }
 
+  setEmptyPlaceholder(html = '<div>No data</div>') {
+    this.subElements.emptyPlaceholder.innerHTML = '';
+    this.subElements.emptyPlaceholder.append(html);
+  }
+
   getTable(data = []) {
     return `
       <div class='sortable-table'>
@@ -205,13 +205,13 @@ export default class SortableTable {
 
     this.element = wrapper.firstElementChild;
     this.subElements = this.getSubElements(this.element);
-
-    if (!this.isSortLocally && this.isEmpty) {
+    this.initEventListeners();
+    if (this.isEmpty) {
+      this.isLoading = true;
       const loadedData = await this.loadData(this.sorted);
+      this.isLoading = false;
       this.addRows(loadedData);
     }
-
-    this.initEventListeners();
   }
 
   initEventListeners() {
@@ -238,13 +238,13 @@ export default class SortableTable {
   }
 
   async sortOnServer(id, order) {
-    this.subElements.body.innerHTML = '';
     this.sorted = {
       id,
       order,
       start: 0,
       end: this.offset
     };
+    this.clearTable();
     this.isLoading = true;
     const sortedData = await this.loadData(this.sorted);
     this.isLoading = false;

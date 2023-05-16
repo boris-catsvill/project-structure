@@ -114,6 +114,19 @@ export default class DoubleSlider {
     this.shift = { left, right };
   }
 
+  reset() {
+    this.selected = { from: this.min, to: this.max };
+    this.setShift(this.min, this.max, this.selected);
+    this.activeSide = '';
+    const { from, to, progress, left, right } = this.subElements;
+    from.innerHTML = this.formatValue(this.selected.from);
+    to.innerHTML = this.formatValue(this.selected.to);
+    progress.style.right = '0';
+    progress.style.left = '0';
+    left.style.left = '0';
+    right.style.right = '0';
+  }
+
   render() {
     const wrap = document.createElement('div');
     wrap.innerHTML = this.template;

@@ -6,6 +6,11 @@ import ColumnChart from '../../components/column-chart';
 import SortableTable from '../../components/sortable-table';
 import header from './bestsellers-header';
 
+type RangeType = {
+  from: Date;
+  to: Date;
+};
+
 interface DateSelectEvent extends CustomEvent<RangeType> {}
 
 enum Components {
@@ -25,12 +30,7 @@ type ChartSettingType = {
   formatHeading?: (data: any) => string;
 };
 
-type RangeType = {
-  from: Date;
-  to: Date;
-};
-
-const BESTSELLER_PRODUCTS_URL = 'api/dashboard/bestsellers?_start=1&_end=20';
+const BESTSELLER_PRODUCTS_URL = 'api/dashboard/bestsellers?_start=0&_end=30&_sort=title&_order=asc';
 
 class Dashboard implements IPage {
   element: Element;
@@ -106,18 +106,21 @@ class Dashboard implements IPage {
     }, {} as SubElementsType);
   }
 
-  async loadData({ from, to }: RangeType) {
-    const sortableTableUrl = new URL(BESTSELLER_PRODUCTS_URL, process.env.BACKEND_URL);
-    sortableTableUrl.searchParams.set('from', from.toISOString());
-    sortableTableUrl.searchParams.set('to', to.toISOString());
+  async loadData(range: RangeType) {
+    const productsRequest: Promise<object[]> = this.loadProducts(range);
+    const chartRequests: Array<Promise<object[]>> = this.loadCharts(range);
 
-    const sortableTableRequest: Promise<object[]> = fetchJson(sortableTableUrl);
-    const chartRequests = this.loadCharts({ from, to });
-
-    return await Promise.all([sortableTableRequest, ...chartRequests]);
+    return await Promise.all([productsRequest, ...chartRequests]);
   }
 
-  loadCharts({ from, to }: RangeType): Promise<object>[] {
+  async loadProducts({ from, to }: RangeType): Promise<object[]> {
+    const bestsellerProducts = new URL(BESTSELLER_PRODUCTS_URL, process.env.BACKEND_URL);
+    bestsellerProducts.searchParams.set('from', from.toISOString());
+    bestsellerProducts.searchParams.set('to', to.toISOString());
+    return fetchJson(bestsellerProducts);
+  }
+
+  loadCharts({ from, to }: RangeType): Array<Promise<object[]>> {
     return this.chartsSettings.map(setting => {
       const url = new URL(setting.url, process.env.BACKEND_URL);
       url.searchParams.set('from', from.toISOString());
