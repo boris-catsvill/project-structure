@@ -3,8 +3,6 @@ import { INodeListOfSubElements, SubElementsType } from '../../types';
 import SortableList from '../sortable-list';
 import escapeHtml from '../../utils/escape-html';
 
-const PRODUCT_URL = 'api/rest/products';
-const CATEGORIES_URL = 'api/rest/categories?_sort=weight&_refs=subcategory';
 export default class ProductForm {
   element: Element;
   productId: string = '';
@@ -243,7 +241,8 @@ export default class ProductForm {
   }
 
   saveProduct(data = {}) {
-    const productUrl = new URL(PRODUCT_URL, process.env['BACKEND_URL']);
+    // @ts-ignore
+    const productUrl = new URL(process.env['PRODUCT_API_PATH'], process.env['BACKEND_URL']);
     const params = {
       method: `${this.productId ? 'PATCH' : 'PUT'}`,
       headers: {
@@ -264,14 +263,16 @@ export default class ProductForm {
   }
 
   loadProductData(productId: String): Promise<object[]> {
-    const productUrl = new URL(PRODUCT_URL, process.env['BACKEND_URL']);
+    //@ts-ignore
+    const productUrl = new URL(process.env['PRODUCT_API_PATH'], process.env['BACKEND_URL']);
     // @ts-ignore
     productUrl.searchParams.set('id', productId);
     return fetchJson(productUrl);
   }
 
   loadCategories(): Promise<object[]> {
-    const categoriesUrl = new URL(CATEGORIES_URL, process.env['BACKEND_URL']);
+    //@ts-ignore
+    const categoriesUrl = new URL(process.env['CATEGORIES_API_PATH'], process.env['BACKEND_URL']);
     return fetchJson(categoriesUrl);
   }
 

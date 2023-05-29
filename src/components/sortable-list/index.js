@@ -47,12 +47,14 @@ export default class SortableList {
     if (!item) {
       return;
     }
-
+    const isTargetGrab = target.dataset.grabHandle !== undefined;
+    const isItemGrab = item.dataset.grabHandle !== undefined;
     if (target.dataset.deleteHandle !== undefined) {
       item.remove();
     }
-
-    if (target.dataset.grabHandle !== undefined) {
+    
+    //TODO Check this
+    if (isTargetGrab || isItemGrab) {
       this.dragItem(item, event);
     }
   }

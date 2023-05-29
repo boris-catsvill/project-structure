@@ -20,8 +20,7 @@ type PriceRangeType = {
 
 interface PriceRangeEvent extends CustomEvent<PriceRangeType> {}
 
-const PRODUCTS_URL =
-  'api/rest/products?_embed=subcategory.category&_start=0&_end=30&_sort=title&_order=asc';
+const PRODUCTS_URL = `${process.env['PRODUCT_API_PATH']}?_embed=subcategory.category&_start=0&_end=30&_sort=title&_order=asc`;
 
 class ProductsPage implements IPage {
   element: Element;
@@ -49,18 +48,18 @@ class ProductsPage implements IPage {
               <div class='content-box content-box_small'>
               <form class='form-inline'>
           <div class='form-group'>
-            <label class='form-label'>Сортировать по:</label>
+            <label class='form-label'>Sort by:</label>
             <input type='text' data-element='${Components.FilterName}' class='form-control' placeholder='Название товара'>
           </div>
           <div class='form-group' data-element='${Components.Slider}'>
             <label class='form-label'>Price:</label>
           </div>
           <div class='form-group'>
-            <label class='form-label'>Статус:</label>
+            <label class='form-label'>Status:</label>
             <select class='form-control' data-element='${Components.FilterStatus}'>
-              <option value='' selected=''>Любой</option>
-              <option value='1'>Активный</option>
-              <option value='0'>Неактивный</option>
+              <option value='' selected=''>Any</option>
+              <option value='1'>Active</option>
+              <option value='0'>Inactive</option>
             </select>
           </div>
         </form>
@@ -73,8 +72,8 @@ class ProductsPage implements IPage {
   }
 
   get emptyPlaceholder() {
-    return `<p>Не найдено товаров удовлетворяющих выбранному критерию</p>
-            <button type='button' class='button-primary-outline'>Очистить фильтры</button>`;
+    return `<p>No products found matching the selected criteria</p>
+            <button type='button' class='button-primary-outline'>Clear filter</button>`;
   }
 
   async render() {
