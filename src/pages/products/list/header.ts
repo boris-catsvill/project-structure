@@ -1,4 +1,4 @@
-import { HeaderType, SortType } from '../../../types/types';
+import { HeaderType, SortType } from '../../../types';
 
 interface ProductHeader {
   images: ProductsHeaderType;
@@ -47,11 +47,7 @@ const header: ProductsHeaderType[] = [
     title: 'Status',
     sortable: true,
     sortType: SortType.NUMBER,
-    template: data => {
-      return `<div class='sortable-table__cell'>
-          ${data > 0 ? 'Active' : 'Inactive'}
-        </div>`;
-    }
+    template: data => (data > 0 ? 'Active' : 'Inactive')
   }
 ];
 

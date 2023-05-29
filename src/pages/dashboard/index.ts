@@ -1,4 +1,4 @@
-import { ComponentsType, INodeListOfSubElements, IPage, SubElementsType } from '../../types/types';
+import { ComponentsType, INodeListOfSubElements, IPage, SubElementsType } from '../../types';
 import menu from '../../components/sidebar/menu';
 import { RangePicker } from '../../components/range-picker';
 import fetchJson from '../../utils/fetch-json';

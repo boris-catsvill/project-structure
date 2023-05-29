@@ -1,6 +1,6 @@
 //import ProductForm from '../../../components/product-form';
 import menu from '../../../components/sidebar/menu';
-import { IComponent, INodeListOfSubElements, IPage, SubElementsType } from '../../../types/types';
+import { IComponent, INodeListOfSubElements, IPage, SubElementsType } from '../../../types';
 import DoubleSlider from '../../../components/double-slider';
 import SortableTable from '../../../components/sortable-table';
 import header from './header';
@@ -25,15 +25,19 @@ const PRODUCTS_URL =
 
 class ProductsPage implements IPage {
   element: Element;
-  subElements = {};
+  subElements: object;
   components = {};
-  activeFilters = {
-    title_like: '',
-    status: ''
-  };
+  activeFilters = this.defaultFilter;
 
   get type() {
     return menu.products.page;
+  }
+
+  get defaultFilter() {
+    return {
+      title_like: '',
+      status: ''
+    };
   }
 
   get template() {
@@ -74,9 +78,9 @@ class ProductsPage implements IPage {
   }
 
   async render() {
-    const element = document.createElement('div');
-    element.innerHTML = this.template;
-    this.element = element.firstElementChild!;
+    const wrap = document.createElement('div');
+    wrap.innerHTML = this.template;
+    this.element = wrap.firstElementChild!;
     this.subElements = this.getSubElements(this.element);
     this.initComponents();
     this.renderComponents();
@@ -99,7 +103,7 @@ class ProductsPage implements IPage {
     this.components = { slider, products };
   }
 
-  async renderComponents() {
+  renderComponents() {
     Object.keys(this.components).forEach(component => {
       // @ts-ignore
       const root = this.subElements[component];
@@ -157,6 +161,7 @@ class ProductsPage implements IPage {
     filterName.value = '';
     filterStatus.value = '';
     slider.reset();
+    this.activeFilters = this.defaultFilter;
     this.setProducts(products);
   }
 

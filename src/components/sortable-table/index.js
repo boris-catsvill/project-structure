@@ -126,8 +126,9 @@ export default class SortableTable {
 
   getHeaderRow({ id, title, sortable }) {
     const dataId = `data-id='${id}'`;
-    const dataOrder = sortable ? `data-order='${this.sorted.order}'` : '';
     const dataSortable = sortable ? 'data-sortable=true' : '';
+    const dataOrder = sortable ? `data-order='${this.sorted.order}'` : '';
+
     return `
       <div class='sortable-table__cell' ${dataId} ${dataSortable} ${dataOrder}>
         <span>${title}</span>

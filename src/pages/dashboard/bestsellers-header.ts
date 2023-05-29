@@ -1,4 +1,4 @@
-import { HeaderType, SortType } from '../../types/types';
+import { HeaderType, SortType } from '../../types';
 
 interface BestsellersHeader {
   images: BestsellersHeaderType;

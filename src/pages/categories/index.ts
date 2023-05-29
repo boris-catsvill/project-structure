@@ -1,4 +1,4 @@
-import { IPage } from '../../types/types';
+import { IPage } from '../../types';
 import menu from '../../components/sidebar/menu';
 
 class Categories implements IPage {

@@ -1,5 +1,5 @@
 import menuObject, { IMenuItem } from './menu';
-import { HTMLDatasetElement, IComponent, IPage, SubElementsType } from '../../types/types';
+import { HTMLDatasetElement, IComponent, IPage, SubElementsType } from '../../types';
 
 type MenuType = Array<IMenuItem>;
 

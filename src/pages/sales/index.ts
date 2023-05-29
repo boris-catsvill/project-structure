@@ -1,5 +1,5 @@
 import menu from '../../components/sidebar/menu';
-import { IPage } from '../../types/types';
+import { IPage } from '../../types';
 
 class SalesPage implements IPage {
   element: Element | null;

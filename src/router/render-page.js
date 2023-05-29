@@ -6,7 +6,8 @@ export default async function (path, match) {
   const { default: Page } = await import(
     /* webpackChunkName: "[request]" */ `../pages/${path}/index`
   );
-  const page = new Page();
+  const { groups: params = {} } = match;
+  const page = new Page(params);
   const element = await page.render();
 
   main.classList.remove('is-loading');
