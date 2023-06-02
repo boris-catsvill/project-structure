@@ -60,7 +60,7 @@ class Categories implements IPage {
     const wrap = document.createElement('div');
     wrap.innerHTML = `<li class='categories__sortable-list-item sortable-list__item' data-grab-handle='' data-id='${id}'>
         <strong>${title}</strong>
-        ${count ? `<span><b>${count}</b> products</span>` : ``}
+        <span><b>${count}</b> products</span>
        </li>`;
     return wrap.firstElementChild;
   }

@@ -160,12 +160,7 @@ export default class SortableTable {
 
   getTableRows(data) {
     return data
-      .map(
-        item => `
-      <a href='/products/${item.id}' class='sortable-table__row'>
-        ${this.getTableRow(item)}
-      </a>`
-      )
+      .map(item => `<div class='sortable-table__row'>${this.getTableRow(item)}</div>`)
       .join('');
   }
 
@@ -174,6 +169,14 @@ export default class SortableTable {
       `<div class='sortable-table__cell'>${template ? template(item[id]) : item[id]}</div>`;
 
     return this.headerConfig.map(cellCallback).join('');
+  }
+
+  setUrlParams({ from, to, start = 0, end = this.offset }) {
+    this.sorted = { ...this.sorted, start, end };
+    this.url.searchParams.set('_start', start);
+    this.url.searchParams.set('_end', end);
+    this.url.searchParams.set('createdAt_gte', from.toISOString());
+    this.url.searchParams.set('createdAt_lte', to.toString());
   }
 
   getLoading() {
@@ -267,7 +270,7 @@ export default class SortableTable {
         case 'custom':
           return direction * customSorting(a, b);
         default:
-          throw new Error(`Неизвестный тип сортировки ${sortType}`);
+          throw new Error(`Unknown sort type ${sortType}`);
       }
     });
   }

@@ -2,9 +2,9 @@
 import menu from '../../../components/sidebar/menu';
 import { IComponent, INodeListOfSubElements, IPage, SubElementsType } from '../../../types';
 import DoubleSlider from '../../../components/double-slider';
-import SortableTable from '../../../components/sortable-table';
 import header from './header';
 import fetchJson from '../../../utils/fetch-json';
+import { ProductSortableTable } from '../../../components/product-sortable-table';
 
 enum Components {
   Products = 'products',
@@ -98,7 +98,7 @@ class ProductsPage implements IPage {
 
   initComponents() {
     const slider = new DoubleSlider({ min: 0, max: 4000, formatValue: data => `$${data}` });
-    const products = new SortableTable(header, { url: PRODUCTS_URL });
+    const products = new ProductSortableTable(header, { url: PRODUCTS_URL });
     this.components = { slider, products };
   }
 
@@ -164,7 +164,7 @@ class ProductsPage implements IPage {
     this.setProducts(products);
   }
 
-  async setProducts(sortableTable: SortableTable) {
+  async setProducts(sortableTable: ProductSortableTable) {
     sortableTable.isLoading = true;
     sortableTable.isEmpty = false;
     sortableTable.setEmptyPlaceholder();

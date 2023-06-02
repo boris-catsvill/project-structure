@@ -12,6 +12,10 @@ export class RangePicker {
     this.render();
   }
 
+  static get EVENT_DATE_SELECT() {
+    return 'date-select';
+  }
+
   get classNames() {
     return {
       open: 'rangepicker_open',
@@ -178,6 +182,7 @@ export class RangePicker {
     this.element = wrap.firstElementChild;
     this.subElements = this.getSubElements(this.element);
     this.initListeners();
+    return this.element;
   }
 
   getSubElements(element) {

@@ -1,17 +1,18 @@
-import { ComponentsType, INodeListOfSubElements, IPage, SubElementsType } from '../../types';
-import menu from '../../components/sidebar/menu';
+import {
+  ComponentsType,
+  DateSelectEvent,
+  INodeListOfSubElements,
+  IPage,
+  RangeType,
+  SubElementsType
+} from '../../types';
 import { RangePicker } from '../../components/range-picker';
+import { ProductSortableTable } from '../../components/product-sortable-table';
+import { ColumnChart } from '../../components/column-chart';
+import menu from '../../components/sidebar/menu';
 import fetchJson from '../../utils/fetch-json';
-import ColumnChart from '../../components/column-chart';
-import SortableTable from '../../components/sortable-table';
+
 import header from './bestsellers-header';
-
-type RangeType = {
-  from: Date;
-  to: Date;
-};
-
-interface DateSelectEvent extends CustomEvent<RangeType> {}
 
 enum Components {
   RangePicker = 'rangePicker',
@@ -113,7 +114,7 @@ class Dashboard implements IPage {
     return await Promise.all([productsRequest, ...chartRequests]);
   }
 
-  async loadProducts({ from, to }: RangeType): Promise<object[]> {
+  loadProducts({ from, to }: RangeType): Promise<object[]> {
     const bestsellerProducts = new URL(BESTSELLER_PRODUCTS_URL, process.env.BACKEND_URL);
     bestsellerProducts.searchParams.set('from', from.toISOString());
     bestsellerProducts.searchParams.set('to', to.toISOString());
@@ -131,12 +132,12 @@ class Dashboard implements IPage {
 
   async initComponents() {
     const to = new Date();
-    const from = new Date(to.getFullYear(), to.getMonth() - 1, 1);
+    const from = new Date(to.getFullYear(), to.getMonth() - 1, to.getDate());
     const range = { from, to };
     const [sortableTableData, ...chartsData] = await this.loadData(range);
 
     this.components[Components.RangePicker] = new RangePicker(range);
-    this.components[Components.SortableTable] = new SortableTable(header, {
+    this.components[Components.SortableTable] = new ProductSortableTable(header, {
       data: sortableTableData,
       url: BESTSELLER_PRODUCTS_URL,
       isSortLocally: true
@@ -182,7 +183,7 @@ class Dashboard implements IPage {
   initListeners() {
     // @ts-ignore
     this.components[Components.RangePicker].element.addEventListener(
-      'date-select',
+      RangePicker.EVENT_DATE_SELECT,
       ({ detail: range }: DateSelectEvent) => {
         this.updateComponents(range);
       }

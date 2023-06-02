@@ -1,4 +1,4 @@
-export default class ColumnChart {
+export class ColumnChart {
   element;
   chartHeight = 50;
   data = [];

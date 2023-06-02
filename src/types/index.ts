@@ -26,6 +26,7 @@ export interface IPage extends IBaseElement {
 export type SubElementsType<T extends keyof any = string> = {
   [P in T]: HTMLElement;
 };
+//TODO Change this type
 export type ComponentsType<T extends keyof any = string> = {
   [P in T]: IComponent | object;
 };
@@ -54,3 +55,10 @@ export interface HeaderType<T> {
   sortType?: SortType;
   template?: (data: any) => string;
 }
+
+export type RangeType = {
+  from: Date;
+  to: Date;
+};
+
+export interface DateSelectEvent extends CustomEvent<RangeType> {}
