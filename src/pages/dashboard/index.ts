@@ -132,7 +132,8 @@ class Dashboard implements IPage {
 
   async initComponents() {
     const to = new Date();
-    const from = new Date(to.getFullYear(), to.getMonth() - 1, to.getDate());
+    const from = new Date();
+    from.setMonth(from.getMonth() - 1);
     const range = { from, to };
     const [sortableTableData, ...chartsData] = await this.loadData(range);
 

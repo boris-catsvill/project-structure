@@ -39,7 +39,8 @@ class SalesPage implements IPage {
 
   initComponents() {
     const to = new Date();
-    const from = new Date(to.getFullYear(), to.getMonth() - 1, to.getDate());
+    const from = new Date();
+    from.setMonth(from.getMonth() - 1);
     const range: RangeType = { from, to };
 
     const rangePicker = new RangePicker(range);
