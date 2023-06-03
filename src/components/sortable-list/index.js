@@ -7,6 +7,10 @@ export default class SortableList {
     this.render();
   }
 
+  static get EVENT_CHANGED_ORDER() {
+    return 'changed-order';
+  }
+
   draggingItem = e => {
     e.preventDefault();
     const { clientX, clientY } = e;
@@ -52,7 +56,7 @@ export default class SortableList {
     if (target.dataset.deleteHandle !== undefined) {
       item.remove();
     }
-    
+
     //TODO Check this
     if (isTargetGrab || isItemGrab) {
       this.dragItem(item, event);
@@ -83,17 +87,39 @@ export default class SortableList {
   }
 
   dropItem(e) {
-    //e.preventDefault();
+    e.preventDefault();
     if (this.activeItem) {
+      const initialIndex = [...this.element.querySelectorAll('.sortable-list__item')].indexOf(
+        this.activeItem
+      );
       document.body.removeEventListener('pointermove', this.draggingItem);
       this.activeItem.classList.remove('sortable-list__item_dragging');
       ['left', 'top', 'width', 'height'].map(prop => (this.activeItem.style[prop] = ''));
       this.placeHolder.after(this.activeItem);
       this.placeHolder?.remove();
+
       this.activeItem.dataset.shiftTop = 0;
       this.activeItem.dataset.shiftLeft = 0;
+      const currentIndex = [...this.element.querySelectorAll('.sortable-list__item')].indexOf(
+        this.activeItem
+      );
       this.activeItem = null;
+
+      //TODO Need to refactor
+      const isOrderChanged = initialIndex !== currentIndex;
+      if (isOrderChanged) {
+        this.dispatchChanged();
+      }
     }
+  }
+
+  dispatchChanged() {
+    this.element.dispatchEvent(
+      new CustomEvent(SortableList.EVENT_CHANGED_ORDER, {
+        detail: { orderChanged: true },
+        bubbles: true
+      })
+    );
   }
 
   render() {

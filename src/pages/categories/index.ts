@@ -3,6 +3,8 @@ import menu from '../../components/sidebar/menu';
 import fetchJson from '../../utils/fetch-json';
 import SortableList from '../../components/sortable-list';
 
+const SUB_CATEGORY_API_PATH = 'api/rest/subcategories';
+
 class Categories implements IPage {
   element: Element | null;
   subElements: SubElementsType;
@@ -88,6 +90,30 @@ class Categories implements IPage {
       },
       true
     );
+    //@ts-ignore
+    categoriesContainer.addEventListener(SortableList.EVENT_CHANGED_ORDER, (e: CustomEvent) =>
+      this.changeOrder(e)
+    );
+  }
+
+  async changeOrder({ target }: CustomEvent) {
+    //@ts-ignore
+    const list = target.closest('ul.sortable-list');
+    const items = list.querySelectorAll('li');
+    const updateData = [...items].reduce((acc, item, index) => {
+      const weight = index + 1;
+      const { id } = item.dataset;
+      acc.push({ id, weight });
+      return acc;
+    }, []);
+    const updateUrl = new URL(SUB_CATEGORY_API_PATH, process.env['BACKEND_URL']);
+    const response = await fetchJson(updateUrl, {
+      method: 'PATCH',
+      headers: {
+        'Content-type': 'application/json'
+      },
+      body: JSON.stringify(updateData)
+    });
   }
 
   getSubElements(element: Element) {
