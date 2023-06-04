@@ -89,10 +89,7 @@ class SalesPage implements IPage {
 
   async selectDate(range: RangeType) {
     const { salesTable } = this.components;
-    const start = 0;
-    const { offset: end } = salesTable;
-    const params = { ...range, start, end };
-    salesTable.setUrlParams(params);
+    salesTable.setUrlRange(range);
     salesTable.isLoading = true;
     salesTable.clearTable();
     const loadedDate = await this.loadSalesData(salesTable.url);

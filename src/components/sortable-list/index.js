@@ -132,6 +132,8 @@ export default class SortableList {
 
   getPlaceHolder(width, height) {
     if (this.placeHolder) {
+      this.placeHolder.style.width = width + 'px';
+      this.placeHolder.style.height = height + 'px';
       return this.placeHolder;
     }
     const placeHolder = document.createElement('div');

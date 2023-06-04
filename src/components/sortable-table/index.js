@@ -171,10 +171,11 @@ export default class SortableTable {
     return this.headerConfig.map(cellCallback).join('');
   }
 
-  setUrlParams({ from, to, start = 0, end = this.offset }) {
-    this.sorted = { ...this.sorted, start, end };
-    this.url.searchParams.set('_start', start);
-    this.url.searchParams.set('_end', end);
+  setUrlRange({ from, to }) {
+    this.sorted.start = 0;
+    this.sorted.end = this.offset;
+    this.url.searchParams.set('_start', this.sorted.start);
+    this.url.searchParams.set('_end', this.sorted.end);
     this.url.searchParams.set('createdAt_gte', from.toISOString());
     this.url.searchParams.set('createdAt_lte', to.toString());
   }

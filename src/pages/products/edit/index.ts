@@ -1,6 +1,8 @@
 import { INodeListOfSubElements, IPage, SubElementsType } from '../../../types';
 import menu from '../../../components/sidebar/menu';
 import ProductForm from '../../../components/product-form';
+import { NotificationMessage } from '../../../components/notification';
+import Router from '../../../router';
 
 export default class Page implements IPage {
   element: Element | null;
@@ -26,8 +28,9 @@ export default class Page implements IPage {
   }
 
   getTitle() {
-    return `<a href='${menu.products.href}' class='link'>Products</a> 
-          / ${this.productId ? 'Edit' : 'Add'}`;
+    return `<a href='${menu.products.href}' class='link'>Products</a> / ${
+      this.productId ? 'Edit' : 'Add'
+    }`;
   }
 
   async render() {
@@ -38,6 +41,7 @@ export default class Page implements IPage {
     this.subElements = this.getSubElements(this.element);
     this.initComponents();
     this.renderComponents();
+    //this.initListeners();
     return this.element;
   }
 
@@ -50,13 +54,26 @@ export default class Page implements IPage {
     }, {} as SubElementsType);
   }
 
-  renderComponents() {
+  // @ts-ignore
+  productAdded({ id: productId }) {
+    const router = Router.instance();
+    document.addEventListener('route', this.onProductAdded);
+    router.navigate(`${menu.products.href}/${productId}`);
+  }
+
+  onProductAdded = () => {
+    new NotificationMessage('Product Added');
+    document.removeEventListener('route', this.onProductAdded);
+  };
+
+  async renderComponents() {
     Object.keys(this.components).forEach(async component => {
       // @ts-ignore
       const root = this.subElements[component];
       // @ts-ignore
       const element = await this.components[component].render();
-
+      //TODO Refactor!!!
+      this.initListeners();
       root.append(element);
     });
   }
@@ -64,6 +81,19 @@ export default class Page implements IPage {
   initComponents() {
     const productForm = new ProductForm(this.productId);
     this.components = { productForm };
+  }
+
+  initListeners() {
+    //@ts-ignore
+    const { productForm } = this.components;
+    productForm.element.addEventListener(
+      ProductForm.UPDATED_PRODUCT_EVENT,
+      () => new NotificationMessage('Product Updated')
+    );
+    productForm.element.addEventListener(
+      ProductForm.ADDED_PRODUCT_EVENT,
+      ({ detail }: CustomEvent) => this.productAdded(detail)
+    );
   }
 
   remove() {

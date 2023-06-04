@@ -48,19 +48,19 @@ class Dashboard implements IPage {
       {
         chart: Components.OrdersChart,
         url: 'api/dashboard/orders',
-        label: 'orders',
+        label: 'Orders',
         link: '#'
       },
       {
         chart: Components.SalesChart,
         url: 'api/dashboard/sales',
-        label: 'sales',
-        formatHeading: data => `$${data}`
+        label: 'Sales',
+        formatHeading: data => `$${data.toLocaleString('en-US')}`
       },
       {
         chart: Components.CustomersChart,
         url: 'api/dashboard/customers',
-        label: 'customers'
+        label: 'Customers'
       }
     ];
   }

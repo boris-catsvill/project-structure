@@ -2,6 +2,7 @@ import { INodeListOfSubElements, IPage, SubElementsType } from '../../types';
 import menu from '../../components/sidebar/menu';
 import fetchJson from '../../utils/fetch-json';
 import SortableList from '../../components/sortable-list';
+import { NotificationMessage } from '../../components/notification';
 
 const SUB_CATEGORY_API_PATH = 'api/rest/subcategories';
 
@@ -100,20 +101,21 @@ class Categories implements IPage {
     //@ts-ignore
     const list = target.closest('ul.sortable-list');
     const items = list.querySelectorAll('li');
-    const updateData = [...items].reduce((acc, item, index) => {
+    const data = [...items].reduce((acc, item, index) => {
       const weight = index + 1;
       const { id } = item.dataset;
       acc.push({ id, weight });
       return acc;
     }, []);
     const updateUrl = new URL(SUB_CATEGORY_API_PATH, process.env['BACKEND_URL']);
-    const response = await fetchJson(updateUrl, {
+    await fetchJson(updateUrl, {
       method: 'PATCH',
       headers: {
         'Content-type': 'application/json'
       },
-      body: JSON.stringify(updateData)
+      body: JSON.stringify(data)
     });
+    new NotificationMessage('Category Order Saved');
   }
 
   getSubElements(element: Element) {

@@ -3,6 +3,7 @@ import { HeaderType, SortType } from '../../types';
 interface BestsellersHeader {
   images: BestsellersHeaderType;
   title: BestsellersHeaderType;
+  subcategory: BestsellersHeaderType;
   quantity: BestsellersHeaderType;
   price: BestsellersHeaderType;
   status: BestsellersHeaderType;
@@ -22,6 +23,12 @@ const header: BestsellersHeaderType[] = [
     title: 'Name',
     sortable: true,
     sortType: SortType.STRING
+  },
+  {
+    id: 'subcategory',
+    title: 'Category',
+    sortable: false,
+    template: data => data.title
   },
   {
     id: 'quantity',

@@ -231,27 +231,21 @@ export class RangePicker {
 
   getMonthGrid(date) {
     const month = new Date(date);
-    const monthNumber = month.getMonth();
-
     const dates = [];
     let numberOfDay = 1;
-
     month.setDate(numberOfDay);
-    while (monthNumber === month.getMonth()) {
-      const isFirstDayOfMonth = numberOfDay === 1;
+    const dayOfWeek = date => (!date.getDay() ? 7 : date.getDay());
 
-      dates.push(`<button
-                  type='button'
-                  class='rangepicker__cell ${this.getClassName(month)}'
-                  data-value='${month.toISOString()}'
-                  ${
-                    isFirstDayOfMonth
-                      ? `style="--start-from: ${!month.getDay() ? 7 : month.getDay()}"`
-                      : ''
-                  }
-                  >
-                    ${month.getDate()}
-                  </button>`);
+    while (date.getMonth() === month.getMonth()) {
+      const isFirstDayOfMonth = numberOfDay === 1;
+      const day = `<button
+                            type='button'
+                            class='rangepicker__cell ${this.getClassName(month)}'
+                            data-value='${month.toISOString()}'
+                            ${isFirstDayOfMonth ? `style="--start-from: ${dayOfWeek(month)}"` : ''}>
+                                ${month.getDate()}
+                            </button>`;
+      dates.push(day);
       numberOfDay++;
       month.setDate(numberOfDay);
     }

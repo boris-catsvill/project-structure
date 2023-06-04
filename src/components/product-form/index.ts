@@ -320,10 +320,8 @@ export default class ProductForm {
   async submitForm(e: SubmitEvent) {
     e.preventDefault();
     const formData = this.getFormData();
-    //@ts-ignore
-    const { submitBtn } = this.subElements;
     const data = await this.saveProduct(formData);
-    this.dispatch();
+    this.dispatch(data);
   }
 
   getFormData() {
@@ -366,11 +364,12 @@ export default class ProductForm {
     productForm.addEventListener('submit', (e: SubmitEvent) => this.submitForm(e));
   }
 
-  dispatch() {
+  dispatch(detail = {}) {
     const event = this.productId
-      ? new CustomEvent(ProductForm.ADDED_PRODUCT_EVENT, { detail: '' })
-      : new CustomEvent(ProductForm.UPDATED_PRODUCT_EVENT, { detail: { id: this.productId } });
-    this.element.dispatchEvent(event);
+      ? ProductForm.UPDATED_PRODUCT_EVENT
+      : ProductForm.ADDED_PRODUCT_EVENT;
+
+    this.element.dispatchEvent(new CustomEvent(event, { detail }));
   }
 
   remove() {
