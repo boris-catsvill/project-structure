@@ -1,15 +1,8 @@
 import { HeaderType, SortType } from '../../types';
 
-interface BestsellersHeader {
-  images: BestsellersHeaderType;
-  title: BestsellersHeaderType;
-  subcategory: BestsellersHeaderType;
-  quantity: BestsellersHeaderType;
-  price: BestsellersHeaderType;
-  status: BestsellersHeaderType;
-}
+type headers = 'images' | 'title' | 'subcategory' | 'quantity' | 'price' | 'status';
 
-type BestsellersHeaderType = HeaderType<BestsellersHeader>;
+type BestsellersHeaderType = HeaderType<headers>;
 
 const header: BestsellersHeaderType[] = [
   {

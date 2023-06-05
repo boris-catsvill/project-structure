@@ -1,17 +1,19 @@
 import { INodeListOfSubElements, IPage, SubElementsType } from '../../types';
-import menu from '../../components/sidebar/menu';
+import { menu } from '../../components/sidebar/menu';
 import fetchJson from '../../utils/fetch-json';
 import SortableList from '../../components/sortable-list';
-import { NotificationMessage } from '../../components/notification';
+import { error, success } from '../../components/notification';
 
 const SUB_CATEGORY_API_PATH = 'api/rest/subcategories';
+
+type RequestOrderType = Array<{ id: string; weight: number }>;
 
 class Categories implements IPage {
   element: Element | null;
   subElements: SubElementsType;
   categories: object[];
 
-  get type(): string {
+  get type() {
     return menu.categories.page;
   }
 
@@ -74,11 +76,10 @@ class Categories implements IPage {
     return fetchJson(categoriesUrl);
   }
 
-  collapseCategory({ target }: PointerEvent) {
-    //@ts-ignore
-    if (target.classList.contains('category__header')) {
-      //@ts-ignore
-      target.closest('.category').classList.toggle('category_open');
+  collapseCategory(e: PointerEvent) {
+    const element = e.target as HTMLElement;
+    if (element.classList.contains('category__header')) {
+      element.closest('.category')?.classList.toggle('category_open');
     }
   }
 
@@ -91,31 +92,31 @@ class Categories implements IPage {
       },
       true
     );
-    //@ts-ignore
-    categoriesContainer.addEventListener(SortableList.EVENT_CHANGED_ORDER, (e: CustomEvent) =>
+    categoriesContainer.addEventListener(SortableList.EVENT_CHANGED_ORDER, e =>
       this.changeOrder(e)
     );
   }
 
-  async changeOrder({ target }: CustomEvent) {
-    //@ts-ignore
-    const list = target.closest('ul.sortable-list');
-    const items = list.querySelectorAll('li');
-    const data = [...items].reduce((acc, item, index) => {
-      const weight = index + 1;
-      const { id } = item.dataset;
-      acc.push({ id, weight });
-      return acc;
-    }, []);
+  async changeOrder(e: Event) {
+    const list = (e.target as HTMLElement).closest('ul.sortable-list');
+    const items = list?.querySelectorAll('li') || [];
     const updateUrl = new URL(SUB_CATEGORY_API_PATH, process.env['BACKEND_URL']);
-    await fetchJson(updateUrl, {
+
+    const data = [...items].reduce((acc: RequestOrderType, item, index) => {
+      const weight = index + 1;
+      const { id = '' } = item.dataset;
+      const order = { id, weight };
+      return [...acc, order];
+    }, []);
+
+    const response = await fetchJson(updateUrl, {
       method: 'PATCH',
       headers: {
         'Content-type': 'application/json'
       },
       body: JSON.stringify(data)
     });
-    new NotificationMessage('Category Order Saved');
+    response.length ? success('Category Order Saved') : error('Category Order Not Saved');
   }
 
   getSubElements(element: Element) {

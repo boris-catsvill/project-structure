@@ -112,9 +112,8 @@ export class RangePicker {
   }
 
   dispatchSelectDate(from, to) {
-    this.element.dispatchEvent(
-      new CustomEvent(RangePicker.EVENT_DATE_SELECT, { detail: { from, to } })
-    );
+    const range = { from, to };
+    this.element.dispatchEvent(new CustomEvent(RangePicker.EVENT_DATE_SELECT, { detail: range }));
   }
 
   renderSelector() {
@@ -142,11 +141,9 @@ export class RangePicker {
 
     const { selector } = this.subElements;
     const [elementMonthA, elementMonthB] = [...selector.querySelectorAll('.rangepicker__calendar')];
-    const wrapper = document.createElement('div');
-    wrapper.innerHTML = this.getMonth(this.monthA);
 
-    elementMonthA.before(wrapper.firstElementChild);
     elementMonthB.remove();
+    elementMonthA.insertAdjacentHTML('beforebegin', this.getMonth(this.monthA));
   }
 
   nextMonth() {
@@ -155,11 +152,9 @@ export class RangePicker {
 
     const { selector } = this.subElements;
     const [elementMonthA, elementMonthB] = [...selector.querySelectorAll('.rangepicker__calendar')];
-    const wrapper = document.createElement('div');
-    wrapper.innerHTML = this.getMonth(this.monthB);
 
-    elementMonthB.after(wrapper.firstElementChild);
     elementMonthA.remove();
+    elementMonthB.insertAdjacentHTML('afterend', this.getMonth(this.monthB));
   }
 
   render() {
@@ -185,9 +180,7 @@ export class RangePicker {
   togglePicker(e) {
     e.preventDefault();
     const { selector } = this.subElements;
-    if (!selector.innerHTML) {
-      this.renderSelector();
-    }
+    !selector.innerHTML ? this.renderSelector() : '';
     this.element.classList.toggle(this.classNames.open);
   }
 

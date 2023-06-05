@@ -25,11 +25,11 @@ export default class ProductForm {
     this.productId = productId;
   }
 
-  static get ADDED_PRODUCT_EVENT() {
+  static get EVENT_ADDED() {
     return 'added-product';
   }
 
-  static get UPDATED_PRODUCT_EVENT() {
+  static get EVENT_UPDATED() {
     return 'updated-product';
   }
 
@@ -365,9 +365,7 @@ export default class ProductForm {
   }
 
   dispatch(detail = {}) {
-    const event = this.productId
-      ? ProductForm.UPDATED_PRODUCT_EVENT
-      : ProductForm.ADDED_PRODUCT_EVENT;
+    const event = this.productId ? ProductForm.EVENT_UPDATED : ProductForm.EVENT_ADDED;
 
     this.element.dispatchEvent(new CustomEvent(event, { detail }));
   }

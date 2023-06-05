@@ -1,4 +1,4 @@
-export class NotificationMessage {
+class NotificationMessage {
   static activeNotification;
 
   constructor(msg = '', { duration = 1500, type = 'success' } = {}) {
@@ -10,6 +10,10 @@ export class NotificationMessage {
 
   get durationSeconds() {
     return this.durationMs / 1000;
+  }
+
+  get isActive() {
+    return NotificationMessage.activeNotification === this;
   }
 
   get template() {
@@ -28,7 +32,6 @@ export class NotificationMessage {
     const wrap = document.createElement('div');
     wrap.innerHTML = this.template;
     this.element = wrap.firstElementChild;
-    this.show();
   }
 
   show(parent = document.body) {
@@ -42,7 +45,7 @@ export class NotificationMessage {
     if (this.element) {
       this.element.remove();
     }
-    if (NotificationMessage.activeNotification === this) {
+    if (this.isActive) {
       NotificationMessage.activeNotification = null;
     }
   }
@@ -59,3 +62,18 @@ export class NotificationMessage {
     this.clearActive();
   }
 }
+
+export const success = (msg = '', params = {}) => {
+  const type = 'success';
+  notification(msg, { ...params, type });
+};
+  
+export const error = (msg = '', params = {}) => {
+  const type = 'error';
+  notification(msg, { ...params, type });
+};
+
+export const notification = (msg = '', { parent = document.body, ...params } = {}) => {
+  const notification = new NotificationMessage(msg, params);
+  notification.show(parent);
+};

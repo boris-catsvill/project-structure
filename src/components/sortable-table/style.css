@@ -77,6 +77,10 @@
     grid-template-columns: auto;
 }
 
+.sortable-table.sortable-table_loading .sortable-table__body {
+    display: none;
+}
+
 .sortable-table__body .sortable-table__row:hover {
     background-color: var(--grey-skeleton);
 }

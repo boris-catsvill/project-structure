@@ -7,7 +7,6 @@ export class ColumnChart {
     this.label = label;
     this.link = link;
     this.data = data;
-    this.loading = false;
     this.formatHeading = formatHeading;
     this.render();
   }
@@ -52,6 +51,7 @@ export class ColumnChart {
     this.data = data;
     this.subElements.header.innerHTML = this.getHeader();
     this.subElements.body.innerHTML = this.getBody();
+    this.isLoading = false;
   }
 
   getHeader() {

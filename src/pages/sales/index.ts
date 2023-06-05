@@ -1,9 +1,9 @@
-import menu from '../../components/sidebar/menu';
+import { menu } from '../../components/sidebar/menu';
 import {
+  DateRangeType,
   DateSelectEvent,
   INodeListOfSubElements,
   IPage,
-  RangeType,
   SubElementsType
 } from '../../types';
 import { RangePicker } from '../../components/range-picker';
@@ -41,7 +41,7 @@ class SalesPage implements IPage {
     const to = new Date();
     const from = new Date();
     from.setMonth(from.getMonth() - 1);
-    const range: RangeType = { from, to };
+    const range: DateRangeType = { from, to };
 
     const rangePicker = new RangePicker(range);
     const salesTable = new SortableTable(header, {
@@ -87,14 +87,14 @@ class SalesPage implements IPage {
     return fetchJson(url);
   }
 
-  async selectDate(range: RangeType) {
+  async selectDate(range: DateRangeType) {
     const { salesTable } = this.components;
     salesTable.setUrlRange(range);
     salesTable.isLoading = true;
-    salesTable.clearTable();
+    
     const loadedDate = await this.loadSalesData(salesTable.url);
     salesTable.isLoading = false;
-    salesTable.addRows(loadedDate);
+    //salesTable.#addRows(loadedDate);
   }
 
   initListener() {

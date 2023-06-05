@@ -1,28 +1,19 @@
-import menuObject, { IMenuItem } from './menu';
+import { getPageLink, IMenuItem, menu, Pages } from './menu';
 import { HTMLDatasetElement, IComponent, IPage, SubElementsType } from '../../types';
 
-type MenuType = Array<IMenuItem>;
-
 interface RouteEvent extends CustomEvent<Record<'page', IPage>> {}
-
-type SidebarArgs = {
-  title?: string;
-  menu?: MenuType;
-};
 
 class Sidebar implements IComponent {
   static instance: Sidebar | null;
   element: Element | null;
-  menu: MenuType;
   subElements: SubElementsType;
   title: string;
 
-  constructor({ title = '', menu = [] }: SidebarArgs = {}) {
+  constructor({ title = '' } = {}) {
     if (Sidebar.instance) {
       return Sidebar.instance;
     }
     Sidebar.instance = this;
-    this.menu = menu;
     this.title = title;
     this.render();
   }
@@ -30,7 +21,7 @@ class Sidebar implements IComponent {
   get template() {
     return `<aside class='sidebar'>
               <h2 class='sidebar__title'>
-                  <a href='/'>${this.title}</a>
+                  <a href='${getPageLink('dashboard')}'>${this.title}</a>
               </h2>
               <ul class='sidebar__nav' data-element='menu'>
                   ${this.getMenu()}
@@ -45,21 +36,19 @@ class Sidebar implements IComponent {
               </aside>`;
   }
 
-  onRoute = (evt: Event) => {
-    const { detail } = evt as RouteEvent;
-    const pageType = detail.page.type;
+  onRoute = ({ detail }: RouteEvent) => {
+    const pageType: Pages = detail.page.type;
     this.setActiveMenuItem(pageType);
   };
 
-  setActiveMenuItem(page: string) {
-    const activeItems: Element[] = Array.from(this.subElements.menu.querySelectorAll('.active'));
+  setActiveMenuItem(page: Pages) {
+    const { menu } = this.subElements;
+    const activeItems: NodeListOf<Element> = menu.querySelectorAll('.active');
     [...activeItems].forEach(item => {
       item.classList.remove('active');
     });
-    const item = this.subElements.menu.querySelector(`[data-page=${page}]`)?.closest('li');
-    if (item) {
-      item.classList.add('active');
-    }
+    const item = menu.querySelector(`[data-page=${page}]`)?.closest('li');
+    if (item) item.classList.add('active');
   }
 
   render() {
@@ -80,7 +69,7 @@ class Sidebar implements IComponent {
 
   initListener() {
     this.subElements.toggler.addEventListener('pointerdown', e => this.toggle(e));
-    document.addEventListener('route', this.onRoute);
+    document.addEventListener('route', this.onRoute as EventListener);
   }
 
   toggle(e: PointerEvent) {
@@ -89,12 +78,14 @@ class Sidebar implements IComponent {
   }
 
   getMenu() {
-    return this.menu.map(item => this.getMenuItem(item)).join('');
+    return Object.values(menu)
+      .map(item => this.getMenuItem(item))
+      .join('');
   }
 
-  getMenuItem({ page, title, href }: IMenuItem) {
+  getMenuItem({ page, title, url }: IMenuItem) {
     return `<li>
-              <a data-page='${page}' href='${href}'>
+              <a data-page='${page}' href='${url}'>
                 <i class='icon-${page}'></i> <span>${title}</span>
               </a>
             </li>`;
@@ -109,13 +100,13 @@ class Sidebar implements IComponent {
   destroy() {
     this.remove();
     this.element = null;
-    document.removeEventListener('route', this.onRoute);
+    document.removeEventListener('route', this.onRoute as EventListener);
     Sidebar.instance = null;
   }
 }
 
 const title: string = 'shop admin';
-const menu: MenuType = Object.values(menuObject);
-const sidebar = new Sidebar({ title, menu });
+
+const sidebar = new Sidebar({ title });
 
 export default sidebar;

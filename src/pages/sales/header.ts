@@ -1,16 +1,10 @@
 import { HeaderType, SortType } from '../../types';
 
-interface SaleHeader {
-  id: SaleHeaderType;
-  user: SaleHeaderType;
-  createdAt: SaleHeaderType;
-  totalCost: SaleHeaderType;
-  delivery: SaleHeaderType;
-}
+type headers = 'id' | 'user' | 'createdAt' | 'totalCost' | 'delivery';
 
-type SaleHeaderType = HeaderType<SaleHeader>;
+type SaleHeader = HeaderType<headers>;
 
-const header: SaleHeaderType[] = [
+const header: SaleHeader[] = [
   {
     id: 'id',
     title: 'ID',
@@ -28,16 +22,8 @@ const header: SaleHeaderType[] = [
     title: 'Date',
     sortable: true,
     sortType: SortType.NUMBER,
-    template: data => {
-      const date = new Date(Date.parse(data));
-      const options = {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      };
-      //@ts-ignore
-      return date.toLocaleString('en-US', options);
-    }
+    template: ISOString =>
+      new Date(Date.parse(ISOString)).toLocaleString('default', { dateStyle: 'medium' })
   },
   {
     id: 'totalCost',

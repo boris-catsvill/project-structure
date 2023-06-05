@@ -1,5 +1,4 @@
-//import ProductForm from '../../../components/product-form';
-import menu from '../../../components/sidebar/menu';
+import { getPageLink, menu } from '../../../components/sidebar/menu';
 import { IComponent, INodeListOfSubElements, IPage, SubElementsType } from '../../../types';
 import DoubleSlider from '../../../components/double-slider';
 import header from './header';
@@ -26,7 +25,7 @@ class ProductsPage implements IPage {
   element: Element;
   subElements: object;
   components = {};
-  activeFilters = this.defaultFilter;
+  filter = this.defaultFilter;
 
   get type() {
     return menu.products.page;
@@ -43,32 +42,31 @@ class ProductsPage implements IPage {
     return `<div class='products-list'>
               <div class='content__top-panel'>
                 <h1 class='page-title'>Products</h1>
-                <a href='/products/add' class='button-primary'>Add product</a>
+                <a href='${getPageLink('products')}/add' class='button-primary'>Add product</a>
               </div>
-              <div class='content-box content-box_small'>
-              <form class='form-inline'>
-          <div class='form-group'>
-            <label class='form-label'>Sort by:</label>
-            <input type='text' data-element='${Components.FilterName}' class='form-control' placeholder='Название товара'>
-          </div>
-          <div class='form-group' data-element='${Components.Slider}'>
-            <label class='form-label'>Price:</label>
-          </div>
-          <div class='form-group'>
-            <label class='form-label'>Status:</label>
-            <select class='form-control' data-element='${Components.FilterStatus}'>
-              <option value='' selected=''>Any</option>
-              <option value='1'>Active</option>
-              <option value='0'>Inactive</option>
-            </select>
-          </div>
-        </form>
-                
-              </div>
-              <div class='products-list__container' data-element='${Components.Products}'>
-                  
-              </div>
+              <div class='content-box content-box_small'>${this.filterForm}</div>
+              <div class='products-list__container' data-element='${Components.Products}'></div>
             </div>`;
+  }
+
+  get filterForm() {
+    return `<form class='form-inline'>
+                <div class='form-group'>
+                  <label class='form-label'>Sort by:</label>
+                  <input type='text' data-element='${Components.FilterName}' class='form-control' placeholder='Product Title'>
+                </div>
+                <div class='form-group' data-element='${Components.Slider}'>
+                  <label class='form-label'>Price:</label>
+                </div>
+                <div class='form-group'>
+                  <label class='form-label'>Status:</label>
+                    <select class='form-control' data-element='${Components.FilterStatus}'>
+                      <option value='' selected=''>Any</option>
+                      <option value='1'>Active</option>
+                      <option value='0'>Inactive</option>
+                    </select>
+                </div>
+            </form>`;
   }
 
   get emptyPlaceholder() {
@@ -113,10 +111,11 @@ class ProductsPage implements IPage {
     });
   }
 
-  onSelectPrice = ({ detail: { from = 0, to = 0 } }: PriceRangeEvent) => {
-    const filter = { price_gte: from, price_lte: to };
-    this.activeFilters = { ...this.activeFilters, ...filter };
-    this.filterProducts(this.activeFilters);
+  onSelectPrice = ({ detail }: PriceRangeEvent) => {
+    const { from: price_gte, to: price_lte } = detail;
+    // @ts-ignore
+    this.filter = { ...this.filter, price_gte, price_lte };
+    this.filterProducts(this.filter);
   };
 
   async filterProducts(filter: object) {
@@ -133,7 +132,7 @@ class ProductsPage implements IPage {
       products.setEmptyPlaceholder();
       products.isSortLocally = true;
       products.isEmpty = false;
-      products.addRows(loadedData);
+      products.update(loadedData);
     } else {
       products.isEmpty = true;
       this.setEmptyProductsPlaceholder(products);
@@ -160,7 +159,7 @@ class ProductsPage implements IPage {
     filterName.value = '';
     filterStatus.value = '';
     slider.reset();
-    this.activeFilters = this.defaultFilter;
+    this.filter = this.defaultFilter;
     this.setProducts(products);
   }
 
@@ -170,7 +169,7 @@ class ProductsPage implements IPage {
     sortableTable.setEmptyPlaceholder();
     const loadedData = await this.loadedProducts();
     sortableTable.isLoading = false;
-    sortableTable.addRows(loadedData);
+    sortableTable.update(loadedData);
     sortableTable.isSortLocally = false;
   }
 
@@ -189,11 +188,11 @@ class ProductsPage implements IPage {
 
     // @ts-ignore
     const { value } = e.target;
-    const { title_like } = this.activeFilters;
+    const { title_like } = this.filter;
     if (title_like !== value) {
       const filter = { title_like: value };
-      this.activeFilters = { ...this.activeFilters, ...filter };
-      this.filterProducts(this.activeFilters);
+      this.filter = { ...this.filter, ...filter };
+      this.filterProducts(this.filter);
     }
   }
 
@@ -201,11 +200,11 @@ class ProductsPage implements IPage {
     e.preventDefault();
     // @ts-ignore
     const { value } = e.target;
-    const { status } = this.activeFilters;
+    const { status } = this.filter;
     if (status !== value) {
       const filter = { status: value };
-      this.activeFilters = { ...this.activeFilters, ...filter };
-      this.filterProducts(this.activeFilters);
+      this.filter = { ...this.filter, ...filter };
+      this.filterProducts(this.filter);
     }
   }
 

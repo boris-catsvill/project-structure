@@ -1,30 +1,38 @@
 import {
-  ComponentsType,
+  DateRangeType,
   DateSelectEvent,
   INodeListOfSubElements,
   IPage,
-  RangeType,
   SubElementsType
 } from '../../types';
 import { RangePicker } from '../../components/range-picker';
 import { ProductSortableTable } from '../../components/product-sortable-table';
-import { ColumnChart } from '../../components/column-chart';
-import menu from '../../components/sidebar/menu';
+import { getPageLink, menu } from '../../components/sidebar/menu';
 import fetchJson from '../../utils/fetch-json';
 
 import header from './bestsellers-header';
+import { ColumnChart } from '../../components/column-chart';
 
 enum Components {
   RangePicker = 'rangePicker',
   OrdersChart = 'ordersChart',
   SalesChart = 'salesChart',
   CustomersChart = 'customersChart',
-  SortableTable = 'sortableTable',
-  ChartsRoot = 'chartRoot'
+  SortableTable = 'sortableTable'
 }
 
+type ChartComponents = Record<
+  Components.OrdersChart | Components.SalesChart | Components.CustomersChart,
+  ColumnChart
+>;
+
+type DashboardComponents = {
+  [Components.RangePicker]: RangePicker;
+  [Components.SortableTable]: ProductSortableTable;
+} & ChartComponents;
+
 type ChartSettingType = {
-  chart: Components;
+  id: keyof ChartComponents;
   url: string;
   label: string;
   link?: string;
@@ -35,9 +43,8 @@ const BESTSELLER_PRODUCTS_URL = 'api/dashboard/bestsellers?_start=0&_end=30&_sor
 
 class Dashboard implements IPage {
   element: Element;
-  subElements: SubElementsType;
-  // @ts-ignore
-  components: ComponentsType = {};
+  subElements: SubElementsType<Components>;
+  components: DashboardComponents;
 
   get type() {
     return menu.dashboard.page;
@@ -46,19 +53,19 @@ class Dashboard implements IPage {
   get chartsSettings(): ChartSettingType[] {
     return [
       {
-        chart: Components.OrdersChart,
+        id: Components.OrdersChart,
         url: 'api/dashboard/orders',
         label: 'Orders',
-        link: '#'
+        link: getPageLink('products')
       },
       {
-        chart: Components.SalesChart,
+        id: Components.SalesChart,
         url: 'api/dashboard/sales',
         label: 'Sales',
-        formatHeading: data => `$${data.toLocaleString('en-US')}`
+        formatHeading: data => `$${data.toLocaleString('default')}`
       },
       {
-        chart: Components.CustomersChart,
+        id: Components.CustomersChart,
         url: 'api/dashboard/customers',
         label: 'Customers'
       }
@@ -67,24 +74,22 @@ class Dashboard implements IPage {
 
   get template() {
     return `<div class='dashboard'>
-      <div class='content__top-panel'>
-        <h2 class='page-title'>Dashboard</h2>
-        <!-- RangePicker component -->
-        <div data-element='${Components.RangePicker}'></div>
-      </div>
-      <div data-element='${Components.ChartsRoot}' class='dashboard__charts'>
-        <!-- column-chart components -->
-        <div data-element='${Components.OrdersChart}' class='dashboard__chart_orders'></div>
-        <div data-element='${Components.SalesChart}' class='dashboard__chart_sales'></div>
-        <div data-element='${Components.CustomersChart}' class='dashboard__chart_customers'></div>
-      </div>
+              <div class='content__top-panel'>
+                <h2 class='page-title'>Dashboard</h2>
+        
+                <div data-element='${Components.RangePicker}'></div>
+              </div>
+              <div class='dashboard__charts'>
+        
+                <div data-element='${Components.OrdersChart}' class='dashboard__chart_orders'></div>
+                <div data-element='${Components.SalesChart}' class='dashboard__chart_sales'></div>
+                <div data-element='${Components.CustomersChart}' class='dashboard__chart_customers'></div>
+              </div>
 
-      <h3 class='block-title'>Best sellers</h3>
+              <h3 class='block-title'>Best sellers</h3>
 
-      <div data-element='${Components.SortableTable}'>
-        <!-- sortable-table component -->
-      </div>
-    </div>`;
+              <div data-element='${Components.SortableTable}'></div>
+            </div>`;
   }
 
   async render() {
@@ -102,104 +107,111 @@ class Dashboard implements IPage {
     const elements: INodeListOfSubElements = element.querySelectorAll('[data-element]');
     return [...elements].reduce((acc, el) => {
       const elementName = el.dataset.element;
-      acc[elementName] = el;
-      return acc;
+      return { ...acc, [elementName]: el };
     }, {} as SubElementsType);
   }
 
-  async loadData(range: RangeType) {
+  async loadData(range: DateRangeType) {
     const productsRequest: Promise<object[]> = this.loadProducts(range);
-    const chartRequests: Array<Promise<object[]>> = this.loadCharts(range);
 
-    return await Promise.all([productsRequest, ...chartRequests]);
+    /* Example: const chartRequests = {chart1: 'Promise1',chart2: 'Promise2', chart3: 'Promise3'};*/
+    const chartRequests: Record<string, Promise<object>> = this.loadCharts(range);
+
+    /* Example: const chartsDataArray = [{ data1 }, { data2 }, { data3 }];*/
+    const [productsData, ...chartsDataArray] = await Promise.all([
+      productsRequest,
+      ...Object.values(chartRequests)
+    ]);
+
+    /* Example: const chartsData = {chart1: { data1 }, chart2: { data2 }, chart3: { data3 }};*/
+    const chartsData = Object.fromEntries(
+      Object.keys(chartRequests).map((key, index) => [key, chartsDataArray[index]])
+    ) as Record<string, object>;
+
+    return { productsData, chartsData };
   }
 
-  loadProducts({ from, to }: RangeType): Promise<object[]> {
+  loadProducts({ from, to }: DateRangeType): Promise<object[]> {
     const bestsellerProducts = new URL(BESTSELLER_PRODUCTS_URL, process.env.BACKEND_URL);
     bestsellerProducts.searchParams.set('from', from.toISOString());
     bestsellerProducts.searchParams.set('to', to.toISOString());
     return fetchJson(bestsellerProducts);
   }
 
-  loadCharts({ from, to }: RangeType): Array<Promise<object[]>> {
-    return this.chartsSettings.map(setting => {
-      const url = new URL(setting.url, process.env.BACKEND_URL);
-      url.searchParams.set('from', from.toISOString());
-      url.searchParams.set('to', to.toISOString());
-      return fetchJson(url);
-    });
+  loadCharts({ from, to }: DateRangeType): Record<string, Promise<object>> {
+    return this.chartsSettings.reduce((acc, { id, url }) => {
+      const apiUrl = new URL(url, process.env.BACKEND_URL);
+      apiUrl.searchParams.set('from', from.toISOString());
+      apiUrl.searchParams.set('to', to.toISOString());
+      return { ...acc, [id]: fetchJson(apiUrl) };
+    }, {});
   }
 
   async initComponents() {
-    const to = new Date();
     const from = new Date();
+    const to = new Date();
     from.setMonth(from.getMonth() - 1);
     const range = { from, to };
-    const [sortableTableData, ...chartsData] = await this.loadData(range);
 
-    this.components[Components.RangePicker] = new RangePicker(range);
-    this.components[Components.SortableTable] = new ProductSortableTable(header, {
-      data: sortableTableData,
-      url: BESTSELLER_PRODUCTS_URL,
+    const { productsData, chartsData } = await this.loadData(range);
+
+    const rangePicker = new RangePicker(range);
+    const sortableTable = new ProductSortableTable(header, {
+      data: productsData,
       isSortLocally: true
     });
-    this.initCharts(chartsData);
+    const { ordersChart, salesChart, customersChart } = this.initCharts(chartsData);
+
+    this.components = {
+      rangePicker,
+      sortableTable,
+      customersChart,
+      ordersChart,
+      salesChart
+    };
   }
 
-  initCharts(chartsData: object[]) {
-    this.chartsSettings.forEach((setting, index) => {
-      const data = Object.values(chartsData[index]);
-      const { chart } = setting;
-      this.components[chart] = new ColumnChart({ data, ...setting });
-    });
+  initCharts(chartsData: Record<string, object>): ChartComponents {
+    const charts: Partial<ChartComponents> = {};
+
+    for (const { id, ...chartSettings } of this.chartsSettings) {
+      const data = Object.values(chartsData[id]);
+      charts[id] = new ColumnChart({ data, ...chartSettings });
+    }
+
+    return charts as ChartComponents;
   }
 
-  async updateComponents(range: RangeType) {
-    // @ts-ignore
-    this.components[Components.SortableTable].isLoading = true;
-    // @ts-ignore
-    this.components[Components.SortableTable].clearTable();
-    this.chartsSettings.forEach(({ chart }, index) => {
-      // @ts-ignore
-      this.components[chart].isLoading = true;
-    });
+  async updateComponents(range: DateRangeType) {
+    const { sortableTable, rangePicker, ...charts } = this.components;
 
-    const [sortableTableData, ...chartsData] = await this.loadData(range);
-    // @ts-ignore
-    this.components[Components.SortableTable].addRows(sortableTableData);
-    // @ts-ignore
-    this.components[Components.SortableTable].isLoading = false;
-    this.updateCharts(chartsData);
-  }
+    sortableTable.isLoading = true;
+    for (const chart of Object.values(charts)) {
+      chart.isLoading = true;
+    }
 
-  updateCharts(chartsData: object[]) {
-    this.chartsSettings.forEach(({ chart }, index) => {
-      // @ts-ignore
-      this.components[chart].update(Object.values(chartsData[index]));
-      // @ts-ignore
-      this.components[chart].isLoading = false;
-    });
+    const { productsData, chartsData } = await this.loadData(range);
+
+    sortableTable.update(productsData);
+    for (const [name, chart] of Object.entries(charts)) {
+      const data = Object.values(chartsData[name]);
+      chart.update(data);
+    }
   }
 
   initListeners() {
-    // @ts-ignore
-    this.components[Components.RangePicker].element.addEventListener(
+    const { rangePicker } = this.components;
+    rangePicker.element.addEventListener(
       RangePicker.EVENT_DATE_SELECT,
-      ({ detail: range }: DateSelectEvent) => {
-        this.updateComponents(range);
-      }
+      ({ detail: range }: DateSelectEvent) => this.updateComponents(range)
     );
   }
 
   renderComponents() {
-    Object.keys(this.components).forEach(component => {
-      // @ts-ignore
-      const root = this.subElements[component];
-      // @ts-ignore
-      const { element } = this.components[component];
-      // @ts-ignore
-      root.append(element);
-    });
+    for (const name of Object.keys(this.components) as Components[]) {
+      const { element } = this.components[name];
+      this.subElements[name].append(element);
+    }
   }
 
   remove() {
@@ -211,7 +223,6 @@ class Dashboard implements IPage {
   destroy() {
     this.remove();
     this.element = null!;
-    // @ts-ignore
     Object.values(this.components).forEach(component => component.destroy());
   }
 }

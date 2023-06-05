@@ -1,7 +1,7 @@
 import { INodeListOfSubElements, IPage, SubElementsType } from '../../../types';
-import menu from '../../../components/sidebar/menu';
+import { getPageLink, menu } from '../../../components/sidebar/menu';
 import ProductForm from '../../../components/product-form';
-import { NotificationMessage } from '../../../components/notification';
+import { success } from '../../../components/notification';
 import Router from '../../../router';
 
 export default class Page implements IPage {
@@ -28,7 +28,7 @@ export default class Page implements IPage {
   }
 
   getTitle() {
-    return `<a href='${menu.products.href}' class='link'>Products</a> / ${
+    return `<a href='${getPageLink('products')}' class='link'>Products</a> / ${
       this.productId ? 'Edit' : 'Add'
     }`;
   }
@@ -58,11 +58,11 @@ export default class Page implements IPage {
   productAdded({ id: productId }) {
     const router = Router.instance();
     document.addEventListener('route', this.onProductAdded);
-    router.navigate(`${menu.products.href}/${productId}`);
+    router.navigate(`${getPageLink('products')}/${productId}`);
   }
 
   onProductAdded = () => {
-    new NotificationMessage('Product Added');
+    success('Product Added');
     document.removeEventListener('route', this.onProductAdded);
   };
 
@@ -86,13 +86,11 @@ export default class Page implements IPage {
   initListeners() {
     //@ts-ignore
     const { productForm } = this.components;
-    productForm.element.addEventListener(
-      ProductForm.UPDATED_PRODUCT_EVENT,
-      () => new NotificationMessage('Product Updated')
+    productForm.element.addEventListener(ProductForm.EVENT_UPDATED, () =>
+      success('Product Updated')
     );
-    productForm.element.addEventListener(
-      ProductForm.ADDED_PRODUCT_EVENT,
-      ({ detail }: CustomEvent) => this.productAdded(detail)
+    productForm.element.addEventListener(ProductForm.EVENT_ADDED, ({ detail }: CustomEvent) =>
+      this.productAdded(detail)
     );
   }
 

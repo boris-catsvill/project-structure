@@ -4,6 +4,7 @@ export default class SortableList {
 
   constructor({ items = [] } = {}) {
     this.items = items;
+    this.items.map(item => item.classList.add('sortable-list__item'));
     this.render();
   }
 
@@ -115,10 +116,7 @@ export default class SortableList {
 
   dispatchChanged() {
     this.element.dispatchEvent(
-      new CustomEvent(SortableList.EVENT_CHANGED_ORDER, {
-        detail: { orderChanged: true },
-        bubbles: true
-      })
+      new CustomEvent(SortableList.EVENT_CHANGED_ORDER, { bubbles: true })
     );
   }
 
@@ -126,7 +124,7 @@ export default class SortableList {
     this.element = document.createElement('ul');
     this.element.classList.add('sortable-list');
     this.element.append(...this.items);
-    this.items.map(item => item.classList.add('sortable-list__item'));
+
     this.initListeners();
   }
 

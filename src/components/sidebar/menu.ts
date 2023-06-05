@@ -1,18 +1,17 @@
+export type Pages = 'dashboard' | 'products' | 'categories' | 'sales';
 type PagePathType = `/${string}`;
 
 export interface IMenuItem {
-  page: string;
+  page: Pages;
   title: Capitalize<string>;
-  href: PagePathType;
+  url: PagePathType;
 }
 
-type MenuType = Record<string, IMenuItem>;
-
-const menu: MenuType = {
-  dashboard: { page: 'dashboard', title: 'Dashboard', href: '/' },
-  products: { page: 'products', title: 'Products', href: '/products' },
-  categories: { page: 'categories', title: 'Categories', href: '/categories' },
-  sales: { page: 'sales', title: 'Sales', href: '/sales' }
+export const menu: Record<Pages, IMenuItem> = {
+  dashboard: { page: 'dashboard', title: 'Dashboard', url: '/' },
+  products: { page: 'products', title: 'Products', url: '/products' },
+  categories: { page: 'categories', title: 'Categories', url: '/categories' },
+  sales: { page: 'sales', title: 'Sales', url: '/sales' }
 };
 
-export default menu;
+export const getPageLink = (page: Pages) => menu[page].url;

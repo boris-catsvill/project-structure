@@ -1,3 +1,5 @@
+import { Pages } from '../components/sidebar/menu';
+
 interface IBaseElement {
   element: Element | null;
 
@@ -15,8 +17,7 @@ export interface IComponent extends IBaseElement {
 }
 
 export interface IPage extends IBaseElement {
-  type: string;
-  components?: IComponents;
+  type: Pages;
 
   initComponents?(): void;
 
@@ -25,10 +26,6 @@ export interface IPage extends IBaseElement {
 
 export type SubElementsType<T extends keyof any = string> = {
   [P in T]: HTMLElement;
-};
-//TODO Change this type
-export type ComponentsType<T extends keyof any = string> = {
-  [P in T]: IComponent | object;
 };
 
 export interface INodeListOfSubElements extends NodeListOf<HTMLDatasetElement<SubElementsType>> {}
@@ -49,16 +46,18 @@ export enum SortType {
 }
 
 export interface HeaderType<T> {
-  id: keyof T;
+  id: T;
   title: string;
   sortable: boolean;
   sortType?: SortType;
   template?: (data: any) => string;
 }
 
-export type RangeType = {
-  from: Date;
-  to: Date;
+export type RangeType<T> = {
+  from: T;
+  to: T;
 };
 
-export interface DateSelectEvent extends CustomEvent<RangeType> {}
+export type DateRangeType = RangeType<Date>;
+
+export interface DateSelectEvent extends CustomEvent<DateRangeType> {}
