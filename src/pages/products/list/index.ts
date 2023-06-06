@@ -19,7 +19,7 @@ type PriceRangeType = {
 
 interface PriceRangeEvent extends CustomEvent<PriceRangeType> {}
 
-const PRODUCTS_URL = `${process.env['PRODUCT_API_PATH']}?_embed=subcategory.category&_start=0&_end=30&_sort=title&_order=asc`;
+const PRODUCTS_URL = `${process.env['PRODUCT_API_PATH']}?_embed=subcategory.category`;
 
 class ProductsPage implements IPage {
   element: Element;
@@ -118,25 +118,17 @@ class ProductsPage implements IPage {
     this.filterProducts(this.filter);
   };
 
-  async filterProducts(filter: object) {
+  filterProducts(filters: object) {
     // @ts-ignore
     const { products } = this.components;
 
-    products.clearTable();
-    products.isLoading = true;
-    products.isEmpty = false;
-    const loadedData = await this.loadedProducts(filter);
-    products.isLoading = false;
-
-    if (loadedData.length) {
-      products.setEmptyPlaceholder();
-      products.isSortLocally = true;
-      products.isEmpty = false;
-      products.update(loadedData);
-    } else {
-      products.isEmpty = true;
-      this.setEmptyProductsPlaceholder(products);
+    const filterProductsUrl = new URL(PRODUCTS_URL, process.env.BACKEND_URL);
+    for (const [field, value] of Object.entries(filters)) {
+      if (value !== '') {
+        filterProductsUrl.searchParams.set(field, String(value));
+      }
     }
+    products.setUrl(filterProductsUrl);
   }
 
   setEmptyProductsPlaceholder(component: IComponent) {
@@ -160,7 +152,7 @@ class ProductsPage implements IPage {
     filterStatus.value = '';
     slider.reset();
     this.filter = this.defaultFilter;
-    this.setProducts(products);
+    products.setUrl(new URL(PRODUCTS_URL, process.env['BACKEND_URL']));
   }
 
   async setProducts(sortableTable: ProductSortableTable) {
@@ -170,7 +162,6 @@ class ProductsPage implements IPage {
     const loadedData = await this.loadedProducts();
     sortableTable.isLoading = false;
     sortableTable.update(loadedData);
-    sortableTable.isSortLocally = false;
   }
 
   loadedProducts(filter = {}) {

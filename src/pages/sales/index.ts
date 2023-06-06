@@ -9,13 +9,14 @@ import {
 import { RangePicker } from '../../components/range-picker';
 import SortableTable from '../../components/sortable-table';
 import header from './header';
-import fetchJson from '../../utils/fetch-json';
 
 type SalesComponents = {
   rangePicker: RangePicker;
   salesTable: SortableTable;
 };
 type SalesComponentNames = keyof SalesComponents;
+
+const ORDER_API_URL = 'api/rest/orders';
 
 class SalesPage implements IPage {
   element: Element | null;
@@ -45,7 +46,7 @@ class SalesPage implements IPage {
 
     const rangePicker = new RangePicker(range);
     const salesTable = new SortableTable(header, {
-      url: `api/rest/orders?createdAt_gte=${from.toISOString()}&createdAt_lte=${to.toISOString()}`,
+      url: `${ORDER_API_URL}?createdAt_gte=${from.toISOString()}&createdAt_lte=${to.toISOString()}`,
       sorted: {
         id: 'createdAt',
         order: 'desc'
@@ -83,18 +84,12 @@ class SalesPage implements IPage {
     }, {} as SubElementsType);
   }
 
-  async loadSalesData(url: URL): Promise<object[]> {
-    return fetchJson(url);
-  }
-
-  async selectDate(range: DateRangeType) {
+  selectDate({ from, to }: DateRangeType) {
     const { salesTable } = this.components;
-    salesTable.setUrlRange(range);
-    salesTable.isLoading = true;
-    
-    const loadedDate = await this.loadSalesData(salesTable.url);
-    salesTable.isLoading = false;
-    //salesTable.#addRows(loadedDate);
+    const orderUrl = new URL(ORDER_API_URL, process.env['BACKEND_URL']);
+    orderUrl.searchParams.set('createdAt_gte', from.toISOString());
+    orderUrl.searchParams.set('createdAt_lte', to.toISOString());
+    salesTable.setUrl(orderUrl);
   }
 
   initListener() {

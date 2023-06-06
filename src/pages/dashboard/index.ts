@@ -112,20 +112,20 @@ class Dashboard implements IPage {
   }
 
   async loadData(range: DateRangeType) {
-    const productsRequest: Promise<object[]> = this.loadProducts(range);
+    const productsPromise: Promise<object[]> = this.loadProducts(range);
 
     /* Example: const chartRequests = {chart1: 'Promise1',chart2: 'Promise2', chart3: 'Promise3'};*/
-    const chartRequests: Record<string, Promise<object>> = this.loadCharts(range);
+    const chartsPromises: Record<string, Promise<object>> = this.loadCharts(range);
 
     /* Example: const chartsDataArray = [{ data1 }, { data2 }, { data3 }];*/
     const [productsData, ...chartsDataArray] = await Promise.all([
-      productsRequest,
-      ...Object.values(chartRequests)
+      productsPromise,
+      ...Object.values(chartsPromises)
     ]);
 
     /* Example: const chartsData = {chart1: { data1 }, chart2: { data2 }, chart3: { data3 }};*/
     const chartsData = Object.fromEntries(
-      Object.keys(chartRequests).map((key, index) => [key, chartsDataArray[index]])
+      Object.keys(chartsPromises).map((key, index) => [key, chartsDataArray[index]])
     ) as Record<string, object>;
 
     return { productsData, chartsData };

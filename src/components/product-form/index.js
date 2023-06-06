@@ -1,13 +1,11 @@
 import fetchJson from '../../utils/fetch-json';
-import { INodeListOfSubElements, SubElementsType } from '../../types';
 import SortableList from '../sortable-list';
 import escapeHtml from '../../utils/escape-html';
 
 export default class ProductForm {
-  element: Element;
-  productId: string = '';
-  formData: object = {};
-  components: object = {};
+  element;
+  productId;
+  formData;
   defaultFormData = {
     title: '',
     description: '',
@@ -18,8 +16,8 @@ export default class ProductForm {
     quantity: 0,
     status: 0
   };
-  subElements: object = {};
-  categories: object[] = [];
+  subElements;
+  categories;
 
   constructor(productId = '') {
     this.productId = productId;
@@ -60,7 +58,6 @@ export default class ProductForm {
   }
 
   get categoryField() {
-    // @ts-ignore
     return `<div class='form-group form-group__half_left'>
               <label class='form-label'>Category</label>
               <select class='form-control' name='subcategory'>
@@ -131,7 +128,6 @@ export default class ProductForm {
             </div>`;
   }
 
-  // @ts-ignore
   getImageItem({ url, source }) {
     const wrapper = document.createElement('div');
     wrapper.innerHTML = `<li class='products-edit__imagelist-item sortable-list__item' style=''>
@@ -151,23 +147,19 @@ export default class ProductForm {
     return wrapper.firstElementChild;
   }
 
-  getCategoryOptions(categories: object[] = []) {
-    return (
-      categories
-        //@ts-ignore
-        .map(({ subcategories, title: categoryTitle }) =>
-          //@ts-ignore
-          subcategories
-            //@ts-ignore
-            .map(subcategory => this.getSubCategoryOption({ categoryTitle, ...subcategory }))
-            .join('')
-        )
-        .join('')
-    );
+  getCategoryOptions(categories = []) {
+    return categories
+
+      .map(({ subcategories, title: categoryTitle }) =>
+        subcategories
+
+          .map(subcategory => this.getSubCategoryOption({ categoryTitle, ...subcategory }))
+          .join('')
+      )
+      .join('');
   }
 
   getSubCategoryOption({ id = '', categoryTitle = '', title: subCategoryTitle = '' }) {
-    // @ts-ignore
     const { subcategory } = this.formData;
     const title = `${categoryTitle} > ${subCategoryTitle}`;
     const isCategorySelected = subcategory === id ? 'selected' : '';
@@ -176,20 +168,19 @@ export default class ProductForm {
   }
 
   async render() {
-    const productPromise: Promise<object[]> = this.productId
+    const productPromise = this.productId
       ? this.loadProductData(this.productId)
       : Promise.resolve([this.defaultFormData]);
-    const categoriesPromise: Promise<object[]> = this.loadCategories();
+    const categoriesPromise = this.loadCategories();
     const [productResponse, categoriesResponse] = await Promise.all([
       productPromise,
       categoriesPromise
     ]);
     const [productData] = productResponse;
 
-    this.formData = productData!;
-    this.categories = categoriesResponse!;
+    this.formData = productData;
+    this.categories = categoriesResponse;
     if (this.formData) {
-      this.initComponents();
       this.renderForm();
       this.fillForm();
       this.initListeners();
@@ -200,48 +191,34 @@ export default class ProductForm {
 
   renderForm() {
     const wrapper = document.createElement('div');
-    wrapper.innerHTML = this.formData ? this.template : this.emptyTemplate;
-    this.element = wrapper.firstElementChild!;
-    this.subElements = this.getSubElements(this.element);
-    this.renderComponents();
-  }
-
-  initComponents() {
-    // @ts-ignore
     const images = this.formData?.images || [];
-    // @ts-ignore
-    const items = images.map(img => this.getImageItem(img));
-    const imageListContainer = new SortableList({ items });
-    // @ts-ignore
-    this.components = { imageListContainer };
+    wrapper.innerHTML = this.formData ? this.template : this.emptyTemplate;
+    this.element = wrapper.firstElementChild;
+    this.subElements = this.getSubElements(this.element);
+    if (images.length) {
+      this.renderImageList(images);
+    }
   }
 
-  renderComponents() {
-    Object.keys(this.components).forEach(async component => {
-      // @ts-ignore
-      const root = this.subElements[component];
-      // @ts-ignore
-      const { element } = this.components[component];
-
-      root.append(element);
-    });
+  renderImageList(images = []) {
+    const { imageListContainer } = this.subElements;
+    const items = images.map(img => this.getImageItem(img));
+    const imageList = new SortableList({ items });
+    imageListContainer.append(imageList.element);
   }
 
   fillForm() {
-    //@ts-ignore
     const { productForm } = this.subElements;
     const excludeFields = ['images', 'subcategory'];
     for (const field of Object.keys(this.defaultFormData)) {
       if (!excludeFields.includes(field)) {
         const input = productForm.querySelector(`[name=${field}]`);
-        // @ts-ignore
         input.value = this.formData[field] || this.defaultFormData[field];
       }
     }
   }
 
-  saveProduct(data = {}) {
-    // @ts-ignore
+  async saveProduct(data = {}) {
     const productUrl = new URL(process.env['PRODUCT_API_PATH'], process.env['BACKEND_URL']);
     const params = {
       method: `${this.productId ? 'PATCH' : 'PUT'}`,
@@ -253,39 +230,34 @@ export default class ProductForm {
     return fetchJson(productUrl, params);
   }
 
-  getSubElements(element: Element) {
-    const elements: INodeListOfSubElements = element.querySelectorAll('[data-element]');
-    return [...elements].reduce((acc, el) => {
-      const elementName = el.dataset.element;
-      acc[elementName] = el;
-      return acc;
-    }, {} as SubElementsType);
+  getSubElements(element) {
+    return [...element.querySelectorAll('[data-element]')].reduce(
+      (acc, el) => ({ [el.dataset.element]: el, ...acc }),
+      {}
+    );
   }
 
-  loadProductData(productId: String): Promise<object[]> {
-    //@ts-ignore
+  loadProductData(productId) {
     const productUrl = new URL(process.env['PRODUCT_API_PATH'], process.env['BACKEND_URL']);
-    // @ts-ignore
+
     productUrl.searchParams.set('id', productId);
     return fetchJson(productUrl);
   }
 
-  loadCategories(): Promise<object[]> {
-    //@ts-ignore
+  loadCategories() {
     const categoriesUrl = new URL(process.env['CATEGORIES_API_PATH'], process.env['BACKEND_URL']);
     return fetchJson(categoriesUrl);
   }
 
-  async uploadImage({ target: imageInput }: Event) {
-    // @ts-ignore
+  async uploadImage({ target: imageInput }) {
     const { imageListContainer, uploadImage: uploadImageBtn } = this.subElements;
-    // @ts-ignore
+
     const [file] = imageInput.files;
-    // @ts-ignore
+
     imageInput.remove();
 
     const formData = new FormData();
-    // @ts-ignore
+
     formData.append('image', file);
 
     uploadImageBtn.disabled = true;
@@ -308,16 +280,16 @@ export default class ProductForm {
     imageListContainer.querySelector('ul').append(newListImageItem);
   }
 
-  onClickImageLoad(e: PointerEvent) {
+  onClickImageLoad(e) {
     e.preventDefault();
     const inputFileUpload = document.createElement('input');
     inputFileUpload.setAttribute('type', 'file');
     inputFileUpload.setAttribute('accept', 'image/*');
-    inputFileUpload.addEventListener('change', (e: Event) => this.uploadImage(e));
+    inputFileUpload.addEventListener('change', e => this.uploadImage(e));
     inputFileUpload.click();
   }
 
-  async submitForm(e: SubmitEvent) {
+  async submitForm(e) {
     e.preventDefault();
     const formData = this.getFormData();
     const data = await this.saveProduct(formData);
@@ -325,7 +297,6 @@ export default class ProductForm {
   }
 
   getFormData() {
-    //@ts-ignore
     const { productForm, imageListContainer } = this.subElements;
     const formData = {};
     const numberFields = ['discount', 'price', 'quantity', 'status'];
@@ -334,19 +305,19 @@ export default class ProductForm {
     const imageElements = imageListContainer.querySelectorAll('li');
 
     if (this.productId) {
-      // @ts-ignore
       formData['id'] = this.productId;
     }
 
     for (const field of fields) {
-      if (excludeFields.includes(field)) continue;
+      if (excludeFields.includes(field)) {
+        continue;
+      }
       const fieldElement = productForm.querySelector(`[name="${field}"]`);
       const value = fieldElement ? fieldElement.value : '';
-      // @ts-ignore
+
       formData[field] = numberFields.includes(field) ? parseInt(value) : value;
     }
 
-    // @ts-ignore
     formData['images'] = [...imageElements].reduce((acc, imageElement) => {
       const source = imageElement.querySelector('input[name="source"]').value;
       const url = imageElement.querySelector('input[name="url"]').value;
@@ -358,15 +329,13 @@ export default class ProductForm {
   }
 
   initListeners() {
-    //@ts-ignore
     const { productForm, uploadImage } = this.subElements;
-    uploadImage.addEventListener('pointerdown', (e: PointerEvent) => this.onClickImageLoad(e));
-    productForm.addEventListener('submit', (e: SubmitEvent) => this.submitForm(e));
+    uploadImage.addEventListener('pointerdown', e => this.onClickImageLoad(e));
+    productForm.addEventListener('submit', e => this.submitForm(e));
   }
 
   dispatch(detail = {}) {
     const event = this.productId ? ProductForm.EVENT_UPDATED : ProductForm.EVENT_ADDED;
-
     this.element.dispatchEvent(new CustomEvent(event, { detail }));
   }
 
@@ -378,10 +347,5 @@ export default class ProductForm {
 
   destroy() {
     this.remove();
-    for (const component of Object.values(this.components)) {
-      if (component.destroy) {
-        component.destroy();
-      }
-    }
   }
 }
