@@ -1,11 +1,13 @@
 import fetchJson from '../../utils/fetch-json';
 import SortableList from '../sortable-list';
 import escapeHtml from '../../utils/escape-html';
+import { BaseComponent } from '../../base-component';
+import { API_ROUTES, CUSTOM_EVENTS } from '../../constants';
 
-export default class ProductForm {
-  element;
+export default class ProductForm extends BaseComponent {
   productId;
   formData;
+  categories;
   defaultFormData = {
     title: '',
     description: '',
@@ -17,19 +19,9 @@ export default class ProductForm {
     status: 1
   };
 
-  subElements;
-  categories;
-
   constructor(productId = '') {
+    super();
     this.productId = productId;
-  }
-
-  static get EVENT_ADDED() {
-    return 'added-product';
-  }
-
-  static get EVENT_UPDATED() {
-    return 'updated-product';
   }
 
   get titleField() {
@@ -211,7 +203,7 @@ export default class ProductForm {
   }
 
   async saveProduct(data = {}) {
-    const productUrl = new URL(process.env['PRODUCT_API_PATH'], process.env['BACKEND_URL']);
+    const productUrl = new URL(API_ROUTES.PRODUCT, process.env['BACKEND_URL']);
     const params = {
       method: `${this.productId ? 'PATCH' : 'PUT'}`,
       headers: {
@@ -222,21 +214,14 @@ export default class ProductForm {
     return fetchJson(productUrl, params);
   }
 
-  getSubElements(element) {
-    return [...element.querySelectorAll('[data-element]')].reduce(
-      (acc, el) => ({ [el.dataset.element]: el, ...acc }),
-      {}
-    );
-  }
-
   loadProductData(productId) {
-    const productUrl = new URL(process.env['PRODUCT_API_PATH'], process.env['BACKEND_URL']);
+    const productUrl = new URL(API_ROUTES.PRODUCT, process.env['BACKEND_URL']);
     productUrl.searchParams.set('id', productId);
     return fetchJson(productUrl);
   }
 
   loadCategories() {
-    const categoriesUrl = new URL(process.env['CATEGORIES_API_PATH'], process.env['BACKEND_URL']);
+    const categoriesUrl = new URL(API_ROUTES.CATEGORIES, process.env['BACKEND_URL']);
     return fetchJson(categoriesUrl);
   }
 
@@ -325,17 +310,7 @@ export default class ProductForm {
   }
 
   dispatch(detail = {}) {
-    const event = this.productId ? ProductForm.EVENT_UPDATED : ProductForm.EVENT_ADDED;
+    const event = this.productId ? CUSTOM_EVENTS.UpdateProduct : CUSTOM_EVENTS.AddProduct;
     this.element.dispatchEvent(new CustomEvent(event, { detail }));
-  }
-
-  remove() {
-    if (this.element) {
-      this.element.remove();
-    }
-  }
-
-  destroy() {
-    this.remove();
   }
 }

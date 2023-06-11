@@ -1,21 +1,19 @@
-export class RangePicker {
+import { BaseComponent } from '../../base-component';
+import { CUSTOM_EVENTS } from '../../constants';
+
+export class RangePicker extends BaseComponent {
   selectedFrom;
   selectedTo;
-  element;
   from;
   to;
   subElements;
 
   constructor({ from = new Date(), to = new Date() } = {}) {
+    super();
     this.from = from;
     this.to = to;
-
     this.initMonths();
     this.render();
-  }
-
-  static get EVENT_DATE_SELECT() {
-    return 'date-select';
   }
 
   get classNames() {
@@ -117,7 +115,7 @@ export class RangePicker {
 
   dispatchSelectDate(from, to) {
     const range = { from, to };
-    this.element.dispatchEvent(new CustomEvent(RangePicker.EVENT_DATE_SELECT, { detail: range }));
+    this.element.dispatchEvent(new CustomEvent(CUSTOM_EVENTS.DateSelect, { detail: range }));
   }
 
   renderSelector() {
@@ -162,10 +160,7 @@ export class RangePicker {
   }
 
   render() {
-    const wrap = document.createElement('div');
-    wrap.innerHTML = this.template;
-    this.element = wrap.firstElementChild;
-    this.subElements = this.getSubElements(this.element);
+    super.render();
     this.initListeners();
     return this.element;
   }
@@ -186,15 +181,6 @@ export class RangePicker {
     const { selector } = this.subElements;
     !selector.innerHTML ? this.renderSelector() : '';
     this.element.classList.toggle(this.classNames.open);
-  }
-
-  getSubElements(element) {
-    const result = {};
-    const elements = this.element.querySelectorAll('[data-element]');
-    for (const el of elements) {
-      result[el.dataset.element] = el;
-    }
-    return result;
   }
 
   getSelector() {
@@ -265,14 +251,8 @@ export class RangePicker {
     return className;
   }
 
-  remove() {
-    if (this.element) {
-      this.element.remove();
-    }
-  }
-
   destroy() {
-    this.remove();
+    super.remove();
     this.removeListeners();
     this.element = null;
     this.subElements = null;

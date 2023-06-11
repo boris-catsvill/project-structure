@@ -1,11 +1,17 @@
 import { ROUTER_LINK } from '../../router/router-link';
+import { BaseComponent } from '../../base-component';
+import { IBase } from '../../types/base';
 
-export class ColumnChart {
-  element;
+export class ColumnChart extends BaseComponent implements IBase {
   chartHeight = 50;
-  data = [];
+  label: string;
+  link: string;
+  formatHeading: (data: any) => string;
+  data: Array<number>;
+  #loading: boolean;
 
-  constructor({ data = [], label = '', link = '', formatHeading = data => data } = {}) {
+  constructor({ data = [], label = '', link = '', formatHeading = (data: string) => data } = {}) {
+    super();
     this.label = label;
     this.link = link;
     this.data = data;
@@ -13,8 +19,8 @@ export class ColumnChart {
     this.render();
   }
 
-  set isLoading(loading) {
-    this.loading = loading;
+  set isLoading(loading: boolean) {
+    this.#loading = loading;
     if (loading) {
       this.element.classList.add('column-chart_loading');
     } else {
@@ -22,7 +28,7 @@ export class ColumnChart {
     }
   }
 
-  getChart() {
+  get template() {
     return `<div class='column-chart column-chart_loading' style='--chart-height: ${
       this.chartHeight
     }'>
@@ -43,15 +49,7 @@ export class ColumnChart {
       : ``;
   }
 
-  getSubElements() {
-    const elements = this.element.querySelectorAll('[data-element]');
-    return [...elements].reduce((acc, el) => {
-      acc[el.dataset.element] = el;
-      return acc;
-    }, {});
-  }
-
-  update(data = []) {
+  update(data: Array<number>) {
     this.data = data;
     this.subElements.header.innerHTML = this.getHeader();
     this.subElements.body.innerHTML = this.getBody();
@@ -59,7 +57,7 @@ export class ColumnChart {
   }
 
   getHeader() {
-    const value = this.data.reduce((acc, val) => acc + val, 0);
+    const value = this.data.reduce((acc: number, val: number) => acc + val, 0);
     return this.formatHeading(value);
   }
 
@@ -74,24 +72,5 @@ export class ColumnChart {
         return `<div style='--value: ${value}' data-tooltip='${percent}'></div>`;
       })
       .join('');
-  }
-
-  render() {
-    const wrap = document.createElement('div');
-    wrap.innerHTML = this.getChart();
-    this.element = wrap.firstElementChild;
-    this.subElements = this.getSubElements();
-  }
-
-  remove() {
-    if (this.element) {
-      this.element.remove();
-    }
-  }
-
-  destroy() {
-    this.remove();
-    this.element = null;
-    this.subElements = null;
   }
 }

@@ -1,46 +1,23 @@
-import { getPageLink, menu } from '../../../components/sidebar/menu';
-import { HTMLDatasetElement, IPage } from '../../../types';
+import { getPageLink, Menu } from '../../../components/sidebar/menu';
 import DoubleSlider from '../../../components/double-slider';
 import header from './header';
 import { ProductSortableTable } from '../../../components/product-sortable-table';
 import { ROUTER_LINK } from '../../../router/router-link';
+import { BasePage } from '../../../base-page';
+import { IPage, TypeComponents } from '../../../types/base';
+import { ComponentsEnum, PriceRangeEvent, ProductsComponents, ProductsSubElements } from './types';
+import { API_ROUTES, CUSTOM_EVENTS } from '../../../constants';
 
-enum Components {
-  Products = 'products',
-  Slider = 'slider',
-  FilterName = 'filterName',
-  FilterStatus = 'filterStatus'
-}
+const PRODUCTS_URL = `${API_ROUTES.PRODUCT}?_embed=subcategory.category`;
 
-type ProductsComponents = {
-  [Components.Products]: ProductSortableTable;
-  [Components.Slider]: DoubleSlider;
-};
-
-type SubElements = {
-  [Components.FilterName]: HTMLInputElement;
-  [Components.FilterStatus]: HTMLSelectElement;
-} & {
-  [K in keyof ProductsComponents]: HTMLElement;
-};
-
-type PriceRangeType = {
-  from: number;
-  to: number;
-};
-
-interface PriceRangeEvent extends CustomEvent<PriceRangeType> {}
-
-const PRODUCTS_URL = `${process.env['PRODUCT_API_PATH']}?_embed=subcategory.category`;
-
-class ProductsPage implements IPage {
+class ProductsPage extends BasePage implements IPage {
   element: Element;
-  components: ProductsComponents;
-  subElements: SubElements;
+  components: TypeComponents<ProductsComponents>;
+  subElements: ProductsSubElements;
   filter = this.defaultFilter;
 
   get type() {
-    return menu.products.page;
+    return Menu.products.page;
   }
 
   get defaultFilter() {
@@ -64,7 +41,7 @@ class ProductsPage implements IPage {
               </div>
               <div class='content-box content-box_small'>${this.filterForm}</div>
               <div class='products-list__container full-height' 
-                   data-element='${Components.Products}'>
+                   data-element='${ComponentsEnum.Products}'>
               </div>
             </div>`;
   }
@@ -73,40 +50,30 @@ class ProductsPage implements IPage {
     return `<form class='form-inline'>
                 <div class='form-group'>
                   <label class='form-label'>Sort by:</label>
-                  <input type='text' name='title_like' data-element='${Components.FilterName}' class='form-control' placeholder='Product Title'>
+                  <input type='text' name='title_like' data-element='${ComponentsEnum.FilterName}' class='form-control' placeholder='Product Title'>
                 </div>
-                <div class='form-group' data-element='${Components.Slider}'>
+                <div class='form-group' data-element='${ComponentsEnum.Slider}'>
                   <label class='form-label'>Price:</label>
                 </div>
                 <div class='form-group'>
                   <label class='form-label'>Status:</label>
-                    <select name='status' class='form-control' data-element='${Components.FilterStatus}'>
+                    <select name='status' class='form-control' data-element='${ComponentsEnum.FilterStatus}'>
                       <option value='' selected=''>Any</option>
                       <option value='1'>Active</option>
                       <option value='0'>Inactive</option>
                     </select>
+                    
                 </div>
-            </form>`;
+                
+           </form>`;
   }
 
   async render() {
-    const wrap = document.createElement('div');
-    wrap.innerHTML = this.template;
-    this.element = wrap.firstElementChild as HTMLElement;
-    this.subElements = this.getSubElements(this.element);
+    super.render();
     this.initComponents();
     this.renderComponents();
     this.initListeners();
     return this.element;
-  }
-
-  getSubElements(element: Element) {
-    const elements: NodeListOf<HTMLDatasetElement<SubElements>> =
-      element.querySelectorAll('[data-element]');
-    return [...elements].reduce((acc, el) => {
-      const elementName = el.dataset.element;
-      return { [elementName]: el, ...acc };
-    }, {} as SubElements);
   }
 
   initComponents() {
@@ -119,14 +86,6 @@ class ProductsPage implements IPage {
     const emptyPlaceholder = this.getEmptyPlaceholder();
     products.setEmptyPlaceholder(emptyPlaceholder);
     this.components = { slider, products };
-  }
-
-  renderComponents() {
-    for (const componentName of Object.keys(this.components) as (keyof ProductsComponents)[]) {
-      const root = this.subElements[componentName];
-      const { element } = this.components[componentName];
-      root.append(element);
-    }
   }
 
   onSelectPrice = ({ detail }: PriceRangeEvent) => {
@@ -179,35 +138,23 @@ class ProductsPage implements IPage {
   }
 
   initListeners() {
-    const { element: sliderElement } = this.components[Components.Slider];
+    const { element: sliderElement } = this.components[ComponentsEnum.Slider];
     const { filterName, filterStatus } = this.subElements;
-    sliderElement?.addEventListener(
-      DoubleSlider.SELECT_RANGE_EVENT,
-      this.onSelectPrice as EventListener
-    );
+    sliderElement.addEventListener(CUSTOM_EVENTS.SelectRange, this.onSelectPrice as EventListener);
     filterName.addEventListener('keyup', (e: Event) => this.onChangeInput(e));
     filterStatus.addEventListener('change', (e: Event) => this.onChangeInput(e));
   }
 
   removeListeners() {
-    const { element: sliderElement } = this.components[Components.Slider];
-    sliderElement?.removeEventListener(
-      DoubleSlider.SELECT_RANGE_EVENT,
+    const { element: sliderElement } = this.components[ComponentsEnum.Slider];
+    sliderElement.removeEventListener(
+      CUSTOM_EVENTS.SelectRange,
       this.onSelectPrice as EventListener
     );
   }
 
-  remove() {
-    if (this.element) {
-      this.element.remove();
-    }
-  }
-
   destroy() {
-    this.remove();
-    for (const component of Object.values(this.components)) {
-      component.destroy();
-    }
+    super.destroy();
     this.removeListeners();
   }
 }

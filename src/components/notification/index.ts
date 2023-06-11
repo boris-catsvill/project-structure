@@ -1,7 +1,14 @@
-class NotificationMessage {
-  static activeNotification;
+import { BaseComponent } from '../../base-component';
+import { IBase } from '../../types/base';
+
+class NotificationMessage extends BaseComponent implements IBase {
+  static activeNotification: NotificationMessage | null;
+  message: string;
+  durationMs: number;
+  type: string;
 
   constructor(msg = '', { duration = 1500, type = 'success' } = {}) {
+    super();
     this.message = msg;
     this.durationMs = duration;
     this.type = type;
@@ -28,12 +35,6 @@ class NotificationMessage {
             </div>`;
   }
 
-  render() {
-    const wrap = document.createElement('div');
-    wrap.innerHTML = this.template;
-    this.element = wrap.firstElementChild;
-  }
-
   show(parent = document.body) {
     this.clearActive();
     NotificationMessage.activeNotification = this;
@@ -42,9 +43,7 @@ class NotificationMessage {
   }
 
   remove() {
-    if (this.element) {
-      this.element.remove();
-    }
+    super.render();
     if (this.isActive) {
       NotificationMessage.activeNotification = null;
     }
@@ -58,7 +57,7 @@ class NotificationMessage {
   }
 
   destroy() {
-    this.remove();
+    super.destroy();
     this.clearActive();
   }
 }
@@ -73,7 +72,10 @@ export const errorNotice = (msg = '', params = {}) => {
   notification(msg, { ...params, type });
 };
 
-export const notification = (msg = '', { parent = document.body, ...params } = {}) => {
+export const notification = (
+  msg = '',
+  { parent = document.body, type = 'success', ...params } = {}
+) => {
   const notification = new NotificationMessage(msg, params);
   notification.show(parent);
 };

@@ -1,28 +1,27 @@
-export default class SortableList {
-  element;
+import { BaseComponent } from '../../base-component';
+import { CUSTOM_EVENTS } from '../../constants';
+
+export default class SortableList extends BaseComponent {
   activeItem;
   placeHolder;
-  items = [];
+  items;
 
   constructor(items = []) {
+    super();
     this.items = items;
     this.items.map(item => item.classList.add('sortable-list__item'));
     this.element = document.createElement('ul');
     this.render();
   }
 
-  static get EVENT_CHANGED_ORDER() {
-    return 'changed-order';
-  }
-
   draggingItem = e => {
     e.preventDefault();
     const { clientX, clientY } = e;
-    const { shiftTop, shiftLeft } = this.activeItem.dataset;
+    const { shiftTop, shiftLeft } = this.activeItem?.dataset;
     const { top: placeholderTop } = this.placeHolder.getBoundingClientRect();
 
-    const itemTop = clientY - shiftTop;
-    const itemLeft = clientX - shiftLeft;
+    const itemTop = clientY - parseInt(shiftTop ?? '0', 10);
+    const itemLeft = clientX - parseInt(shiftLeft ?? '0', 10);
 
     const isMoveDown = placeholderTop < itemTop;
     const isMoveTop = placeholderTop > itemTop;
@@ -31,16 +30,18 @@ export default class SortableList {
 
     if (isMoveDown) {
       const nextSibling = this.placeHolder.nextSibling;
-      const isUnderSibling = nextSibling ? itemTop > getSiblingTop(nextSibling) : false;
+      const isUnderSibling =
+        nextSibling instanceof HTMLElement ? itemTop > getSiblingTop(nextSibling) : false;
       if (isUnderSibling) {
-        nextSibling.after(this.placeHolder);
+        nextSibling?.after(this.placeHolder);
       }
     }
     if (isMoveTop) {
       const prevSibling = this.placeHolder.previousSibling;
-      const isOverSibling = prevSibling ? itemTop < getSiblingTop(prevSibling) : false;
+      const isOverSibling =
+        prevSibling instanceof HTMLElement ? itemTop < getSiblingTop(prevSibling) : false;
       if (isOverSibling) {
-        prevSibling.before(this.placeHolder);
+        prevSibling?.before(this.placeHolder);
       }
     }
 
@@ -48,22 +49,22 @@ export default class SortableList {
     this.activeItem.style.left = itemLeft + 'px';
   };
 
-  onPointerDown(event) {
-    event.preventDefault();
-    const { target } = event;
+  onPointerDown(e) {
+    e.preventDefault();
+    const { target } = e;
     const item = target.closest('li');
     if (!item) {
       return;
     }
-    const isTargetGrab = target.dataset.grabHandle !== undefined;
-    const isItemGrab = item.dataset.grabHandle !== undefined;
     if (target.dataset.deleteHandle !== undefined) {
       item.remove();
     }
 
-    //TODO Check this
+    const isTargetGrab = target.dataset.grabHandle !== undefined;
+    const isItemGrab = item.dataset.grabHandle !== undefined;
+
     if (isTargetGrab || isItemGrab) {
-      this.dragItem(item, event);
+      this.dragItem(item, e);
     }
   }
 
@@ -74,8 +75,8 @@ export default class SortableList {
     this.activeItem.before(this.placeHolder);
     this.activeItem.classList.add('sortable-list__item_dragging');
 
-    this.activeItem.dataset.shiftTop = clientY - top;
-    this.activeItem.dataset.shiftLeft = clientX - left;
+    this.activeItem.dataset.shiftTop = (clientY - top).toString();
+    this.activeItem.dataset.shiftLeft = (clientX - left).toString();
 
     const style = {
       left: left + 'px',
@@ -93,40 +94,33 @@ export default class SortableList {
   dropItem(e) {
     e.preventDefault();
     if (this.activeItem) {
-      const initialIndex = [...this.element.querySelectorAll('.sortable-list__item')].indexOf(
-        this.activeItem
-      );
+      const getIndexItem = item =>
+        [...this.element.querySelectorAll('.sortable-list__item')].indexOf(item);
+
+      const indexBeforeDrop = getIndexItem(this.activeItem);
       document.body.removeEventListener('pointermove', this.draggingItem);
       this.activeItem.classList.remove('sortable-list__item_dragging');
       ['left', 'top', 'width', 'height'].map(prop => (this.activeItem.style[prop] = ''));
       this.placeHolder.after(this.activeItem);
       this.placeHolder?.remove();
-
-      this.activeItem.dataset.shiftTop = 0;
-      this.activeItem.dataset.shiftLeft = 0;
-      const currentIndex = [...this.element.querySelectorAll('.sortable-list__item')].indexOf(
-        this.activeItem
-      );
+      this.activeItem.dataset.shiftTop = '0';
+      this.activeItem.dataset.shiftLeft = '0';
+      const indexAfterDrop = getIndexItem(this.activeItem);
       this.activeItem = null;
 
-      //TODO Need to refactor
-      const isOrderChanged = initialIndex !== currentIndex;
-      if (isOrderChanged) {
-        this.dispatchChanged();
+      if (indexBeforeDrop !== indexAfterDrop) {
+        this.dispatch();
       }
     }
   }
 
-  dispatchChanged() {
-    this.element.dispatchEvent(
-      new CustomEvent(SortableList.EVENT_CHANGED_ORDER, { bubbles: true })
-    );
+  dispatch() {
+    this.element.dispatchEvent(new CustomEvent(CUSTOM_EVENTS.ChangedOrder, { bubbles: true }));
   }
 
   render() {
     this.element.classList.add('sortable-list');
     this.element.append(...this.items);
-
     this.initListeners();
   }
 
@@ -149,16 +143,5 @@ export default class SortableList {
     this.items.map(item => {
       item.addEventListener('dragstart', () => false);
     });
-  }
-
-  remove() {
-    if (this.element) {
-      this.element.remove();
-    }
-  }
-
-  destroy() {
-    this.remove();
-    this.element = null;
   }
 }

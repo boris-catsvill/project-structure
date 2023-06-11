@@ -1,34 +1,33 @@
-import { HTMLDatasetElement, IPage } from '../../../types';
 import ProductForm from '../../../components/product-form';
-import { getPageLink, menu } from '../../../components/sidebar/menu';
+import { getPageLink, Menu } from '../../../components/sidebar/menu';
 import { successNotice } from '../../../components/notification';
 import { ROUTER_LINK } from '../../../router/router-link';
 import { navigate } from '../../../router';
+import { IPage, TypeComponents, TypeSubElements } from '../../../types/base';
+import { BasePage } from '../../../base-page';
+import { CUSTOM_EVENTS } from '../../../constants';
 
-enum Components {
+enum ComponentsEnum {
   ProductForm = 'productForm'
 }
 
 type EditProductComponents = {
-  [Components.ProductForm]: ProductForm;
+  [ComponentsEnum.ProductForm]: ProductForm;
 };
 
-type SubElements = {
-  [K in keyof EditProductComponents]: HTMLElement;
-};
-
-export default class Page implements IPage {
+export default class Page extends BasePage implements IPage {
   element: Element;
-  subElements: SubElements;
-  components: EditProductComponents;
+  subElements: TypeSubElements<EditProductComponents>;
+  components: TypeComponents<EditProductComponents>;
   productId: string;
 
   constructor({ productId = '' } = {}) {
+    super();
     this.productId = productId;
   }
 
   get type() {
-    return menu.products.page;
+    return Menu.products.page;
   }
 
   get template() {
@@ -36,7 +35,7 @@ export default class Page implements IPage {
       <div class='content__top-panel'>
         <h1 class='page-title'>${this.getTitle()}</h1>
       </div>
-      <div class='content-box' data-element='productForm'></div>
+      <div class='content-box' data-element='${ComponentsEnum.ProductForm}'></div>
     </div>`;
   }
 
@@ -47,29 +46,15 @@ export default class Page implements IPage {
   }
 
   async render() {
-    const wrapper = document.createElement('div');
-    wrapper.innerHTML = this.template;
-
-    this.element = wrapper.firstElementChild as HTMLElement;
-    this.subElements = this.getSubElements(this.element);
+    super.render();
     this.initComponents();
     await this.renderComponents();
     this.initListeners();
     return this.element;
   }
 
-  getSubElements(element: Element) {
-    const elements: NodeListOf<HTMLDatasetElement<SubElements>> =
-      element.querySelectorAll('[data-element]');
-    return [...elements].reduce((acc, el) => {
-      const elementName = el.dataset.element;
-      acc[elementName] = el;
-      return acc;
-    }, {} as SubElements);
-  }
-
-  onProductAdded({ detail }: CustomEvent) {
-    const { id: productId } = detail;
+  onProductAdded(e: CustomEvent) {
+    const { id: productId } = e.detail;
     successNotice('Product Added');
     navigate(`${getPageLink('products')}/${productId}`);
   }
@@ -109,21 +94,10 @@ export default class Page implements IPage {
 
   initListeners() {
     const { productForm } = this.components;
-    productForm.element.addEventListener(ProductForm.EVENT_UPDATED, () =>
+    productForm.element.addEventListener(CUSTOM_EVENTS.UpdateProduct, () =>
       successNotice('Product Updated')
     );
-    productForm.element.addEventListener(ProductForm.EVENT_ADDED, (e: CustomEvent) =>
-      this.onProductAdded(e)
-    );
-  }
-
-  remove() {
-    if (this.element) {
-      this.element.remove();
-    }
-  }
-
-  destroy() {
-    this.remove();
+    productForm.element.addEventListener(CUSTOM_EVENTS.AddProduct, ((e: CustomEvent) =>
+      this.onProductAdded(e)) as EventListener);
   }
 }

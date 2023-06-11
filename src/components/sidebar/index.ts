@@ -1,16 +1,19 @@
-import { getPageLink, IMenuItem, menu, Pages } from './menu';
-import { HTMLDatasetElement, IComponent, IPage, SubElementsType } from '../../types';
+import { getPageLink, Menu } from './menu';
 import { ROUTER_LINK } from '../../router/router-link';
+import { BaseComponent } from '../../base-component';
+import { IPage } from '../../types/base';
+import { IMenuItem, Pages } from '../../types';
+import { CUSTOM_EVENTS } from '../../constants';
 
 interface RouteEvent extends CustomEvent<Record<'page', IPage>> {}
 
-class Sidebar implements IComponent {
+class Sidebar extends BaseComponent {
   static instance: Sidebar | null;
-  element: Element | null;
-  subElements: SubElementsType;
+
   title: string;
 
-  constructor({ title = '' } = {}) {
+  constructor(title = '') {
+    super();
     if (Sidebar.instance) {
       return Sidebar.instance;
     }
@@ -53,24 +56,13 @@ class Sidebar implements IComponent {
   }
 
   render() {
-    const wrap = document.createElement('div');
-    wrap.innerHTML = this.template;
-    this.element = wrap.firstElementChild;
-    this.subElements = this.getSubElements(this.element!);
+    super.render();
     this.initListener();
-  }
-
-  getSubElements(element: Element) {
-    const elements: NodeListOf<HTMLDatasetElement> = element.querySelectorAll('[data-element]');
-    return [...elements].reduce((acc: SubElementsType, el) => {
-      acc[el.dataset.element] = el;
-      return acc;
-    }, {});
   }
 
   initListener() {
     this.subElements.toggler.addEventListener('pointerdown', e => this.toggle(e));
-    document.addEventListener('route', this.onRoute as EventListener);
+    document.addEventListener(CUSTOM_EVENTS.Route, this.onRoute as EventListener);
   }
 
   toggle(e: PointerEvent) {
@@ -79,7 +71,7 @@ class Sidebar implements IComponent {
   }
 
   getMenu() {
-    return Object.values(menu)
+    return Object.values(Menu)
       .map(item => this.getMenuItem(item))
       .join('');
   }
@@ -92,22 +84,11 @@ class Sidebar implements IComponent {
             </li>`;
   }
 
-  remove() {
-    if (this.element) {
-      this.element.remove();
-    }
-  }
-
   destroy() {
-    this.remove();
-    this.element = null;
-    document.removeEventListener('route', this.onRoute as EventListener);
+    super.destroy();
+    document.removeEventListener(CUSTOM_EVENTS.Route, this.onRoute as EventListener);
     Sidebar.instance = null;
   }
 }
 
-const title: string = 'shop admin';
-
-const sidebar = new Sidebar({ title });
-
-export default sidebar;
+export default new Sidebar('shop admin');

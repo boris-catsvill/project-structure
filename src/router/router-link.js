@@ -1,5 +1,6 @@
+import { CUSTOM_EVENTS } from '../constants';
+
 export const ROUTER_LINK = 'router-link';
-export const EVENT_ROUTE_CHANGE = 'route-change';
 
 export class RouterLink extends HTMLAnchorElement {
   constructor() {
@@ -12,7 +13,7 @@ export class RouterLink extends HTMLAnchorElement {
       e => {
         e.preventDefault();
         e.stopPropagation();
-        const event = new CustomEvent(EVENT_ROUTE_CHANGE, {
+        const event = new CustomEvent(CUSTOM_EVENTS.RouteChange, {
           /*composed: true,*/
           bubbles: true,
           detail: { link: this }

@@ -1,5 +1,6 @@
 import renderPage from './render-page.js';
-import { EVENT_ROUTE_CHANGE, ROUTER_LINK, RouterLink } from './router-link';
+import { ROUTER_LINK, RouterLink } from './router-link';
+import { CUSTOM_EVENTS } from '../constants';
 
 // performs routing on all links
 export default class Router {
@@ -34,7 +35,7 @@ export default class Router {
         this.navigate(href);
       }
     });
-    document.addEventListener(EVENT_ROUTE_CHANGE, ({ detail }) => {
+    document.addEventListener(CUSTOM_EVENTS.RouteChange, ({ detail }) => {
       const { link } = detail;
       const href = link.getAttribute('href');
 
@@ -63,7 +64,7 @@ export default class Router {
     }
 
     document.dispatchEvent(
-      new CustomEvent('route', {
+      new CustomEvent(CUSTOM_EVENTS.Route, {
         detail: {
           page: this.page
         }

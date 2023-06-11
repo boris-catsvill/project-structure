@@ -1,10 +1,8 @@
 import { HeaderType, SortType } from '../../types';
 
-type headers = 'id' | 'user' | 'createdAt' | 'totalCost' | 'delivery';
+type Headers = 'id' | 'user' | 'createdAt' | 'totalCost' | 'delivery';
 
-type SaleHeader = HeaderType<headers>;
-
-const header: SaleHeader[] = [
+const header: HeaderType<Headers>[] = [
   {
     id: 'id',
     title: 'ID',

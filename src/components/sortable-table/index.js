@@ -1,10 +1,8 @@
 import fetchJson from '../../utils/fetch-json';
+import { BaseComponent } from '../../base-component';
+import { DEFAULT_LIMIT } from '../../constants';
 
-export const DEFAULT_LIMIT = 30;
-
-export default class SortableTable {
-  element;
-  subElements;
+export default class SortableTable extends BaseComponent {
   #limit;
   #isLoading;
   #isSortLocally;
@@ -23,6 +21,7 @@ export default class SortableTable {
       isLoading = false
     } = {}
   ) {
+    super();
     this.headerConfig = headerConfig;
     this.data = data;
     this.sorted = sorted;
@@ -163,12 +162,11 @@ export default class SortableTable {
   }
 
   async render() {
-    const wrapper = document.createElement('div');
-    wrapper.innerHTML = this.template;
-    this.element = wrapper.firstElementChild;
-    this.subElements = this.getSubElements(this.element);
+    super.render();
     this.data = !this.#isSortLocally && this.isEmpty ? await this.getServerData() : this.data;
-    this.isEmpty ? (this.isEmpty = !this.isLoading) : this.renderRows(this.data);
+    if (!this.isLoading) {
+      this.data.length ? this.renderRows(this.data) : (this.isEmpty = true);
+    }
     this.initEventListeners();
   }
 
@@ -239,19 +237,6 @@ export default class SortableTable {
     window.addEventListener('scroll', this.onWindowScroll);
   }
 
-  getSubElements(element) {
-    const result = {};
-    const elements = element.querySelectorAll('[data-element]');
-
-    for (const subElement of elements) {
-      const name = subElement.dataset.element;
-
-      result[name] = subElement;
-    }
-
-    return result;
-  }
-
   sortOnClient(id, order) {
     const sortedData = this.sortData(id, order);
     this.update(sortedData);
@@ -285,14 +270,8 @@ export default class SortableTable {
     return fetchJson(this.url);
   }
 
-  remove() {
-    if (this.element) {
-      this.element.remove();
-    }
-  }
-
   destroy() {
-    this.remove();
+    super.destroy();
     this.element = null;
     this.subElements = null;
     window.removeEventListener('scroll', this.onWindowScroll);

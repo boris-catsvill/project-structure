@@ -1,21 +1,18 @@
-import { INodeListOfSubElements, IPage, SubElementsType } from '../../types';
-import { menu } from '../../components/sidebar/menu';
+import { Menu } from '../../components/sidebar/menu';
 import fetchJson from '../../utils/fetch-json';
-import SortableList from '../../components/sortable-list';
 import { errorNotice, successNotice } from '../../components/notification';
 import CategoryList from '../../components/categories';
-
-const SUB_CATEGORY_API_PATH = 'api/rest/subcategories';
+import { BasePage } from '../../base-page';
+import { IPage } from '../../types/base';
+import { API_ROUTES, CUSTOM_EVENTS } from '../../constants';
 
 type RequestOrderType = Array<{ id: string; weight: number }>;
 
-class Categories implements IPage {
-  element: Element;
-  subElements: SubElementsType;
+class Categories extends BasePage implements IPage {
   categories: object[];
 
   get type() {
-    return menu.categories.page;
+    return Menu.categories.page;
   }
 
   get template() {
@@ -29,10 +26,7 @@ class Categories implements IPage {
   }
 
   async render() {
-    const wrap = document.createElement('div');
-    wrap.innerHTML = this.template;
-    this.element = wrap.firstElementChild as Element;
-    this.subElements = this.getSubElements(this.element);
+    super.render();
     this.categories = await this.loadCategories();
     this.renderCategories(this.categories);
     this.initListeners();
@@ -41,23 +35,20 @@ class Categories implements IPage {
 
   renderCategories(categories: object[]) {
     const { categoriesContainer } = this.subElements;
-    const categoriesElements: Element[] = categories.map(category => {
-      const categoryList = new CategoryList(category);
+    const categoriesElements: Element[] = categories.map((category, index) => {
+      const categoryList = new CategoryList(category, index === 0);
       return categoryList.element;
     });
     categoriesContainer.append(...categoriesElements);
   }
 
   loadCategories(): Promise<object[]> {
-    const categoriesUrl = new URL(
-      process.env['CATEGORIES_API_PATH'] as string,
-      process.env['BACKEND_URL']
-    );
+    const categoriesUrl = new URL(API_ROUTES.CATEGORIES, process.env['BACKEND_URL']);
     return fetchJson(categoriesUrl);
   }
 
   initListeners() {
-    this.element.addEventListener(SortableList.EVENT_CHANGED_ORDER, e => this.changeOrder(e));
+    this.element.addEventListener(CUSTOM_EVENTS.ChangedOrder, e => this.changeOrder(e));
   }
 
   async changeOrder(e: Event) {
@@ -66,7 +57,7 @@ class Categories implements IPage {
     if (!categoriesContainer.contains(list)) return;
 
     const items = list?.querySelectorAll('li') || [];
-    const updateUrl = new URL(SUB_CATEGORY_API_PATH, process.env['BACKEND_URL']);
+    const updateUrl = new URL(API_ROUTES.SUB_CATEGORY, process.env['BACKEND_URL']);
 
     const data = [...items].reduce((acc: RequestOrderType, item, index) => {
       const weight = index + 1;
@@ -85,25 +76,6 @@ class Categories implements IPage {
     response.length
       ? successNotice('Category Order Saved')
       : errorNotice('Category Order Not Saved');
-  }
-
-  getSubElements(element: Element) {
-    const elements: INodeListOfSubElements = element.querySelectorAll('[data-element]');
-    return [...elements].reduce((acc, el) => {
-      const elementName = el.dataset.element;
-      acc[elementName] = el;
-      return acc;
-    }, {} as SubElementsType);
-  }
-
-  remove() {
-    if (this.element) {
-      this.element.remove();
-    }
-  }
-
-  destroy() {
-    this.remove();
   }
 }
 

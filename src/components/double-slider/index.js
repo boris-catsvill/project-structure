@@ -1,4 +1,7 @@
-export default class DoubleSlider {
+import { BaseComponent } from '../../base-component';
+import { CUSTOM_EVENTS } from '../../constants';
+
+export default class DoubleSlider extends BaseComponent {
   activeSide;
   shift = {};
   startPosition = {};
@@ -9,16 +12,13 @@ export default class DoubleSlider {
     selected = { from: min, to: max },
     formatValue = value => value
   } = {}) {
+    super();
     this.min = min;
     this.max = max;
     this.selected = selected;
     this.formatValue = formatValue;
     this.setShift(this.min, this.max, this.selected);
     this.render();
-  }
-
-  static get SELECT_RANGE_EVENT() {
-    return 'range-select';
   }
 
   get template() {
@@ -60,9 +60,9 @@ export default class DoubleSlider {
     this.element.classList.remove('range-slider_dragging');
     document.removeEventListener('pointerup', this.onPointerUp);
     document.removeEventListener('pointermove', this.onPointerMove);
-    this.dispatchSelectRange();
     this.shift[this.activeSide] = parseFloat(this.subElements.progress.style[this.activeSide]);
     this.activeSide = '';
+    this.dispatch();
   };
 
   onPointerMove = ({ clientX }) => {
@@ -128,11 +128,8 @@ export default class DoubleSlider {
   }
 
   render() {
-    const wrap = document.createElement('div');
-    wrap.innerHTML = this.template;
-    this.element = wrap.firstElementChild;
+    super.render();
     this.element.ondragstart = () => false;
-    this.subElements = this.getSubElements(this.element);
     this.initListeners();
   }
 
@@ -141,33 +138,14 @@ export default class DoubleSlider {
     this.subElements.right.addEventListener('pointerdown', e => this.onPointerDown(e));
   }
 
-  getSubElements(element) {
-    const elements = element.querySelectorAll('[data-element]');
-    return [...elements].reduce((acc, el) => {
-      acc[el.dataset.element] = el;
-      return acc;
-    }, {});
-  }
-
-  dispatchSelectRange() {
+  dispatch() {
     this.element.dispatchEvent(
-      new CustomEvent(DoubleSlider.SELECT_RANGE_EVENT, {
+      new CustomEvent(CUSTOM_EVENTS.SelectRange, {
         detail: {
           from: this.sorted.from,
           to: this.sorted.to
         }
       })
     );
-  }
-
-  remove() {
-    if (this.element) {
-      this.element.remove();
-    }
-  }
-
-  destroy() {
-    this.remove();
-    this.elements = null;
   }
 }

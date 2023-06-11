@@ -1,10 +1,8 @@
 import { HeaderType, SortType } from '../../../types';
 
-type headers = 'images' | 'title' | 'subcategory' | 'quantity' | 'price' | 'status';
+type Headers = 'images' | 'title' | 'subcategory' | 'quantity' | 'price' | 'status';
 
-type ProductsHeaderType = HeaderType<headers>;
-
-const header: ProductsHeaderType[] = [
+const header: HeaderType<Headers>[] = [
   {
     id: 'images',
     title: 'Image',
@@ -35,7 +33,7 @@ const header: ProductsHeaderType[] = [
     title: 'Price',
     sortable: true,
     sortType: SortType.NUMBER,
-    template: data => `$${data.toLocaleString('default')}`
+    template: data => `$${data.toLocaleString()}`
   },
   {
     id: 'status',

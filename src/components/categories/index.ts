@@ -1,13 +1,16 @@
 import SortableList from '../sortable-list';
+import { BaseComponent } from '../../base-component';
+import { TypeBaseComponents } from '../../types/base';
 
-export default class Categories {
-  element;
+export default class Categories extends BaseComponent implements BaseComponent {
+  components: TypeBaseComponents;
   subCategories;
   id;
   title;
   isOpen;
 
   constructor({ id = '', title = '', subcategories = [] }, isOpen = true) {
+    super();
     this.subCategories = subcategories;
     this.id = id;
     this.title = title;
@@ -25,18 +28,10 @@ export default class Categories {
   }
 
   render() {
-    const wrapper = document.createElement('div');
-    wrapper.innerHTML = this.template;
-    this.element = wrapper.firstElementChild;
-    this.subElemenents = this.getSubElements(this.element);
+    super.render();
     this.initComponents();
     this.renderComponents();
     this.initListeners();
-  }
-
-  getSubElements(element) {
-    const elements = element.querySelectorAll('[data-element]');
-    return [...elements].reduce((acc, el) => ({ ...acc, [el.dataset.element]: el }), {});
   }
 
   initComponents() {
@@ -47,7 +42,7 @@ export default class Categories {
 
   renderComponents() {
     for (const [name, component] of Object.entries(this.components)) {
-      const root = this.subElemenents[name];
+      const root = this.subElements[name];
       const { element } = component;
       root.insertAdjacentElement('beforeend', element);
     }
@@ -72,14 +67,8 @@ export default class Categories {
     return wrap.firstElementChild;
   }
 
-  remove() {
-    if (this.element) {
-      this.element.remove();
-    }
-  }
-
   destroy() {
-    this.remove();
+    super.destroy();
     this.subCategories = [];
   }
 }

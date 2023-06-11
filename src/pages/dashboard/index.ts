@@ -1,67 +1,46 @@
-import { DateRangeType, IPage, SubElementsType } from '../../types';
+import { DateRangeType } from '../../types';
 import { RangePicker } from '../../components/range-picker';
 import { ProductSortableTable } from '../../components/product-sortable-table';
-import { getPageLink, menu } from '../../components/sidebar/menu';
+import { getPageLink, Menu } from '../../components/sidebar/menu';
 import fetchJson from '../../utils/fetch-json';
 
 import header from './bestsellers-header';
 import { ColumnChart } from '../../components/column-chart';
-import { DEFAULT_LIMIT } from '../../components/sortable-table';
-import { Base } from '../../base';
+import { BasePage } from '../../base-page';
+import { IPage, TypeComponents, TypeSubElements } from '../../types/base';
+import {
+  ChartComponentKeys,
+  ChartComponents,
+  ChartSettingType,
+  ComponentsEnum,
+  DashboardComponents
+} from './types';
+import { API_ROUTES, CUSTOM_EVENTS } from '../../constants';
 
-enum Components {
-  RangePicker = 'rangePicker',
-  OrdersChart = 'ordersChart',
-  SalesChart = 'salesChart',
-  CustomersChart = 'customersChart',
-  SortableTable = 'sortableTable'
-}
-
-type ChartComponents = Record<
-  Components.OrdersChart | Components.SalesChart | Components.CustomersChart,
-  ColumnChart
->;
-
-type DashboardComponents = {
-  [Components.RangePicker]: RangePicker;
-  [Components.SortableTable]: ProductSortableTable;
-} & ChartComponents;
-
-type ChartSettingType = {
-  id: keyof ChartComponents;
-  url: string;
-  label: string;
-  link?: string;
-  formatHeading?: (data: any) => string;
-};
-
-const BESTSELLER_PRODUCTS_URL = `api/dashboard/bestsellers?_start=0&_end=${DEFAULT_LIMIT}&_sort=title&_order=asc`;
-
-class Dashboard extends Base implements IPage {
-  element: Element;
-  subElements: SubElementsType<Components>;
-  components: DashboardComponents;
+class Dashboard extends BasePage implements IPage {
+  components: TypeComponents<DashboardComponents>;
+  subElements: TypeSubElements<DashboardComponents>;
 
   get type() {
-    return menu.dashboard.page;
+    return Menu.dashboard.page;
   }
 
   get chartsSettings(): ChartSettingType[] {
     return [
       {
-        id: Components.OrdersChart,
+        id: ComponentsEnum.OrdersChart,
         url: 'api/dashboard/orders',
         label: 'Orders',
         link: getPageLink('sales')
       },
       {
-        id: Components.SalesChart,
+        id: ComponentsEnum.SalesChart,
         url: 'api/dashboard/sales',
         label: 'Sales',
-        formatHeading: data => `$${data.toLocaleString('default')}`
+        formatHeading: data => `$${data.toLocaleString()}`
       },
       {
-        id: Components.CustomersChart,
+        id: ComponentsEnum.CustomersChart,
         url: 'api/dashboard/customers',
         label: 'Customers'
       }
@@ -73,22 +52,22 @@ class Dashboard extends Base implements IPage {
               <div class='content__top-panel'>
                 <h2 class='page-title'>Dashboard</h2>
         
-                <div data-element='${Components.RangePicker}'></div>
+                <div data-element='${ComponentsEnum.RangePicker}'></div>
               </div>
               <div class='dashboard__charts'>
         
-                <div data-element='${Components.OrdersChart}' class='dashboard__chart_orders'></div>
-                <div data-element='${Components.SalesChart}' class='dashboard__chart_sales'></div>
-                <div data-element='${Components.CustomersChart}' class='dashboard__chart_customers'></div>
+                <div data-element='${ComponentsEnum.OrdersChart}' class='dashboard__chart_orders'></div>
+                <div data-element='${ComponentsEnum.SalesChart}' class='dashboard__chart_sales'></div>
+                <div data-element='${ComponentsEnum.CustomersChart}' class='dashboard__chart_customers'></div>
               </div>
 
               <h3 class='block-title'>Best sellers</h3>
 
-              <div class='full-height' data-element='${Components.SortableTable}' ></div>
+              <div class='full-height' data-element='${ComponentsEnum.SortableTable}' ></div>
             </div>`;
   }
 
-  render() {
+  async render() {
     super.render();
     this.initComponents();
     this.renderComponents();
@@ -99,19 +78,20 @@ class Dashboard extends Base implements IPage {
 
   async loadData(range: DateRangeType) {
     const productsPromise: Promise<object[]> = this.loadProducts(range);
-    const chartsPromises: Array<Promise<Array<Promise<any>>>> = this.loadCharts(range);
+    const chartsPromises: Array<Promise<[ChartComponentKeys, Record<string, number>]>> =
+      this.loadCharts(range);
     const [productsData, ...chartsData] = await Promise.all([productsPromise, ...chartsPromises]);
     return { productsData, chartsData };
   }
 
   loadProducts({ from, to }: DateRangeType): Promise<object[]> {
-    const bestsellerProducts = new URL(BESTSELLER_PRODUCTS_URL, process.env.BACKEND_URL);
+    const bestsellerProducts = new URL(API_ROUTES.BESTSELLERS, process.env.BACKEND_URL);
     bestsellerProducts.searchParams.set('from', from.toISOString());
     bestsellerProducts.searchParams.set('to', to.toISOString());
     return fetchJson(bestsellerProducts);
   }
 
-  loadCharts({ from, to }: DateRangeType): Array<Promise<Array<Promise<DashboardComponents>>>> {
+  loadCharts({ from, to }: DateRangeType) {
     return this.chartsSettings.map(async ({ id, url }) => {
       const apiUrl = new URL(url, process.env.BACKEND_URL);
       apiUrl.searchParams.set('from', from.toISOString());
@@ -166,7 +146,6 @@ class Dashboard extends Base implements IPage {
     sortableTable.update(productsData);
     for (const chartData of chartsData) {
       const [chartName, data] = chartData;
-      // @ts-ignore
       const chart = this.components[chartName];
       chart.update(Object.values(data));
     }
@@ -174,23 +153,8 @@ class Dashboard extends Base implements IPage {
 
   initListeners() {
     const { rangePicker } = this.components;
-    rangePicker.element.addEventListener(RangePicker.EVENT_DATE_SELECT, () =>
-      this.updateComponents()
-    );
+    rangePicker.element.addEventListener(CUSTOM_EVENTS.DateSelect, () => this.updateComponents());
   }
-
-  renderComponents() {
-    for (const name of Object.keys(this.components) as Components[]) {
-      const { element } = this.components[name];
-      this.subElements[name].append(element);
-    }
-  }
-
-  /*  destroy() {
-      this.remove();
-      this.element = null!;
-      Object.values(this.components).forEach(component => component.destroy());
-    }*/
 }
 
 export default Dashboard;

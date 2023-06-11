@@ -20,14 +20,12 @@ class Tooltip {
   };
 
   onPointerOut = () => {
-    console.log('tooltip pointer out');
     document.removeEventListener('pointermove', this.onPointerMove);
     document.removeEventListener('pointerout', this.onPointerOut);
     this.remove();
   };
 
   onPointerMove = event => {
-    console.log('tooltip pointer move');
     this.moveTooltip(event);
   };
 
