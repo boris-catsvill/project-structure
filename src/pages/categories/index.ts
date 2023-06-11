@@ -2,14 +2,15 @@ import { INodeListOfSubElements, IPage, SubElementsType } from '../../types';
 import { menu } from '../../components/sidebar/menu';
 import fetchJson from '../../utils/fetch-json';
 import SortableList from '../../components/sortable-list';
-import { error, success } from '../../components/notification';
+import { errorNotice, successNotice } from '../../components/notification';
+import CategoryList from '../../components/categories';
 
 const SUB_CATEGORY_API_PATH = 'api/rest/subcategories';
 
 type RequestOrderType = Array<{ id: string; weight: number }>;
 
 class Categories implements IPage {
-  element: Element | null;
+  element: Element;
   subElements: SubElementsType;
   categories: object[];
 
@@ -40,65 +41,30 @@ class Categories implements IPage {
 
   renderCategories(categories: object[]) {
     const { categoriesContainer } = this.subElements;
-    const categoriesElements = categories.map(category => this.getCategoryElement(category));
-    // @ts-ignore
+    const categoriesElements: Element[] = categories.map(category => {
+      const categoryList = new CategoryList(category);
+      return categoryList.element;
+    });
     categoriesContainer.append(...categoriesElements);
   }
 
-  getCategoryElement({ id = '', title = '', subcategories = [] }) {
-    const wrapper = document.createElement('div');
-    wrapper.innerHTML = `<div class='category category_open' data-id='${id}'>
-                            <header class='category__header'>${title}</header>
-                            <div class='category__body'>
-                              <div class='subcategory-list'></div>
-                            </div>
-                         </div>`;
-    const items = subcategories.map(subcategory => this.getSubCategoryElement(subcategory));
-    const sortableList = new SortableList({ items });
-    const { element } = sortableList;
-    //@ts-ignore
-    wrapper.querySelector('.subcategory-list').append(element);
-    return wrapper.firstElementChild;
-  }
-
-  getSubCategoryElement({ id = '', title = '', count = 0 } = {}) {
-    const wrap = document.createElement('div');
-    wrap.innerHTML = `<li class='categories__sortable-list-item sortable-list__item' data-grab-handle='' data-id='${id}'>
-        <strong>${title}</strong>
-        <span><b>${count}</b> products</span>
-       </li>`;
-    return wrap.firstElementChild;
-  }
-
   loadCategories(): Promise<object[]> {
-    //@ts-ignore
-    const categoriesUrl = new URL(process.env['CATEGORIES_API_PATH'], process.env['BACKEND_URL']);
+    const categoriesUrl = new URL(
+      process.env['CATEGORIES_API_PATH'] as string,
+      process.env['BACKEND_URL']
+    );
     return fetchJson(categoriesUrl);
   }
 
-  collapseCategory(e: PointerEvent) {
-    const element = e.target as HTMLElement;
-    if (element.classList.contains('category__header')) {
-      element.closest('.category')?.classList.toggle('category_open');
-    }
-  }
-
   initListeners() {
-    const { categoriesContainer } = this.subElements;
-    categoriesContainer.addEventListener(
-      'pointerdown',
-      (e: PointerEvent) => {
-        this.collapseCategory(e);
-      },
-      true
-    );
-    categoriesContainer.addEventListener(SortableList.EVENT_CHANGED_ORDER, e =>
-      this.changeOrder(e)
-    );
+    this.element.addEventListener(SortableList.EVENT_CHANGED_ORDER, e => this.changeOrder(e));
   }
 
   async changeOrder(e: Event) {
     const list = (e.target as HTMLElement).closest('ul.sortable-list');
+    const { categoriesContainer } = this.subElements;
+    if (!categoriesContainer.contains(list)) return;
+
     const items = list?.querySelectorAll('li') || [];
     const updateUrl = new URL(SUB_CATEGORY_API_PATH, process.env['BACKEND_URL']);
 
@@ -116,7 +82,9 @@ class Categories implements IPage {
       },
       body: JSON.stringify(data)
     });
-    response.length ? success('Category Order Saved') : error('Category Order Not Saved');
+    response.length
+      ? successNotice('Category Order Saved')
+      : errorNotice('Category Order Not Saved');
   }
 
   getSubElements(element: Element) {
@@ -136,7 +104,6 @@ class Categories implements IPage {
 
   destroy() {
     this.remove();
-    this.element = null;
   }
 }
 

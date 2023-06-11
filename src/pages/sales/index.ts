@@ -1,11 +1,5 @@
 import { menu } from '../../components/sidebar/menu';
-import {
-  DateRangeType,
-  DateSelectEvent,
-  INodeListOfSubElements,
-  IPage,
-  SubElementsType
-} from '../../types';
+import { DateRangeType, INodeListOfSubElements, IPage } from '../../types';
 import { RangePicker } from '../../components/range-picker';
 import SortableTable from '../../components/sortable-table';
 import header from './header';
@@ -14,14 +8,16 @@ type SalesComponents = {
   rangePicker: RangePicker;
   salesTable: SortableTable;
 };
-type SalesComponentNames = keyof SalesComponents;
+type SubElements = {
+  [K in keyof SalesComponents]: HTMLElement;
+};
 
 const ORDER_API_URL = 'api/rest/orders';
 
 class SalesPage implements IPage {
-  element: Element | null;
+  element: Element;
   components: SalesComponents;
-  subElements: SubElementsType;
+  subElements: SubElements;
 
   get type() {
     return menu.sales.page;
@@ -58,8 +54,8 @@ class SalesPage implements IPage {
   render() {
     const wrap = document.createElement('div');
     wrap.innerHTML = this.template;
-    this.element = wrap.firstElementChild;
-    this.subElements = this.getSubElements(this.element!);
+    this.element = wrap.firstElementChild as Element;
+    this.subElements = this.getSubElements(this.element);
     this.initComponents();
     this.renderComponents();
     this.initListener();
@@ -67,8 +63,7 @@ class SalesPage implements IPage {
   }
 
   renderComponents() {
-    // @ts-ignore
-    Object.keys(this.components).forEach(async (componentName: SalesComponentNames) => {
+    (Object.keys(this.components) as (keyof SalesComponents)[]).forEach(async componentName => {
       const root = this.subElements[componentName];
       const component = this.components[componentName];
       root.append(component.element);
@@ -79,13 +74,13 @@ class SalesPage implements IPage {
     const elements: INodeListOfSubElements = element.querySelectorAll('[data-element]');
     return [...elements].reduce((acc, el) => {
       const elementName = el.dataset.element;
-      acc[elementName] = el;
-      return acc;
-    }, {} as SubElementsType);
+      return { [elementName]: el, ...acc };
+    }, {} as SubElements);
   }
 
-  selectDate({ from, to }: DateRangeType) {
-    const { salesTable } = this.components;
+  selectDate() {
+    const { salesTable, rangePicker } = this.components;
+    const { from, to } = rangePicker.rangeDate;
     const orderUrl = new URL(ORDER_API_URL, process.env['BACKEND_URL']);
     orderUrl.searchParams.set('createdAt_gte', from.toISOString());
     orderUrl.searchParams.set('createdAt_lte', to.toISOString());
@@ -94,10 +89,7 @@ class SalesPage implements IPage {
 
   initListener() {
     const { rangePicker } = this.components;
-    rangePicker.element.addEventListener(
-      RangePicker.EVENT_DATE_SELECT,
-      ({ detail: range }: DateSelectEvent) => this.selectDate(range)
-    );
+    rangePicker.element.addEventListener(RangePicker.EVENT_DATE_SELECT, () => this.selectDate());
   }
 
   remove() {
@@ -108,7 +100,6 @@ class SalesPage implements IPage {
 
   destroy() {
     this.remove();
-    this.element = null;
   }
 }
 

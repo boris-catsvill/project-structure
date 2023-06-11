@@ -1,9 +1,9 @@
 import { getPageLink, menu } from '../../../components/sidebar/menu';
-import { IComponent, INodeListOfSubElements, IPage, SubElementsType } from '../../../types';
+import { HTMLDatasetElement, IPage } from '../../../types';
 import DoubleSlider from '../../../components/double-slider';
 import header from './header';
-import fetchJson from '../../../utils/fetch-json';
 import { ProductSortableTable } from '../../../components/product-sortable-table';
+import { ROUTER_LINK } from '../../../router/router-link';
 
 enum Components {
   Products = 'products',
@@ -11,6 +11,18 @@ enum Components {
   FilterName = 'filterName',
   FilterStatus = 'filterStatus'
 }
+
+type ProductsComponents = {
+  [Components.Products]: ProductSortableTable;
+  [Components.Slider]: DoubleSlider;
+};
+
+type SubElements = {
+  [Components.FilterName]: HTMLInputElement;
+  [Components.FilterStatus]: HTMLSelectElement;
+} & {
+  [K in keyof ProductsComponents]: HTMLElement;
+};
 
 type PriceRangeType = {
   from: number;
@@ -23,8 +35,8 @@ const PRODUCTS_URL = `${process.env['PRODUCT_API_PATH']}?_embed=subcategory.cate
 
 class ProductsPage implements IPage {
   element: Element;
-  subElements: object;
-  components = {};
+  components: ProductsComponents;
+  subElements: SubElements;
   filter = this.defaultFilter;
 
   get type() {
@@ -34,18 +46,26 @@ class ProductsPage implements IPage {
   get defaultFilter() {
     return {
       title_like: '',
-      status: ''
+      status: '',
+      price_gte: NaN,
+      price_lte: NaN
     };
   }
 
   get template() {
-    return `<div class='products-list'>
+    return `<div class='products-list flex-column full-height'>
               <div class='content__top-panel'>
                 <h1 class='page-title'>Products</h1>
-                <a href='${getPageLink('products')}/add' class='button-primary'>Add product</a>
+                <a is='${ROUTER_LINK}' 
+                   href='${getPageLink('products')}/add' 
+                   class='button-primary'>
+                   Add product
+                </a>
               </div>
               <div class='content-box content-box_small'>${this.filterForm}</div>
-              <div class='products-list__container' data-element='${Components.Products}'></div>
+              <div class='products-list__container full-height' 
+                   data-element='${Components.Products}'>
+              </div>
             </div>`;
   }
 
@@ -53,14 +73,14 @@ class ProductsPage implements IPage {
     return `<form class='form-inline'>
                 <div class='form-group'>
                   <label class='form-label'>Sort by:</label>
-                  <input type='text' data-element='${Components.FilterName}' class='form-control' placeholder='Product Title'>
+                  <input type='text' name='title_like' data-element='${Components.FilterName}' class='form-control' placeholder='Product Title'>
                 </div>
                 <div class='form-group' data-element='${Components.Slider}'>
                   <label class='form-label'>Price:</label>
                 </div>
                 <div class='form-group'>
                   <label class='form-label'>Status:</label>
-                    <select class='form-control' data-element='${Components.FilterStatus}'>
+                    <select name='status' class='form-control' data-element='${Components.FilterStatus}'>
                       <option value='' selected=''>Any</option>
                       <option value='1'>Active</option>
                       <option value='0'>Inactive</option>
@@ -69,15 +89,10 @@ class ProductsPage implements IPage {
             </form>`;
   }
 
-  get emptyPlaceholder() {
-    return `<p>No products found matching the selected criteria</p>
-            <button type='button' class='button-primary-outline'>Clear filter</button>`;
-  }
-
   async render() {
     const wrap = document.createElement('div');
     wrap.innerHTML = this.template;
-    this.element = wrap.firstElementChild!;
+    this.element = wrap.firstElementChild as HTMLElement;
     this.subElements = this.getSubElements(this.element);
     this.initComponents();
     this.renderComponents();
@@ -86,67 +101,68 @@ class ProductsPage implements IPage {
   }
 
   getSubElements(element: Element) {
-    const elements: INodeListOfSubElements = element.querySelectorAll('[data-element]');
+    const elements: NodeListOf<HTMLDatasetElement<SubElements>> =
+      element.querySelectorAll('[data-element]');
     return [...elements].reduce((acc, el) => {
       const elementName = el.dataset.element;
-      acc[elementName] = el;
-      return acc;
-    }, {} as SubElementsType);
+      return { [elementName]: el, ...acc };
+    }, {} as SubElements);
   }
 
   initComponents() {
-    const slider = new DoubleSlider({ min: 0, max: 4000, formatValue: data => `$${data}` });
+    const slider = new DoubleSlider({
+      min: 0,
+      max: 10000,
+      formatValue: data => `$${data.toLocaleString()}`
+    });
     const products = new ProductSortableTable(header, { url: PRODUCTS_URL });
+    const emptyPlaceholder = this.getEmptyPlaceholder();
+    products.setEmptyPlaceholder(emptyPlaceholder);
     this.components = { slider, products };
   }
 
   renderComponents() {
-    Object.keys(this.components).forEach(component => {
-      // @ts-ignore
-      const root = this.subElements[component];
-      // @ts-ignore
-      const { element } = this.components[component];
-
+    for (const componentName of Object.keys(this.components) as (keyof ProductsComponents)[]) {
+      const root = this.subElements[componentName];
+      const { element } = this.components[componentName];
       root.append(element);
-    });
+    }
   }
 
   onSelectPrice = ({ detail }: PriceRangeEvent) => {
     const { from: price_gte, to: price_lte } = detail;
-    // @ts-ignore
     this.filter = { ...this.filter, price_gte, price_lte };
     this.filterProducts(this.filter);
   };
 
   filterProducts(filters: object) {
-    // @ts-ignore
     const { products } = this.components;
-
     const filterProductsUrl = new URL(PRODUCTS_URL, process.env.BACKEND_URL);
     for (const [field, value] of Object.entries(filters)) {
-      if (value !== '') {
+      if (value !== '' && !Number.isNaN(value)) {
         filterProductsUrl.searchParams.set(field, String(value));
       }
     }
     products.setUrl(filterProductsUrl);
   }
 
-  setEmptyProductsPlaceholder(component: IComponent) {
-    const wrapper = document.createElement('div');
-    wrapper.innerHTML = this.emptyPlaceholder;
-    // @ts-ignore
-    wrapper.querySelector('button').addEventListener('pointerdown', e => {
-      this.clearFilter(e);
-    });
-    // @ts-ignore
-    component.setEmptyPlaceholder(wrapper);
+  getEmptyPlaceholder() {
+    const placeholder = document.createElement('div');
+    const btn = document.createElement('button');
+    const text = `<p>No products found matching the selected criteria</p>`;
+
+    btn.className = 'button-primary-outline';
+    btn.innerText = 'Clear filter';
+    btn.onpointerdown = e => this.clearFilter(e);
+
+    placeholder.insertAdjacentHTML('afterbegin', text);
+    placeholder.insertAdjacentElement('beforeend', btn);
+    return placeholder;
   }
 
   clearFilter(e: Event) {
     e.preventDefault();
-    //@ts-ignore
     const { slider, products } = this.components;
-    //@ts-ignore
     const { filterName, filterStatus } = this.subElements;
     filterName.value = '';
     filterStatus.value = '';
@@ -155,70 +171,30 @@ class ProductsPage implements IPage {
     products.setUrl(new URL(PRODUCTS_URL, process.env['BACKEND_URL']));
   }
 
-  async setProducts(sortableTable: ProductSortableTable) {
-    sortableTable.isLoading = true;
-    sortableTable.isEmpty = false;
-    sortableTable.setEmptyPlaceholder();
-    const loadedData = await this.loadedProducts();
-    sortableTable.isLoading = false;
-    sortableTable.update(loadedData);
-  }
-
-  loadedProducts(filter = {}) {
-    const filterProductsUrl = new URL(PRODUCTS_URL, process.env.BACKEND_URL);
-    for (const [field, value] of Object.entries(filter)) {
-      if (value !== '') {
-        filterProductsUrl.searchParams.set(field, String(value));
-      }
-    }
-    return fetchJson(filterProductsUrl);
-  }
-
-  onSortTitle(e: PointerEvent) {
+  onChangeInput(e: Event) {
     e.preventDefault();
-
-    // @ts-ignore
-    const { value } = e.target;
-    const { title_like } = this.filter;
-    if (title_like !== value) {
-      const filter = { title_like: value };
-      this.filter = { ...this.filter, ...filter };
-      this.filterProducts(this.filter);
-    }
-  }
-
-  onSortStatus(e: PointerEvent) {
-    e.preventDefault();
-    // @ts-ignore
-    const { value } = e.target;
-    const { status } = this.filter;
-    if (status !== value) {
-      const filter = { status: value };
-      this.filter = { ...this.filter, ...filter };
-      this.filterProducts(this.filter);
-    }
+    const { value, name } = e.target as HTMLInputElement;
+    this.filter = { ...this.filter, [name]: value };
+    this.filterProducts(this.filter);
   }
 
   initListeners() {
-    // @ts-ignore
     const { element: sliderElement } = this.components[Components.Slider];
-    //@ts-ignore
     const { filterName, filterStatus } = this.subElements;
-    sliderElement.addEventListener(DoubleSlider.SELECT_RANGE_EVENT, this.onSelectPrice);
-    // @ts-ignore
-    filterName.addEventListener('keyup', e => {
-      this.onSortTitle(e);
-    });
-    // @ts-ignore
-    filterStatus.addEventListener('change', e => {
-      this.onSortStatus(e);
-    });
+    sliderElement?.addEventListener(
+      DoubleSlider.SELECT_RANGE_EVENT,
+      this.onSelectPrice as EventListener
+    );
+    filterName.addEventListener('keyup', (e: Event) => this.onChangeInput(e));
+    filterStatus.addEventListener('change', (e: Event) => this.onChangeInput(e));
   }
 
   removeListeners() {
-    // @ts-ignore
     const { element: sliderElement } = this.components[Components.Slider];
-    sliderElement.removeEventListener(DoubleSlider.SELECT_RANGE_EVENT, this.onSelectPrice);
+    sliderElement?.removeEventListener(
+      DoubleSlider.SELECT_RANGE_EVENT,
+      this.onSelectPrice as EventListener
+    );
   }
 
   remove() {
@@ -230,7 +206,6 @@ class ProductsPage implements IPage {
   destroy() {
     this.remove();
     for (const component of Object.values(this.components)) {
-      // @ts-ignore
       component.destroy();
     }
     this.removeListeners();

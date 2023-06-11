@@ -1,5 +1,6 @@
 import { getPageLink, IMenuItem, menu, Pages } from './menu';
 import { HTMLDatasetElement, IComponent, IPage, SubElementsType } from '../../types';
+import { ROUTER_LINK } from '../../router/router-link';
 
 interface RouteEvent extends CustomEvent<Record<'page', IPage>> {}
 
@@ -21,7 +22,7 @@ class Sidebar implements IComponent {
   get template() {
     return `<aside class='sidebar'>
               <h2 class='sidebar__title'>
-                  <a href='${getPageLink('dashboard')}'>${this.title}</a>
+                  <a is='${ROUTER_LINK}' href='${getPageLink('dashboard')}'>${this.title}</a>
               </h2>
               <ul class='sidebar__nav' data-element='menu'>
                   ${this.getMenu()}
@@ -85,7 +86,7 @@ class Sidebar implements IComponent {
 
   getMenuItem({ page, title, url }: IMenuItem) {
     return `<li>
-              <a data-page='${page}' href='${url}'>
+              <a is='${ROUTER_LINK}' data-page='${page}' href='${url}'>
                 <i class='icon-${page}'></i> <span>${title}</span>
               </a>
             </li>`;

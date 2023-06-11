@@ -63,12 +63,12 @@ class NotificationMessage {
   }
 }
 
-export const success = (msg = '', params = {}) => {
+export const successNotice = (msg = '', params = {}) => {
   const type = 'success';
   notification(msg, { ...params, type });
 };
-  
-export const error = (msg = '', params = {}) => {
+
+export const errorNotice = (msg = '', params = {}) => {
   const type = 'error';
   notification(msg, { ...params, type });
 };

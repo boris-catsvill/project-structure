@@ -39,6 +39,10 @@ export class RangePicker {
             </div>`;
   }
 
+  get rangeDate() {
+    return { from: this.from, to: this.to };
+  }
+
   static formatDate(date) {
     return date.toLocaleString('ru-RU', { dateStyle: 'short' });
   }
@@ -60,8 +64,8 @@ export class RangePicker {
     element.blur();
     const { value: ISOString } = element.dataset;
 
-    this.selectedTo = this.selectedFrom ? new Date(Date.parse(ISOString)) : null;
-    this.selectedFrom = this.selectedFrom || new Date(Date.parse(ISOString));
+    this.selectedTo = this.selectedFrom ? new Date(ISOString) : null;
+    this.selectedFrom = this.selectedFrom || new Date(ISOString);
 
     if (this.selectedFrom && this.selectedTo) {
       this.setRange(this.selectedFrom, this.selectedTo);
@@ -93,7 +97,7 @@ export class RangePicker {
     const elementDates = selector.querySelectorAll('.rangepicker__cell');
     for (const element of elementDates) {
       const { value } = element.dataset;
-      const date = new Date(Date.parse(value));
+      const date = new Date(value);
       const className = this.getClassName(date);
       element.classList.add(className);
     }

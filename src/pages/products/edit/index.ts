@@ -1,14 +1,27 @@
-import { INodeListOfSubElements, IPage, SubElementsType } from '../../../types';
-import { getPageLink, menu } from '../../../components/sidebar/menu';
+import { HTMLDatasetElement, IPage } from '../../../types';
 import ProductForm from '../../../components/product-form';
-import { success } from '../../../components/notification';
-import Router from '../../../router';
+import { getPageLink, menu } from '../../../components/sidebar/menu';
+import { successNotice } from '../../../components/notification';
+import { ROUTER_LINK } from '../../../router/router-link';
+import { navigate } from '../../../router';
+
+enum Components {
+  ProductForm = 'productForm'
+}
+
+type EditProductComponents = {
+  [Components.ProductForm]: ProductForm;
+};
+
+type SubElements = {
+  [K in keyof EditProductComponents]: HTMLElement;
+};
 
 export default class Page implements IPage {
-  element: Element | null;
-  subElements = {};
-  components = {};
-  productId;
+  element: Element;
+  subElements: SubElements;
+  components: EditProductComponents;
+  productId: string;
 
   constructor({ productId = '' } = {}) {
     this.productId = productId;
@@ -28,7 +41,7 @@ export default class Page implements IPage {
   }
 
   getTitle() {
-    return `<a href='${getPageLink('products')}' class='link'>Products</a> / ${
+    return `<a href='${getPageLink('products')}' is='${ROUTER_LINK}' class='link'>Products</a> / ${
       this.productId ? 'Edit' : 'Add'
     }`;
   }
@@ -37,45 +50,56 @@ export default class Page implements IPage {
     const wrapper = document.createElement('div');
     wrapper.innerHTML = this.template;
 
-    this.element = wrapper.firstElementChild!;
+    this.element = wrapper.firstElementChild as HTMLElement;
     this.subElements = this.getSubElements(this.element);
     this.initComponents();
-    this.renderComponents();
-    //this.initListeners();
+    await this.renderComponents();
+    this.initListeners();
     return this.element;
   }
 
   getSubElements(element: Element) {
-    const elements: INodeListOfSubElements = element.querySelectorAll('[data-element]');
+    const elements: NodeListOf<HTMLDatasetElement<SubElements>> =
+      element.querySelectorAll('[data-element]');
     return [...elements].reduce((acc, el) => {
       const elementName = el.dataset.element;
       acc[elementName] = el;
       return acc;
-    }, {} as SubElementsType);
+    }, {} as SubElements);
   }
 
-  // @ts-ignore
-  productAdded({ id: productId }) {
-    const router = Router.instance();
-    document.addEventListener('route', this.onProductAdded);
-    router.navigate(`${getPageLink('products')}/${productId}`);
+  onProductAdded({ detail }: CustomEvent) {
+    const { id: productId } = detail;
+    successNotice('Product Added');
+    navigate(`${getPageLink('products')}/${productId}`);
   }
-
-  onProductAdded = () => {
-    success('Product Added');
-    document.removeEventListener('route', this.onProductAdded);
-  };
 
   async renderComponents() {
-    Object.keys(this.components).forEach(async component => {
-      // @ts-ignore
-      const root = this.subElements[component];
-      // @ts-ignore
-      const element = await this.components[component].render();
-      //TODO Refactor!!!
-      this.initListeners();
-      root.append(element);
-    });
+    const isPromise = (result: any) => result instanceof Promise;
+    await Promise.all(
+      (Object.keys(this.components) as (keyof EditProductComponents)[]).map(async componentName => {
+        const root = this.subElements[componentName];
+        const component = this.components[componentName];
+        /**
+         * If (component.element === undefined) - call the render();
+         * render() can return - (Promise || element || undefined);
+         * result === (element OR undefined) || (Promise resolved with  (element || undefined));
+         * even if (resolved Promise) === undefined,
+         * element = component.Element because render() was called and (component.element !== undefined)
+         *
+         * P.S May be this is complex. I tried to cover cases like this:
+         * - render() was not called in component
+         * - render() NOT async AND return element
+         * - render() NOT async NOT return element
+         * - render() async AND return element
+         * - render() async NOT return element
+         */
+        const result = component.element || component.render();
+        const element = await (isPromise(result) ? result : Promise.resolve(result));
+
+        root.append(element || component.element);
+      })
+    );
   }
 
   initComponents() {
@@ -84,19 +108,18 @@ export default class Page implements IPage {
   }
 
   initListeners() {
-    //@ts-ignore
     const { productForm } = this.components;
     productForm.element.addEventListener(ProductForm.EVENT_UPDATED, () =>
-      success('Product Updated')
+      successNotice('Product Updated')
     );
-    productForm.element.addEventListener(ProductForm.EVENT_ADDED, ({ detail }: CustomEvent) =>
-      this.productAdded(detail)
+    productForm.element.addEventListener(ProductForm.EVENT_ADDED, (e: CustomEvent) =>
+      this.onProductAdded(e)
     );
   }
 
   remove() {
     if (this.element) {
-      this.element = null;
+      this.element.remove();
     }
   }
 

@@ -6,7 +6,7 @@ export default class SortableTable {
   element;
   subElements;
   #limit;
-  #loading;
+  #isLoading;
   #isSortLocally;
 
   constructor(
@@ -19,7 +19,8 @@ export default class SortableTable {
       },
       isSortLocally = false,
       limit = DEFAULT_LIMIT,
-      url = ''
+      url = '',
+      isLoading = false
     } = {}
   ) {
     this.headerConfig = headerConfig;
@@ -28,21 +29,22 @@ export default class SortableTable {
     this.url = new URL(url, process.env.BACKEND_URL);
     this.#isSortLocally = isSortLocally;
     this.#limit = limit;
+    this.#isLoading = isLoading;
     this.render();
   }
 
   get isLoading() {
-    return this.#loading;
+    return this.#isLoading;
   }
 
-  set isLoading(loading) {
-    if (loading) {
+  set isLoading(isLoading) {
+    if (isLoading) {
       this.element.classList.remove('sortable-table_empty');
       this.element.classList.add('sortable-table_loading');
     } else {
       this.element.classList.remove('sortable-table_loading');
     }
-    this.#loading = loading;
+    this.#isLoading = isLoading;
   }
 
   get isEmpty() {
@@ -52,6 +54,7 @@ export default class SortableTable {
   set isEmpty(empty) {
     if (empty) {
       this.element.classList.add('sortable-table_empty');
+      this.element.classList.remove('sortable-table_loading');
     } else {
       this.element.classList.remove('sortable-table_empty');
     }
@@ -80,8 +83,10 @@ export default class SortableTable {
     };
 
     if (column) {
-      const { id, order } = column.dataset;
-      const newOrder = toggleOrder(order);
+      const { id: newId } = column.dataset;
+      const { id, order } = this.sorted;
+      const newOrder = id === newId ? toggleOrder(order) : order;
+
       const arrow = column.querySelector('.sortable-table__sort-arrow');
 
       column.dataset.order = newOrder;
@@ -89,11 +94,12 @@ export default class SortableTable {
       if (!arrow) {
         column.append(this.subElements.arrow);
       }
+      this.sorted = { id: newId, order: newOrder };
 
       if (this.#isSortLocally) {
-        this.sortOnClient(id, newOrder);
+        this.sortOnClient(newId, newOrder);
       } else {
-        this.sortOnServer(id, newOrder);
+        this.sortOnServer(newId, newOrder);
       }
     }
   }
@@ -150,9 +156,10 @@ export default class SortableTable {
     return `<div data-element='emptyPlaceholder' class='sortable-table__empty-placeholder'><div>No data</div></div>`;
   }
 
-  setEmptyPlaceholder(html = '<div>No data</div>') {
-    this.subElements.emptyPlaceholder.innerHTML = '';
-    this.subElements.emptyPlaceholder.append(html);
+  setEmptyPlaceholder(element) {
+    const { emptyPlaceholder } = this.subElements;
+    emptyPlaceholder.innerText = '';
+    emptyPlaceholder.insertAdjacentElement('afterbegin', element);
   }
 
   async render() {
@@ -161,15 +168,13 @@ export default class SortableTable {
     this.element = wrapper.firstElementChild;
     this.subElements = this.getSubElements(this.element);
     this.data = !this.#isSortLocally && this.isEmpty ? await this.getServerData() : this.data;
-    this.renderRows(this.data);
+    this.isEmpty ? (this.isEmpty = !this.isLoading) : this.renderRows(this.data);
     this.initEventListeners();
   }
 
   renderRows(data) {
     const { body } = this.subElements;
-    this.isLoading = false;
     data.length ? body.insertAdjacentHTML('beforeend', this.getTableRows(data)) : '';
-    this.isEmpty = this.data.length === 0;
   }
 
   onWindowScroll = async () => {
@@ -182,26 +187,37 @@ export default class SortableTable {
     }
   };
 
+  cleanRows() {
+    this.subElements.body.innerText = '';
+    this.isEmpty = false;
+  }
+
   sortOnServer(id, order) {
     this.sorted = { id, order };
     this.serverUpdate();
   }
 
   async serverUpdate() {
-    this.subElements.body.innerText = '';
+    this.cleanRows();
     const data = await this.getServerData({ ...this.sorted, start: 0 });
     this.update(data);
   }
 
   addRows(data) {
     this.data = [...this.data, ...data];
-    this.renderRows(data);
+    this.isLoading = false;
+    data.length ? this.renderRows(this.data) : '';
   }
 
   update(data = []) {
     this.data = data;
-    this.subElements.body.innerText = '';
-    this.data.length ? this.renderRows(this.data) : (this.isEmpty = true);
+    this.isLoading = false;
+    if (!this.isEmpty) {
+      this.cleanRows();
+      this.renderRows(this.data);
+    } else {
+      this.isEmpty = true;
+    }
   }
 
   setUrl(url) {

@@ -1,3 +1,5 @@
+import { ROUTER_LINK } from '../../router/router-link';
+
 export class ColumnChart {
   element;
   chartHeight = 50;
@@ -36,7 +38,9 @@ export class ColumnChart {
   }
 
   getLink() {
-    return this.link ? `<a href='${this.link}' class='column-chart__link'>View all</a>` : ``;
+    return this.link
+      ? `<a is='${ROUTER_LINK}' href='${this.link}' class='column-chart__link'>View all</a>`
+      : ``;
   }
 
   getSubElements() {
@@ -77,7 +81,6 @@ export class ColumnChart {
     wrap.innerHTML = this.getChart();
     this.element = wrap.firstElementChild;
     this.subElements = this.getSubElements();
-    this.isLoading = false;
   }
 
   remove() {

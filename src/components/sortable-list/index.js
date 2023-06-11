@@ -1,10 +1,13 @@
 export default class SortableList {
+  element;
   activeItem;
   placeHolder;
+  items = [];
 
-  constructor({ items = [] } = {}) {
+  constructor(items = []) {
     this.items = items;
     this.items.map(item => item.classList.add('sortable-list__item'));
+    this.element = document.createElement('ul');
     this.render();
   }
 
@@ -121,7 +124,6 @@ export default class SortableList {
   }
 
   render() {
-    this.element = document.createElement('ul');
     this.element.classList.add('sortable-list');
     this.element.append(...this.items);
 

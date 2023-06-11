@@ -9,7 +9,8 @@ const header: ProductsHeaderType[] = [
     id: 'images',
     title: 'Image',
     sortable: false,
-    template: data => `<img class='sortable-table-image' alt='Image' src='${data[0].url}'>`
+    template: data =>
+      data?.[0]?.url ? `<img class='sortable-table-image' alt='Image' src='${data?.[0]?.url}'>` : ''
   },
   {
     id: 'title',
@@ -33,7 +34,8 @@ const header: ProductsHeaderType[] = [
     id: 'price',
     title: 'Price',
     sortable: true,
-    sortType: SortType.NUMBER
+    sortType: SortType.NUMBER,
+    template: data => `$${data.toLocaleString('default')}`
   },
   {
     id: 'status',

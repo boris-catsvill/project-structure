@@ -28,7 +28,7 @@ export type SubElementsType<T extends keyof any = string> = {
   [P in T]: HTMLElement;
 };
 
-export interface INodeListOfSubElements extends NodeListOf<HTMLDatasetElement<SubElementsType>> {}
+export interface NodeListOfSubElements<T> extends NodeListOf<HTMLDatasetElement<T>> {}
 
 export interface IComponents {
   [element: string]: IComponent | object;
@@ -42,7 +42,8 @@ export interface HTMLDatasetElement<T = string> extends HTMLElement {
 
 export enum SortType {
   STRING = 'string',
-  NUMBER = 'number'
+  NUMBER = 'number',
+  CUSTOM = 'custom'
 }
 
 export interface HeaderType<T> {
@@ -51,6 +52,7 @@ export interface HeaderType<T> {
   sortable: boolean;
   sortType?: SortType;
   template?: (data: any) => string;
+  customSorting?: (a: any, b: any) => number | boolean;
 }
 
 export type RangeType<T> = {

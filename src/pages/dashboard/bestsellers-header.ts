@@ -33,7 +33,8 @@ const header: BestsellersHeaderType[] = [
     id: 'price',
     title: 'Price',
     sortable: true,
-    sortType: SortType.NUMBER
+    sortType: SortType.NUMBER,
+    template: data => `$${data.toLocaleString()}`
   },
   {
     id: 'status',
@@ -41,9 +42,7 @@ const header: BestsellersHeaderType[] = [
     sortable: true,
     sortType: SortType.NUMBER,
     template: data => {
-      return `<div class='sortable-table__cell'>
-          ${data > 0 ? 'Active' : 'Inactive'}
-        </div>`;
+      return `${data > 0 ? 'Active' : 'Inactive'}`;
     }
   }
 ];

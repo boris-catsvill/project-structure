@@ -21,16 +21,16 @@ const header: SaleHeader[] = [
     id: 'createdAt',
     title: 'Date',
     sortable: true,
-    sortType: SortType.NUMBER,
-    template: ISOString =>
-      new Date(Date.parse(ISOString)).toLocaleString('default', { dateStyle: 'medium' })
+    sortType: SortType.CUSTOM,
+    template: ISOString => new Date(ISOString).toLocaleString('default', { dateStyle: 'medium' }),
+    customSorting: (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
   },
   {
     id: 'totalCost',
     title: 'Cost',
     sortable: true,
     sortType: SortType.NUMBER,
-    template: data => `$${data}`
+    template: data => `$${data.toLocaleString()}`
   },
   {
     id: 'delivery',

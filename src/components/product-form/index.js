@@ -11,11 +11,12 @@ export default class ProductForm {
     description: '',
     images: [],
     subcategory: '',
-    price: 0,
+    price: 100,
     discount: 0,
-    quantity: 0,
-    status: 0
+    quantity: 1,
+    status: 1
   };
+
   subElements;
   categories;
 
@@ -74,7 +75,7 @@ export default class ProductForm {
               </fieldset>
               <fieldset>
                 <label class='form-label'>Discount ($)</label>
-                <input required='' type='number' name='discount' class='form-control' placeholder='0'>
+                <input type='number' name='discount' class='form-control' placeholder='0'>
               </fieldset>
             </div>`;
   }
@@ -90,7 +91,7 @@ export default class ProductForm {
     return `<div class='form-group form-group__part-half'>
               <label class='form-label'>Status</label>
               <select class='form-control' name='status'>
-                <option value='1'>Active</option>
+                <option value='1' selected>Active</option>
                 <option value='0'>Inactive</option>
               </select>
             </div>`;
@@ -149,10 +150,8 @@ export default class ProductForm {
 
   getCategoryOptions(categories = []) {
     return categories
-
       .map(({ subcategories, title: categoryTitle }) =>
         subcategories
-
           .map(subcategory => this.getSubCategoryOption({ categoryTitle, ...subcategory }))
           .join('')
       )
@@ -163,7 +162,6 @@ export default class ProductForm {
     const { subcategory } = this.formData;
     const title = `${categoryTitle} > ${subCategoryTitle}`;
     const isCategorySelected = subcategory === id ? 'selected' : '';
-
     return `<option value='${id}' ${isCategorySelected} >${title}</option>`;
   }
 
@@ -180,13 +178,9 @@ export default class ProductForm {
 
     this.formData = productData;
     this.categories = categoriesResponse;
-    if (this.formData) {
-      this.renderForm();
-      this.fillForm();
-      this.initListeners();
-    }
-
-    return this.element;
+    this.renderForm();
+    this.fillForm();
+    this.initListeners();
   }
 
   renderForm() {
@@ -195,25 +189,23 @@ export default class ProductForm {
     wrapper.innerHTML = this.formData ? this.template : this.emptyTemplate;
     this.element = wrapper.firstElementChild;
     this.subElements = this.getSubElements(this.element);
-    if (images.length) {
-      this.renderImageList(images);
-    }
+    this.renderImageList(images);
   }
 
   renderImageList(images = []) {
     const { imageListContainer } = this.subElements;
     const items = images.map(img => this.getImageItem(img));
-    const imageList = new SortableList({ items });
+    const imageList = new SortableList(items);
     imageListContainer.append(imageList.element);
   }
 
   fillForm() {
     const { productForm } = this.subElements;
     const excludeFields = ['images', 'subcategory'];
-    for (const field of Object.keys(this.defaultFormData)) {
+    for (const [field, defaultValue] of Object.entries(this.defaultFormData)) {
       if (!excludeFields.includes(field)) {
         const input = productForm.querySelector(`[name=${field}]`);
-        input.value = this.formData[field] || this.defaultFormData[field];
+        input.value = this.formData[field] || defaultValue;
       }
     }
   }
@@ -239,7 +231,6 @@ export default class ProductForm {
 
   loadProductData(productId) {
     const productUrl = new URL(process.env['PRODUCT_API_PATH'], process.env['BACKEND_URL']);
-
     productUrl.searchParams.set('id', productId);
     return fetchJson(productUrl);
   }
@@ -262,7 +253,7 @@ export default class ProductForm {
 
     uploadImageBtn.disabled = true;
     uploadImageBtn.classList.add('is-loading');
-    const response = await fetchJson(process.env['IMGUR_URL'], {
+    const { data } = await fetchJson(process.env['IMGUR_URL'], {
       method: 'POST',
       headers: {
         Authorization: `Client-ID ${process.env['IMGUR_CLIENT_ID']}`
@@ -273,11 +264,11 @@ export default class ProductForm {
     uploadImageBtn.classList.remove('is-loading');
     uploadImageBtn.disabled = false;
 
-    const url = response['data']['link'];
+    const url = data['link'];
     const source = file['name'];
 
     const newListImageItem = this.getImageItem({ url, source });
-    imageListContainer.querySelector('ul').append(newListImageItem);
+    imageListContainer.querySelector('ul').insertAdjacentElement('beforeend', newListImageItem);
   }
 
   onClickImageLoad(e) {
@@ -318,14 +309,13 @@ export default class ProductForm {
       formData[field] = numberFields.includes(field) ? parseInt(value) : value;
     }
 
-    formData['images'] = [...imageElements].reduce((acc, imageElement) => {
-      const source = imageElement.querySelector('input[name="source"]').value;
-      const url = imageElement.querySelector('input[name="url"]').value;
-      acc.push({ source, url });
-      return acc;
+    const images = [...imageElements].reduce((acc, imageElement) => {
+      const { value: source } = imageElement.querySelector('input[name="source"]');
+      const { value: url } = imageElement.querySelector('input[name="url"]');
+      return [...acc, { source, url }];
     }, []);
 
-    return formData;
+    return { ...formData, images };
   }
 
   initListeners() {
