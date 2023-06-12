@@ -91,4 +91,4 @@ class Sidebar extends BaseComponent {
   }
 }
 
-export default new Sidebar('shop admin');
+export const sidebar = new Sidebar('shop admin');

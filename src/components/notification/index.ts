@@ -43,7 +43,7 @@ class NotificationMessage extends BaseComponent implements IBase {
   }
 
   remove() {
-    super.render();
+    super.remove();
     if (this.isActive) {
       NotificationMessage.activeNotification = null;
     }
