@@ -27,7 +27,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.ts?$/,
+        test: /\.(ts|js)x?$/,
         use: tsLoaders,
         exclude: /node_modules/
       },
@@ -56,7 +56,7 @@ module.exports = {
     ]
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.js'],
+    extensions: ['.tsx', '.ts', '.jsx', '.js'],
     extensionAlias: {
       '.js': ['.js', '.ts']
     }

@@ -80,7 +80,7 @@ class ProductsPage extends BasePage implements IPage {
     const slider = new DoubleSlider({
       min: 0,
       max: 10000,
-      formatValue: data => `$${data.toLocaleString()}`
+      formatValue: (data: any) => `$${data.toLocaleString()}`
     });
     const products = new ProductSortableTable(header, { url: PRODUCTS_URL });
     const emptyPlaceholder = this.getEmptyPlaceholder();
