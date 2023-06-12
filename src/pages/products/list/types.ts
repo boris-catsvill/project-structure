@@ -1,6 +1,7 @@
 import { ProductSortableTable } from '../../../components/product-sortable-table';
 import DoubleSlider from '../../../components/double-slider';
 import { TypeSubElements } from '../../../types/base';
+import { RangeType } from '../../../types';
 
 export enum ComponentsEnum {
   Products = 'products',
@@ -19,9 +20,6 @@ export type ProductsSubElements = {
   [ComponentsEnum.FilterStatus]: HTMLSelectElement;
 } & TypeSubElements<ProductsComponents>;
 
-export type PriceRangeType = {
-  from: number;
-  to: number;
-};
+export type PriceRangeType = RangeType<number>;
 
 export interface PriceRangeEvent extends CustomEvent<PriceRangeType> {}
