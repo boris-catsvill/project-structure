@@ -33,7 +33,7 @@
   cursor: pointer;
 }
 .category__header::before {
-  content: "";
+  content: '';
   width: 0;
   height: 0;
   border: 6px solid transparent;
